@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.coordinatorlayout.widget.CoordinatorLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:ns6="http://schemas.android.com/apk/res-auto"
+    android:fitsSystemWindows="true"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <com.google.android.material.appbar.AppBarLayout
+        android:theme="@style/AppTheme.AppBarOverlay"
+        android:background="@android:color/holo_orange_dark"
+        android:paddingTop="@dimen/appbar_padding_top"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <androidx.appcompat.widget.Toolbar
+            android:id="@+id/toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize"
+            android:layout_weight="1"
+            android:background="@android:color/holo_orange_dark"
+            android:isScrollContainer="false"
+            ns6:layout_scrollFlags="enterAlways|scroll"
+            ns6:navigationIcon="@mipmap/ic_launcher"
+            ns6:popupTheme="@style/ThemeOverlay.AppCompat.Light"
+            ns6:title="Factor de Escala Topografia" />
+
+        <com.google.android.material.tabs.TabLayout
+            android:id="@+id/tabs"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            ns6:tabIndicatorColor="@android:color/black">
+
+            <com.google.android.material.tabs.TabItem
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/tab_text_1"/>
+
+            <com.google.android.material.tabs.TabItem
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/tab_text_2"/>
+
+            <com.google.android.material.tabs.TabItem
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/tab_text_3"/>
+
+            <com.google.android.material.tabs.TabItem
+                android:id="@+id/tabItem"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Tab5" />
+
+        </com.google.android.material.tabs.TabLayout>
+    </com.google.android.material.appbar.AppBarLayout>
+
+    <!-- Cambié android:layout_height a match_parent para adaptar el contenido a cualquier pantalla -->
+    <androidx.viewpager.widget.ViewPager
+        android:id="@+id/container"
+        android:layout_width="match_parent"
+        android:layout_height="619dp"
+        android:layout_marginBottom="35dp"
+        ns6:layout_behavior="@string/appbar_scrolling_view_behavior" />
+
+    <!-- AQUÍ SE AGREGA EL TEXTO EN LA PARTE INFERIOR -->
+    <TextView
+        android:id="@+id/tvDeveloper"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom"
+        android:gravity="center"
+        android:paddingTop="6dp"
+        android:paddingBottom="8dp"
+        android:text="Desarrollado por: Attack7710 - RTK Soluciones Topograficas"
+        android:textColor="#888888"
+        android:textSize="11sp"
+        android:textStyle="bold"
+        ns6:layout_anchor="@+id/container"
+        ns6:layout_anchorGravity="bottom|center" />
+
+</androidx.coordinatorlayout.widget.CoordinatorLayout>
