@@ -72,4 +72,44 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         SQLiteDatabase db = this.getWritableDatabase();
         db.delete(TABLE_PUNTOS, COLUMN_ID + " = ?", new String[]{String.valueOf(id)});
     }
+
+    public void seedExampleData() {
+        SQLiteDatabase db = this.getWritableDatabase();
+        Cursor cursor = db.rawQuery("SELECT COUNT(*) FROM " + TABLE_PUNTOS, null);
+        cursor.moveToFirst();
+        int count = cursor.getInt(0);
+        cursor.close();
+
+        if (count == 0) {
+            // Ejemplo 1: La Paz
+            ContentValues v1 = new ContentValues();
+            v1.put(COLUMN_NOMBRE, "Punto_Test_LP_01");
+            v1.put(COLUMN_LATITUD, "-16º 30' 00.00''");
+            v1.put(COLUMN_LONGITUD, "-68º 09' 00.00''");
+            v1.put(COLUMN_ALTURA, "3600.00 m");
+            v1.put(COLUMN_ESTE, "590745.00 m");
+            v1.put(COLUMN_NORTE, "8175432.00 m");
+            v1.put(COLUMN_ZONA, "19");
+            v1.put(COLUMN_HEMISFERIO, "S");
+            v1.put(COLUMN_FACTOR_ESCALA, "0.99965432");
+            v1.put(COLUMN_FACTOR_ALTURA, "0.99943210");
+            v1.put(COLUMN_FACTOR_COMBINADO, "0.99908642");
+            db.insert(TABLE_PUNTOS, null, v1);
+
+            // Ejemplo 2: Cochabamba
+            ContentValues v2 = new ContentValues();
+            v2.put(COLUMN_NOMBRE, "Punto_Test_CBBA_02");
+            v2.put(COLUMN_LATITUD, "-17º 23' 15.50''");
+            v2.put(COLUMN_LONGITUD, "-66º 09' 30.20''");
+            v2.put(COLUMN_ALTURA, "2550.00 m");
+            v2.put(COLUMN_ESTE, "802145.00 m");
+            v2.put(COLUMN_NORTE, "8076543.00 m");
+            v2.put(COLUMN_ZONA, "19");
+            v2.put(COLUMN_HEMISFERIO, "S");
+            v2.put(COLUMN_FACTOR_ESCALA, "0.99971234");
+            v2.put(COLUMN_FACTOR_ALTURA, "0.99965432");
+            v2.put(COLUMN_FACTOR_COMBINADO, "0.99936666");
+            db.insert(TABLE_PUNTOS, null, v2);
+        }
+    }
 }

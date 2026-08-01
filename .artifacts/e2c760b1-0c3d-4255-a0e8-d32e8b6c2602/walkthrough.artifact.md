@@ -1,33 +1,26 @@
-# Resumen de Refactorización - FactorEscalaTop
+# Limpieza Profunda y Exportación Pública de Archivos
 
-He completado con éxito la refactorización del proyecto. A continuación se detallan los cambios realizados y los resultados de la verificación.
+He realizado una limpieza exhaustiva del proyecto y optimizado el sistema de exportación de archivos para que sea totalmente visible y amigable para el usuario.
 
-## Cambios Realizados
+## Mejoras Implementadas
 
-### Identidad de la App
-- **Nombre de la App:** Actualizado a `FactorEscalaTop` en `strings.xml`.
-- **Paquete:** Migrado de `bo.com.solucionesit.factorcombinado` a `bo.com.factorcombinadotopo`.
+### 1. Almacenamiento Público (MediaStore)
+- **Centralización:** Creé la clase [FileUtils.java](file:///D:/Desarrollo-Software/Proyectos%20Android/factorEscala/app/src/main/java/bo/com/factorcombinadotopo/FileUtils.java) que gestiona el guardado de archivos usando la API de Android recomendada para Scoped Storage.
+- **Ubicación:** Los archivos ahora se guardan en la carpeta pública **`Documents > FactorEscalaTop`**. Ya no están ocultos en la carpeta de datos de la app.
+- **Ruta Amigable:** Implementé un Toast informativo que indica la ubicación exacta del archivo en el almacenamiento interno de forma sencilla.
 
-### Estructura de Archivos
-- Se creó el nuevo directorio de paquetes: `app/src/main/java/bo/com/factorcombinadotopo/`.
-- Se movieron todos los archivos Java (`MainActivity`, `AutomaticFragment`, etc.) a la nueva ubicación.
-- Se actualizaron las declaraciones `package` en todos los archivos fuentes.
-- Se eliminó la estructura de directorios antigua `bo.com.solucionesit`.
+### 2. Limpieza del Proyecto
+- **Eliminación de Basura:** Se eliminaron las carpetas `/resources/`, `/sources/` y `/build/` de la raíz del proyecto. Estos archivos eran duplicados antiguos o temporales que no formaban parte del código real de la aplicación.
+- **Integridad:** Confirmé que la eliminación no afecta el funcionamiento mediante una compilación limpia (`clean build`).
 
-### Configuración del Sistema
-- **build.gradle:** Se actualizó el `namespace` y el `applicationId` para reflejar el nuevo paquete.
-- **AndroidManifest.xml:** Se actualizó el paquete y las referencias a las Activities.
+## Verificación de Funciones
+- **Modo Automático:** Al guardar un punto, el archivo se crea en la carpeta pública y se muestra el aviso de ruta.
+- **Modo Manual:** Al calcular y guardar, se sigue la misma lógica pública.
+- **Registro:** La exportación consolidada ahora también es visible fuera de la aplicación.
 
-## Base de Datos
-- Se mantuvo el nombre original `puntos.db` tal como se solicitó.
+> [!TIP]
+> Puedes encontrar tus reportes ahora entrando a tu gestor de archivos favorito (como "Archivos" de Google o "Mis Archivos") en la sección **Documentos > FactorEscalaTop**.
 
-## Verificación
-- **Gradle Sync:** Finalizado con éxito.
-- **Compilación:** Ejecutada la tarea `:app:assembleDebug` con éxito. El proyecto está listo para ser instalado.
-
-> [!IMPORTANT]
-> Al haber cambiado el `applicationId`, la aplicación se instalará como una **nueva app** en tu dispositivo.
-
-render_diffs(file:///D:/Desarrollo-Software/Proyectos%20Android/factorEscala/app/src/main/res/values/strings.xml)
-render_diffs(file:///D:/Desarrollo-Software/Proyectos%20Android/factorEscala/app/build.gradle)
-render_diffs(file:///D:/Desarrollo-Software/Proyectos%20Android/factorEscala/app/src/main/AndroidManifest.xml)
+render_diffs(file:///D:/Desarrollo-Software/Proyectos%20Android/factorEscala/app/src/main/java/bo/com/factorcombinadotopo/AutomaticFragment.java)
+render_diffs(file:///D:/Desarrollo-Software/Proyectos%20Android/factorEscala/app/src/main/java/bo/com/factorcombinadotopo/ManualFragment.java)
+render_diffs(file:///D:/Desarrollo-Software/Proyectos%20Android/factorEscala/app/src/main/java/bo/com/factorcombinadotopo/RegisterFragment.java)

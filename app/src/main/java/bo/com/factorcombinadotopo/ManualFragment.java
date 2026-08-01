@@ -177,28 +177,7 @@ public class ManualFragment extends Fragment {
         sb.append("------------------------------------------\n");
 
         String fileName = "Calculo_Factors_" + new SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault()).format(new Date()) + ".txt";
-        
-        try {
-            File path = requireContext().getExternalFilesDir(Environment.DIRECTORY_DOCUMENTS);
-            if (path != null && !path.exists()) path.mkdirs();
-            
-            File file = new File(path, fileName);
-            FileOutputStream fos = new FileOutputStream(file);
-            fos.write(sb.toString().getBytes());
-            fos.close();
-            
-            Toast.makeText(requireContext(), "Guardado en: Android/data/.../files/Documents", Toast.LENGTH_LONG).show();
-        } catch (IOException e) {
-            e.printStackTrace();
-            try {
-                FileOutputStream fos = requireActivity().openFileOutput(fileName, Context.MODE_PRIVATE);
-                fos.write(sb.toString().getBytes());
-                fos.close();
-                Toast.makeText(requireContext(), "Guardado en memoria interna", Toast.LENGTH_SHORT).show();
-            } catch (Exception ex) {
-                Toast.makeText(requireContext(), "Error al guardar el archivo", Toast.LENGTH_SHORT).show();
-            }
-        }
+        FileUtils.savePublicTxtFile(requireContext(), fileName, sb.toString());
     }
 
     public void limpiar(View v) {

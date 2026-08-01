@@ -1,41 +1,42 @@
-# Plan de Refactorización de Paquete y Nombre de App
+# Plan de Limpieza, Verificación y Exportación Pública
 
-Este plan detalla los pasos para realizar un cambio completo del nombre del paquete y actualizar el nombre público de la aplicación, manteniendo la base de datos existente.
+Este plan consolida la migración de archivos a la memoria pública del celular, la notificación de ruta mediante Toasts y la limpieza profunda del proyecto para eliminar archivos basura.
 
-## Cambios Solicitados
+## Cambios en Funcionalidades
 
-### 1. Nombre de la Aplicación
-#### [MODIFY] [strings.xml](file:///D:/Desarrollo-Software/Proyectos%20Android/factorEscala/app/src/main/res/values/strings.xml)
-- Cambiar el valor de la cadena `app_name` de `"Factor de Escala"` a `"FactorEscalaTop"`.
+### 1. Centralización de Exportación (FileUtils)
+#### [NEW] [FileUtils.java](file:///D:/Desarrollo-Software/Proyectos%20Android/factorEscala/app/src/main/java/bo/com/factorcombinadotopo/FileUtils.java)
+- Implementar `savePublicTxtFile` usando `MediaStore` para que los archivos sean visibles en `Documents/FactorEscalaTop`.
+- Retornar la ruta amigable para mostrar en el Toast.
 
-### 2. Refactorización de Paquete
-Se cambiará el paquete de `bo.com.solucionesit.factorcombinado` a `bo.com.factorcombinadotopo`.
+### 2. Actualización de Pestañas
+#### [MODIFY] [RegisterFragment.java](file:///D:/Desarrollo-Software/Proyectos%20Android/factorEscala/app/src/main/java/bo/com/factorcombinadotopo/RegisterFragment.java)
+#### [MODIFY] [AutomaticFragment.java](file:///D:/Desarrollo-Software/Proyectos%20Android/factorEscala/app/src/main/java/bo/com/factorcombinadotopo/AutomaticFragment.java)
+#### [MODIFY] [ManualFragment.java](file:///D:/Desarrollo-Software/Proyectos%20Android/factorEscala/app/src/main/java/bo/com/factorcombinadotopo/ManualFragment.java)
+- Usar `FileUtils.savePublicTxtFile`.
+- Mostrar Toast: `"Guardado en: Almacenamiento Interno > Documents > FactorEscalaTop > [archivo].txt"`.
 
-#### [MOVE] Estructura de Directorios
-- Mover todos los archivos de `app/src/main/java/bo/com/solucionesit/factorcombinado/` a `app/src/main/java/bo/com/factorcombinadotopo/`.
-- Eliminar la carpeta intermedia `solucionesit`.
+## Limpieza del Proyecto (Archivos no usados)
 
-#### [MODIFY] Código Fuente (Java)
-- Actualizar la declaración `package` en todos los archivos `.java`.
-- Actualizar todas las referencias e imports que utilicen el nombre antiguo.
+He detectado varias carpetas que no pertenecen a la estructura estándar de Android y contienen archivos duplicados o basura:
 
-#### [MODIFY] Configuración del Proyecto
-- **[build.gradle](file:///D:/Desarrollo-Software/Proyectos%20Android/factorEscala/app/build.gradle)**: Actualizar `namespace` y `applicationId`.
-- **[AndroidManifest.xml](file:///D:/Desarrollo-Software/Proyectos%20Android/factorEscala/app/src/main/AndroidManifest.xml)**: Actualizar el atributo `package` y las referencias a las Activities.
+#### [DELETE] `/resources/`
+- Contiene layouts antiguos que ya fueron migrados a `app/src/main/res`.
 
-### 3. Base de Datos
-- **Se mantiene como `puntos.db`** (sin cambios según lo solicitado).
+#### [DELETE] `/sources/`
+- Contiene código fuente redundante o de respaldo que no es utilizado por el compilador de Gradle.
 
-## Consideraciones Críticas
-> [!IMPORTANT]
-> El cambio de `applicationId` hará que el dispositivo reconozca la aplicación como una **nueva app**. Si tienes instalada la versión anterior, esta se instalará como una aplicación separada.
+#### [DELETE] `/build/` (Raíz)
+- Los archivos de compilación deben estar dentro de cada módulo. El `/build` de la raíz se puede regenerar si es necesario.
+
+#### [CLEANUP] `.artifacts/`
+- Eliminar subcarpetas de interacciones pasadas, manteniendo solo la actual para liberar espacio y reducir ruido.
 
 ## Plan de Verificación
 
-### Compilación y Ejecución
-1. Ejecutar `./gradlew clean` para eliminar archivos generados con el paquete antiguo.
-2. Ejecutar `./gradlew :app:assembleDebug` para verificar que el nuevo `namespace` genere la clase `R` correctamente.
-3. Verificar que el nombre de la app en el lanzador sea "FactorEscalaTop".
+1. **Sincronización:** Ejecutar `Gradle Sync`.
+2. **Compilación:** Ejecutar `clean build` para asegurar que el proyecto está íntegro sin los archivos eliminados.
+3. **Prueba de Exportación:** Verificar que el Toast muestre la ruta y que el archivo aparezca en la memoria pública.
 
 ---
-¿Deseas que proceda con esta refactorización?
+¿Deseas que proceda con la limpieza y la actualización de almacenamiento?

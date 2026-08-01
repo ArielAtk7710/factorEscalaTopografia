@@ -40,6 +40,10 @@ public class MainActivity extends AppCompatActivity {
         this.mViewPager.addOnPageChangeListener(new TabLayout.TabLayoutOnPageChangeListener(tabLayout));
         tabLayout.addOnTabSelectedListener(new TabLayout.ViewPagerOnTabSelectedListener(this.mViewPager));
         this.fontAwesome = Typeface.createFromAsset(getAssets(), "fonts/fontawesome-webfont.ttf");
+
+        // Insertar datos de ejemplo si el registro está vacío
+        DatabaseHelper dbHelper = new DatabaseHelper(this);
+        dbHelper.seedExampleData();
     }
 
     @Override

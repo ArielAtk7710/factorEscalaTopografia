@@ -204,21 +204,10 @@ public class AutomaticFragment extends Fragment {
 
         String fileName = "Punto_" + nombrePunto.replaceAll("[^a-zA-Z0-9]", "_") + "_" + new SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault()).format(new Date()) + ".txt";
         
-        try {
-            File path = requireContext().getExternalFilesDir(Environment.DIRECTORY_DOCUMENTS);
-            if (path != null && !path.exists()) path.mkdirs();
-            File file = new File(path, fileName);
-            FileOutputStream fos = new FileOutputStream(file);
-            fos.write(sb.toString().getBytes());
-            fos.close();
-            
-            if (id != -1) {
-                showProToast("success", "Punto '" + nombrePunto + "' guardado. Reporte en: Android/data/.../files/Documents");
-            }
-        } catch (IOException e) {
-            if (id != -1) {
-                showProToast("success", "Punto guardado en Registro (Error al exportar TXT)");
-            }
+        FileUtils.savePublicTxtFile(requireContext(), fileName, sb.toString());
+        
+        if (id != -1) {
+            // El Toast de ruta se maneja en FileUtils
         }
     }
 
