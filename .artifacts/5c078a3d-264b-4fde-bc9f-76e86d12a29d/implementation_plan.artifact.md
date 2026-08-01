@@ -1,28 +1,39 @@
-# Implementation Plan - Fix Duplicate R$array.class Build Error
+# Implementation Plan - Mini Map Toggle in Automatic Mode
 
-The error `Zip file ... already contains entry 'bo/com/solucionesit/factorcombinado/R$array.class', cannot overwrite` occurs because there are two definitions of the `R` class (and its inner classes like `array`) being included in the build.
+Add a "Mapa" toggle switch to the main header in the "Automático" tab and a `CardView` to hold a future minimap. The visibility of this card will be controlled by the switch.
 
-Research reveals that the project contains manually added `R.java` and `BuildConfig.java` files in the `app/src/main/java/bo/com/solucionesit/factorcombinado/` directory. These files appear to be from a decompiler (as indicated by `/* JADX INFO: loaded from: classes.dex */` comments).
+## User Review Required
 
-In a standard Android project, the Android Gradle Plugin (AGP) automatically generates these classes during the build process based on your resources (`res/`) and build configuration (`build.gradle`). Including them in the source tree causes a conflict.
+> [!NOTE]
+> The minimap area will be empty for now as requested. Activating the switch will show a dark card, and deactivating it will collapse the space completely (`View.GONE`).
 
 ## Proposed Changes
 
-### [app]
+### [app] - Layouts
 
-Summary: Remove manually added generated files from the source tree.
+#### [MODIFY] [fragment_automatic.xml](file:///D:/Desarrollo-Software/Proyectos%20Android/factorEscala/app/src/main/res/layout/fragment_automatic.xml)
+- Wrap the "SISTEMA DE REFERENCIA WGS84" `TextView` in a horizontal `LinearLayout`.
+- Add a `com.google.android.material.materialswitch.MaterialSwitch` to the right with the text "Mapa".
+- Add a `androidx.cardview.widget.CardView` (ID: `@+id/card_mapa`) below the title line but above the GPS data row.
+- Set `android:visibility="gone"` by default on `card_mapa`.
+- Style the `CardView` with `8dp` radius and a fixed height (e.g., `200dp`) to act as a placeholder.
 
-#### [DELETE] [R.java](file:///D:/Desarrollo-Software/Proyectos%20Android/factorEscala/app/src/main/java/bo/com/solucionesit/factorcombinado/R.java)
-#### [DELETE] [BuildConfig.java](file:///D:/Desarrollo-Software/Proyectos%20Android/factorEscala/app/src/main/java/bo/com/solucionesit/factorcombinado/BuildConfig.java)
+### [app] - Java Code
+
+#### [MODIFY] [AutomaticFragment.java](file:///D:/Desarrollo-Software/Proyectos%20Android/factorEscala/app/src/main/java/bo/com/solucionesit/factorcombinado/AutomaticFragment.java)
+- Define `MaterialSwitch switchMapa` and `CardView cardMapa` member variables.
+- In `onViewCreated`:
+    - Initialize both views.
+    - Set a `setOnCheckedChangeListener` to `switchMapa`.
+    - Logic: `cardMapa.setVisibility(isChecked ? View.VISIBLE : View.GONE)`.
 
 ## Verification Plan
 
 ### Automated Tests
-1. Run a clean build to ensure the generated classes are correctly created by AGP and there are no conflicts.
-   - `gradlew clean assembleDebug`
+1. Run `gradlew clean assembleDebug` to ensure all new XML elements (Switch/CardView) are correctly linked.
 
 ### Manual Verification
-1. Verify that `MainActivity.java` and other classes still compile. Since they are in the same package as the `namespace` defined in `build.gradle`, they will automatically use the generated `R` and `BuildConfig` classes.
-
-> [!IMPORTANT]
-> The directories `sources/` and `resources/` at the root of the project also appear to contain decompiled artifacts. These are currently not part of the `:app` module build, but they should be kept separate or removed to avoid confusion.
+1. Open the app and go to the "Automático" tab.
+2. Verify the "Mapa" switch appears next to the title.
+3. Toggle the switch ON and verify an empty card appears above the coordinates.
+4. Toggle the switch OFF and verify the card disappears and coordinates move back up.

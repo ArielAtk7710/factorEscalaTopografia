@@ -1,4 +1,4 @@
-package bo.com.solucionesit.factorcombinado;
+package bo.com.factorcombinadotopo;
 
 import android.graphics.Typeface;
 import android.os.Bundle;
@@ -17,7 +17,6 @@ import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.TextView;
 
-/* JADX INFO: loaded from: classes.dex */
 public class MainActivity extends AppCompatActivity {
     private EditText et1;
     private EditText et2;

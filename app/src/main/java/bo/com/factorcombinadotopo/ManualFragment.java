@@ -1,4 +1,4 @@
-package bo.com.solucionesit.factorcombinado;
+package bo.com.factorcombinadotopo;
 
 import android.os.Bundle;
 import androidx.annotation.NonNull;
@@ -17,7 +17,6 @@ import android.widget.TextView;
 import android.widget.Toast;
 import android.os.Environment;
 import android.content.Context;
-import android.content.pm.PackageManager;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -143,10 +142,6 @@ public class ManualFragment extends Fragment {
             return;
         }
 
-        // Para Android 10+ usamos el directorio de la app o Documents si tenemos permiso
-        // Para simplificar y asegurar que funcione, usaremos getExternalFilesDir que no requiere permisos
-        // pero si el usuario quiere "memoria del dispositivo" publica, intentamos Documents
-        
         StringBuilder sb = new StringBuilder();
         String timeStamp = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault()).format(new Date());
         
@@ -184,24 +179,22 @@ public class ManualFragment extends Fragment {
         String fileName = "Calculo_Factors_" + new SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault()).format(new Date()) + ".txt";
         
         try {
-            // Intentamos guardar en la carpeta de Documentos publica
-            File path = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOCUMENTS);
-            if (!path.exists()) path.mkdirs();
+            File path = requireContext().getExternalFilesDir(Environment.DIRECTORY_DOCUMENTS);
+            if (path != null && !path.exists()) path.mkdirs();
             
             File file = new File(path, fileName);
             FileOutputStream fos = new FileOutputStream(file);
             fos.write(sb.toString().getBytes());
             fos.close();
             
-            Toast.makeText(requireContext(), "Guardado en: Documents/" + fileName, Toast.LENGTH_LONG).show();
+            Toast.makeText(requireContext(), "Guardado en: Android/data/.../files/Documents", Toast.LENGTH_LONG).show();
         } catch (IOException e) {
             e.printStackTrace();
-            // Fallback al almacenamiento interno si falla
             try {
                 FileOutputStream fos = requireActivity().openFileOutput(fileName, Context.MODE_PRIVATE);
                 fos.write(sb.toString().getBytes());
                 fos.close();
-                Toast.makeText(requireContext(), "Guardado en memoria interna (Error en SD)", Toast.LENGTH_SHORT).show();
+                Toast.makeText(requireContext(), "Guardado en memoria interna", Toast.LENGTH_SHORT).show();
             } catch (Exception ex) {
                 Toast.makeText(requireContext(), "Error al guardar el archivo", Toast.LENGTH_SHORT).show();
             }
@@ -234,40 +227,73 @@ public class ManualFragment extends Fragment {
     }
 
     private void calculateWithUtm() {
-        Double K = 0.9996d;
-        Double A = 6378137.0d;
-        Double B = 6356752.31424518d;
-        Double X = Double.parseDouble(this.et_utm_este.getText().toString());
-        Double Y = Double.parseDouble(this.et_utm_norte.getText().toString());
-        Double Alt = Double.parseDouble(this.et_utm_alt.getText().toString());
-        int Z = this.spzona.getSelectedItemPosition() + 1;
-        String hemisferio = this.sphemisferio.getSelectedItemPosition() == 0 ? "S" : "N";
-        if (hemisferio.equals("S")) {
-            Y = Y - 1.0E7d;
+        try {
+            Double K = 0.9996d;
+            Double A = 6378137.0d;
+            Double B = 6356752.31424518d;
+            
+            String esteStr = this.et_utm_este.getText().toString();
+            String norteStr = this.et_utm_norte.getText().toString();
+            String altStr = this.et_utm_alt.getText().toString();
+
+            if (esteStr.isEmpty() || norteStr.isEmpty() || altStr.isEmpty()) {
+                Toast.makeText(requireContext(), "Por favor, complete todos los campos UTM", Toast.LENGTH_SHORT).show();
+                return;
+            }
+
+            Double X = Double.parseDouble(esteStr);
+            Double Y = Double.parseDouble(norteStr);
+            Double Alt = Double.parseDouble(altStr);
+            
+            int Z = this.spzona.getSelectedItemPosition() + 1;
+            String hemisferio = this.sphemisferio.getSelectedItemPosition() == 0 ? "S" : "N";
+            if (hemisferio.equals("S")) {
+                Y = Y - 1.0E7d;
+            }
+            Double M = Y / K;
+            Double E = (Math.pow(A, 2.0d) - Math.pow(B, 2.0d)) / Math.pow(A, 2.0d);
+            Double D = (Math.pow(A, 2.0d) - Math.pow(B, 2.0d)) / Math.pow(B, 2.0d);
+            Double G = (1.0d - Math.sqrt(1.0d - E)) / (1.0d + Math.sqrt(1.0d - E));
+            Double Tit = M / (A * (((1.0d - (E / 4.0d)) - ((3.0d * Math.pow(E, 2.0d)) / 64.0d)) - ((5.0d * Math.pow(E, 3.0d)) / 256.0d)));
+            Double P = Tit + ((((3.0d * G) / 2.0d) - ((27.0d * Math.pow(G, 3.0d)) / 32.0d)) * Math.sin(2.0d * Tit)) + ((((21.0d * Math.pow(G, 2.0d)) / 16.0d) - ((55.0d * Math.pow(G, 4.0d)) / 32.0d)) * Math.sin(4.0d * Tit)) + (((151.0d * Math.pow(G, 3.0d)) / 96.0d) * Math.sin(6.0d * Tit));
+            Double Q = D * Math.pow(Math.cos(P), 2.0d);
+            Double T = Math.pow(Math.tan(P), 2.0d);
+            Double N = A / Math.sqrt(1.0d - (E * Math.pow(Math.sin(P), 2.0d)));
+            Double M2 = (A * (1.0d - E)) / Math.sqrt(Math.pow(1.0d - (E * Math.pow(Math.sin(P), 2.0d)), 3.0d));
+            Double R = (X - 500000.0d) / (N * K);
+            Double F = P - (((N * Math.tan(P)) / M2) * (((Math.pow(R, 2.0d) / 2.0d) - ((((((5.0d + (3.0d * T)) + (10.0d * Q)) - (4.0d * Math.pow(Q, 2.0d))) - (9.0d * D)) * Math.pow(R, 4.0d)) / 24.0d)) + (((((((61.0d + (90.0d * T)) + (298.0d * Q)) + (45.0d * Math.pow(T, 2.0d))) - (252.0d * D)) - (3.0d * Math.pow(Q, 2.0d))) * Math.pow(R, 6.0d)) / 720.0d)));
+            Double F2 = (180.0d * F) / 3.141592653589793d;
+            int W = (Z * 6) - 183;
+            Double L = ((((double) W) * 3.141592653589793d) / 180.0d) + (((R - ((((1.0d + (2.0d * T)) + Q) * Math.pow(R, 3.0d)) / 6.0d)) + (((((((5.0d - (2.0d * Q)) + (28.0d * T)) - (3.0d * Math.pow(Q, 2.0d))) + (8.0d * D)) + (24.0d * Math.pow(T, 2.0d))) * Math.pow(R, 5.0d)) / 120.0d)) / Math.cos(P));
+            calcularManual((180.0d * L) / 3.141592653589793d, F2, Alt);
+        } catch (NumberFormatException e) {
+            Toast.makeText(requireContext(), "Error: Ingrese valores numéricos válidos", Toast.LENGTH_SHORT).show();
         }
-        Double M = Y / K;
-        Double E = (Math.pow(A, 2.0d) - Math.pow(B, 2.0d)) / Math.pow(A, 2.0d);
-        Double D = (Math.pow(A, 2.0d) - Math.pow(B, 2.0d)) / Math.pow(B, 2.0d);
-        Double G = (1.0d - Math.sqrt(1.0d - E)) / (1.0d + Math.sqrt(1.0d - E));
-        Double Tit = M / (A * (((1.0d - (E / 4.0d)) - ((3.0d * Math.pow(E, 2.0d)) / 64.0d)) - ((5.0d * Math.pow(E, 3.0d)) / 256.0d)));
-        Double P = Tit + ((((3.0d * G) / 2.0d) - ((27.0d * Math.pow(G, 3.0d)) / 32.0d)) * Math.sin(2.0d * Tit)) + ((((21.0d * Math.pow(G, 2.0d)) / 16.0d) - ((55.0d * Math.pow(G, 4.0d)) / 32.0d)) * Math.sin(4.0d * Tit)) + (((151.0d * Math.pow(G, 3.0d)) / 96.0d) * Math.sin(6.0d * Tit));
-        Double Q = D * Math.pow(Math.cos(P), 2.0d);
-        Double T = Math.pow(Math.tan(P), 2.0d);
-        Double N = A / Math.sqrt(1.0d - (E * Math.pow(Math.sin(P), 2.0d)));
-        Double M2 = (A * (1.0d - E)) / Math.sqrt(Math.pow(1.0d - (E * Math.pow(Math.sin(P), 2.0d)), 3.0d));
-        Double R = (X - 500000.0d) / (N * K);
-        Double F = P - (((N * Math.tan(P)) / M2) * (((Math.pow(R, 2.0d) / 2.0d) - ((((((5.0d + (3.0d * T)) + (10.0d * Q)) - (4.0d * Math.pow(Q, 2.0d))) - (9.0d * D)) * Math.pow(R, 4.0d)) / 24.0d)) + (((((((61.0d + (90.0d * T)) + (298.0d * Q)) + (45.0d * Math.pow(T, 2.0d))) - (252.0d * D)) - (3.0d * Math.pow(Q, 2.0d))) * Math.pow(R, 6.0d)) / 720.0d)));
-        Double F2 = (180.0d * F) / 3.141592653589793d;
-        int W = (Z * 6) - 183;
-        Double L = ((((double) W) * 3.141592653589793d) / 180.0d) + (((R - ((((1.0d + (2.0d * T)) + Q) * Math.pow(R, 3.0d)) / 6.0d)) + (((((((5.0d - (2.0d * Q)) + (28.0d * T)) - (3.0d * Math.pow(Q, 2.0d))) + (8.0d * D)) + (24.0d * Math.pow(T, 2.0d))) * Math.pow(R, 5.0d)) / 120.0d)) / Math.cos(P));
-        calcularManual((180.0d * L) / 3.141592653589793d, F2, Alt);
     }
 
     private void calculateWithGeo() {
-        Double L = Math.abs(Double.parseDouble(this.et_lon_gra.getText().toString())) + (Double.parseDouble(this.et_lon_min.getText().toString()) / 60.0d) + ((Double.parseDouble(this.et_lon_seg.getText().toString()) / 60.0d) / 60.0d);
-        Double F = Math.abs(Double.parseDouble(this.et_lat_gra.getText().toString())) + (Double.parseDouble(this.et_lat_min.getText().toString()) / 60.0d) + ((Double.parseDouble(this.et_lat_seg.getText().toString()) / 60.0d) / 60.0d);
-        Double Alt = Double.parseDouble(this.et_alt.getText().toString());
-        calcularManual(L, F, Alt);
+        try {
+            String latGra = this.et_lat_gra.getText().toString();
+            String latMin = this.et_lat_min.getText().toString();
+            String latSeg = this.et_lat_seg.getText().toString();
+            String lonGra = this.et_lon_gra.getText().toString();
+            String lonMin = this.et_lon_min.getText().toString();
+            String lonSeg = this.et_lon_seg.getText().toString();
+            String altStr = this.et_alt.getText().toString();
+
+            if (latGra.isEmpty() || latMin.isEmpty() || latSeg.isEmpty() || 
+                lonGra.isEmpty() || lonMin.isEmpty() || lonSeg.isEmpty() || altStr.isEmpty()) {
+                Toast.makeText(requireContext(), "Por favor, complete todos los campos Geodésicos", Toast.LENGTH_SHORT).show();
+                return;
+            }
+
+            Double L = Math.abs(Double.parseDouble(lonGra)) + (Double.parseDouble(lonMin) / 60.0d) + ((Double.parseDouble(lonSeg) / 60.0d) / 60.0d);
+            Double F = Math.abs(Double.parseDouble(latGra)) + (Double.parseDouble(latMin) / 60.0d) + ((Double.parseDouble(latSeg) / 60.0d) / 60.0d);
+            Double Alt = Double.parseDouble(altStr);
+            calcularManual(L, F, Alt);
+        } catch (NumberFormatException e) {
+            Toast.makeText(requireContext(), "Error: Ingrese valores numéricos válidos", Toast.LENGTH_SHORT).show();
+        }
     }
 
     public void calcularManual(Double L, Double F, Double Alt) {

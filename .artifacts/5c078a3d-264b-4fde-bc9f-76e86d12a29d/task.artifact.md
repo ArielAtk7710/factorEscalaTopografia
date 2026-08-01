@@ -1,6 +1,8 @@
-- [ ] Fix build conflicts (delete `R.java` and `BuildConfig.java`)
-- [ ] Add colors to `colors.xml`
-- [ ] Create `tab_color_selector.xml`
-- [ ] Create vector icons (`ic_auto.xml`, `ic_manual.xml`, `ic_info.xml`)
-- [ ] Update `activity_main.xml` with the new style
-- [ ] Verify build and UI
+- [x] Fix build conflicts
+- [x] Unified Palette Implementation
+- [x] High-Fidelity Professional Toasts
+- [x] Perpetual GPS Monitoring
+- [x] Mini Map Toggle (Automatic Mode):
+    - [x] Update `fragment_automatic.xml` (Header & CardView)
+    - [x] Update `AutomaticFragment.java` (Toggle Logic)
+- [x] Final verification build

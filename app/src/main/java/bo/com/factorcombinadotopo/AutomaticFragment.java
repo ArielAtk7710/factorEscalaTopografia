@@ -1,4 +1,4 @@
-package bo.com.solucionesit.factorcombinado;
+package bo.com.factorcombinadotopo;
 
 import android.content.Intent;
 import android.graphics.Typeface;
@@ -37,7 +37,6 @@ import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
-import java.text.DecimalFormat;
 
 public class AutomaticFragment extends Fragment {
     private TextView txt_alt;
@@ -206,15 +205,15 @@ public class AutomaticFragment extends Fragment {
         String fileName = "Punto_" + nombrePunto.replaceAll("[^a-zA-Z0-9]", "_") + "_" + new SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault()).format(new Date()) + ".txt";
         
         try {
-            File path = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOCUMENTS);
-            if (!path.exists()) path.mkdirs();
+            File path = requireContext().getExternalFilesDir(Environment.DIRECTORY_DOCUMENTS);
+            if (path != null && !path.exists()) path.mkdirs();
             File file = new File(path, fileName);
             FileOutputStream fos = new FileOutputStream(file);
             fos.write(sb.toString().getBytes());
             fos.close();
             
             if (id != -1) {
-                showProToast("success", "Punto '" + nombrePunto + "' guardado en Registro y TXT generado");
+                showProToast("success", "Punto '" + nombrePunto + "' guardado. Reporte en: Android/data/.../files/Documents");
             }
         } catch (IOException e) {
             if (id != -1) {

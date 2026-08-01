@@ -54,26 +54,26 @@
                 </LinearLayout>
 
                 <!-- CONTENEDOR DEL MINIMAPA (OCULTO POR DEFECTO) -->
-                <androidx.cardview.widget.CardView
-                    android:id="@+id/card_mapa"
+            <androidx.cardview.widget.CardView
+                android:id="@+id/card_mapa"
+                android:layout_width="match_parent"
+                android:layout_height="250dp"
+                android:layout_marginTop="8dp"
+                android:layout_marginBottom="8dp"
+                android:visibility="visible"
+                app:cardBackgroundColor="@color/bg_surface"
+                app:cardCornerRadius="12dp"
+                app:cardElevation="0dp">
+
+                <!-- Imagen referencial del mapa -->
+                <ImageView
+                    android:id="@+id/img_minimapa"
                     android:layout_width="match_parent"
-                    android:layout_height="250dp"
-                    android:layout_marginTop="8dp"
-                    android:layout_marginBottom="8dp"
-                    android:visibility="gone"
-                    app:cardBackgroundColor="@color/bg_surface"
-                    app:cardCornerRadius="12dp"
-                    app:cardElevation="0dp">
+                    android:layout_height="match_parent"
+                    android:scaleType="centerCrop"
+                    android:src="@drawable/img_mapa_referencial" />
 
-                    <!-- Imagen referencial del mapa -->
-                    <ImageView
-                        android:id="@+id/img_minimapa"
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:scaleType="centerCrop"
-                        android:src="@drawable/img_mapa_referencial" />
-
-                </androidx.cardview.widget.CardView>
+            </androidx.cardview.widget.CardView>
                 <!-- LÍNEA DIVISORIA 0 -->
                 <View
                     android:layout_width="match_parent"

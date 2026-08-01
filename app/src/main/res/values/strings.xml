@@ -2,7 +2,7 @@
 <resources>
 <string name="action_settings">Ajustes</string>
 
-<string name="app_name">Factor de Escala</string>
+<string name="app_name">FactorEscalaTop</string>
 <string name="tab_text_1">Automático</string>
 <string name="tab_text_2">Manual</string>
 <string name="tab_text_3">Registro</string>

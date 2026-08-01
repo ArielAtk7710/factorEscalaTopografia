@@ -1,4 +1,4 @@
-package bo.com.solucionesit.factorcombinado;
+package bo.com.factorcombinadotopo;
 
 import android.database.Cursor;
 import android.os.Bundle;

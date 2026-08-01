@@ -1,0 +1,9 @@
+- [ ] Crear la base de datos local
+    - [ ] Implementar `DatabaseHelper.java` con la tabla de puntos
+- [ ] Implementar guardado dual en la pestaña Automático
+    - [ ] Actualizar `AutomaticFragment.java` para guardar en DB y TXT
+- [ ] Configurar la pestaña de Registro
+    - [ ] Crear el layout de fila `item_punto.xml`
+    - [ ] Actualizar `fragment_register.xml` con un `RecyclerView`
+    - [ ] Implementar lógica en `RegisterFragment.java` (Adapter y carga de datos)
+- [ ] Verificar el flujo completo (Guardar -> Exportar -> Ver en lista)

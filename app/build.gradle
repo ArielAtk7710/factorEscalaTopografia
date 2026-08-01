@@ -3,12 +3,12 @@ plugins {
 }
 
 android {
-    namespace 'bo.com.solucionesit.factorcombinado'
+    namespace 'bo.com.factorcombinadotopo'
     compileSdk 35
 
     defaultConfig {
         // Se añade .test para evitar el conflicto "No se instaló la app" con la versión previa de tu teléfono
-        applicationId 'bo.com.solucionesit.factorcombinado.test'
+        applicationId 'bo.com.factorcombinadotopo'
         minSdk 23
         targetSdk 35
         versionCode 2
