@@ -31,6 +31,9 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+        if (getSupportActionBar() != null) {
+            getSupportActionBar().setDisplayShowTitleEnabled(false);
+        }
         this.mSectionsPagerAdapter = new SectionsPagerAdapter(getSupportFragmentManager());
         this.mViewPager = (ViewPager) findViewById(R.id.container);
         this.mViewPager.setAdapter(this.mSectionsPagerAdapter);
@@ -89,8 +92,7 @@ public class MainActivity extends AppCompatActivity {
                     ManualFragment manualFragment = new ManualFragment();
                     return manualFragment;
                 case 2:
-                    InfoFragment infoFragment = new InfoFragment();
-                    return infoFragment;
+                    return new RegisterFragment();
                 default:
                     return PlaceholderFragment.newInstance(position + 1);
             }

@@ -1,0 +1,6 @@
+- [ ] Fix build conflicts (delete `R.java` and `BuildConfig.java`)
+- [ ] Add colors to `colors.xml`
+- [ ] Create `tab_color_selector.xml`
+- [ ] Create vector icons (`ic_auto.xml`, `ic_manual.xml`, `ic_info.xml`)
+- [ ] Update `activity_main.xml` with the new style
+- [ ] Verify build and UI

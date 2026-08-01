@@ -1,324 +1,535 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout
-    xmlns:android="http://schemas.android.com/apk/res/android" 
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
-    <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_height="match_parent"
+    android:background="@color/bg_main">
+
+    <ScrollView
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
-        <ScrollView
-            android:scrollbars="vertical"
+        android:layout_height="match_parent"
+        android:fillViewport="true"
+        android:scrollbars="vertical">
+
+        <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent">
-            <LinearLayout
-                android:orientation="vertical"
-                android:padding="5dp"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content">
-                <TextView
-                    android:textStyle="bold"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="Sistema de referencia WGS84"/>
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="12dp"
+            android:paddingBottom="100dp">
+
+                <!-- CABECERA CON INTERRUPTOR DE MAPA -->
                 <LinearLayout
-                    android:orientation="horizontal"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent">
-                    <TextView
-                        android:id="@+id/txt_presicion"
-                        android:padding="3dp"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_margin="5dp"
-                        android:layout_column="1"
-                        android:layout_weight="1"
-                        android:isScrollContainer="false"
-                        android:layout_row="0"/>
-                    <TextView
-                        android:id="@+id/txt_sat"
-                        android:padding="3dp"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_margin="5dp"
-                        android:layout_column="1"
-                        android:layout_weight="1"
-                        android:layout_row="0"/>
-                </LinearLayout>
-                <TextView
-                    android:textStyle="bold"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="Coordenadas Geodésicas"/>
-                <GridLayout
                     android:orientation="horizontal"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:rowCount="3"
-                    android:columnCount="2">
+                    android:gravity="center_vertical"
+                    android:layout_marginBottom="1dp">
+
                     <TextView
-                        android:padding="3dp"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="SISTEMA DE REFERENCIA WGS84"
+                        android:textColor="@color/text_secondary"
+                        android:textSize="16sp"
+                        android:textStyle="bold" />
+
+                    <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_margin="5dp"
-                        android:layout_column="0"
-                        android:text="Latitud"
+                        android:text="Mapa"
+                        android:textColor="@color/accent_light"
+                        android:textSize="14sp"
+                        android:textStyle="bold"
+                        android:layout_marginEnd="8dp" />
+
+                    <com.google.android.material.switchmaterial.SwitchMaterial
+                        android:id="@+id/switch_mapa"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text=""
+                        app:thumbTint="@color/switch_thumb_selector"
+                        app:trackTint="@color/switch_track_selector" />
+                </LinearLayout>
+
+                <!-- CONTENEDOR DEL MINIMAPA (OCULTO POR DEFECTO) -->
+                <androidx.cardview.widget.CardView
+                    android:id="@+id/card_mapa"
+                    android:layout_width="match_parent"
+                    android:layout_height="250dp"
+                    android:layout_marginTop="8dp"
+                    android:layout_marginBottom="8dp"
+                    android:visibility="gone"
+                    app:cardBackgroundColor="@color/bg_surface"
+                    app:cardCornerRadius="12dp"
+                    app:cardElevation="0dp">
+
+                    <!-- Imagen referencial del mapa -->
+                    <ImageView
+                        android:id="@+id/img_minimapa"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:scaleType="centerCrop"
+                        android:src="@drawable/img_mapa_referencial" />
+
+                </androidx.cardview.widget.CardView>
+                <!-- LÍNEA DIVISORIA 0 -->
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:layout_marginTop="8dp"
+                    android:layout_marginBottom="8dp"
+                    android:background="@color/divider" />
+                <!-- SECCIÓN GPS (FILA BLUE) -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:orientation="horizontal">
+
+                    <!-- Precision -->
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
                         android:layout_weight="1"
-                        android:layout_row="0"/>
+                        android:gravity="center_vertical|start"
+                        android:orientation="horizontal"
+                        android:padding="2dp">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Presición: "
+                            android:textColor="@color/accent_light"
+                            android:textSize="14sp" />
+
+                        <ImageView
+                            android:layout_width="16dp"
+                            android:layout_height="16dp"
+                            android:layout_marginHorizontal="4dp"
+                            android:src="@drawable/ic_precision"
+                            app:tint="@color/accent_orange" />
+
+                        <TextView
+                            android:id="@+id/txt_presicion"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="±0 m"
+                            android:textColor="@color/accent_orange"
+                            android:textSize="14sp"
+                            android:textStyle="bold" />
+                    </LinearLayout>
+
+                    <!-- Satellites -->
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:gravity="center_vertical|end"
+                        android:orientation="horizontal"
+                        android:padding="2dp">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Satelites: "
+                            android:textColor="@color/accent_light"
+                            android:textSize="14sp" />
+
+                        <ImageView
+                            android:layout_width="16dp"
+                            android:layout_height="16dp"
+                            android:layout_marginHorizontal="4dp"
+                            android:src="@drawable/satellite"
+                            app:tint="@color/accent_orange" />
+
+                        <TextView
+                            android:id="@+id/txt_sat"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="0"
+                            android:textColor="@color/accent_orange"
+                            android:textSize="14sp"
+                            android:textStyle="bold" />
+                    </LinearLayout>
+                </LinearLayout>
+
+                <!-- LÍNEA DIVISORIA 1 -->
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:layout_marginTop="8dp"
+                    android:layout_marginBottom="8dp"
+                    android:background="@color/divider" />
+
+                <!-- SECCIÓN 1: COORDENADAS GEODÉSICAS -->
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="COORDENADAS GEODESICAS"
+                    android:textColor="@color/text_secondary"
+                    android:textSize="12sp"
+                    android:textStyle="bold" />
+
+                <GridLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="4dp"
+                    android:columnCount="2"
+                    android:orientation="horizontal"
+                    android:rowCount="3">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_row="0"
+                        android:layout_column="0"
+                        android:layout_margin="3dp"
+                        android:layout_weight="1"
+                        android:padding="3dp"
+                        android:text="Latitud"
+                        android:textColor="@color/text_primary" />
+
                     <TextView
                         android:id="@+id/txt_lat"
-                        android:background="@android:color/white"
-                        android:padding="3dp"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_margin="5dp"
+                        android:layout_row="0"
                         android:layout_column="1"
-                        android:text="0"
+                        android:layout_margin="3dp"
                         android:layout_weight="1"
-                        android:layout_row="0"/>
-                    <TextView
                         android:padding="3dp"
+                        android:text="0"
+                        android:textColor="@color/accent_orange"
+                        android:textStyle="bold" />
+
+                    <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_margin="5dp"
+                        android:layout_row="1"
                         android:layout_column="0"
-                        android:text="Longitud"
+                        android:layout_margin="3dp"
                         android:layout_weight="1"
-                        android:layout_row="1"/>
+                        android:padding="3dp"
+                        android:text="Longitud"
+                        android:textColor="@color/text_primary" />
+
                     <TextView
                         android:id="@+id/txt_lon"
-                        android:background="@android:color/white"
-                        android:padding="3dp"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_margin="5dp"
+                        android:layout_row="1"
                         android:layout_column="1"
-                        android:text="0"
+                        android:layout_margin="3dp"
                         android:layout_weight="1"
-                        android:layout_row="1"/>
-                    <TextView
                         android:padding="3dp"
+                        android:text="0"
+                        android:textColor="@color/accent_orange"
+                        android:textStyle="bold" />
+
+                    <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_margin="5dp"
+                        android:layout_row="2"
                         android:layout_column="0"
-                        android:text="Altura Elipsoidal"
+                        android:layout_margin="3dp"
                         android:layout_weight="1"
-                        android:layout_row="2"/>
+                        android:padding="3dp"
+                        android:text="Altura Elipsoidal"
+                        android:textColor="@color/text_primary" />
+
                     <TextView
                         android:id="@+id/txt_alt"
-                        android:background="@android:color/white"
-                        android:padding="3dp"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_margin="5dp"
+                        android:layout_row="2"
                         android:layout_column="1"
-                        android:text="0"
+                        android:layout_margin="3dp"
                         android:layout_weight="1"
-                        android:layout_row="2"/>
+                        android:padding="3dp"
+                        android:text="0"
+                        android:textColor="@color/accent_orange"
+                        android:textStyle="bold" />
                 </GridLayout>
+
+                <!-- LÍNEA DIVISORIA 2 -->
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:layout_marginTop="8dp"
+                    android:layout_marginBottom="8dp"
+                    android:background="@color/divider" />
+
+                <!-- SECCIÓN 2: COORDENADAS UTM -->
                 <TextView
-                    android:textStyle="bold"
-                    android:paddingTop="8dp"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="Coordenadas UTM"/>
+                    android:text="COORDENADAS UTM"
+                    android:textColor="@color/text_secondary"
+                    android:textSize="12sp"
+                    android:textStyle="bold" />
+
                 <GridLayout
-                    android:orientation="horizontal"
                     android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:rowCount="3"
-                    android:columnCount="4">
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="4dp"
+                    android:columnCount="4"
+                    android:orientation="horizontal"
+                    android:rowCount="3">
+
                     <TextView
-                        android:padding="3dp"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_margin="5dp"
+                        android:layout_row="0"
                         android:layout_column="0"
-                        android:text="Este"
+                        android:layout_margin="3dp"
                         android:layout_weight="1"
-                        android:layout_row="0"/>
+                        android:padding="3dp"
+                        android:text="Este"
+                        android:textColor="@color/text_primary" />
+
                     <TextView
                         android:id="@+id/txt_est"
-                        android:background="@android:color/white"
-                        android:padding="3dp"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_margin="5dp"
+                        android:layout_row="0"
                         android:layout_column="1"
-                        android:text="0"
+                        android:layout_margin="3dp"
                         android:layout_weight="1"
-                        android:layout_row="0"/>
-                    <TextView
                         android:padding="3dp"
+                        android:text="0"
+                        android:textColor="@color/accent_orange"
+                        android:textStyle="bold" />
+
+                    <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_margin="5dp"
+                        android:layout_row="1"
                         android:layout_column="0"
-                        android:text="Norte"
+                        android:layout_margin="3dp"
                         android:layout_weight="1"
-                        android:layout_row="1"/>
+                        android:padding="3dp"
+                        android:text="Norte"
+                        android:textColor="@color/text_primary" />
+
                     <TextView
                         android:id="@+id/txt_nort"
-                        android:background="@android:color/white"
-                        android:padding="3dp"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_margin="5dp"
+                        android:layout_row="1"
                         android:layout_column="1"
-                        android:text="0"
+                        android:layout_margin="3dp"
                         android:layout_weight="1"
-                        android:layout_row="1"/>
-                    <TextView
                         android:padding="3dp"
+                        android:text="0"
+                        android:textColor="@color/accent_orange"
+                        android:textStyle="bold" />
+
+                    <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_margin="5dp"
+                        android:layout_row="2"
                         android:layout_column="0"
-                        android:text="Zona"
+                        android:layout_margin="3dp"
                         android:layout_weight="1"
-                        android:layout_row="2"/>
+                        android:padding="3dp"
+                        android:text="Zona"
+                        android:textColor="@color/text_primary" />
+
                     <TextView
                         android:id="@+id/txt_zona"
-                        android:background="@android:color/white"
-                        android:padding="3dp"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_margin="5dp"
+                        android:layout_row="2"
                         android:layout_column="1"
-                        android:text="0"
+                        android:layout_margin="3dp"
                         android:layout_weight="1"
-                        android:layout_row="2"/>
-                    <TextView
                         android:padding="3dp"
+                        android:text="0"
+                        android:textColor="@color/accent_orange"
+                        android:textStyle="bold" />
+
+                    <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_margin="5dp"
+                        android:layout_row="2"
                         android:layout_column="2"
-                        android:text="Hemisferio"
+                        android:layout_margin="3dp"
                         android:layout_weight="1"
-                        android:layout_row="2"/>
+                        android:padding="3dp"
+                        android:text="Hemisferio"
+                        android:textColor="@color/text_primary" />
+
                     <TextView
                         android:id="@+id/txt_hemis"
-                        android:background="@android:color/white"
-                        android:padding="3dp"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_margin="5dp"
+                        android:layout_row="2"
                         android:layout_column="3"
-                        android:text="-"
+                        android:layout_margin="3dp"
                         android:layout_weight="1"
-                        android:layout_row="2"/>
+                        android:padding="3dp"
+                        android:text="-"
+                        android:textColor="@color/accent_orange"
+                        android:textStyle="bold" />
                 </GridLayout>
+
+                <!-- LÍNEA DIVISORIA 3 -->
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:layout_marginTop="8dp"
+                    android:layout_marginBottom="8dp"
+                    android:background="@color/divider" />
+
+                <!-- SECCIÓN 3: FACTORES DE CORRECCIÓN -->
                 <TextView
-                    android:textStyle="bold"
-                    android:paddingTop="8dp"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="Factores de correción geometrica"/>
+                    android:text="FACTORES DE CORRECION GEOMETRICA"
+                    android:textColor="@color/text_secondary"
+                    android:textSize="12sp"
+                    android:textStyle="bold" />
+
+                <!-- FACTOR DE ESCALA Y FACTOR DE ALTURA -->
                 <GridLayout
-                    android:orientation="horizontal"
                     android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:rowCount="3"
-                    android:columnCount="3">
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="4dp"
+                    android:columnCount="3"
+                    android:orientation="horizontal"
+                    android:rowCount="2">
+
+                    <!-- Factor de Escala -->
                     <TextView
-                        android:padding="3dp"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_margin="5dp"
+                        android:layout_row="0"
                         android:layout_column="0"
-                        android:text="Factor de Escala"
+                        android:layout_margin="3dp"
                         android:layout_weight="1"
-                        android:layout_row="0"/>
+                        android:padding="3dp"
+                        android:text="Factor de Escala"
+                        android:textColor="@color/text_primary" />
+
                     <TextView
                         android:id="@+id/txt_fe"
-                        android:background="@android:color/white"
-                        android:padding="3dp"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_margin="5dp"
+                        android:layout_row="0"
                         android:layout_column="1"
-                        android:text="0"
+                        android:layout_margin="3dp"
                         android:layout_weight="1"
-                        android:layout_row="0"/>
+                        android:padding="3dp"
+                        android:text="0"
+                        android:textColor="@color/accent_orange"
+                        android:textStyle="bold" />
+
                     <TextView
                         android:id="@+id/txt_fe_ppm"
-                        android:background="@android:color/white"
-                        android:padding="3dp"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_margin="5dp"
+                        android:layout_row="0"
                         android:layout_column="2"
-                        android:text="0"
+                        android:layout_margin="3dp"
                         android:layout_weight="1"
-                        android:layout_row="0"/>
-                    <TextView
                         android:padding="3dp"
+                        android:text="0"
+                        android:textColor="@color/text_secondary" />
+
+                    <!-- Factor de Altura -->
+                    <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_margin="5dp"
+                        android:layout_row="1"
                         android:layout_column="0"
-                        android:text="Factor de Altura"
+                        android:layout_margin="3dp"
                         android:layout_weight="1"
-                        android:layout_row="1"/>
+                        android:padding="3dp"
+                        android:text="Factor de Altura"
+                        android:textColor="@color/text_primary" />
+
                     <TextView
                         android:id="@+id/txt_fa"
-                        android:background="@android:color/white"
-                        android:padding="3dp"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_margin="5dp"
+                        android:layout_row="1"
                         android:layout_column="1"
-                        android:text="0"
+                        android:layout_margin="3dp"
                         android:layout_weight="1"
-                        android:layout_row="1"/>
+                        android:padding="3dp"
+                        android:text="0"
+                        android:textColor="@color/accent_orange"
+                        android:textStyle="bold" />
+
                     <TextView
                         android:id="@+id/txt_fa_ppm"
-                        android:background="@android:color/white"
-                        android:padding="3dp"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_margin="5dp"
+                        android:layout_row="1"
                         android:layout_column="2"
-                        android:text="0"
+                        android:layout_margin="3dp"
                         android:layout_weight="1"
-                        android:layout_row="1"/>
-                    <TextView
-                        android:textStyle="bold"
                         android:padding="3dp"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_margin="5dp"
-                        android:layout_column="0"
-                        android:text="Factor Combinado"
-                        android:layout_weight="1"
-                        android:layout_row="2"/>
-                    <TextView
-                        android:textStyle="bold"
-                        android:id="@+id/txt_fc"
-                        android:background="@android:color/white"
-                        android:padding="3dp"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_margin="5dp"
-                        android:layout_column="1"
                         android:text="0"
-                        android:layout_weight="1"
-                        android:layout_row="2"/>
-                    <TextView
-                        android:textStyle="bold"
-                        android:id="@+id/txt_fc_ppm"
-                        android:background="@android:color/white"
-                        android:padding="3dp"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_margin="5dp"
-                        android:layout_column="2"
-                        android:text="0"
-                        android:layout_weight="1"
-                        android:layout_row="2"/>
+                        android:textColor="@color/text_secondary" />
                 </GridLayout>
+
+                <!-- RECUADRO DESTACADO: FACTOR COMBINADO -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="10dp"
+                    android:background="@color/accent_primary"
+                    android:orientation="horizontal"
+                    android:padding="8dp">
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1.2"
+                        android:padding="3dp"
+                        android:text="Factor Combinado"
+                        android:textSize="12sp"
+                        android:textColor="@color/text_primary"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:id="@+id/txt_fc"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1.2"
+                        android:padding="3dp"
+                        android:text="0"
+                        android:textColor="@color/accent_orange"
+                        android:textSize="15sp"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:id="@+id/txt_fc_ppm"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="0.8"
+                        android:padding="3dp"
+                        android:text="0"
+                        android:textColor="@color/text_secondary"
+                        android:textStyle="bold" />
+                </LinearLayout>
+
+                <!-- BOTÓN GUARDAR PUNTO -->
+                <Button
+                    android:id="@+id/btn_guardar_punto_auto"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="24dp"
+                    android:text="@string/btn_save_point"
+                    app:backgroundTint="@color/accent_orange"
+                    android:textColor="@color/text_primary"
+                    android:textStyle="bold"
+                    app:icon="@drawable/ic_save_white"
+                    app:iconGravity="textStart" />
+
             </LinearLayout>
         </ScrollView>
-    </FrameLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -14,11 +14,22 @@ import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
+import android.widget.Toast;
+import android.os.Environment;
+import android.content.Context;
+import android.content.pm.PackageManager;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Locale;
 import java.text.DecimalFormat;
 
 public class ManualFragment extends Fragment {
     private Button btn_calcular;
     private Button btn_limpiar;
+    private Button btn_guardar;
     private EditText et_alt;
     private EditText et_lat_gra;
     private EditText et_lat_min;
@@ -119,6 +130,82 @@ public class ManualFragment extends Fragment {
 
         this.btn_limpiar = view.findViewById(R.id.btn_limpiar);
         this.btn_limpiar.setOnClickListener(this::limpiar);
+
+        this.btn_guardar = view.findViewById(R.id.btn_guardar);
+        this.btn_guardar.setOnClickListener(v -> {
+            guardarResultados();
+        });
+    }
+
+    private void guardarResultados() {
+        if (txt_man_fe.getText().toString().equals("0") && txt_man_fc.getText().toString().equals("0")) {
+            Toast.makeText(requireContext(), "No hay resultados para guardar", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        // Para Android 10+ usamos el directorio de la app o Documents si tenemos permiso
+        // Para simplificar y asegurar que funcione, usaremos getExternalFilesDir que no requiere permisos
+        // pero si el usuario quiere "memoria del dispositivo" publica, intentamos Documents
+        
+        StringBuilder sb = new StringBuilder();
+        String timeStamp = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault()).format(new Date());
+        
+        sb.append("--- REPORTE DE FACTORES DE CORRECCIÓN ---\n");
+        sb.append("Fecha: ").append(timeStamp).append("\n\n");
+        
+        if (proyeccion.getSelectedItemPosition() == 0) {
+            sb.append("DATOS DE ENTRADA (UTM):\n");
+            sb.append("Este: ").append(et_utm_este.getText().toString()).append(" m\n");
+            sb.append("Norte: ").append(et_utm_norte.getText().toString()).append(" m\n");
+            sb.append("Altura: ").append(et_utm_alt.getText().toString()).append(" m\n");
+            sb.append("Zona: ").append(spzona.getSelectedItem().toString()).append("\n");
+            sb.append("Hemisferio: ").append(sphemisferio.getSelectedItem().toString()).append("\n\n");
+        } else {
+            sb.append("DATOS DE ENTRADA (GEODÉSICAS):\n");
+            sb.append("Latitud: ").append(et_lat_gra.getText().toString()).append("º ")
+              .append(et_lat_min.getText().toString()).append("' ")
+              .append(et_lat_seg.getText().toString()).append("''\n");
+            sb.append("Longitud: ").append(et_lon_gra.getText().toString()).append("º ")
+              .append(et_lon_min.getText().toString()).append("' ")
+              .append(et_lon_seg.getText().toString()).append("''\n");
+            sb.append("Altura: ").append(et_alt.getText().toString()).append(" m\n\n");
+        }
+
+        sb.append("FACTORES DE CORRECCIÓN GEOMÉTRICA:\n");
+        sb.append("Factor de Escala: ").append(txt_man_fe.getText().toString())
+          .append(" (").append(txt_man_fe_ppm.getText().toString()).append(")\n");
+        sb.append("Factor de Altura: ").append(txt_man_fa.getText().toString())
+          .append(" (").append(txt_man_fa_ppm.getText().toString()).append(")\n");
+        sb.append("FACTOR COMBINADO: ").append(txt_man_fc.getText().toString())
+          .append(" (").append(txt_man_fc_ppm.getText().toString()).append(")\n");
+        sb.append("\nDesarrollado por Attack7710\n");
+        sb.append("------------------------------------------\n");
+
+        String fileName = "Calculo_Factors_" + new SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault()).format(new Date()) + ".txt";
+        
+        try {
+            // Intentamos guardar en la carpeta de Documentos publica
+            File path = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOCUMENTS);
+            if (!path.exists()) path.mkdirs();
+            
+            File file = new File(path, fileName);
+            FileOutputStream fos = new FileOutputStream(file);
+            fos.write(sb.toString().getBytes());
+            fos.close();
+            
+            Toast.makeText(requireContext(), "Guardado en: Documents/" + fileName, Toast.LENGTH_LONG).show();
+        } catch (IOException e) {
+            e.printStackTrace();
+            // Fallback al almacenamiento interno si falla
+            try {
+                FileOutputStream fos = requireActivity().openFileOutput(fileName, Context.MODE_PRIVATE);
+                fos.write(sb.toString().getBytes());
+                fos.close();
+                Toast.makeText(requireContext(), "Guardado en memoria interna (Error en SD)", Toast.LENGTH_SHORT).show();
+            } catch (Exception ex) {
+                Toast.makeText(requireContext(), "Error al guardar el archivo", Toast.LENGTH_SHORT).show();
+            }
+        }
     }
 
     public void limpiar(View v) {

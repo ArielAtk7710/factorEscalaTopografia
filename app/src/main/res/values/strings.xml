@@ -5,7 +5,7 @@
 <string name="app_name">Factor de Escala</string>
 <string name="tab_text_1">Automático</string>
 <string name="tab_text_2">Manual</string>
-<string name="tab_text_3">Información</string>
+<string name="tab_text_3">Registro</string>
 <string name="tab_text_4">tab_4</string>
 <string name="section_format">Sección %1$d</string>
 <string name="appbar_scrolling_view_behavior">com.google.android.material.appbar.AppBarLayout$ScrollingViewBehavior</string>
@@ -910,4 +910,15 @@
     <string name="status_bar_notification_info_overflow">999+</string>
     <string name="username">rambabusaravanan</string>
     <string name="website">www.rambabusaravanan.com</string>
+    <string name="splash_title">App Factor Escala Topografica</string>
+    <string name="developer_name">Desarrollado por Attack7710</string>
+    <string name="btn_save_results">GUARDAR RESULTADOS</string>
+    <string name="btn_save_point">Guardar Punto</string>
+    <string name="dialog_register_point">Registrar Nuevo Punto</string>
+    <string name="label_point_name">NOMBRE DEL PUNTO</string>
+    <string name="hint_point_name">PC_...</string>
+    <string name="btn_cancel">Cancelar</string>
+    <string name="title_register_history">HISTORIAL DE PUNTOS</string>
+    <string name="msg_no_registered_points">No hay puntos registrados aún.</string>
+    <string name="label_combined_factor_short">Factor Combinado</string>
 </resources>

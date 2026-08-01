@@ -1,6 +1,5 @@
 package bo.com.solucionesit.factorcombinado;
 
-import android.app.AlertDialog;
 import android.content.Intent;
 import android.graphics.Typeface;
 import android.location.Location;
@@ -16,12 +15,31 @@ import androidx.fragment.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.EditText;
 import android.widget.TextView;
+import androidx.cardview.widget.CardView;
+import androidx.appcompat.app.AlertDialog;
+import android.content.BroadcastReceiver;
+import android.content.Context;
+import android.content.IntentFilter;
+import android.os.Handler;
+import android.os.Looper;
+import com.google.android.material.switchmaterial.SwitchMaterial;
+import java.text.DecimalFormat;
+import android.view.Gravity;
+import android.widget.Toast;
+import android.content.ContentValues;
+import android.os.Environment;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Locale;
 import java.text.DecimalFormat;
 
 public class AutomaticFragment extends Fragment {
-    private Typeface fontAwesome;
-    private Typeface materialIco;
     private TextView txt_alt;
     private TextView txt_est;
     private TextView txt_fa;
@@ -37,6 +55,268 @@ public class AutomaticFragment extends Fragment {
     private TextView txt_presicion;
     private TextView txt_sat;
     private TextView txt_zona;
+    private SwitchMaterial switchMapa;
+    private CardView cardMapa;
+    private Button btn_guardar_punto;
+
+    private boolean isGpsCurrentlyEnabled = true;
+
+    private final Runnable manualInfoRunnable = new Runnable() {
+        @Override
+        public void run() {
+            if (isAdded() && !isGpsCurrentlyEnabled) {
+                showProToast("info", "Ingrese de Forma Manual los datos");
+            }
+        }
+    };
+
+    private final Runnable periodicAlertRunnable = new Runnable() {
+        @Override
+        public void run() {
+            if (isAdded() && !isGpsCurrentlyEnabled) {
+                // Paso 1: Mostrar Advertencia (Amarillo)
+                showProToast("warning", "Active el GPS de su Dispositivo");
+                resetUIData();
+
+                // Paso 2: Programar Info (Azul) a los 5 segundos
+                gpsCheckHandler.removeCallbacks(manualInfoRunnable);
+                gpsCheckHandler.postDelayed(manualInfoRunnable, 5000);
+
+                // Paso 3: Reiniciar este ciclo en 20 segundos totales
+                gpsCheckHandler.postDelayed(this, 20000);
+            }
+        }
+    };
+
+    private final BroadcastReceiver gpsReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            if (LocationManager.PROVIDERS_CHANGED_ACTION.equals(intent.getAction())) {
+                checkGpsState(false);
+            }
+        }
+    };
+
+    private void checkGpsState(boolean forceNotification) {
+        if (!isAdded() || getActivity() == null) return;
+
+        LocationManager mlocManager = (LocationManager) getActivity().getSystemService(Context.LOCATION_SERVICE);
+        if (mlocManager == null) return;
+
+        boolean isEnabled = mlocManager.isProviderEnabled(LocationManager.GPS_PROVIDER);
+
+        if (!isEnabled && (isGpsCurrentlyEnabled || forceNotification)) {
+            // Recién desactivado (o forzado al entrar)
+            isGpsCurrentlyEnabled = false;
+            
+            // Detener cualquier ciclo previo y empezar uno nuevo
+            stopAlertCycles();
+            gpsCheckHandler.post(periodicAlertRunnable);
+            
+        } else if (isEnabled && (!isGpsCurrentlyEnabled || forceNotification)) {
+            // Recién activado (o forzado al entrar)
+            isGpsCurrentlyEnabled = true;
+            stopAlertCycles();
+            showProToast("success", "GPS ACTIVADO");
+        }
+    }
+
+    private void stopAlertCycles() {
+        gpsCheckHandler.removeCallbacks(periodicAlertRunnable);
+        gpsCheckHandler.removeCallbacks(manualInfoRunnable);
+    }
+
+    private void showSavePointDialog() {
+        if (!isAdded() || getActivity() == null) return;
+
+        View dialogView = getLayoutInflater().inflate(R.layout.dialog_save_point, null);
+        AlertDialog.Builder builder = new AlertDialog.Builder(requireContext());
+        
+        AlertDialog dialog = builder.create();
+        if (dialog.getWindow() != null) {
+            dialog.getWindow().setBackgroundDrawableResource(android.R.color.transparent);
+        }
+        
+        dialog.setView(dialogView);
+
+        EditText etPointName = dialogView.findViewById(R.id.et_point_name);
+        Button btnSave = dialogView.findViewById(R.id.btn_dialog_save);
+        Button btnCancel = dialogView.findViewById(R.id.btn_dialog_cancel);
+
+        btnSave.setOnClickListener(v -> {
+            String pointName = etPointName.getText().toString().trim();
+            if (pointName.isEmpty()) {
+                etPointName.setError("Ingrese un nombre");
+                return;
+            }
+            
+            // Lógica de guardado dual (DB y TXT)
+            guardarPuntoEnDbYTXT(pointName);
+            dialog.dismiss();
+        });
+
+        btnCancel.setOnClickListener(v -> dialog.dismiss());
+
+        dialog.show();
+    }
+
+    private void guardarPuntoEnDbYTXT(String nombrePunto) {
+        // 1. Guardar en Base de Datos
+        DatabaseHelper dbHelper = new DatabaseHelper(requireContext());
+        ContentValues values = new ContentValues();
+        values.put(DatabaseHelper.COLUMN_NOMBRE, nombrePunto);
+        values.put(DatabaseHelper.COLUMN_LATITUD, txt_lat.getText().toString());
+        values.put(DatabaseHelper.COLUMN_LONGITUD, txt_lon.getText().toString());
+        values.put(DatabaseHelper.COLUMN_ALTURA, txt_alt.getText().toString());
+        values.put(DatabaseHelper.COLUMN_ESTE, txt_est.getText().toString());
+        values.put(DatabaseHelper.COLUMN_NORTE, txt_nort.getText().toString());
+        values.put(DatabaseHelper.COLUMN_ZONA, txt_zona.getText().toString());
+        values.put(DatabaseHelper.COLUMN_HEMISFERIO, txt_hemis.getText().toString());
+        values.put(DatabaseHelper.COLUMN_FACTOR_ESCALA, txt_fe.getText().toString());
+        values.put(DatabaseHelper.COLUMN_FACTOR_ALTURA, txt_fa.getText().toString());
+        values.put(DatabaseHelper.COLUMN_FACTOR_COMBINADO, txt_fc.getText().toString());
+        
+        long id = dbHelper.insertarPunto(values);
+
+        // 2. Exportar a TXT (Lógica similar a ManualFragment)
+        StringBuilder sb = new StringBuilder();
+        String timeStamp = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault()).format(new Date());
+        
+        sb.append("--- REPORTE DE PUNTO REGISTRADO (AUTOMÁTICO) ---\n");
+        sb.append("Punto: ").append(nombrePunto).append("\n");
+        sb.append("Fecha: ").append(timeStamp).append("\n\n");
+        
+        sb.append("COORDENADAS GEODÉSICAS:\n");
+        sb.append("Latitud: ").append(txt_lat.getText().toString()).append("\n");
+        sb.append("Longitud: ").append(txt_lon.getText().toString()).append("\n");
+        sb.append("Altura: ").append(txt_alt.getText().toString()).append("\n\n");
+        
+        sb.append("COORDENADAS UTM:\n");
+        sb.append("Este: ").append(txt_est.getText().toString()).append("\n");
+        sb.append("Norte: ").append(txt_nort.getText().toString()).append("\n");
+        sb.append("Zona/Hem: ").append(txt_zona.getText().toString()).append(" ").append(txt_hemis.getText().toString()).append("\n\n");
+
+        sb.append("FACTORES DE CORRECCIÓN:\n");
+        sb.append("Factor de Escala: ").append(txt_fe.getText().toString()).append(" (").append(txt_fe_ppm.getText().toString()).append(")\n");
+        sb.append("Factor de Altura: ").append(txt_fa.getText().toString()).append(" (").append(txt_fa_ppm.getText().toString()).append(")\n");
+        sb.append("FACTOR COMBINADO: ").append(txt_fc.getText().toString()).append(" (").append(txt_fc_ppm.getText().toString()).append(")\n");
+        sb.append("\nDesarrollado por Attack7710\n");
+        sb.append("------------------------------------------------\n");
+
+        String fileName = "Punto_" + nombrePunto.replaceAll("[^a-zA-Z0-9]", "_") + "_" + new SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault()).format(new Date()) + ".txt";
+        
+        try {
+            File path = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOCUMENTS);
+            if (!path.exists()) path.mkdirs();
+            File file = new File(path, fileName);
+            FileOutputStream fos = new FileOutputStream(file);
+            fos.write(sb.toString().getBytes());
+            fos.close();
+            
+            if (id != -1) {
+                showProToast("success", "Punto '" + nombrePunto + "' guardado en Registro y TXT generado");
+            }
+        } catch (IOException e) {
+            if (id != -1) {
+                showProToast("success", "Punto guardado en Registro (Error al exportar TXT)");
+            }
+        }
+    }
+
+    private Handler gpsCheckHandler = new Handler(Looper.getMainLooper());
+    private final Runnable checkGpsRunnable = new Runnable() {
+        @Override
+        public void run() {
+            if (!isAdded() || getActivity() == null) return;
+            
+            LocationManager mlocManager = (LocationManager) getActivity().getSystemService(Context.LOCATION_SERVICE);
+            if (mlocManager != null) {
+                boolean isEnabled = mlocManager.isProviderEnabled(LocationManager.GPS_PROVIDER);
+                if (isEnabled != isGpsCurrentlyEnabled) {
+                    checkGpsState(false);
+                }
+            }
+            gpsCheckHandler.postDelayed(this, 5000);
+        }
+    };
+
+    private void showProToast(String type, String message) {
+        if (!isAdded() || getActivity() == null) return;
+
+        View layout = getLayoutInflater().inflate(R.layout.layout_custom_toast_pro, getActivity().findViewById(android.R.id.content), false);
+        View root = layout.findViewById(R.id.toast_root);
+        android.widget.ImageView icon = layout.findViewById(R.id.toast_icon);
+        TextView label = layout.findViewById(R.id.toast_label);
+        TextView msg = layout.findViewById(R.id.toast_message);
+
+        switch (type.toLowerCase()) {
+            case "success":
+                root.setBackgroundResource(R.drawable.bg_toast_success);
+                icon.setImageResource(R.drawable.ic_toast_success);
+                label.setText("Éxito:");
+                break;
+            case "warning":
+                root.setBackgroundResource(R.drawable.bg_toast_warning);
+                icon.setImageResource(R.drawable.ic_toast_warning);
+                label.setText("GPS Desactivado");
+                break;
+            case "error":
+                root.setBackgroundResource(R.drawable.bg_toast_error);
+                icon.setImageResource(R.drawable.ic_toast_error);
+                label.setText("Error:");
+                break;
+            default: // info
+                root.setBackgroundResource(R.drawable.bg_toast_info);
+                icon.setImageResource(R.drawable.ic_toast_info);
+                label.setText("Información:");
+                break;
+        }
+
+        msg.setText(message);
+
+        Toast toast = new Toast(requireContext());
+        toast.setDuration(Toast.LENGTH_LONG);
+        toast.setView(layout);
+        toast.setGravity(Gravity.CENTER, 0, 0);
+        toast.show();
+    }
+
+    private void resetUIData() {
+        if (txt_lat == null) return;
+        txt_lat.setText("0");
+        txt_lon.setText("0");
+        txt_alt.setText("0");
+        txt_est.setText("0");
+        txt_nort.setText("0");
+        txt_zona.setText("0");
+        txt_hemis.setText("-");
+        txt_fe.setText("0");
+        txt_fe_ppm.setText("0ppm");
+        txt_fa.setText("0");
+        txt_fa_ppm.setText("0ppm");
+        txt_fc.setText("0");
+        txt_fc_ppm.setText("0ppm");
+        txt_presicion.setText("±0 m");
+        txt_sat.setText("0");
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        requireActivity().registerReceiver(gpsReceiver, new IntentFilter(LocationManager.PROVIDERS_CHANGED_ACTION));
+        
+        checkGpsState(true); // Forzar chequeo inicial al entrar
+        
+        gpsCheckHandler.post(checkGpsRunnable);
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        requireActivity().unregisterReceiver(gpsReceiver);
+        gpsCheckHandler.removeCallbacks(checkGpsRunnable);
+        stopAlertCycles();
+    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -62,9 +342,17 @@ public class AutomaticFragment extends Fragment {
         this.txt_fc_ppm = view.findViewById(R.id.txt_fc_ppm);
         this.txt_presicion = view.findViewById(R.id.txt_presicion);
         this.txt_sat = view.findViewById(R.id.txt_sat);
+        this.switchMapa = view.findViewById(R.id.switch_mapa);
+        this.cardMapa = view.findViewById(R.id.card_mapa);
+        this.btn_guardar_punto = view.findViewById(R.id.btn_guardar_punto_auto);
 
-        this.fontAwesome = Typeface.createFromAsset(requireContext().getAssets(), "fonts/fontawesome-webfont.ttf");
-        this.materialIco = Typeface.createFromAsset(requireContext().getAssets(), "fonts/MaterialIcons-Regular.ttf");
+        this.btn_guardar_punto.setOnClickListener(v -> {
+            showSavePointDialog();
+        });
+
+        this.switchMapa.setOnCheckedChangeListener((buttonView, isChecked) -> {
+            this.cardMapa.setVisibility(isChecked ? View.VISIBLE : View.GONE);
+        });
 
         if (ActivityCompat.checkSelfPermission(requireContext(), "android.permission.ACCESS_FINE_LOCATION") != 0 &&
             ActivityCompat.checkSelfPermission(requireContext(), "android.permission.ACCESS_COARSE_LOCATION") != 0) {
@@ -144,11 +432,9 @@ public class AutomaticFragment extends Fragment {
             txt_nort.setText(formatter.format(Y) + " m");
             txt_zona.setText(Integer.toString(Z));
             txt_hemis.setText(hemisferio);
-            txt_presicion.setTypeface(fontAwesome);
-            txt_presicion.setText("\uf140 ±" + Math.round(loc.getAccuracy()) + " m");
+            txt_presicion.setText("±" + Math.round(loc.getAccuracy()) + " m");
 
             Bundle extras = loc.getExtras();
-            txt_sat.setCompoundDrawablesWithIntrinsicBounds(R.drawable.satellite, 0, 0, 0);
             if (extras != null) {
                 txt_sat.setText(Integer.toString(extras.getInt("satellites")));
             }
@@ -163,18 +449,12 @@ public class AutomaticFragment extends Fragment {
 
         @Override
         public void onProviderDisabled(@NonNull String provider) {
-            new AlertDialog.Builder(requireContext())
-                    .setMessage("El GPS se encuentra deshabilitado")
-                    .setTitle("AVISO TERRATEC")
-                    .show();
+            // La lógica de repetición controlada se maneja en checkGpsRunnable
         }
 
         @Override
         public void onProviderEnabled(@NonNull String provider) {
-            new AlertDialog.Builder(requireContext())
-                    .setMessage("GENIAL!!!. GPS habilitado")
-                    .setTitle("AVISO TERRATEC")
-                    .show();
+            // Se elimina la alerta intrusiva anterior para una mejor experiencia de usuario
         }
 
         @Override
