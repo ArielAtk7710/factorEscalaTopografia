@@ -41,7 +41,8 @@ public class RegisterFragment extends Fragment {
     private List<Punto> puntosList = new ArrayList<>();
     
     // Header views
-    private ImageView btnExport, btnDeleteMode;
+    private ImageView btnExportAll, btnExportSelected, btnDelete;
+    private ImageView btnCancelSelection;
     private TextView btnConfirmDelete;
     
     private boolean isSelectionMode = false;
@@ -61,16 +62,43 @@ public class RegisterFragment extends Fragment {
         recyclerView = view.findViewById(R.id.rv_puntos);
         txtNoData = view.findViewById(R.id.txt_no_data);
         
-        btnExport = view.findViewById(R.id.btn_header_export);
-        btnDeleteMode = view.findViewById(R.id.btn_header_delete_mode);
+        btnExportAll = view.findViewById(R.id.btn_header_export_all);
+        btnExportSelected = view.findViewById(R.id.btn_header_export_selected);
+        btnDelete = view.findViewById(R.id.btn_header_delete);
         btnConfirmDelete = view.findViewById(R.id.btn_confirm_delete);
+        btnCancelSelection = view.findViewById(R.id.btn_cancel_selection);
 
         recyclerView.setLayoutManager(new LinearLayoutManager(requireContext()));
         adapter = new PuntosAdapter(puntosList);
         recyclerView.setAdapter(adapter);
 
-        btnDeleteMode.setOnClickListener(v -> toggleSelectionMode());
-        
+        // Exportar Todo (Visible siempre que no estemos seleccionando)
+        btnExportAll.setOnClickListener(v -> exportarHistorialTxt(puntosList, "Completo"));
+
+        // Exportar Selección (Activa modo selección si no está activo)
+        btnExportSelected.setOnClickListener(v -> {
+            if (!isSelectionMode) {
+                toggleSelectionMode();
+                UIUtils.showInfoToast(requireContext(), "Seleccione puntos para exportar");
+            } else {
+                if (selectedIds.isEmpty()) {
+                    UIUtils.showWarningToast(requireContext(), "No hay puntos seleccionados");
+                    return;
+                }
+                exportarSeleccionados();
+            }
+        });
+
+        // Eliminar (Activa modo selección si no está activo)
+        btnDelete.setOnClickListener(v -> {
+            if (!isSelectionMode) {
+                toggleSelectionMode();
+                UIUtils.showInfoToast(requireContext(), "Seleccione puntos para borrar");
+            } else {
+                toggleSelectionMode(); // Simplemente sale del modo si ya estaba en él (como un botón de toggle)
+            }
+        });
+
         btnConfirmDelete.setOnClickListener(v -> {
             if (selectedIds.isEmpty()) {
                 toggleSelectionMode();
@@ -79,7 +107,7 @@ public class RegisterFragment extends Fragment {
             eliminarSeleccionados();
         });
 
-        btnExport.setOnClickListener(v -> exportarHistorialTxt());
+        btnCancelSelection.setOnClickListener(v -> toggleSelectionMode());
 
         cargarPuntos();
     }
@@ -88,9 +116,18 @@ public class RegisterFragment extends Fragment {
         isSelectionMode = !isSelectionMode;
         selectedIds.clear();
         
+        // El de "Exportar Todo" se queda visible o no según prefieras, lo ocultaremos para dar foco
+        btnExportAll.setVisibility(isSelectionMode ? View.GONE : View.VISIBLE);
+        
+        // Estilo del de Exportar Selección
+        btnExportSelected.setColorFilter(requireContext().getColor(isSelectionMode ? R.color.accent_orange : R.color.text_secondary));
+        
+        // Estilo de la Papelera
+        btnDelete.setColorFilter(requireContext().getColor(isSelectionMode ? R.color.state_error : R.color.text_secondary));
+        
+        // Botones de acción final
         btnConfirmDelete.setVisibility(isSelectionMode ? View.VISIBLE : View.GONE);
-        btnDeleteMode.setColorFilter(requireContext().getColor(isSelectionMode ? R.color.state_error : R.color.text_secondary));
-        btnExport.setVisibility(isSelectionMode ? View.GONE : View.VISIBLE);
+        btnCancelSelection.setVisibility(isSelectionMode ? View.VISIBLE : View.GONE);
         
         adapter.notifyDataSetChanged();
     }
@@ -99,47 +136,64 @@ public class RegisterFragment extends Fragment {
         for (int id : selectedIds) {
             dbHelper.eliminarPunto(id);
         }
-        Toast.makeText(requireContext(), "Registros eliminados: " + selectedIds.size(), Toast.LENGTH_SHORT).show();
+        UIUtils.showSuccessToast(requireContext(), "Registros eliminados: " + selectedIds.size());
         toggleSelectionMode();
         cargarPuntos();
     }
 
-    private void exportarHistorialTxt() {
-        if (puntosList.isEmpty()) {
-            Toast.makeText(requireContext(), "No hay datos para exportar", Toast.LENGTH_SHORT).show();
+    private void exportarSeleccionados() {
+        List<Punto> seleccionados = new ArrayList<>();
+        for (Punto p : puntosList) {
+            if (selectedIds.contains(p.id)) {
+                seleccionados.add(p);
+            }
+        }
+        exportarHistorialTxt(seleccionados, "Seleccion");
+        toggleSelectionMode();
+    }
+
+    private void exportarHistorialTxt(List<Punto> lista, String sufijo) {
+        if (lista.isEmpty()) {
+            UIUtils.showWarningToast(requireContext(), "No hay datos para exportar");
             return;
         }
 
-        // Agrupar por fecha (solo parte YYYY-MM-DD)
+        // Agrupar por fecha
         TreeMap<String, List<Punto>> agrupados = new TreeMap<>();
-        for (Punto p : puntosList) {
+        for (Punto p : lista) {
             String fechaKey = p.fecha.split(" ")[0];
             if (!agrupados.containsKey(fechaKey)) {
                 agrupados.put(fechaKey, new ArrayList<>());
             }
-            agrupados.get(fechaKey).add(p);
+            List<Punto> subLista = agrupados.get(fechaKey);
+            if (subLista != null) subLista.add(p);
         }
 
         StringBuilder sb = new StringBuilder();
         sb.append("==========================================\n");
-        sb.append("   HISTORIAL COMPLETO - FACTORESCALATOP   \n");
+        sb.append("   REPORTE ").append(sufijo.toUpperCase()).append(" - FACTORESCALATOP   \n");
         sb.append("==========================================\n\n");
 
         for (String fecha : agrupados.keySet()) {
             sb.append("--- FECHA: ").append(fecha).append(" ---\n");
-            for (Punto p : agrupados.get(fecha)) {
-                sb.append("PUNTO: ").append(p.nombre).append("\n");
-                sb.append("  UTM: E=").append(p.este).append(" | N=").append(p.norte).append("\n");
-                sb.append("  LAT/LON: ").append(p.latitud).append(" / ").append(p.longitud).append("\n");
-                sb.append("  K COMBINADO: ").append(p.fc).append("\n");
-                sb.append("------------------------------------------\n");
+            List<Punto> subLista = agrupados.get(fecha);
+            if (subLista != null) {
+                for (Punto p : subLista) {
+                    sb.append("PUNTO: ").append(p.nombre).append("\n");
+                    sb.append("  UTM: E=").append(p.este).append(" | N=").append(p.norte).append("\n");
+                    sb.append("  LAT/LON: ").append(p.latitud).append(" / ").append(p.longitud).append("\n");
+                    sb.append("  ALT: Elipsoidal=").append(p.altura).append(" | Ortométrica=").append(p.altOrto).append("\n");
+                    sb.append("  PRESIÓN: ").append(p.presion).append("\n");
+                    sb.append("  K COMBINADO: ").append(p.fc).append("\n");
+                    sb.append("------------------------------------------\n");
+                }
             }
             sb.append("\n");
         }
         
         sb.append("Generado por FactorEscalaTop el ").append(new SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.getDefault()).format(new Date())).append("\n");
 
-        String fileName = "Historial_Registros_" + new SimpleDateFormat("yyyyMMdd_HHmm", Locale.getDefault()).format(new Date()) + ".txt";
+        String fileName = "Historial_" + sufijo + "_" + new SimpleDateFormat("yyyyMMdd_HHmm", Locale.getDefault()).format(new Date()) + ".txt";
         FileUtils.savePublicTxtFile(requireContext(), fileName, sb.toString());
     }
 
@@ -160,6 +214,8 @@ public class RegisterFragment extends Fragment {
                 p.latitud = cursor.getString(cursor.getColumnIndexOrThrow(DatabaseHelper.COLUMN_LATITUD));
                 p.longitud = cursor.getString(cursor.getColumnIndexOrThrow(DatabaseHelper.COLUMN_LONGITUD));
                 p.altura = cursor.getString(cursor.getColumnIndexOrThrow(DatabaseHelper.COLUMN_ALTURA));
+                p.altOrto = cursor.getString(cursor.getColumnIndexOrThrow(DatabaseHelper.COLUMN_ALTURA_ORTO));
+                p.presion = cursor.getString(cursor.getColumnIndexOrThrow(DatabaseHelper.COLUMN_PRESION));
                 p.este = cursor.getString(cursor.getColumnIndexOrThrow(DatabaseHelper.COLUMN_ESTE));
                 p.norte = cursor.getString(cursor.getColumnIndexOrThrow(DatabaseHelper.COLUMN_NORTE));
                 p.zona = cursor.getString(cursor.getColumnIndexOrThrow(DatabaseHelper.COLUMN_ZONA));
@@ -185,7 +241,7 @@ public class RegisterFragment extends Fragment {
 
     private static class Punto {
         int id;
-        String nombre, latitud, longitud, altura, este, norte, zona, hemisferio, fe, fa, fc, fecha;
+        String nombre, latitud, longitud, altura, altOrto, presion, este, norte, zona, hemisferio, fe, fa, fc, fecha;
         boolean isExpanded = false;
     }
 
@@ -213,6 +269,8 @@ public class RegisterFragment extends Fragment {
             holder.txtDetLat.setText(punto.latitud);
             holder.txtDetLon.setText(punto.longitud);
             holder.txtDetAlt.setText(punto.altura);
+            holder.txtDetAltOrto.setText(punto.altOrto);
+            holder.txtDetPresion.setText(punto.presion);
             holder.txtDetSis.setText("WGS-84 " + punto.zona + " " + punto.hemisferio);
             holder.txtDetFe.setText(punto.fe);
             holder.txtDetFa.setText(punto.fa);
@@ -243,12 +301,12 @@ public class RegisterFragment extends Fragment {
             holder.btnCopy.setOnClickListener(v -> copiarAlPortapapeles(punto));
             holder.btnShare.setOnClickListener(v -> compartirPunto(punto));
 
-            // El botón eliminar individual se oculta en modo selección para evitar confusiones
+            // Botón Eliminar individual se oculta en modo selección para evitar confusiones
             holder.btnDelete.setVisibility(isSelectionMode ? View.GONE : View.VISIBLE);
             holder.btnDelete.setOnClickListener(v -> {
                 dbHelper.eliminarPunto(punto.id);
                 cargarPuntos();
-                Toast.makeText(requireContext(), "Registro eliminado", Toast.LENGTH_SHORT).show();
+                UIUtils.showSuccessToast(requireContext(), "Registro eliminado");
             });
         }
 
@@ -258,7 +316,7 @@ public class RegisterFragment extends Fragment {
             ClipData clip = ClipData.newPlainText("Punto Topográfico", reporte);
             if (clipboard != null) {
                 clipboard.setPrimaryClip(clip);
-                Toast.makeText(requireContext(), "Copiado al portapapeles", Toast.LENGTH_SHORT).show();
+                UIUtils.showSuccessToast(requireContext(), "Copiado al portapapeles");
             }
         }
 
@@ -277,7 +335,9 @@ public class RegisterFragment extends Fragment {
                    "Este: " + p.este + "\nNorte: " + p.norte + "\n" +
                    "Zona/Hem: " + p.zona + " " + p.hemisferio + "\n" +
                    "Lat: " + p.latitud + "\nLon: " + p.longitud + "\n" +
-                   "Alt: " + p.altura + "\n" +
+                   "Alt Elipsoidal: " + p.altura + "\n" +
+                   "Alt Ortométrica: " + p.altOrto + "\n" +
+                   "Presión: " + p.presion + "\n" +
                    "FACTOR COMBINADO: " + p.fc + "\n" +
                    "Fecha: " + p.fecha + "\n" +
                    "---------------------------";
@@ -289,7 +349,7 @@ public class RegisterFragment extends Fragment {
         }
 
         class ViewHolder extends RecyclerView.ViewHolder {
-            TextView txtNombre, txtResumenUtm, txtDetLat, txtDetLon, txtDetAlt, txtDetSis, txtDetFe, txtDetFa, txtDetFc, txtFechaFull, txtExpandLabel;
+            TextView txtNombre, txtResumenUtm, txtDetLat, txtDetLon, txtDetAlt, txtDetAltOrto, txtDetPresion, txtDetSis, txtDetFe, txtDetFa, txtDetFc, txtFechaFull, txtExpandLabel;
             ImageView btnDelete, btnCopy, btnShare, imgArrow;
             CheckBox cbSelect;
             LinearLayout layoutExpand, btnExpand;
@@ -310,6 +370,8 @@ public class RegisterFragment extends Fragment {
                 txtDetLat = itemView.findViewById(R.id.txt_det_lat);
                 txtDetLon = itemView.findViewById(R.id.txt_det_lon);
                 txtDetAlt = itemView.findViewById(R.id.txt_det_alt);
+                txtDetAltOrto = itemView.findViewById(R.id.txt_det_alt_orto);
+                txtDetPresion = itemView.findViewById(R.id.txt_det_presion);
                 txtDetSis = itemView.findViewById(R.id.txt_det_sis);
                 txtDetFe = itemView.findViewById(R.id.txt_det_fe);
                 txtDetFa = itemView.findViewById(R.id.txt_det_fa);

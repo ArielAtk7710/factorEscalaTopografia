@@ -1,42 +1,39 @@
-# Plan de Limpieza, Verificación y Exportación Pública
+# Plan de Unificación de Notificaciones (Toasts)
 
-Este plan consolida la migración de archivos a la memoria pública del celular, la notificación de ruta mediante Toasts y la limpieza profunda del proyecto para eliminar archivos basura.
+El objetivo es asegurar que todas las notificaciones de la aplicación utilicen el diseño personalizado y la paleta de colores establecida, eliminando los Toasts estándar de Android que rompen con la estética minimalista de la app.
 
-## Cambios en Funcionalidades
+## Cambios Propuestos
 
-### 1. Centralización de Exportación (FileUtils)
-#### [NEW] [FileUtils.java](file:///D:/Desarrollo-Software/Proyectos%20Android/factorEscala/app/src/main/java/bo/com/factorcombinadotopo/FileUtils.java)
-- Implementar `savePublicTxtFile` usando `MediaStore` para que los archivos sean visibles en `Documents/FactorEscalaTop`.
-- Retornar la ruta amigable para mostrar en el Toast.
+### 1. Centralización en UIUtils
+#### [MODIFY] [UIUtils.java](file:///D:/Desarrollo-Software/Proyectos%20Android/factorEscala/app/src/main/java/bo/com/factorcombinadotopo/UIUtils.java)
+- Ampliar la clase para incluir métodos específicos para cada tipo de mensaje:
+    - `showSuccessToast(Context, String message)`
+    - `showErrorToast(Context, String message)`
+    - `showInfoToast(Context, String message)` (y la versión `Long` para rutas)
+    - `showWarningToast(Context, String message)`
+- Todos los métodos utilizarán el layout `layout_custom_toast_pro.xml` con los fondos y colores correspondientes (`bg_toast_success`, `bg_toast_error`, etc.).
 
-### 2. Actualización de Pestañas
-#### [MODIFY] [RegisterFragment.java](file:///D:/Desarrollo-Software/Proyectos%20Android/factorEscala/app/src/main/java/bo/com/factorcombinadotopo/RegisterFragment.java)
+### 2. Actualización de Fragmentos y Utilidades
 #### [MODIFY] [AutomaticFragment.java](file:///D:/Desarrollo-Software/Proyectos%20Android/factorEscala/app/src/main/java/bo/com/factorcombinadotopo/AutomaticFragment.java)
+- Eliminar el método local `showProToast`.
+- Reemplazar todas las llamadas internas por `UIUtils.show...Toast`.
+
 #### [MODIFY] [ManualFragment.java](file:///D:/Desarrollo-Software/Proyectos%20Android/factorEscala/app/src/main/java/bo/com/factorcombinadotopo/ManualFragment.java)
-- Usar `FileUtils.savePublicTxtFile`.
-- Mostrar Toast: `"Guardado en: Almacenamiento Interno > Documents > FactorEscalaTop > [archivo].txt"`.
+- Reemplazar todos los `Toast.makeText` (mensajes de validación y errores de cálculo) por la versión estilizada.
 
-## Limpieza del Proyecto (Archivos no usados)
+#### [MODIFY] [RegisterFragment.java](file:///D:/Desarrollo-Software/Proyectos%20Android/factorEscala/app/src/main/java/bo/com/factorcombinadotopo/RegisterFragment.java)
+- Reemplazar los `Toast.makeText` (eliminación, copiado, selección) por la versión estilizada.
 
-He detectado varias carpetas que no pertenecen a la estructura estándar de Android y contienen archivos duplicados o basura:
-
-#### [DELETE] `/resources/`
-- Contiene layouts antiguos que ya fueron migrados a `app/src/main/res`.
-
-#### [DELETE] `/sources/`
-- Contiene código fuente redundante o de respaldo que no es utilizado por el compilador de Gradle.
-
-#### [DELETE] `/build/` (Raíz)
-- Los archivos de compilación deben estar dentro de cada módulo. El `/build` de la raíz se puede regenerar si es necesario.
-
-#### [CLEANUP] `.artifacts/`
-- Eliminar subcarpetas de interacciones pasadas, manteniendo solo la actual para liberar espacio y reducir ruido.
+#### [MODIFY] [FileUtils.java](file:///D:/Desarrollo-Software/Proyectos%20Android/factorEscala/app/src/main/java/bo/com/factorcombinadotopo/FileUtils.java)
+- Asegurar que los errores de escritura usen `UIUtils.showErrorToast`.
 
 ## Plan de Verificación
 
-1. **Sincronización:** Ejecutar `Gradle Sync`.
-2. **Compilación:** Ejecutar `clean build` para asegurar que el proyecto está íntegro sin los archivos eliminados.
-3. **Prueba de Exportación:** Verificar que el Toast muestre la ruta y que el archivo aparezca en la memoria pública.
+### Pruebas de Interfaz
+1. **Éxito:** Guardar un punto y verificar el Toast verde.
+2. **Error:** Intentar calcular sin datos y verificar el Toast rojo.
+3. **Info:** Exportar y verificar el Toast azul de 5 segundos.
+4. **Advertencia:** Desactivar GPS y verificar el Toast naranja recurrente.
 
 ---
-¿Deseas que proceda con la limpieza y la actualización de almacenamiento?
+¿Deseas que proceda con la unificación de todos los Toasts de la app?

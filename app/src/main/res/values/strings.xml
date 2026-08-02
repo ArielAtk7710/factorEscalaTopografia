@@ -921,4 +921,6 @@
     <string name="title_register_history">HISTORIAL DE PUNTOS</string>
     <string name="msg_no_registered_points">No hay puntos registrados aún.</string>
     <string name="label_combined_factor_short">Factor Combinado</string>
+    <string name="menu_about">Acerca de</string>
+    <string name="menu_tutorial">Tutorial</string>
 </resources>

@@ -9,7 +9,7 @@ import android.database.sqlite.SQLiteOpenHelper;
 public class DatabaseHelper extends SQLiteOpenHelper {
 
     private static final String DATABASE_NAME = "puntos.db";
-    private static final int DATABASE_VERSION = 1;
+    private static final int DATABASE_VERSION = 2;
     public static final String TABLE_PUNTOS = "puntos";
 
     public static final String COLUMN_ID = "id";
@@ -17,6 +17,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public static final String COLUMN_LATITUD = "latitud";
     public static final String COLUMN_LONGITUD = "longitud";
     public static final String COLUMN_ALTURA = "altura";
+    public static final String COLUMN_ALTURA_ORTO = "altura_ortometrica";
+    public static final String COLUMN_PRESION = "presion";
     public static final String COLUMN_ESTE = "este";
     public static final String COLUMN_NORTE = "norte";
     public static final String COLUMN_ZONA = "zona";
@@ -33,6 +35,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                     COLUMN_LATITUD + " TEXT, " +
                     COLUMN_LONGITUD + " TEXT, " +
                     COLUMN_ALTURA + " TEXT, " +
+                    COLUMN_ALTURA_ORTO + " TEXT, " +
+                    COLUMN_PRESION + " TEXT, " +
                     COLUMN_ESTE + " TEXT, " +
                     COLUMN_NORTE + " TEXT, " +
                     COLUMN_ZONA + " TEXT, " +

@@ -1,26 +1,26 @@
-# Limpieza Profunda y Exportación Pública de Archivos
+# Unificación de Notificaciones (Toasts) Estilizadas
 
-He realizado una limpieza exhaustiva del proyecto y optimizado el sistema de exportación de archivos para que sea totalmente visible y amigable para el usuario.
+He unificado todos los mensajes de notificación de la aplicación para que utilicen el diseño personalizado y la paleta de colores de la marca, eliminando los Toasts genéricos de Android.
 
 ## Mejoras Implementadas
 
-### 1. Almacenamiento Público (MediaStore)
-- **Centralización:** Creé la clase [FileUtils.java](file:///D:/Desarrollo-Software/Proyectos%20Android/factorEscala/app/src/main/java/bo/com/factorcombinadotopo/FileUtils.java) que gestiona el guardado de archivos usando la API de Android recomendada para Scoped Storage.
-- **Ubicación:** Los archivos ahora se guardan en la carpeta pública **`Documents > FactorEscalaTop`**. Ya no están ocultos en la carpeta de datos de la app.
-- **Ruta Amigable:** Implementé un Toast informativo que indica la ubicación exacta del archivo en el almacenamiento interno de forma sencilla.
+### 1. Centralización en `UIUtils`
+- Creé métodos especializados en [UIUtils.java](file:///D:/Desarrollo-Software/Proyectos%20Android/factorEscala/app/src/main/java/bo/com/factorcombinadotopo/UIUtils.java) para cada tipo de interacción:
+    - **Éxito (Verde):** Confirmación de guardado, eliminación y copiado.
+    - **Error (Rojo):** Avisos de fallos técnicos o validaciones críticas.
+    - **Información (Azul):** Detalles de ruta de archivos y avisos operativos.
+    - **Advertencia (Naranja):** Avisos de GPS desactivado y campos incompletos.
 
-### 2. Limpieza del Proyecto
-- **Eliminación de Basura:** Se eliminaron las carpetas `/resources/`, `/sources/` y `/build/` de la raíz del proyecto. Estos archivos eran duplicados antiguos o temporales que no formaban parte del código real de la aplicación.
-- **Integridad:** Confirmé que la eliminación no afecta el funcionamiento mediante una compilación limpia (`clean build`).
+### 2. Consistencia en toda la App
+- **Automático:** Actualizado el aviso de activación de GPS y las alertas de estado.
+- **Manual:** Los errores de validación de campos vacíos o datos no numéricos ahora son elegantes y visibles.
+- **Registro:** Las confirmaciones de copiado al portapapeles y eliminación masiva ahora coinciden con el estilo visual.
+- **Archivos:** Los avisos de ruta de exportación mantienen la duración extendida de 5 segundos con el nuevo estilo azul.
 
-## Verificación de Funciones
-- **Modo Automático:** Al guardar un punto, el archivo se crea en la carpeta pública y se muestra el aviso de ruta.
-- **Modo Manual:** Al calcular y guardar, se sigue la misma lógica pública.
-- **Registro:** La exportación consolidada ahora también es visible fuera de la aplicación.
+## Verificación Visual
+- Se utiliza el layout [layout_custom_toast_pro.xml](file:///D:/Desarrollo-Software/Proyectos%20Android/factorEscala/app/src/main/res/layout/layout_custom_toast_pro.xml) en todos los mensajes.
+- Los iconos informativos se ajustan automáticamente según el tipo de mensaje.
+- El texto es legible sobre fondos contrastados según la paleta minimalista (Oscuro/Naranja/Azul).
 
-> [!TIP]
-> Puedes encontrar tus reportes ahora entrando a tu gestor de archivos favorito (como "Archivos" de Google o "Mis Archivos") en la sección **Documentos > FactorEscalaTop**.
-
-render_diffs(file:///D:/Desarrollo-Software/Proyectos%20Android/factorEscala/app/src/main/java/bo/com/factorcombinadotopo/AutomaticFragment.java)
-render_diffs(file:///D:/Desarrollo-Software/Proyectos%20Android/factorEscala/app/src/main/java/bo/com/factorcombinadotopo/ManualFragment.java)
+render_diffs(file:///D:/Desarrollo-Software/Proyectos%20Android/factorEscala/app/src/main/java/bo/com/factorcombinadotopo/UIUtils.java)
 render_diffs(file:///D:/Desarrollo-Software/Proyectos%20Android/factorEscala/app/src/main/java/bo/com/factorcombinadotopo/RegisterFragment.java)

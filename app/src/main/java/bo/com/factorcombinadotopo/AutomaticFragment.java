@@ -37,9 +37,14 @@ import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
+import android.hardware.Sensor;
+import android.hardware.SensorEvent;
+import android.hardware.SensorEventListener;
+import android.hardware.SensorManager;
+import android.location.GnssStatus;
 
-public class AutomaticFragment extends Fragment {
-    private TextView txt_alt;
+public class AutomaticFragment extends Fragment implements SensorEventListener {
+    private TextView txt_alt, txt_alt_orto;
     private TextView txt_est;
     private TextView txt_fa;
     private TextView txt_fa_ppm;
@@ -54,9 +59,32 @@ public class AutomaticFragment extends Fragment {
     private TextView txt_presicion;
     private TextView txt_sat;
     private TextView txt_zona;
+    private TextView txt_presion;
     private SwitchMaterial switchMapa;
     private CardView cardMapa;
     private Button btn_guardar_punto;
+
+    private SensorManager sensorManager;
+    private Sensor pressureSensor;
+    private float currentPressure = 0;
+
+    private LocationManager mlocManager;
+    private Localizacion localizacion;
+
+    private final GnssStatus.Callback gnssCallback = new GnssStatus.Callback() {
+        @Override
+        public void onSatelliteStatusChanged(@NonNull GnssStatus status) {
+            int satellitesInUse = 0;
+            for (int i = 0; i < status.getSatelliteCount(); i++) {
+                if (status.usedInFix(i)) {
+                    satellitesInUse++;
+                }
+            }
+            if (txt_sat != null) {
+                txt_sat.setText(String.valueOf(satellitesInUse));
+            }
+        }
+    };
 
     private boolean isGpsCurrentlyEnabled = true;
 
@@ -64,7 +92,7 @@ public class AutomaticFragment extends Fragment {
         @Override
         public void run() {
             if (isAdded() && !isGpsCurrentlyEnabled) {
-                showProToast("info", "Ingrese de Forma Manual los datos");
+                UIUtils.showInfoToast(requireContext(), "Ingrese de Forma Manual los datos");
             }
         }
     };
@@ -74,7 +102,7 @@ public class AutomaticFragment extends Fragment {
         public void run() {
             if (isAdded() && !isGpsCurrentlyEnabled) {
                 // Paso 1: Mostrar Advertencia (Amarillo)
-                showProToast("warning", "Active el GPS de su Dispositivo");
+                UIUtils.showWarningToast(requireContext(), "Active el GPS de su Dispositivo");
                 resetUIData();
 
                 // Paso 2: Programar Info (Azul) a los 5 segundos
@@ -96,27 +124,45 @@ public class AutomaticFragment extends Fragment {
         }
     };
 
+    @Override
+    public void onSensorChanged(SensorEvent event) {
+        if (event.sensor.getType() == Sensor.TYPE_PRESSURE) {
+            currentPressure = event.values[0];
+            if (txt_presion != null) {
+                txt_presion.setText(String.format(Locale.getDefault(), "%.1f hPa", currentPressure));
+            }
+        }
+    }
+
+    @Override
+    public void onAccuracyChanged(Sensor sensor, int accuracy) {}
+
     private void checkGpsState(boolean forceNotification) {
         if (!isAdded() || getActivity() == null) return;
 
-        LocationManager mlocManager = (LocationManager) getActivity().getSystemService(Context.LOCATION_SERVICE);
+        mlocManager = (LocationManager) getActivity().getSystemService(Context.LOCATION_SERVICE);
         if (mlocManager == null) return;
 
         boolean isEnabled = mlocManager.isProviderEnabled(LocationManager.GPS_PROVIDER);
 
         if (!isEnabled && (isGpsCurrentlyEnabled || forceNotification)) {
-            // Recién desactivado (o forzado al entrar)
             isGpsCurrentlyEnabled = false;
-            
-            // Detener cualquier ciclo previo y empezar uno nuevo
             stopAlertCycles();
             gpsCheckHandler.post(periodicAlertRunnable);
             
         } else if (isEnabled && (!isGpsCurrentlyEnabled || forceNotification)) {
-            // Recién activado (o forzado al entrar)
             isGpsCurrentlyEnabled = true;
             stopAlertCycles();
-            showProToast("success", "GPS ACTIVADO");
+            UIUtils.showSuccessToast(requireContext(), "GPS ACTIVADO");
+            restartLocationUpdates();
+        }
+    }
+
+    private void restartLocationUpdates() {
+        if (ActivityCompat.checkSelfPermission(requireContext(), android.Manifest.permission.ACCESS_FINE_LOCATION) == 0) {
+            mlocManager.removeUpdates(localizacion);
+            mlocManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, localizacion);
+            mlocManager.registerGnssStatusCallback(gnssCallback, new Handler(Looper.getMainLooper()));
         }
     }
 
@@ -167,6 +213,8 @@ public class AutomaticFragment extends Fragment {
         values.put(DatabaseHelper.COLUMN_LATITUD, txt_lat.getText().toString());
         values.put(DatabaseHelper.COLUMN_LONGITUD, txt_lon.getText().toString());
         values.put(DatabaseHelper.COLUMN_ALTURA, txt_alt.getText().toString());
+        values.put(DatabaseHelper.COLUMN_ALTURA_ORTO, txt_alt_orto.getText().toString());
+        values.put(DatabaseHelper.COLUMN_PRESION, txt_presion.getText().toString());
         values.put(DatabaseHelper.COLUMN_ESTE, txt_est.getText().toString());
         values.put(DatabaseHelper.COLUMN_NORTE, txt_nort.getText().toString());
         values.put(DatabaseHelper.COLUMN_ZONA, txt_zona.getText().toString());
@@ -177,7 +225,7 @@ public class AutomaticFragment extends Fragment {
         
         long id = dbHelper.insertarPunto(values);
 
-        // 2. Exportar a TXT (Lógica similar a ManualFragment)
+        // 2. Exportar a TXT
         StringBuilder sb = new StringBuilder();
         String timeStamp = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault()).format(new Date());
         
@@ -188,8 +236,12 @@ public class AutomaticFragment extends Fragment {
         sb.append("COORDENADAS GEODÉSICAS:\n");
         sb.append("Latitud: ").append(txt_lat.getText().toString()).append("\n");
         sb.append("Longitud: ").append(txt_lon.getText().toString()).append("\n");
-        sb.append("Altura: ").append(txt_alt.getText().toString()).append("\n\n");
+        sb.append("Altura Elipsoidal: ").append(txt_alt.getText().toString()).append("\n");
+        sb.append("Altura Ortométrica: ").append(txt_alt_orto.getText().toString()).append("\n\n");
         
+        sb.append("DATOS ATMOSFÉRICOS:\n");
+        sb.append("Presión: ").append(txt_presion.getText().toString()).append("\n\n");
+
         sb.append("COORDENADAS UTM:\n");
         sb.append("Este: ").append(txt_est.getText().toString()).append("\n");
         sb.append("Norte: ").append(txt_nort.getText().toString()).append("\n");
@@ -199,16 +251,12 @@ public class AutomaticFragment extends Fragment {
         sb.append("Factor de Escala: ").append(txt_fe.getText().toString()).append(" (").append(txt_fe_ppm.getText().toString()).append(")\n");
         sb.append("Factor de Altura: ").append(txt_fa.getText().toString()).append(" (").append(txt_fa_ppm.getText().toString()).append(")\n");
         sb.append("FACTOR COMBINADO: ").append(txt_fc.getText().toString()).append(" (").append(txt_fc_ppm.getText().toString()).append(")\n");
-        sb.append("\nDesarrollado por Attack7710\n");
+        sb.append("\nDesarrollado por FactorEscalaTop\n");
         sb.append("------------------------------------------------\n");
 
         String fileName = "Punto_" + nombrePunto.replaceAll("[^a-zA-Z0-9]", "_") + "_" + new SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault()).format(new Date()) + ".txt";
         
         FileUtils.savePublicTxtFile(requireContext(), fileName, sb.toString());
-        
-        if (id != -1) {
-            // El Toast de ruta se maneja en FileUtils
-        }
     }
 
     private Handler gpsCheckHandler = new Handler(Looper.getMainLooper());
@@ -228,52 +276,12 @@ public class AutomaticFragment extends Fragment {
         }
     };
 
-    private void showProToast(String type, String message) {
-        if (!isAdded() || getActivity() == null) return;
-
-        View layout = getLayoutInflater().inflate(R.layout.layout_custom_toast_pro, getActivity().findViewById(android.R.id.content), false);
-        View root = layout.findViewById(R.id.toast_root);
-        android.widget.ImageView icon = layout.findViewById(R.id.toast_icon);
-        TextView label = layout.findViewById(R.id.toast_label);
-        TextView msg = layout.findViewById(R.id.toast_message);
-
-        switch (type.toLowerCase()) {
-            case "success":
-                root.setBackgroundResource(R.drawable.bg_toast_success);
-                icon.setImageResource(R.drawable.ic_toast_success);
-                label.setText("Éxito:");
-                break;
-            case "warning":
-                root.setBackgroundResource(R.drawable.bg_toast_warning);
-                icon.setImageResource(R.drawable.ic_toast_warning);
-                label.setText("GPS Desactivado");
-                break;
-            case "error":
-                root.setBackgroundResource(R.drawable.bg_toast_error);
-                icon.setImageResource(R.drawable.ic_toast_error);
-                label.setText("Error:");
-                break;
-            default: // info
-                root.setBackgroundResource(R.drawable.bg_toast_info);
-                icon.setImageResource(R.drawable.ic_toast_info);
-                label.setText("Información:");
-                break;
-        }
-
-        msg.setText(message);
-
-        Toast toast = new Toast(requireContext());
-        toast.setDuration(Toast.LENGTH_LONG);
-        toast.setView(layout);
-        toast.setGravity(Gravity.CENTER, 0, 0);
-        toast.show();
-    }
-
     private void resetUIData() {
         if (txt_lat == null) return;
         txt_lat.setText("0");
         txt_lon.setText("0");
         txt_alt.setText("0");
+        txt_alt_orto.setText("0");
         txt_est.setText("0");
         txt_nort.setText("0");
         txt_zona.setText("0");
@@ -286,6 +294,7 @@ public class AutomaticFragment extends Fragment {
         txt_fc_ppm.setText("0ppm");
         txt_presicion.setText("±0 m");
         txt_sat.setText("0");
+        txt_presion.setText("--- hPa");
     }
 
     @Override
@@ -293,8 +302,11 @@ public class AutomaticFragment extends Fragment {
         super.onResume();
         requireActivity().registerReceiver(gpsReceiver, new IntentFilter(LocationManager.PROVIDERS_CHANGED_ACTION));
         
-        checkGpsState(true); // Forzar chequeo inicial al entrar
-        
+        if (pressureSensor != null) {
+            sensorManager.registerListener(this, pressureSensor, SensorManager.SENSOR_DELAY_UI);
+        }
+
+        checkGpsState(true); 
         gpsCheckHandler.post(checkGpsRunnable);
     }
 
@@ -302,6 +314,12 @@ public class AutomaticFragment extends Fragment {
     public void onPause() {
         super.onPause();
         requireActivity().unregisterReceiver(gpsReceiver);
+        if (sensorManager != null) {
+            sensorManager.unregisterListener(this);
+        }
+        if (mlocManager != null) {
+            mlocManager.unregisterGnssStatusCallback(gnssCallback);
+        }
         gpsCheckHandler.removeCallbacks(checkGpsRunnable);
         stopAlertCycles();
     }
@@ -322,6 +340,8 @@ public class AutomaticFragment extends Fragment {
         this.txt_lat = view.findViewById(R.id.txt_lat);
         this.txt_alt = view.findViewById(R.id.txt_alt);
         this.txt_lon = view.findViewById(R.id.txt_lon);
+        this.txt_alt_orto = view.findViewById(R.id.txt_alt_orto);
+        this.txt_presion = view.findViewById(R.id.txt_presion);
         this.txt_fe = view.findViewById(R.id.txt_fe);
         this.txt_fe_ppm = view.findViewById(R.id.txt_fe_ppm);
         this.txt_fa = view.findViewById(R.id.txt_fa);
@@ -334,6 +354,13 @@ public class AutomaticFragment extends Fragment {
         this.cardMapa = view.findViewById(R.id.card_mapa);
         this.btn_guardar_punto = view.findViewById(R.id.btn_guardar_punto_auto);
 
+        sensorManager = (SensorManager) requireActivity().getSystemService(Context.SENSOR_SERVICE);
+        if (sensorManager != null) {
+            pressureSensor = sensorManager.getDefaultSensor(Sensor.TYPE_PRESSURE);
+        }
+
+        localizacion = new Localizacion();
+
         this.btn_guardar_punto.setOnClickListener(v -> {
             showSavePointDialog();
         });
@@ -342,35 +369,31 @@ public class AutomaticFragment extends Fragment {
             this.cardMapa.setVisibility(isChecked ? View.VISIBLE : View.GONE);
         });
 
-        if (ActivityCompat.checkSelfPermission(requireContext(), "android.permission.ACCESS_FINE_LOCATION") != 0 &&
-            ActivityCompat.checkSelfPermission(requireContext(), "android.permission.ACCESS_COARSE_LOCATION") != 0) {
-            ActivityCompat.requestPermissions(requireActivity(), new String[]{"android.permission.ACCESS_FINE_LOCATION"}, 1000);
+        if (ActivityCompat.checkSelfPermission(requireContext(), android.Manifest.permission.ACCESS_FINE_LOCATION) != 0) {
+            ActivityCompat.requestPermissions(requireActivity(), new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION}, 1000);
         } else {
             locationStart();
         }
     }
 
     private void locationStart() {
-        LocationManager mlocManager = (LocationManager) requireActivity().getSystemService("location");
+        mlocManager = (LocationManager) requireActivity().getSystemService(Context.LOCATION_SERVICE);
         if (mlocManager == null) return;
 
-        Localizacion local = new Localizacion();
-        boolean gpsEnabled = mlocManager.isProviderEnabled("gps");
+        boolean gpsEnabled = mlocManager.isProviderEnabled(LocationManager.GPS_PROVIDER);
         if (!gpsEnabled) {
             Intent settingsIntent = new Intent("android.settings.LOCATION_SOURCE_SETTINGS");
             startActivity(settingsIntent);
         }
 
-        if (ActivityCompat.checkSelfPermission(requireContext(), "android.permission.ACCESS_FINE_LOCATION") == 0 ||
-            ActivityCompat.checkSelfPermission(requireContext(), "android.permission.ACCESS_COARSE_LOCATION") == 0) {
-            mlocManager.requestLocationUpdates("network", 0L, 0.0f, local);
-            mlocManager.requestLocationUpdates("gps", 0L, 0.0f, local);
+        if (ActivityCompat.checkSelfPermission(requireContext(), android.Manifest.permission.ACCESS_FINE_LOCATION) == 0) {
+            mlocManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, localizacion);
+            mlocManager.registerGnssStatusCallback(gnssCallback, new Handler(Looper.getMainLooper()));
         }
     }
 
     public class Localizacion implements LocationListener {
         @Override
-        @RequiresApi(api = 17)
         public void onLocationChanged(Location loc) {
             Integer Z;
             Integer W;
@@ -379,6 +402,20 @@ public class AutomaticFragment extends Fragment {
             Double L = loc.getLongitude();
             Double F = loc.getLatitude();
             Double Alt = loc.getAltitude();
+
+            // Cálculo de ondulación del geoide y Altura Ortométrica
+            double N_geoid = GeoidManager.getGeoidUndulation(F, L);
+            double altOrto = Alt - N_geoid;
+            DecimalFormat formatter = new DecimalFormat("#0.00");
+            if (txt_alt_orto != null) {
+                txt_alt_orto.setText(formatter.format(altOrto) + " m");
+            }
+
+            // Cálculo de Presión Atmosférica mediante fórmula física
+            double presionMmHg = GeoidManager.calculatePressureMmHg(altOrto);
+            if (txt_presion != null) {
+                txt_presion.setText(String.format(Locale.getDefault(), "%.1f mmHg", presionMmHg));
+            }
 
             String hemisferio = F < 0.0d ? "S" : "N";
             if (L > 0.0d) {
@@ -392,28 +429,27 @@ public class AutomaticFragment extends Fragment {
             Double B = 6356752.31424518d;
             Double E = (Math.pow(A, 2.0d) - Math.pow(B, 2.0d)) / Math.pow(A, 2.0d);
             Double D = (Math.pow(A, 2.0d) - Math.pow(B, 2.0d)) / Math.pow(B, 2.0d);
-            Double N = A / Math.sqrt(1.0d - (E * Math.pow(Math.sin((F * 3.141592653589793d) / 180.0d), 2.0d)));
-            Double T = Math.pow(Math.tan((F * 3.141592653589793d) / 180.0d), 2.0d);
-            Double C = D * Math.pow(Math.cos((F * 3.141592653589793d) / 180.0d), 2.0d);
-            Double G = (L - ((double) W)) * ((Math.cos((F * 3.141592653589793d) / 180.0d) * 3.141592653589793d) / 180.0d);
-            Double M = A * (((((((1.0d - (E / 4.0d)) - ((3.0d * Math.pow(E, 2.0d)) / 64.0d)) - ((5.0d * Math.pow(E, 3.0d)) / 256.0d)) * ((F * 3.141592653589793d) / 180.0d)) - (((((3.0d * E) / 8.0d) + ((3.0d * Math.pow(E, 2.0d)) / 32.0d)) + ((45.0d * Math.pow(E, 3.0d)) / 1024.0d)) * Math.sin(((2.0d * F) * 3.141592653589793d) / 180.0d))) + ((((15.0d * Math.pow(E, 2.0d)) / 256.0d) + ((45.0d * Math.pow(E, 3.0d)) / 1024.0d)) * Math.sin(((4.0d * F) * 3.141592653589793d) / 180.0d))) - (((35.0d * Math.pow(E, 3.0d)) / 3072.0d) * Math.sin(((6.0d * F) * 3.141592653589793d) / 180.0d)));
+            Double N = A / Math.sqrt(1.0d - (E * Math.pow(Math.sin((F * Math.PI) / 180.0d), 2.0d)));
+            Double T = Math.pow(Math.tan((F * Math.PI) / 180.0d), 2.0d);
+            Double C = D * Math.pow(Math.cos((F * Math.PI) / 180.0d), 2.0d);
+            Double G = (L - ((double) W)) * ((Math.cos((F * Math.PI) / 180.0d) * Math.PI) / 180.0d);
+            Double M = A * (((((((1.0d - (E / 4.0d)) - ((3.0d * Math.pow(E, 2.0d)) / 64.0d)) - ((5.0d * Math.pow(E, 3.0d)) / 256.0d)) * ((F * Math.PI) / 180.0d)) - (((((3.0d * E) / 8.0d) + ((3.0d * Math.pow(E, 2.0d)) / 32.0d)) + ((45.0d * Math.pow(E, 3.0d)) / 1024.0d)) * Math.sin(((2.0d * F) * Math.PI) / 180.0d))) + ((((15.0d * Math.pow(E, 2.0d)) / 256.0d) + ((45.0d * Math.pow(E, 3.0d)) / 1024.0d)) * Math.sin(((4.0d * F) * Math.PI) / 180.0d))) - (((35.0d * Math.pow(E, 3.0d)) / 3072.0d) * Math.sin(((6.0d * F) * Math.PI) / 180.0d)));
             Double Rt = K * N * (G + ((((1.0d - T) + C) * Math.pow(G, 3.0d)) / 6.0d) + ((((((5.0d - (18.0d * T)) + Math.pow(T, 2.0d)) + (72.0d * C)) - (58.0d * D)) * Math.pow(G, 5.0d)) / 120.0d));
             Double X = Rt + 500000.0d;
-            Double H = K * (M + (N * Math.tan((F * 3.141592653589793d) / 180.0d) * ((Math.pow(G, 2.0d) / 2.0d) + (((((5.0d - T) + (9.0d * C)) + (4.0d * Math.pow(C, 2.0d))) * Math.pow(G, 4.0d)) / 24.0d) + ((((((61.0d - (58.0d * T)) + Math.pow(T, 2.0d)) + (600.0d * C)) - (330.0d * D)) * Math.pow(G, 6.0d)) / 720.0d))));
+            Double H = K * (M + (N * Math.tan((F * Math.PI) / 180.0d) * ((Math.pow(G, 2.0d) / 2.0d) + (((((5.0d - T) + (9.0d * C)) + (4.0d * Math.pow(C, 2.0d))) * Math.pow(G, 4.0d)) / 24.0d) + ((((((61.0d - (58.0d * T)) + Math.pow(T, 2.0d)) + (600.0d * C)) - (330.0d * D)) * Math.pow(G, 6.0d)) / 720.0d))));
             Double Y = H;
             if (H < 0.0d) {
                 Y = H + 1.0E7d;
             }
             Double Q = K * (1.0d + (((1.0d + C) * Math.pow(G, 2.0d)) / 2.0d) + ((((((5.0d - (4.0d * T)) + (42.0d * C)) + (13.0d * Math.pow(C, 2.0d))) - (28.0d * D)) * Math.pow(G, 4.0d)) / 24.0d) + ((((61.0d - (148.0d * T)) + (16.0d * Math.pow(T, 2.0d))) * Math.pow(G, 6.0d)) / 720.0d));
             Double PPMQ = (-1.0d) * (1.0d - Q) * 1000000.0d;
-            Double MM = (A * (1.0d - E)) / Math.sqrt(Math.pow(1.0d - (E * Math.pow(Math.sin((F * 3.141592653589793d) / 180.0d), 2.0d)), 3.0d));
+            Double MM = (A * (1.0d - E)) / Math.sqrt(Math.pow(1.0d - (E * Math.pow(Math.sin((F * Math.PI) / 180.0d), 2.0d)), 3.0d));
             Double RR = Math.sqrt(MM * N);
             Double KH = (RR + Alt) / (RR + (2.0d * Alt));
             Double PPMH = (-1.0d) * (1.0d - KH) * 1000000.0d;
             Double FC = KH * Q;
             Double PPMFC = PPMQ + PPMH;
 
-            DecimalFormat formatter = new DecimalFormat("#0.00");
             DecimalFormat formatterEsc = new DecimalFormat("#0.00000000");
 
             txt_est.setText(formatter.format(X) + " m");
@@ -421,11 +457,6 @@ public class AutomaticFragment extends Fragment {
             txt_zona.setText(Integer.toString(Z));
             txt_hemis.setText(hemisferio);
             txt_presicion.setText("±" + Math.round(loc.getAccuracy()) + " m");
-
-            Bundle extras = loc.getExtras();
-            if (extras != null) {
-                txt_sat.setText(Integer.toString(extras.getInt("satellites")));
-            }
 
             txt_fe.setText(formatterEsc.format(Q));
             txt_fe_ppm.setText(Math.round(PPMQ) + "ppm");
@@ -436,23 +467,13 @@ public class AutomaticFragment extends Fragment {
         }
 
         @Override
-        public void onProviderDisabled(@NonNull String provider) {
-            // La lógica de repetición controlada se maneja en checkGpsRunnable
-        }
+        public void onProviderDisabled(@NonNull String provider) {}
 
         @Override
-        public void onProviderEnabled(@NonNull String provider) {
-            // Se elimina la alerta intrusiva anterior para una mejor experiencia de usuario
-        }
+        public void onProviderEnabled(@NonNull String provider) {}
 
         @Override
-        public void onStatusChanged(String provider, int status, Bundle extras) {
-            switch (status) {
-                case 0: Log.d("STATE", "LocationProvider.OUT_OF_SERVICE"); break;
-                case 1: Log.d("STATE", "LocationProvider.TEMPORARILY_UNAVAILABLE"); break;
-                case 2: Log.d("STATE", "LocationProvider.AVAILABLE"); break;
-            }
-        }
+        public void onStatusChanged(String provider, int status, Bundle extras) {}
     }
 
     public void showGPSData(Location loc) {

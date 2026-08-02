@@ -1,14 +1,13 @@
-# Tareas de Limpieza y Exportación Pública
+# Tareas de Unificación de Notificaciones (Toasts)
 
-- `[x]` Implementar Almacenamiento Público
-    - `[x]` Crear `FileUtils.java` con lógica de `MediaStore`
-    - `[x]` Actualizar `AutomaticFragment.java` (Guardado + Toast)
-    - `[x]` Actualizar `ManualFragment.java` (Guardado + Toast)
-    - `[x]` Actualizar `RegisterFragment.java` (Exportación + Toast)
-- `[x]` Limpieza de Archivos Basura
-    - `[x]` Eliminar carpeta `/resources/` (Raíz)
-    - `[x]` Eliminar carpeta `/sources/` (Raíz)
-    - `[x]` Eliminar carpeta `/build/` (Raíz)
-- `[x]` Verificación Final
-    - `[x]` Ejecutar `clean build`
-    - `[x]` Verificar sincronización de Gradle
+- `[x]` Expandir `UIUtils.java`
+    - `[x]` Añadir `showSuccessToast`
+    - `[x]` Añadir `showErrorToast`
+    - `[x]` Añadir `showWarningToast`
+    - `[x]` Añadir `showInfoToast` (versión normal y larga)
+- `[x]` Actualizar Fragmentos y Utilidades
+    - `[x]` `AutomaticFragment.java`: Limpiar y redirigir a `UIUtils`
+    - `[x]` `ManualFragment.java`: Cambiar todos los `Toast.makeText`
+    - `[x]` `RegisterFragment.java`: Cambiar todos los `Toast.makeText`
+    - `[x]` `FileUtils.java`: Cambiar aviso de error
+- `[x]` Verificación y Compilación

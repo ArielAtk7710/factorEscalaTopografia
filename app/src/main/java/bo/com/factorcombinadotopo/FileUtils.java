@@ -6,7 +6,6 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Environment;
 import android.provider.MediaStore;
-import android.widget.Toast;
 import java.io.OutputStream;
 
 public class FileUtils {
@@ -48,12 +47,12 @@ public class FileUtils {
                 }
             }
         } catch (Exception e) {
-            Toast.makeText(context, "Error al guardar archivo: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+            UIUtils.showErrorToast(context, "Error al guardar archivo: " + e.getMessage());
         }
     }
 
     private static void showPathToast(Context context, String fileName) {
         String amigablePath = "Almacenamiento Interno > Documents > FactorEscalaTop > " + fileName;
-        Toast.makeText(context, "Guardado en:\n" + amigablePath, Toast.LENGTH_LONG).show();
+        UIUtils.showInfoToastLong(context, amigablePath);
     }
 }

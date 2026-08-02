@@ -188,8 +188,28 @@
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_marginBottom="12dp">
+                    <TextView android:text="ALTURA ORTOMÉTRICA" android:textSize="10sp" android:textColor="@color/text_secondary" android:textStyle="bold" android:layout_width="wrap_content" android:layout_height="wrap_content"/>
+                    <TextView android:id="@+id/txt_det_alt_orto" android:text="3560.00 m" android:textColor="@color/text_primary" android:textSize="13sp" android:layout_width="wrap_content" android:layout_height="wrap_content"/>
+                </LinearLayout>
+
+                <LinearLayout
+                    android:orientation="vertical"
+                    android:layout_columnWeight="1"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="12dp">
                     <TextView android:text="SISTEMA DE REF." android:textSize="10sp" android:textColor="@color/text_secondary" android:textStyle="bold" android:layout_width="wrap_content" android:layout_height="wrap_content"/>
                     <TextView android:id="@+id/txt_det_sis" android:text="WGS-84 19 S" android:textColor="@color/text_primary" android:textSize="13sp" android:layout_width="wrap_content" android:layout_height="wrap_content"/>
+                </LinearLayout>
+
+                <LinearLayout
+                    android:orientation="vertical"
+                    android:layout_columnWeight="1"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="12dp">
+                    <TextView android:text="PRESIÓN" android:textSize="10sp" android:textColor="@color/text_secondary" android:textStyle="bold" android:layout_width="wrap_content" android:layout_height="wrap_content"/>
+                    <TextView android:id="@+id/txt_det_presion" android:text="--- hPa" android:textColor="@color/text_primary" android:textSize="13sp" android:layout_width="wrap_content" android:layout_height="wrap_content"/>
                 </LinearLayout>
             </GridLayout>
 

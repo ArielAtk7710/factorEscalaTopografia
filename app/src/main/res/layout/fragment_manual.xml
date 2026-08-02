@@ -296,16 +296,6 @@
                     android:layout_marginStart="4dp"/>
             </LinearLayout>
 
-            <Button
-                android:id="@+id/btn_guardar"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
-                android:text="@string/btn_save_results"
-                app:backgroundTint="@color/accent_orange"
-                android:textColor="@color/text_primary"
-                android:textStyle="bold" />
-
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -388,6 +378,78 @@
                     android:textColor="@color/text_secondary" />
             </LinearLayout>
 
+            <!-- Altura Ortométrica -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:background="@color/bg_surface_secondary"
+                android:orientation="horizontal"
+                android:padding="4dp">
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1.2"
+                    android:padding="3dp"
+                    android:text="Altura Ortométrica"
+                    android:textColor="@color/text_primary" />
+
+                <TextView
+                    android:id="@+id/txt_man_alt_orto"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1.2"
+                    android:padding="3dp"
+                    android:text="0"
+                    android:textColor="@color/accent_orange"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="0.8"
+                    android:padding="3dp"
+                    android:text="m"
+                    android:textColor="@color/text_secondary" />
+            </LinearLayout>
+
+            <!-- Presión Atmosférica -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:background="@color/bg_surface_secondary"
+                android:orientation="horizontal"
+                android:padding="4dp">
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1.2"
+                    android:padding="3dp"
+                    android:text="Presión Estándar"
+                    android:textColor="@color/text_primary" />
+
+                <TextView
+                    android:id="@+id/txt_man_presion"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1.2"
+                    android:padding="3dp"
+                    android:text="0"
+                    android:textColor="@color/accent_orange"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="0.8"
+                    android:padding="3dp"
+                    android:text="mmHg"
+                    android:textColor="@color/text_secondary" />
+            </LinearLayout>
+
             <!-- RECUADRO DESTACADO: FACTOR COMBINADO (IDENTICO AL AUTOMATICO) -->
             <LinearLayout
                 android:layout_width="match_parent"
@@ -428,6 +490,16 @@
                     android:textColor="@color/text_secondary"
                     android:textStyle="bold" />
             </LinearLayout>
+
+            <Button
+                android:id="@+id/btn_guardar"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="24dp"
+                android:text="@string/btn_save_results"
+                app:backgroundTint="@color/accent_orange"
+                android:textColor="@color/text_primary"
+                android:textStyle="bold" />
         </LinearLayout>
     </ScrollView>
 </FrameLayout>

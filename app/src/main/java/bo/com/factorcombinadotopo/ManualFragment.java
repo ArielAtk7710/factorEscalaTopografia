@@ -15,6 +15,7 @@ import android.widget.LinearLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
+import android.content.ContentValues;
 import android.os.Environment;
 import android.content.Context;
 import java.io.File;
@@ -50,6 +51,8 @@ public class ManualFragment extends Fragment {
     private TextView txt_man_fc_ppm;
     private TextView txt_man_fe;
     private TextView txt_man_fe_ppm;
+    private TextView txt_man_alt_orto;
+    private TextView txt_man_presion;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -97,6 +100,8 @@ public class ManualFragment extends Fragment {
         this.txt_man_fa_ppm = view.findViewById(R.id.txt_man_fa_ppm);
         this.txt_man_fc = view.findViewById(R.id.txt_man_fc);
         this.txt_man_fc_ppm = view.findViewById(R.id.txt_man_fc_ppm);
+        this.txt_man_alt_orto = view.findViewById(R.id.txt_man_alt_orto);
+        this.txt_man_presion = view.findViewById(R.id.txt_man_presion);
 
         // Set listeners
         this.proyeccion.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
@@ -138,21 +143,56 @@ public class ManualFragment extends Fragment {
 
     private void guardarResultados() {
         if (txt_man_fe.getText().toString().equals("0") && txt_man_fc.getText().toString().equals("0")) {
-            Toast.makeText(requireContext(), "No hay resultados para guardar", Toast.LENGTH_SHORT).show();
+            UIUtils.showWarningToast(requireContext(), "No hay resultados para guardar");
             return;
         }
 
+        // 1. Guardar en Base de Datos (Mismo esquema que el Automático)
+        DatabaseHelper dbHelper = new DatabaseHelper(requireContext());
+        ContentValues values = new ContentValues();
+        values.put(DatabaseHelper.COLUMN_NOMBRE, "MANUAL_" + new SimpleDateFormat("HHmm", Locale.getDefault()).format(new Date()));
+        
+        // Determinar coordenadas según el modo
+        if (proyeccion.getSelectedItemPosition() == 0) {
+            values.put(DatabaseHelper.COLUMN_ESTE, et_utm_este.getText().toString());
+            values.put(DatabaseHelper.COLUMN_NORTE, et_utm_norte.getText().toString());
+            values.put(DatabaseHelper.COLUMN_ZONA, spzona.getSelectedItem().toString());
+            values.put(DatabaseHelper.COLUMN_HEMISFERIO, sphemisferio.getSelectedItem().toString());
+            // En modo UTM no tenemos Lat/Lon directos en campos, pero el motor los calcula internamente.
+            // Para el registro manual guardaremos lo que tenemos.
+            values.put(DatabaseHelper.COLUMN_LATITUD, "N/A (UTM)");
+            values.put(DatabaseHelper.COLUMN_LONGITUD, "N/A (UTM)");
+            values.put(DatabaseHelper.COLUMN_ALTURA, et_utm_alt.getText().toString());
+        } else {
+            values.put(DatabaseHelper.COLUMN_LATITUD, et_lat_gra.getText().toString() + "º " + et_lat_min.getText().toString() + "' " + et_lat_seg.getText().toString() + "''");
+            values.put(DatabaseHelper.COLUMN_LONGITUD, et_lon_gra.getText().toString() + "º " + et_lon_min.getText().toString() + "' " + et_lon_seg.getText().toString() + "''");
+            values.put(DatabaseHelper.COLUMN_ALTURA, et_alt.getText().toString());
+            values.put(DatabaseHelper.COLUMN_ESTE, "N/A (GEO)");
+            values.put(DatabaseHelper.COLUMN_NORTE, "N/A (GEO)");
+            values.put(DatabaseHelper.COLUMN_ZONA, "-");
+            values.put(DatabaseHelper.COLUMN_HEMISFERIO, "-");
+        }
+
+        values.put(DatabaseHelper.COLUMN_ALTURA_ORTO, txt_man_alt_orto.getText().toString());
+        values.put(DatabaseHelper.COLUMN_PRESION, txt_man_presion.getText().toString() + " mmHg");
+        values.put(DatabaseHelper.COLUMN_FACTOR_ESCALA, txt_man_fe.getText().toString());
+        values.put(DatabaseHelper.COLUMN_FACTOR_ALTURA, txt_man_fa.getText().toString());
+        values.put(DatabaseHelper.COLUMN_FACTOR_COMBINADO, txt_man_fc.getText().toString());
+        
+        dbHelper.insertarPunto(values);
+
+        // 2. Exportar a TXT
         StringBuilder sb = new StringBuilder();
         String timeStamp = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault()).format(new Date());
         
-        sb.append("--- REPORTE DE FACTORES DE CORRECCIÓN ---\n");
+        sb.append("--- REPORTE DE FACTORES DE CORRECCIÓN (MANUAL) ---\n");
         sb.append("Fecha: ").append(timeStamp).append("\n\n");
         
         if (proyeccion.getSelectedItemPosition() == 0) {
             sb.append("DATOS DE ENTRADA (UTM):\n");
             sb.append("Este: ").append(et_utm_este.getText().toString()).append(" m\n");
             sb.append("Norte: ").append(et_utm_norte.getText().toString()).append(" m\n");
-            sb.append("Altura: ").append(et_utm_alt.getText().toString()).append(" m\n");
+            sb.append("Altura Elipsoidal: ").append(et_utm_alt.getText().toString()).append(" m\n");
             sb.append("Zona: ").append(spzona.getSelectedItem().toString()).append("\n");
             sb.append("Hemisferio: ").append(sphemisferio.getSelectedItem().toString()).append("\n\n");
         } else {
@@ -163,8 +203,12 @@ public class ManualFragment extends Fragment {
             sb.append("Longitud: ").append(et_lon_gra.getText().toString()).append("º ")
               .append(et_lon_min.getText().toString()).append("' ")
               .append(et_lon_seg.getText().toString()).append("''\n");
-            sb.append("Altura: ").append(et_alt.getText().toString()).append(" m\n\n");
+            sb.append("Altura Elipsoidal: ").append(et_alt.getText().toString()).append(" m\n\n");
         }
+
+        sb.append("DATOS CALCULADOS:\n");
+        sb.append("Altura Ortométrica: ").append(txt_man_alt_orto.getText().toString()).append(" m\n");
+        sb.append("Presión Estimada: ").append(txt_man_presion.getText().toString()).append(" mmHg\n\n");
 
         sb.append("FACTORES DE CORRECCIÓN GEOMÉTRICA:\n");
         sb.append("Factor de Escala: ").append(txt_man_fe.getText().toString())
@@ -173,10 +217,10 @@ public class ManualFragment extends Fragment {
           .append(" (").append(txt_man_fa_ppm.getText().toString()).append(")\n");
         sb.append("FACTOR COMBINADO: ").append(txt_man_fc.getText().toString())
           .append(" (").append(txt_man_fc_ppm.getText().toString()).append(")\n");
-        sb.append("\nDesarrollado por Attack7710\n");
+        sb.append("\nDesarrollado por FactorEscalaTop\n");
         sb.append("------------------------------------------\n");
 
-        String fileName = "Calculo_Factors_" + new SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault()).format(new Date()) + ".txt";
+        String fileName = "Calculo_Manual_" + new SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault()).format(new Date()) + ".txt";
         FileUtils.savePublicTxtFile(requireContext(), fileName, sb.toString());
     }
 
@@ -203,6 +247,8 @@ public class ManualFragment extends Fragment {
         this.txt_man_fa_ppm.setText("0");
         this.txt_man_fc.setText("0");
         this.txt_man_fc_ppm.setText("0");
+        this.txt_man_alt_orto.setText("0");
+        this.txt_man_presion.setText("0");
     }
 
     private void calculateWithUtm() {
@@ -216,7 +262,7 @@ public class ManualFragment extends Fragment {
             String altStr = this.et_utm_alt.getText().toString();
 
             if (esteStr.isEmpty() || norteStr.isEmpty() || altStr.isEmpty()) {
-                Toast.makeText(requireContext(), "Por favor, complete todos los campos UTM", Toast.LENGTH_SHORT).show();
+                UIUtils.showWarningToast(requireContext(), "Por favor, complete todos los campos UTM");
                 return;
             }
 
@@ -246,7 +292,7 @@ public class ManualFragment extends Fragment {
             Double L = ((((double) W) * 3.141592653589793d) / 180.0d) + (((R - ((((1.0d + (2.0d * T)) + Q) * Math.pow(R, 3.0d)) / 6.0d)) + (((((((5.0d - (2.0d * Q)) + (28.0d * T)) - (3.0d * Math.pow(Q, 2.0d))) + (8.0d * D)) + (24.0d * Math.pow(T, 2.0d))) * Math.pow(R, 5.0d)) / 120.0d)) / Math.cos(P));
             calcularManual((180.0d * L) / 3.141592653589793d, F2, Alt);
         } catch (NumberFormatException e) {
-            Toast.makeText(requireContext(), "Error: Ingrese valores numéricos válidos", Toast.LENGTH_SHORT).show();
+            UIUtils.showErrorToast(requireContext(), "Error: Ingrese valores numéricos válidos");
         }
     }
 
@@ -262,7 +308,7 @@ public class ManualFragment extends Fragment {
 
             if (latGra.isEmpty() || latMin.isEmpty() || latSeg.isEmpty() || 
                 lonGra.isEmpty() || lonMin.isEmpty() || lonSeg.isEmpty() || altStr.isEmpty()) {
-                Toast.makeText(requireContext(), "Por favor, complete todos los campos Geodésicos", Toast.LENGTH_SHORT).show();
+                UIUtils.showWarningToast(requireContext(), "Por favor, complete todos los campos Geodésicos");
                 return;
             }
 
@@ -271,7 +317,7 @@ public class ManualFragment extends Fragment {
             Double Alt = Double.parseDouble(altStr);
             calcularManual(L, F, Alt);
         } catch (NumberFormatException e) {
-            Toast.makeText(requireContext(), "Error: Ingrese valores numéricos válidos", Toast.LENGTH_SHORT).show();
+            UIUtils.showErrorToast(requireContext(), "Error: Ingrese valores numéricos válidos");
         }
     }
 
@@ -303,11 +349,19 @@ public class ManualFragment extends Fragment {
         Double FC = KH * Q;
         Double PPMFC = PPMQ + PPMH;
         DecimalFormat formatterEsc = new DecimalFormat("#0.00000000");
+        DecimalFormat formatter = new DecimalFormat("#0.00");
+
+        double N_geoid = GeoidManager.getGeoidUndulation(F, L);
+        double altOrto = Alt - N_geoid;
+        double presionMmHg = GeoidManager.calculatePressureMmHg(altOrto);
+
         this.txt_man_fe.setText(formatterEsc.format(Q));
         this.txt_man_fe_ppm.setText(Math.round(PPMQ) + "ppm");
         this.txt_man_fa.setText(formatterEsc.format(KH));
         this.txt_man_fa_ppm.setText(Math.round(PPMH) + "ppm");
         this.txt_man_fc.setText(formatterEsc.format(FC));
         this.txt_man_fc_ppm.setText(Math.round(PPMFC) + "ppm");
+        this.txt_man_alt_orto.setText(formatter.format(altOrto));
+        this.txt_man_presion.setText(String.format(Locale.getDefault(), "%.1f", presionMmHg));
     }
 }

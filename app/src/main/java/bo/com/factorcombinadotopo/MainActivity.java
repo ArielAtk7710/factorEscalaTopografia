@@ -55,7 +55,11 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
-        if (id == R.id.action_settings) {
+        if (id == R.id.action_about) {
+            // Mostrar diálogo o pantalla de información
+            return true;
+        } else if (id == R.id.action_tutorial) {
+            // Iniciar flujo de tutorial
             return true;
         }
         return super.onOptionsItemSelected(item);
