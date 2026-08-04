@@ -6,7 +6,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
 import android.os.Bundle;
-import android.os.Environment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -14,15 +13,12 @@ import android.widget.CheckBox;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
+import com.google.android.material.tabs.TabLayout;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -36,17 +32,22 @@ public class RegisterFragment extends Fragment {
 
     private RecyclerView recyclerView;
     private TextView txtNoData;
-    private PuntosAdapter adapter;
+    private PuntosAdapter puntosAdapter;
+    private LibretaAdapter libretaAdapter;
     private DatabaseHelper dbHelper;
-    private List<Punto> puntosList = new ArrayList<>();
+    private final List<Punto> puntosList = new ArrayList<>();
+    private final List<LibretaEntry> libretaList = new ArrayList<>();
     
-    // Header views
+    private TabLayout tabLayout;
+    private int activeTab = 0; // 0: Puntos, 1: Libreta
+    
     private ImageView btnExportAll, btnExportSelected, btnDelete;
     private ImageView btnCancelSelection;
-    private TextView btnConfirmDelete;
+    private TextView btnConfirmDelete, btnConfirmExport;
     
     private boolean isSelectionMode = false;
-    private Set<Integer> selectedIds = new HashSet<>();
+    private boolean isExportMode = false;
+    private final Set<Integer> selectedIds = new HashSet<>();
 
     @Nullable
     @Override
@@ -58,7 +59,7 @@ public class RegisterFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        dbHelper = new DatabaseHelper(requireContext());
+        dbHelper = DatabaseHelper.getInstance(requireContext());
         recyclerView = view.findViewById(R.id.rv_puntos);
         txtNoData = view.findViewById(R.id.txt_no_data);
         
@@ -66,141 +67,127 @@ public class RegisterFragment extends Fragment {
         btnExportSelected = view.findViewById(R.id.btn_header_export_selected);
         btnDelete = view.findViewById(R.id.btn_header_delete);
         btnConfirmDelete = view.findViewById(R.id.btn_confirm_delete);
+        btnConfirmExport = view.findViewById(R.id.btn_confirm_export);
         btnCancelSelection = view.findViewById(R.id.btn_cancel_selection);
+        
+        tabLayout = view.findViewById(R.id.tabs_register_sub);
+        setupTabs();
 
         recyclerView.setLayoutManager(new LinearLayoutManager(requireContext()));
-        adapter = new PuntosAdapter(puntosList);
-        recyclerView.setAdapter(adapter);
+        puntosAdapter = new PuntosAdapter(puntosList);
+        libretaAdapter = new LibretaAdapter(libretaList);
+        recyclerView.setAdapter(puntosAdapter);
 
-        // Exportar Todo (Visible siempre que no estemos seleccionando)
-        btnExportAll.setOnClickListener(v -> exportarHistorialTxt(puntosList, "Completo"));
+        btnExportAll.setOnClickListener(v -> {
+            if (activeTab == 0) exportarHistorialTxt(puntosList, "Completo");
+            else exportarLibretaTxt(libretaList, "Completo_Libreta");
+        });
 
-        // Exportar Selección (Activa modo selección si no está activo)
         btnExportSelected.setOnClickListener(v -> {
             if (!isSelectionMode) {
+                isExportMode = true;
                 toggleSelectionMode();
-                UIUtils.showInfoToast(requireContext(), "Seleccione puntos para exportar");
+                UIUtils.showInfoToast(requireContext(), getString(R.string.msg_select_points_export));
             } else {
-                if (selectedIds.isEmpty()) {
-                    UIUtils.showWarningToast(requireContext(), "No hay puntos seleccionados");
-                    return;
-                }
-                exportarSeleccionados();
+                toggleSelectionMode();
             }
         });
 
-        // Eliminar (Activa modo selección si no está activo)
         btnDelete.setOnClickListener(v -> {
             if (!isSelectionMode) {
+                isExportMode = false;
                 toggleSelectionMode();
-                UIUtils.showInfoToast(requireContext(), "Seleccione puntos para borrar");
+                UIUtils.showInfoToast(requireContext(), getString(R.string.msg_select_points_delete));
             } else {
-                toggleSelectionMode(); // Simplemente sale del modo si ya estaba en él (como un botón de toggle)
+                toggleSelectionMode();
             }
         });
 
         btnConfirmDelete.setOnClickListener(v -> {
-            if (selectedIds.isEmpty()) {
-                toggleSelectionMode();
-                return;
-            }
+            if (selectedIds.isEmpty()) { toggleSelectionMode(); return; }
             eliminarSeleccionados();
+        });
+
+        btnConfirmExport.setOnClickListener(v -> {
+            if (selectedIds.isEmpty()) { toggleSelectionMode(); return; }
+            exportarSeleccionados();
         });
 
         btnCancelSelection.setOnClickListener(v -> toggleSelectionMode());
 
-        cargarPuntos();
+        cargarDatos();
+    }
+
+    private void setupTabs() {
+        tabLayout.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
+            @Override
+            public void onTabSelected(TabLayout.Tab tab) {
+                activeTab = tab.getPosition();
+                if (isSelectionMode) toggleSelectionMode();
+                cargarDatos();
+            }
+            @Override public void onTabUnselected(TabLayout.Tab tab) {}
+            @Override public void onTabReselected(TabLayout.Tab tab) {}
+        });
+    }
+
+    private void cargarDatos() {
+        if (activeTab == 0) {
+            recyclerView.setAdapter(puntosAdapter);
+            cargarPuntos();
+        } else {
+            recyclerView.setAdapter(libretaAdapter);
+            cargarLibreta();
+        }
     }
 
     private void toggleSelectionMode() {
         isSelectionMode = !isSelectionMode;
         selectedIds.clear();
-        
-        // El de "Exportar Todo" se queda visible o no según prefieras, lo ocultaremos para dar foco
         btnExportAll.setVisibility(isSelectionMode ? View.GONE : View.VISIBLE);
-        
-        // Estilo del de Exportar Selección
-        btnExportSelected.setColorFilter(requireContext().getColor(isSelectionMode ? R.color.accent_orange : R.color.text_secondary));
-        
-        // Estilo de la Papelera
-        btnDelete.setColorFilter(requireContext().getColor(isSelectionMode ? R.color.state_error : R.color.text_secondary));
-        
-        // Botones de acción final
-        btnConfirmDelete.setVisibility(isSelectionMode ? View.VISIBLE : View.GONE);
+        btnExportSelected.setColorFilter(requireContext().getColor(isSelectionMode && isExportMode ? R.color.accent_orange : R.color.text_secondary));
+        btnDelete.setColorFilter(requireContext().getColor(isSelectionMode && !isExportMode ? R.color.state_error : R.color.text_secondary));
+        btnConfirmExport.setVisibility(isSelectionMode && isExportMode ? View.VISIBLE : View.GONE);
+        btnConfirmDelete.setVisibility(isSelectionMode && !isExportMode ? View.VISIBLE : View.GONE);
         btnCancelSelection.setVisibility(isSelectionMode ? View.VISIBLE : View.GONE);
-        
-        adapter.notifyDataSetChanged();
+        if (activeTab == 0) puntosAdapter.notifyDataSetChanged();
+        else libretaAdapter.notifyDataSetChanged();
     }
 
     private void eliminarSeleccionados() {
-        for (int id : selectedIds) {
-            dbHelper.eliminarPunto(id);
-        }
-        UIUtils.showSuccessToast(requireContext(), "Registros eliminados: " + selectedIds.size());
-        toggleSelectionMode();
-        cargarPuntos();
-    }
-
-    private void exportarSeleccionados() {
-        List<Punto> seleccionados = new ArrayList<>();
-        for (Punto p : puntosList) {
-            if (selectedIds.contains(p.id)) {
-                seleccionados.add(p);
-            }
-        }
-        exportarHistorialTxt(seleccionados, "Seleccion");
-        toggleSelectionMode();
-    }
-
-    private void exportarHistorialTxt(List<Punto> lista, String sufijo) {
-        if (lista.isEmpty()) {
-            UIUtils.showWarningToast(requireContext(), "No hay datos para exportar");
+        if (selectedIds.isEmpty()) {
+            UIUtils.showWarningToast(requireContext(), getString(R.string.msg_no_points_selected));
+            toggleSelectionMode();
             return;
         }
 
-        // Agrupar por fecha
-        TreeMap<String, List<Punto>> agrupados = new TreeMap<>();
-        for (Punto p : lista) {
-            String fechaKey = p.fecha.split(" ")[0];
-            if (!agrupados.containsKey(fechaKey)) {
-                agrupados.put(fechaKey, new ArrayList<>());
+        UIUtils.showConfirmDialog(requireContext(), R.string.dialog_delete_title, R.string.dialog_delete_msg, () -> {
+            for (int id : selectedIds) {
+                if (activeTab == 0) dbHelper.eliminarPunto(id);
+                else dbHelper.eliminarLibreta(id);
             }
-            List<Punto> subLista = agrupados.get(fechaKey);
-            if (subLista != null) subLista.add(p);
-        }
-
-        StringBuilder sb = new StringBuilder();
-        sb.append("==========================================\n");
-        sb.append("   REPORTE ").append(sufijo.toUpperCase()).append(" - FACTORESCALATOP   \n");
-        sb.append("==========================================\n\n");
-
-        for (String fecha : agrupados.keySet()) {
-            sb.append("--- FECHA: ").append(fecha).append(" ---\n");
-            List<Punto> subLista = agrupados.get(fecha);
-            if (subLista != null) {
-                for (Punto p : subLista) {
-                    sb.append("PUNTO: ").append(p.nombre).append("\n");
-                    sb.append("  UTM: E=").append(p.este).append(" | N=").append(p.norte).append("\n");
-                    sb.append("  LAT/LON: ").append(p.latitud).append(" / ").append(p.longitud).append("\n");
-                    sb.append("  ALT: Elipsoidal=").append(p.altura).append(" | Ortométrica=").append(p.altOrto).append("\n");
-                    sb.append("  PRESIÓN: ").append(p.presion).append("\n");
-                    sb.append("  K COMBINADO: ").append(p.fc).append("\n");
-                    sb.append("------------------------------------------\n");
-                }
-            }
-            sb.append("\n");
-        }
-        
-        sb.append("Generado por FactorEscalaTop el ").append(new SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.getDefault()).format(new Date())).append("\n");
-
-        String fileName = "Historial_" + sufijo + "_" + new SimpleDateFormat("yyyyMMdd_HHmm", Locale.getDefault()).format(new Date()) + ".txt";
-        FileUtils.savePublicTxtFile(requireContext(), fileName, sb.toString());
+            UIUtils.showSuccessToast(requireContext(), getString(R.string.msg_point_deleted));
+            toggleSelectionMode();
+            cargarDatos();
+        });
     }
 
-    @Override
-    public void onResume() {
-        super.onResume();
-        cargarPuntos();
+    private void exportarSeleccionados() {
+        if (selectedIds.isEmpty()) {
+            UIUtils.showWarningToast(requireContext(), getString(R.string.msg_no_points_selected));
+            toggleSelectionMode();
+            return;
+        }
+        if (activeTab == 0) {
+            List<Punto> seleccionados = new ArrayList<>();
+            for (Punto p : puntosList) if (selectedIds.contains(p.id)) seleccionados.add(p);
+            exportarHistorialTxt(seleccionados, "Seleccion");
+        } else {
+            List<LibretaEntry> seleccionados = new ArrayList<>();
+            for (LibretaEntry e : libretaList) if (selectedIds.contains(e.id)) seleccionados.add(e);
+            exportarLibretaTxt(seleccionados, "Seleccion_Libreta");
+        }
+        toggleSelectionMode();
     }
 
     private void cargarPuntos() {
@@ -224,159 +211,201 @@ public class RegisterFragment extends Fragment {
                 p.fa = cursor.getString(cursor.getColumnIndexOrThrow(DatabaseHelper.COLUMN_FACTOR_ALTURA));
                 p.fc = cursor.getString(cursor.getColumnIndexOrThrow(DatabaseHelper.COLUMN_FACTOR_COMBINADO));
                 p.fecha = cursor.getString(cursor.getColumnIndexOrThrow(DatabaseHelper.COLUMN_FECHA));
+                p.notas = cursor.getString(cursor.getColumnIndexOrThrow(DatabaseHelper.COLUMN_NOTAS));
                 puntosList.add(p);
             } while (cursor.moveToNext());
             cursor.close();
         }
-
-        if (puntosList.isEmpty()) {
-            txtNoData.setVisibility(View.VISIBLE);
-            recyclerView.setVisibility(View.GONE);
-        } else {
-            txtNoData.setVisibility(View.GONE);
-            recyclerView.setVisibility(View.VISIBLE);
-            adapter.notifyDataSetChanged();
-        }
+        actualizarVistaVacia(puntosList.isEmpty());
     }
 
+    private void cargarLibreta() {
+        libretaList.clear();
+        Cursor cursor = dbHelper.obtenerLibreta();
+        if (cursor != null && cursor.moveToFirst()) {
+            do {
+                LibretaEntry e = new LibretaEntry();
+                e.id = cursor.getInt(cursor.getColumnIndexOrThrow(DatabaseHelper.COL_LIB_ID));
+                e.estacion = cursor.getString(cursor.getColumnIndexOrThrow(DatabaseHelper.COL_LIB_ESTACION));
+                e.altIns = cursor.getString(cursor.getColumnIndexOrThrow(DatabaseHelper.COL_LIB_ALT_INS));
+                e.puntoRef = cursor.getString(cursor.getColumnIndexOrThrow(DatabaseHelper.COL_LIB_PUNTO_REF));
+                e.altPri = cursor.getString(cursor.getColumnIndexOrThrow(DatabaseHelper.COL_LIB_ALT_PRI));
+                e.puntoAux = cursor.getString(cursor.getColumnIndexOrThrow(DatabaseHelper.COL_LIB_PUNTO_AUX));
+                e.tipoReg = cursor.getString(cursor.getColumnIndexOrThrow(DatabaseHelper.COL_LIB_TIPO_REG));
+                e.este = cursor.getString(cursor.getColumnIndexOrThrow(DatabaseHelper.COL_LIB_ESTE));
+                e.norte = cursor.getString(cursor.getColumnIndexOrThrow(DatabaseHelper.COL_LIB_NORTE));
+                e.cota = cursor.getString(cursor.getColumnIndexOrThrow(DatabaseHelper.COL_LIB_COTA));
+                e.obs = cursor.getString(cursor.getColumnIndexOrThrow(DatabaseHelper.COL_LIB_OBS));
+                e.fecha = cursor.getString(cursor.getColumnIndexOrThrow(DatabaseHelper.COL_LIB_FECHA));
+                libretaList.add(e);
+            } while (cursor.moveToNext());
+            cursor.close();
+        }
+        actualizarVistaVacia(libretaList.isEmpty());
+    }
+
+    private void actualizarVistaVacia(boolean isEmpty) {
+        txtNoData.setVisibility(isEmpty ? View.VISIBLE : View.GONE);
+        recyclerView.setVisibility(isEmpty ? View.GONE : View.VISIBLE);
+        if (activeTab == 0) puntosAdapter.notifyDataSetChanged();
+        else libretaAdapter.notifyDataSetChanged();
+    }
+
+    private void exportarHistorialTxt(List<Punto> lista, String sufijo) {
+        if (lista.isEmpty()) { UIUtils.showWarningToast(requireContext(), "No hay datos para exportar"); return; }
+        StringBuilder sb = new StringBuilder();
+        sb.append("==========================================\nREPORTE ").append(sufijo.toUpperCase()).append(" - FACTORESCALATOP\n==========================================\n\n");
+        for (Punto p : lista) {
+            sb.append("PUNTO: ").append(p.nombre).append(" (").append(p.fecha).append(")\n");
+            if (p.notas != null && !p.notas.isEmpty()) sb.append("  OBS: ").append(p.notas).append("\n");
+            sb.append("  UTM: E=").append(p.este).append(" | N=").append(p.norte).append("\n  LAT/LON: ").append(p.latitud).append(" / ").append(p.longitud).append("\n  ALT: Elip=").append(p.altura).append(" | Orto=").append(p.altOrto).append("\n  K COMBINADO: ").append(p.fc).append("\n------------------------------------------\n");
+        }
+        String fileName = "Puntos_" + sufijo + "_" + new SimpleDateFormat("yyyyMMdd_HHmm", Locale.getDefault()).format(new Date()) + ".txt";
+        FileUtils.savePublicTxtFile(requireContext(), fileName, sb.toString());
+    }
+
+    private void exportarLibretaTxt(List<LibretaEntry> lista, String sufijo) {
+        if (lista.isEmpty()) { UIUtils.showWarningToast(requireContext(), "No hay datos para exportar"); return; }
+        StringBuilder sb = new StringBuilder();
+        sb.append("==========================================\n   LIBRETA DE CAMPO - FACTORESCALATOP   \n==========================================\n\n");
+        for (LibretaEntry e : lista) {
+            sb.append("FECHA: ").append(e.fecha).append("\nESTACIÓN: ").append(e.estacion).append(" (Ins: ").append(e.altIns).append("m) -> AUX: ").append(e.puntoAux).append("\nREF: ").append(e.puntoRef).append(" (Prisma: ").append(e.altPri).append("m) | ").append(e.tipoReg).append("\nCOORD: E=").append(e.este).append(" | N=").append(e.norte).append(" | Z=").append(e.cota).append("\n");
+            if (e.obs != null && !e.obs.isEmpty()) sb.append("OBS: ").append(e.obs).append("\n");
+            sb.append("------------------------------------------\n");
+        }
+        String fileName = "Libreta_" + sufijo + "_" + new SimpleDateFormat("yyyyMMdd_HHmm", Locale.getDefault()).format(new Date()) + ".txt";
+        FileUtils.savePublicTxtFile(requireContext(), fileName, sb.toString());
+    }
+
+    @Override public void onResume() { super.onResume(); cargarDatos(); }
+
     private static class Punto {
-        int id;
-        String nombre, latitud, longitud, altura, altOrto, presion, este, norte, zona, hemisferio, fe, fa, fc, fecha;
+        int id; String nombre, latitud, longitud, altura, altOrto, presion, este, norte, zona, hemisferio, fe, fa, fc, fecha, notas;
+        boolean isExpanded = false;
+    }
+
+    private static class LibretaEntry {
+        int id; String estacion, altIns, puntoRef, altPri, puntoAux, tipoReg, este, norte, cota, obs, fecha;
         boolean isExpanded = false;
     }
 
     private class PuntosAdapter extends RecyclerView.Adapter<PuntosAdapter.ViewHolder> {
-        private List<Punto> list;
-
-        PuntosAdapter(List<Punto> list) {
-            this.list = list;
+        private final List<Punto> list;
+        PuntosAdapter(List<Punto> list) { this.list = list; }
+        @NonNull @Override public ViewHolder onCreateViewHolder(@NonNull ViewGroup p, int vt) {
+            return new ViewHolder(LayoutInflater.from(p.getContext()).inflate(R.layout.item_punto, p, false));
         }
-
-        @NonNull
-        @Override
-        public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-            View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_punto, parent, false);
-            return new ViewHolder(view);
-        }
-
-        @Override
-        public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
-            Punto punto = list.get(position);
-            
-            holder.txtNombre.setText(punto.nombre);
-            holder.txtResumenUtm.setText("E: " + punto.este + " | N: " + punto.norte);
-            
-            holder.txtDetLat.setText(punto.latitud);
-            holder.txtDetLon.setText(punto.longitud);
-            holder.txtDetAlt.setText(punto.altura);
-            holder.txtDetAltOrto.setText(punto.altOrto);
-            holder.txtDetPresion.setText(punto.presion);
-            holder.txtDetSis.setText("WGS-84 " + punto.zona + " " + punto.hemisferio);
-            holder.txtDetFe.setText(punto.fe);
-            holder.txtDetFa.setText(punto.fa);
-            holder.txtDetFc.setText(punto.fc);
-            holder.txtFechaFull.setText("Registrado: " + punto.fecha);
-
-            // Gestión de Selección
-            holder.cbSelect.setVisibility(isSelectionMode ? View.VISIBLE : View.GONE);
-            holder.cbSelect.setChecked(selectedIds.contains(punto.id));
-            holder.cbSelect.setOnClickListener(v -> {
-                if (holder.cbSelect.isChecked()) {
-                    selectedIds.add(punto.id);
-                } else {
-                    selectedIds.remove(punto.id);
-                }
-            });
-
-            // Lógica de expansión
-            holder.layoutExpand.setVisibility(punto.isExpanded ? View.VISIBLE : View.GONE);
-            holder.imgArrow.setRotation(punto.isExpanded ? 180 : 0);
-            holder.txtExpandLabel.setText(punto.isExpanded ? "Ocultar Detalles" : "Ver Detalles");
-
-            holder.btnExpand.setOnClickListener(v -> {
-                punto.isExpanded = !punto.isExpanded;
-                notifyItemChanged(position);
-            });
-
-            holder.btnCopy.setOnClickListener(v -> copiarAlPortapapeles(punto));
-            holder.btnShare.setOnClickListener(v -> compartirPunto(punto));
-
-            // Botón Eliminar individual se oculta en modo selección para evitar confusiones
-            holder.btnDelete.setVisibility(isSelectionMode ? View.GONE : View.VISIBLE);
-            holder.btnDelete.setOnClickListener(v -> {
-                dbHelper.eliminarPunto(punto.id);
-                cargarPuntos();
-                UIUtils.showSuccessToast(requireContext(), "Registro eliminado");
+        @Override public void onBindViewHolder(@NonNull ViewHolder h, int pos) {
+            Punto p = list.get(pos);
+            h.txtNombre.setText(p.nombre); h.txtResumenUtm.setText("E: " + p.este + " | N: " + p.norte);
+            h.txtDetLat.setText(p.latitud); h.txtDetLon.setText(p.longitud); h.txtDetAlt.setText(p.altura);
+            h.txtDetAltOrto.setText(p.altOrto); h.txtDetPresion.setText(p.presion);
+            h.txtDetSis.setText("WGS-84 " + p.zona + " " + p.hemisferio);
+            h.txtDetFe.setText(p.fe); h.txtDetFa.setText(p.fa); h.txtDetFc.setText(p.fc);
+            h.txtFechaFull.setText("Registrado: " + p.fecha);
+            h.txtDetNotas.setText((p.notas != null && !p.notas.isEmpty()) ? p.notas : "Sin observaciones.");
+            h.cbSelect.setVisibility(isSelectionMode ? View.VISIBLE : View.GONE);
+            h.cbSelect.setChecked(selectedIds.contains(p.id));
+            h.cbSelect.setOnClickListener(v -> { if (h.cbSelect.isChecked()) selectedIds.add(p.id); else selectedIds.remove(p.id); });
+            h.layoutExpand.setVisibility(p.isExpanded ? View.VISIBLE : View.GONE);
+            h.imgArrow.setRotation(p.isExpanded ? 180 : 0);
+            h.txtExpandLabel.setText(p.isExpanded ? "Ocultar Detalles" : "Ver Detalles");
+            h.btnExpand.setOnClickListener(v -> { p.isExpanded = !p.isExpanded; notifyItemChanged(pos); });
+            h.btnCopy.setOnClickListener(v -> copiarPunto(p));
+            h.btnShare.setOnClickListener(v -> compartirPunto(p));
+            h.btnDelete.setVisibility(isSelectionMode ? View.GONE : View.VISIBLE);
+            h.btnDelete.setOnClickListener(v -> {
+                UIUtils.showConfirmDialog(requireContext(), R.string.dialog_delete_title, R.string.dialog_delete_msg_single, () -> {
+                    dbHelper.eliminarPunto(p.id);
+                    cargarPuntos();
+                    UIUtils.showSuccessToast(requireContext(), getString(R.string.msg_point_deleted));
+                });
             });
         }
-
-        private void copiarAlPortapapeles(Punto p) {
-            String reporte = generarReporte(p);
-            ClipboardManager clipboard = (ClipboardManager) requireContext().getSystemService(Context.CLIPBOARD_SERVICE);
-            ClipData clip = ClipData.newPlainText("Punto Topográfico", reporte);
-            if (clipboard != null) {
-                clipboard.setPrimaryClip(clip);
-                UIUtils.showSuccessToast(requireContext(), "Copiado al portapapeles");
+        @Override public int getItemCount() { return list.size(); }
+        private void copiarPunto(Punto p) {
+            String r = "PUNTO: " + p.nombre + "\nE: " + p.este + " N: " + p.norte + "\nZ: " + p.fc + "\nFecha: " + p.fecha;
+            ((ClipboardManager)requireContext().getSystemService(Context.CLIPBOARD_SERVICE)).setPrimaryClip(ClipData.newPlainText("Punto", r));
+            UIUtils.showSuccessToast(requireContext(), getString(R.string.msg_copied_clipboard));
+        }
+        private void compartirPunto(Punto p) {
+            Intent si = new Intent(Intent.ACTION_SEND); si.setType("text/plain"); si.putExtra(Intent.EXTRA_TEXT, "PUNTO: " + p.nombre + "\nE: " + p.este + " N: " + p.norte);
+            startActivity(Intent.createChooser(si, "Compartir"));
+        }
+        class ViewHolder extends RecyclerView.ViewHolder {
+            TextView txtNombre, txtResumenUtm, txtDetLat, txtDetLon, txtDetAlt, txtDetAltOrto, txtDetPresion, txtDetSis, txtDetFe, txtDetFa, txtDetFc, txtFechaFull, txtExpandLabel, txtDetNotas;
+            ImageView btnDelete, btnCopy, btnShare, imgArrow; CheckBox cbSelect; LinearLayout layoutExpand, btnExpand;
+            ViewHolder(View v) {
+                super(v);
+                txtNombre = v.findViewById(R.id.txt_item_nombre); txtResumenUtm = v.findViewById(R.id.txt_item_resumen_utm);
+                btnDelete = v.findViewById(R.id.btn_item_delete); btnCopy = v.findViewById(R.id.btn_item_copy);
+                btnShare = v.findViewById(R.id.btn_item_share); imgArrow = v.findViewById(R.id.img_expand_arrow);
+                txtExpandLabel = v.findViewById(R.id.txt_expand_label); btnExpand = v.findViewById(R.id.btn_expand_details);
+                layoutExpand = v.findViewById(R.id.layout_details_expand); cbSelect = v.findViewById(R.id.cb_item_select);
+                txtDetLat = v.findViewById(R.id.txt_det_lat); txtDetLon = v.findViewById(R.id.txt_det_lon);
+                txtDetAlt = v.findViewById(R.id.txt_det_alt); txtDetAltOrto = v.findViewById(R.id.txt_det_alt_orto);
+                txtDetPresion = v.findViewById(R.id.txt_det_presion); txtDetSis = v.findViewById(R.id.txt_det_sis);
+                txtDetFe = v.findViewById(R.id.txt_det_fe); txtDetFa = v.findViewById(R.id.txt_det_fa);
+                txtDetFc = v.findViewById(R.id.txt_det_fc); txtFechaFull = v.findViewById(R.id.txt_item_fecha_full);
+                txtDetNotas = v.findViewById(R.id.txt_det_notas);
             }
         }
+    }
 
-        private void compartirPunto(Punto p) {
-            String reporte = generarReporte(p);
-            Intent sendIntent = new Intent();
-            sendIntent.setAction(Intent.ACTION_SEND);
-            sendIntent.putExtra(Intent.EXTRA_TEXT, reporte);
-            sendIntent.setType("text/plain");
-            Intent shareIntent = Intent.createChooser(sendIntent, "Compartir Punto");
-            startActivity(shareIntent);
+    private class LibretaAdapter extends RecyclerView.Adapter<LibretaAdapter.ViewHolder> {
+        private final List<LibretaEntry> list;
+        LibretaAdapter(List<LibretaEntry> list) { this.list = list; }
+        @NonNull @Override public ViewHolder onCreateViewHolder(@NonNull ViewGroup p, int vt) {
+            return new ViewHolder(LayoutInflater.from(p.getContext()).inflate(R.layout.item_libreta, p, false));
         }
-
-        private String generarReporte(Punto p) {
-            return "--- REPORTE PUNTO: " + p.nombre + " ---\n" +
-                   "Este: " + p.este + "\nNorte: " + p.norte + "\n" +
-                   "Zona/Hem: " + p.zona + " " + p.hemisferio + "\n" +
-                   "Lat: " + p.latitud + "\nLon: " + p.longitud + "\n" +
-                   "Alt Elipsoidal: " + p.altura + "\n" +
-                   "Alt Ortométrica: " + p.altOrto + "\n" +
-                   "Presión: " + p.presion + "\n" +
-                   "FACTOR COMBINADO: " + p.fc + "\n" +
-                   "Fecha: " + p.fecha + "\n" +
-                   "---------------------------";
+        @Override public void onBindViewHolder(@NonNull ViewHolder h, int pos) {
+            LibretaEntry e = list.get(pos);
+            h.txtNombre.setText(e.estacion + " -> " + e.puntoAux); h.txtResumen.setText("Ref: " + e.puntoRef + " | Prisma: " + e.altPri + "m");
+            h.txtDetTipo.setText(e.tipoReg); h.txtDetAltIns.setText(e.altIns + " m"); h.txtDetEste.setText(e.este);
+            h.txtDetNorte.setText(e.norte); h.txtDetCota.setText(e.cota); h.txtDetFecha.setText(e.fecha);
+            h.txtDetObs.setText((e.obs == null || e.obs.isEmpty()) ? "Sin observaciones." : e.obs);
+            h.cbSelect.setVisibility(isSelectionMode ? View.VISIBLE : View.GONE);
+            h.cbSelect.setChecked(selectedIds.contains(e.id));
+            h.cbSelect.setOnClickListener(v -> { if (h.cbSelect.isChecked()) selectedIds.add(e.id); else selectedIds.remove(e.id); });
+            h.layoutExpand.setVisibility(e.isExpanded ? View.VISIBLE : View.GONE);
+            h.imgArrow.setRotation(e.isExpanded ? 180 : 0);
+            h.txtExpandLabel.setText(e.isExpanded ? "Ocultar Detalles" : "Ver Detalles");
+            h.btnExpand.setOnClickListener(v -> { e.isExpanded = !e.isExpanded; notifyItemChanged(pos); });
+            h.btnCopy.setOnClickListener(v -> copiarLibreta(e));
+            h.btnShare.setOnClickListener(v -> compartirLibreta(e));
+            h.btnDelete.setVisibility(isSelectionMode ? View.GONE : View.VISIBLE);
+            h.btnDelete.setOnClickListener(v -> {
+                UIUtils.showConfirmDialog(requireContext(), R.string.dialog_delete_title, R.string.dialog_delete_msg_single, () -> {
+                    dbHelper.eliminarLibreta(e.id);
+                    cargarLibreta();
+                    UIUtils.showSuccessToast(requireContext(), getString(R.string.msg_point_deleted));
+                });
+            });
         }
-
-        @Override
-        public int getItemCount() {
-            return list.size();
+        @Override public int getItemCount() { return list.size(); }
+        private void copiarLibreta(LibretaEntry e) {
+            String r = "LIBRETA: " + e.estacion + " -> " + e.puntoAux + "\nE: " + e.este + " N: " + e.norte + " Z: " + e.cota;
+            ((ClipboardManager)requireContext().getSystemService(Context.CLIPBOARD_SERVICE)).setPrimaryClip(ClipData.newPlainText("Libreta", r));
+            UIUtils.showSuccessToast(requireContext(), getString(R.string.msg_copied_clipboard));
         }
-
+        private void compartirLibreta(LibretaEntry e) {
+            Intent si = new Intent(Intent.ACTION_SEND); si.setType("text/plain"); si.putExtra(Intent.EXTRA_TEXT, "LIBRETA: " + e.estacion + " -> " + e.puntoAux);
+            startActivity(Intent.createChooser(si, "Compartir"));
+        }
         class ViewHolder extends RecyclerView.ViewHolder {
-            TextView txtNombre, txtResumenUtm, txtDetLat, txtDetLon, txtDetAlt, txtDetAltOrto, txtDetPresion, txtDetSis, txtDetFe, txtDetFa, txtDetFc, txtFechaFull, txtExpandLabel;
-            ImageView btnDelete, btnCopy, btnShare, imgArrow;
-            CheckBox cbSelect;
-            LinearLayout layoutExpand, btnExpand;
-
-            ViewHolder(View itemView) {
-                super(itemView);
-                txtNombre = itemView.findViewById(R.id.txt_item_nombre);
-                txtResumenUtm = itemView.findViewById(R.id.txt_item_resumen_utm);
-                btnDelete = itemView.findViewById(R.id.btn_item_delete);
-                btnCopy = itemView.findViewById(R.id.btn_item_copy);
-                btnShare = itemView.findViewById(R.id.btn_item_share);
-                imgArrow = itemView.findViewById(R.id.img_expand_arrow);
-                txtExpandLabel = itemView.findViewById(R.id.txt_expand_label);
-                btnExpand = itemView.findViewById(R.id.btn_expand_details);
-                layoutExpand = itemView.findViewById(R.id.layout_details_expand);
-                cbSelect = itemView.findViewById(R.id.cb_item_select);
-                
-                txtDetLat = itemView.findViewById(R.id.txt_det_lat);
-                txtDetLon = itemView.findViewById(R.id.txt_det_lon);
-                txtDetAlt = itemView.findViewById(R.id.txt_det_alt);
-                txtDetAltOrto = itemView.findViewById(R.id.txt_det_alt_orto);
-                txtDetPresion = itemView.findViewById(R.id.txt_det_presion);
-                txtDetSis = itemView.findViewById(R.id.txt_det_sis);
-                txtDetFe = itemView.findViewById(R.id.txt_det_fe);
-                txtDetFa = itemView.findViewById(R.id.txt_det_fa);
-                txtDetFc = itemView.findViewById(R.id.txt_det_fc);
-                txtFechaFull = itemView.findViewById(R.id.txt_item_fecha_full);
+            TextView txtNombre, txtResumen, txtDetTipo, txtDetAltIns, txtDetEste, txtDetNorte, txtDetCota, txtDetFecha, txtDetObs, txtExpandLabel;
+            ImageView btnDelete, btnCopy, btnShare, imgArrow; CheckBox cbSelect; LinearLayout layoutExpand, btnExpand;
+            ViewHolder(View v) {
+                super(v);
+                txtNombre = v.findViewById(R.id.txt_item_lib_nombre); txtResumen = v.findViewById(R.id.txt_item_lib_resumen);
+                btnDelete = v.findViewById(R.id.btn_item_lib_delete); btnCopy = v.findViewById(R.id.btn_item_lib_copy);
+                btnShare = v.findViewById(R.id.btn_item_lib_share); imgArrow = v.findViewById(R.id.img_lib_expand_arrow);
+                txtExpandLabel = v.findViewById(R.id.txt_lib_expand_label); btnExpand = v.findViewById(R.id.btn_expand_lib_details);
+                layoutExpand = v.findViewById(R.id.layout_lib_details_expand); cbSelect = v.findViewById(R.id.cb_item_select_lib);
+                txtDetTipo = v.findViewById(R.id.txt_lib_det_tipo); txtDetAltIns = v.findViewById(R.id.txt_lib_det_alt_ins);
+                txtDetEste = v.findViewById(R.id.txt_lib_det_este); txtDetNorte = v.findViewById(R.id.txt_lib_det_norte);
+                txtDetCota = v.findViewById(R.id.txt_lib_det_cota); txtDetFecha = v.findViewById(R.id.txt_lib_det_fecha);
+                txtDetObs = v.findViewById(R.id.txt_lib_det_obs);
             }
         }
     }

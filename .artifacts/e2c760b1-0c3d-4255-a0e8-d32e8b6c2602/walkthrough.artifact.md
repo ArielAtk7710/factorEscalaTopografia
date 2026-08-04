@@ -1,26 +1,25 @@
-# Unificación de Notificaciones (Toasts) Estilizadas
+# Limpieza de Interfaz Manual e Información de Exportación
 
-He unificado todos los mensajes de notificación de la aplicación para que utilicen el diseño personalizado y la paleta de colores de la marca, eliminando los Toasts genéricos de Android.
+He optimizado la pestaña **Manual** para centrarla en la entrada de datos del usuario y he añadido información crucial sobre la ubicación de los archivos en el menú de **Ajustes**.
 
 ## Mejoras Implementadas
 
-### 1. Centralización en `UIUtils`
-- Creé métodos especializados en [UIUtils.java](file:///D:/Desarrollo-Software/Proyectos%20Android/factorEscala/app/src/main/java/bo/com/factorcombinadotopo/UIUtils.java) para cada tipo de interacción:
-    - **Éxito (Verde):** Confirmación de guardado, eliminación y copiado.
-    - **Error (Rojo):** Avisos de fallos técnicos o validaciones críticas.
-    - **Información (Azul):** Detalles de ruta de archivos y avisos operativos.
-    - **Advertencia (Naranja):** Avisos de GPS desactivado y campos incompletos.
+### 1. Pestaña Manual Minimalista
+- **Eliminación de Sensores:** He quitado la barra superior que mostraba la precisión y los satélites en el modo manual. Como esta sección está destinada al ingreso de datos teóricos o de otros instrumentos, la información del GPS interno era innecesaria y ocupaba espacio vital.
+- **Foco en el Formulario:** Ahora el sistema de referencia WGS84 es lo primero que verás al entrar, permitiéndote empezar a trabajar de inmediato sin distracciones visuales.
 
-### 2. Consistencia en toda la App
-- **Automático:** Actualizado el aviso de activación de GPS y las alertas de estado.
-- **Manual:** Los errores de validación de campos vacíos o datos no numéricos ahora son elegantes y visibles.
-- **Registro:** Las confirmaciones de copiado al portapapeles y eliminación masiva ahora coinciden con el estilo visual.
-- **Archivos:** Los avisos de ruta de exportación mantienen la duración extendida de 5 segundos con el nuevo estilo azul.
+### 2. Visibilidad del Directorio de Exportación
+Para resolver la duda de dónde se guardan los reportes, he añadido una nueva sección informativa en el diálogo de **Ajustes**:
+- **Ruta Transparente:** Ahora puedes ver la ruta exacta: `Almacenamiento Interno > Documents > FactorEscalaTop`.
+- **Internacionalización:** Esta información también ha sido traducida a los 4 idiomas soportados por la app (**Inglés, Portugués y Francés**).
 
-## Verificación Visual
-- Se utiliza el layout [layout_custom_toast_pro.xml](file:///D:/Desarrollo-Software/Proyectos%20Android/factorEscala/app/src/main/res/layout/layout_custom_toast_pro.xml) en todos los mensajes.
-- Los iconos informativos se ajustan automáticamente según el tipo de mensaje.
-- El texto es legible sobre fondos contrastados según la paleta minimalista (Oscuro/Naranja/Azul).
+## Verificación
+- **Consistencia Visual:** El nuevo panel informativo en Ajustes mantiene la estética de tarjetas sobre fondo oscuro.
+- **Compilación Exitosa:** El proyecto se ha construido correctamente (`BUILD SUCCESSFUL`).
 
-render_diffs(file:///D:/Desarrollo-Software/Proyectos%20Android/factorEscala/app/src/main/java/bo/com/factorcombinadotopo/UIUtils.java)
-render_diffs(file:///D:/Desarrollo-Software/Proyectos%20Android/factorEscala/app/src/main/java/bo/com/factorcombinadotopo/RegisterFragment.java)
+> [!NOTE]
+> Al exportar cualquier registro, la app te notificará la ruta en pantalla, pero ahora también puedes consultarla en cualquier momento desde el menú de Ajustes para mayor seguridad.
+
+render_diffs(file:///D:/Desarrollo-Software/Proyectos%20Android/factorEscala/app/src/main/res/layout/fragment_manual.xml)
+render_diffs(file:///D:/Desarrollo-Software/Proyectos%20Android/factorEscala/app/src/main/res/layout/dialog_settings.xml)
+render_diffs(file:///D:/Desarrollo-Software/Proyectos%20Android/factorEscala/app/src/main/res/values/strings.xml)

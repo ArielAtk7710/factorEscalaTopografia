@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="60dp"
+    android:height="60dp"
+    android:viewportWidth="60"
+    android:viewportHeight="60">
+    <!-- Círculo exterior sutil -->
+    <path
+        android:pathData="M30,30m-28,0a28,28 0,1 1,56 0a28,28 0,1 1,-56 0"
+        android:strokeWidth="1"
+        android:strokeColor="#33FFFFFF"/>
+    <!-- Círculo objetivo (Centro) -->
+    <path
+        android:pathData="M30,30m-6,0a6,6 0,1 1,12 0a6,6 0,1 1,-12 0"
+        android:strokeWidth="1"
+        android:strokeColor="#FF8C2A"/>
+    <!-- Cruz de nivel -->
+    <path android:pathData="M30,5v10 M30,55v-10 M5,30h10 M55,30h-10" android:strokeWidth="0.5" android:strokeColor="#66FFFFFF"/>
+</vector>

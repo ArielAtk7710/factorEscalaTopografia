@@ -1,0 +1,140 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">FactorEscalaTop</string>
+    <string name="action_settings">Ajustes</string>
+    <string name="tab_text_1">Automático</string>
+    <string name="tab_text_2">Manual</string>
+    <string name="tab_text_3">Registro</string>
+    <string name="section_format">Seção %1$d</string>
+
+    <!-- General Labels -->
+    <string name="label_wgs84">Sistema de Referência WGS84</string>
+    <string name="label_projection">Projeção</string>
+    <string name="label_latitude">Latitude</string>
+    <string name="label_longitude">Longitude</string>
+    <string name="label_altitude">Altitude</string>
+    <string name="label_ellipsoidal_altitude">Altitude Elipsoidal</string>
+    <string name="label_orthometric_altitude">Altitude Ortométrica</string>
+    <string name="label_pressure">Pressão</string>
+    <string name="label_pressure_unit">mmHg</string>
+    <string name="label_precision">Precisão</string>
+    <string name="label_satellites">Satélites</string>
+    <string name="label_east">Este</string>
+    <string name="label_north">Norte</string>
+    <string name="label_zone">Zona</string>
+    <string name="label_hemisphere">Hemisfério</string>
+    <string name="label_map">Mapa</string>
+
+    <!-- Factors -->
+    <string name="title_geodetic_coords">COORDENADAS GEODÉSICAS</string>
+    <string name="title_utm_coords">COORDENADAS UTM</string>
+    <string name="title_geometric_factors">FATORES DE CORREÇÃO GEOMÉTRICA</string>
+    <string name="label_scale_factor">Fator de Escala</string>
+    <string name="label_elevation_factor">Fator de Altura</string>
+    <string name="label_combined_factor">Fator Combinado</string>
+
+    <!-- Buttons -->
+    <string name="btn_calculate">CALCULAR</string>
+    <string name="btn_clean">LIMPAR</string>
+    <string name="btn_save_results">SALVAR RESULTADOS</string>
+    <string name="btn_save_point">Salvar Ponto</string>
+    <string name="btn_cancel">Cancelar</string>
+    <string name="btn_confirm">Confirmar</string>
+    <string name="btn_export">EXPORTAR</string>
+    <string name="btn_delete">Apagar</string>
+
+    <!-- History / Register -->
+    <string name="title_register">Registro</string>
+    <string name="title_register_history">HISTÓRICO DE PONTOS</string>
+    <string name="msg_no_registered_points">Nenhum ponto registrado ainda.</string>
+    <string name="dialog_register_point">Registrar Novo Ponto</string>
+    <string name="label_point_name">NOME DO PONTO</string>
+    <string name="hint_point_name">PC_...</string>
+    <string name="msg_point_saved">Ponto salvo no Registro</string>
+    <string name="msg_point_deleted">Registro apagado</string>
+    <string name="msg_copied_clipboard">Copiado para a área de transferência</string>
+
+    <!-- GNSS Calendar -->
+    <string name="menu_gnss_calendar">Calendário GNSS</string>
+    <string name="title_gnss_calendar">Calendário GNSS Pro</string>
+    <string name="label_select_date">Selecionar Data</string>
+    <string name="label_julian_day">Número de Dia Juliano</string>
+    <string name="label_doy">Dia do Ano (DOY)</string>
+    <string name="label_gps_week">Semana GPS</string>
+    <string name="label_gps_week_num">Número de Semana GPS</string>
+    <string name="msg_utc_standard">Cálculos baseados no padrão IGS/GNSS (UTC)</string>
+
+    <!-- Settings Dialog -->
+    <string name="title_settings">Configurações do Sistema</string>
+    <string name="label_language">Idioma</string>
+    <string name="label_theme">Tema Visual</string>
+    <string name="label_dark_mode">Modo Escuro</string>
+    <string name="label_light_mode">Modo Claro</string>
+    <string name="lang_es">Espanhol (Español)</string>
+    <string name="lang_en">Inglês (English)</string>
+    <string name="lang_pt">Português</string>
+    <string name="lang_fr">Francês (Français)</string>
+    <string name="label_export_directory">Diretório de Exportação</string>
+    <string name="text_export_path">Armazenamento Interno > Documents > FactorEscalaTop</string>
+    <string name="label_pressure_adjustment">Ajuste do Barômetro (mmHg)</string>
+    <string name="hint_pressure_adjustment">Ex: -1.5 ou 0.8</string>
+    <string name="msg_restart_required">O aplicativo será reiniciado para aplicar as alterações.</string>
+
+    <!-- Compass Calibrate -->
+    <string name="menu_calibrate_compass">Calibrar Bússola</string>
+    <string name="title_calibrate_compass">Calibrar Bússola</string>
+    <string name="msg_calibrate_instructions">Para melhorar a precisão, mova seu dispositivo desenhando um \'8\' no ar várias vezes.</string>
+    <string name="btn_understood">ENTENDIDO</string>
+
+    <!-- Menu items -->
+    <string name="menu_about">Sobre</string>
+    <string name="menu_tutorial">Tutorial</string>
+
+    <string name="splash_title">App Fator de Escala Topográfica</string>
+    <string name="developer_name">Desenvolvido por Attack7710</string>
+    <string name="msg_gps_activated">GPS ATIVADO</string>
+    <string name="msg_manual_entry_hint">Insira os dados manualmente</string>
+    <string name="msg_activate_gps">Ative o GPS do seu dispositivo</string>
+    <string name="msg_point_saved_format">Ponto \'%1$s\' salvo no Registro</string>
+    <string name="msg_select_points_export">Selecione os pontos para exportar</string>
+    <string name="msg_select_points_delete">Selecione os pontos para apagar</string>
+    <string name="msg_no_points_selected">Nenhum ponto selecionado</string>
+
+    <!-- Compass Specific -->
+    <string name="label_azimut_dms">AZIMUTE: %1$d° %2$02d\' %3$02d\"</string>
+    <string name="label_este_utm">ESTE (E) - UTM</string>
+    <string name="label_norte_utm">NORTE (N) - UTM</string>
+    <string name="label_alt_cota">ALTURA (Z / COTA)</string>
+    <string name="label_comb_factor">FATOR COMBINADO</string>
+    <string name="label_press_atm">PRESSÃO ATMOSFÉRICA</string>
+    <string name="label_zone_hem">ZONA / HEMISFERIO</string>
+    <string name="label_unknown_location">Localização Desconhecida</string>
+
+    <!-- Cardinal Directions -->
+    <string name="dir_n">N</string>
+    <string name="dir_ne">NE</string>
+    <string name="dir_e">E</string>
+    <string name="dir_se">SE</string>
+    <string name="dir_s">S</string>
+    <string name="dir_so">SO</string>
+    <string name="dir_o">O</string>
+    <string name="dir_no">NO</string>
+
+    <!-- Map Specific -->
+    <string name="btn_view_on_map">VER NO MAPA</string>
+    <string name="msg_location_permission_required">Permissão de localização necessária</string>
+    <string name="msg_location_error">Não foi posible obter a localização atual</string>
+
+    <!-- UI Labels -->
+    <string name="label_success">Sucesso:</string>
+    <string name="label_error">Erro:</string>
+    <string name="label_warning">Aviso:</string>
+    <string name="label_info">Informação:</string>
+
+    <!-- Dialogs -->
+    <string name="dialog_delete_title">Confirmar Exclusão</string>
+    <string name="dialog_delete_msg">Tem certeza de que deseja excluir os registros selecionados? Esta ação não pode ser desfeita.</string>
+    <string name="dialog_delete_msg_single">Tem certeza de que deseja excluir este registro?</string>
+    <string name="btn_yes">SIM, EXCLUIR</string>
+    <string name="btn_no">CANCELAR</string>
+</resources>

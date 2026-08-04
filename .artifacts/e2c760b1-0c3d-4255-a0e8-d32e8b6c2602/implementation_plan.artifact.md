@@ -1,39 +1,28 @@
-# Plan de Unificación de Notificaciones (Toasts)
+# Plan de Ajuste: Limpieza Manual y Ruta de Exportación
 
-El objetivo es asegurar que todas las notificaciones de la aplicación utilicen el diseño personalizado y la paleta de colores establecida, eliminando los Toasts estándar de Android que rompen con la estética minimalista de la app.
+Este plan detalla la optimización de la pestaña **Manual** para centrarse exclusivamente en la entrada de datos del usuario y la mejora del panel de **Ajustes** para informar sobre la ubicación de los archivos generados.
 
-## Cambios Propuestos
+## 1. Limpieza en Pestaña Manual
+Eliminaremos la barra de estado superior (GPS) de esta pestaña, ya que su propósito es el ingreso de datos externos o teóricos.
 
-### 1. Centralización en UIUtils
-#### [MODIFY] [UIUtils.java](file:///D:/Desarrollo-Software/Proyectos%20Android/factorEscala/app/src/main/java/bo/com/factorcombinadotopo/UIUtils.java)
-- Ampliar la clase para incluir métodos específicos para cada tipo de mensaje:
-    - `showSuccessToast(Context, String message)`
-    - `showErrorToast(Context, String message)`
-    - `showInfoToast(Context, String message)` (y la versión `Long` para rutas)
-    - `showWarningToast(Context, String message)`
-- Todos los métodos utilizarán el layout `layout_custom_toast_pro.xml` con los fondos y colores correspondientes (`bg_toast_success`, `bg_toast_error`, etc.).
+### [MODIFY] [fragment_manual.xml](file:///D:/Desarrollo-Software/Proyectos%20Android/factorEscala/app/src/main/res/layout/fragment_manual.xml)
+- Eliminar el bloque de "BARRA DE ESTADO GPS".
+- Asegurar que el formulario de coordenadas sea lo primero visible para el usuario.
 
-### 2. Actualización de Fragmentos y Utilidades
-#### [MODIFY] [AutomaticFragment.java](file:///D:/Desarrollo-Software/Proyectos%20Android/factorEscala/app/src/main/java/bo/com/factorcombinadotopo/AutomaticFragment.java)
-- Eliminar el método local `showProToast`.
-- Reemplazar todas las llamadas internas por `UIUtils.show...Toast`.
+## 2. Información de Exportación en Ajustes
+Añadiremos una sección informativa en el diálogo de ajustes para que el usuario sepa exactamente dónde encontrar sus reportes.
 
-#### [MODIFY] [ManualFragment.java](file:///D:/Desarrollo-Software/Proyectos%20Android/factorEscala/app/src/main/java/bo/com/factorcombinadotopo/ManualFragment.java)
-- Reemplazar todos los `Toast.makeText` (mensajes de validación y errores de cálculo) por la versión estilizada.
+### [MODIFY] [strings.xml](file:///D:/Desarrollo-Software/Proyectos%20Android/factorEscala/app/src/main/res/values/strings.xml)
+- Añadir etiquetas: `label_export_path`, `text_export_path_value`.
 
-#### [MODIFY] [RegisterFragment.java](file:///D:/Desarrollo-Software/Proyectos%20Android/factorEscala/app/src/main/java/bo/com/factorcombinadotopo/RegisterFragment.java)
-- Reemplazar los `Toast.makeText` (eliminación, copiado, selección) por la versión estilizada.
-
-#### [MODIFY] [FileUtils.java](file:///D:/Desarrollo-Software/Proyectos%20Android/factorEscala/app/src/main/java/bo/com/factorcombinadotopo/FileUtils.java)
-- Asegurar que los errores de escritura usen `UIUtils.showErrorToast`.
+### [MODIFY] [dialog_settings.xml](file:///D:/Desarrollo-Software/Proyectos%20Android/factorEscala/app/src/main/res/layout/dialog_settings.xml)
+- Añadir sección "**Directorio de Exportación**".
+- Mostrar la ruta: `Almacenamiento Interno > Documents > FactorEscalaTop`.
+- Estilo minimalista coherente con el resto del diálogo.
 
 ## Plan de Verificación
-
-### Pruebas de Interfaz
-1. **Éxito:** Guardar un punto y verificar el Toast verde.
-2. **Error:** Intentar calcular sin datos y verificar el Toast rojo.
-3. **Info:** Exportar y verificar el Toast azul de 5 segundos.
-4. **Advertencia:** Desactivar GPS y verificar el Toast naranja recurrente.
+1. **Pestaña Manual:** Confirmar que la pantalla inicia directamente con el "Sistema de Referencia WGS84" sin los datos de satélites.
+2. **Ajustes:** Abrir el menú de ajustes y verificar que la ruta de guardado sea claramente legible y correcta.
 
 ---
-¿Deseas que proceda con la unificación de todos los Toasts de la app?
+## Usuario, ¿Deseas que proceda con estos cambios de limpieza e información?

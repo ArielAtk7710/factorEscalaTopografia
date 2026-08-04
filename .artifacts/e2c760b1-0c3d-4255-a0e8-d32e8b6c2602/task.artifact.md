@@ -1,13 +1,13 @@
-# Tareas de Unificación de Notificaciones (Toasts)
+# Tareas: Brújula Topográfica Pro con Nivel de Burbuja
 
-- `[x]` Expandir `UIUtils.java`
-    - `[x]` Añadir `showSuccessToast`
-    - `[x]` Añadir `showErrorToast`
-    - `[x]` Añadir `showWarningToast`
-    - `[x]` Añadir `showInfoToast` (versión normal y larga)
-- `[x]` Actualizar Fragmentos y Utilidades
-    - `[x]` `AutomaticFragment.java`: Limpiar y redirigir a `UIUtils`
-    - `[x]` `ManualFragment.java`: Cambiar todos los `Toast.makeText`
-    - `[x]` `RegisterFragment.java`: Cambiar todos los `Toast.makeText`
-    - `[x]` `FileUtils.java`: Cambiar aviso de error
-- `[x]` Verificación y Compilación
+- `[x]` Preparar Recursos Visuales
+    - `[x]` Crear dial profesional `ic_compass_pro_dial.xml`
+    - `[x]` Crear círculo de nivel `ic_level_circle.xml`
+    - `[x]` Crear burbuja de nivel `ic_level_bubble.xml`
+- `[x]` Rediseño de Interfaz
+    - `[x]` Actualizar `fragment_compass.xml` con diseño técnico y panel de datos
+- `[x]` Lógica de Sensores Avanzada
+    - `[x]` Implementar cálculo de Pitch y Roll (Inclinación) en `CompassFragment.java`
+    - `[x]` Integrar lecturas de GPS (E, N, Z) en tiempo real
+    - `[x]` Añadir monitoreo de precisión del sensor y µT
+- `[x]` Verificación y Compilación (BUILD SUCCESSFUL)

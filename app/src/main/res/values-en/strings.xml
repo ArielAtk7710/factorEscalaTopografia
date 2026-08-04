@@ -1,0 +1,140 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">FactorEscalaTop</string>
+    <string name="action_settings">Settings</string>
+    <string name="tab_text_1">Automatic</string>
+    <string name="tab_text_2">Manual</string>
+    <string name="tab_text_3">Register</string>
+    <string name="section_format">Section %1$d</string>
+
+    <!-- General Labels -->
+    <string name="label_wgs84">WGS84 Reference System</string>
+    <string name="label_projection">Projection</string>
+    <string name="label_latitude">Latitude</string>
+    <string name="label_longitude">Longitude</string>
+    <string name="label_altitude">Altitude</string>
+    <string name="label_ellipsoidal_altitude">Ellipsoidal Altitude</string>
+    <string name="label_orthometric_altitude">Orthometric Altitude</string>
+    <string name="label_pressure">Pressure</string>
+    <string name="label_pressure_unit">mmHg</string>
+    <string name="label_precision">Precision</string>
+    <string name="label_satellites">Satellites</string>
+    <string name="label_east">East</string>
+    <string name="label_north">North</string>
+    <string name="label_zone">Zone</string>
+    <string name="label_hemisphere">Hemisphere</string>
+    <string name="label_map">Map</string>
+
+    <!-- Factors -->
+    <string name="title_geodetic_coords">GEODETIC COORDINATES</string>
+    <string name="title_utm_coords">UTM COORDINATES</string>
+    <string name="title_geometric_factors">GEOMETRIC CORRECTION FACTORS</string>
+    <string name="label_scale_factor">Scale Factor</string>
+    <string name="label_elevation_factor">Elevation Factor</string>
+    <string name="label_combined_factor">Combined Factor</string>
+
+    <!-- Buttons -->
+    <string name="btn_calculate">CALCULATE</string>
+    <string name="btn_clean">CLEAN</string>
+    <string name="btn_save_results">SAVE RESULTS</string>
+    <string name="btn_save_point">Save Point</string>
+    <string name="btn_cancel">Cancel</string>
+    <string name="btn_confirm">Confirm</string>
+    <string name="btn_export">EXPORT</string>
+    <string name="btn_delete">Delete</string>
+
+    <!-- History / Register -->
+    <string name="title_register">Register</string>
+    <string name="title_register_history">POINTS HISTORY</string>
+    <string name="msg_no_registered_points">No points registered yet.</string>
+    <string name="dialog_register_point">Register New Point</string>
+    <string name="label_point_name">POINT NAME</string>
+    <string name="hint_point_name">PC_...</string>
+    <string name="msg_point_saved">Point saved to Register</string>
+    <string name="msg_point_deleted">Record deleted</string>
+    <string name="msg_copied_clipboard">Copied to clipboard</string>
+
+    <!-- GNSS Calendar -->
+    <string name="menu_gnss_calendar">GNSS Calendar</string>
+    <string name="title_gnss_calendar">GNSS Calendar Pro</string>
+    <string name="label_select_date">Select Date</string>
+    <string name="label_julian_day">Julian Day Number</string>
+    <string name="label_doy">Day of Year (DOY)</string>
+    <string name="label_gps_week">GPS Week</string>
+    <string name="label_gps_week_num">GPS Week Number</string>
+    <string name="msg_utc_standard">Calculations based on IGS/GNSS standard (UTC)</string>
+
+    <!-- Settings Dialog -->
+    <string name="title_settings">System Settings</string>
+    <string name="label_language">Language</string>
+    <string name="label_theme">Visual Theme</string>
+    <string name="label_dark_mode">Dark Mode</string>
+    <string name="label_light_mode">Light Mode</string>
+    <string name="lang_es">Spanish (Español)</string>
+    <string name="lang_en">English</string>
+    <string name="lang_pt">Portuguese (Português)</string>
+    <string name="lang_fr">French (Français)</string>
+    <string name="label_export_directory">Export Directory</string>
+    <string name="text_export_path">Internal Storage > Documents > FactorEscalaTop</string>
+    <string name="label_pressure_adjustment">Barometer Adjustment (mmHg)</string>
+    <string name="hint_pressure_adjustment">Ex: -1.5 or 0.8</string>
+    <string name="msg_restart_required">The app will restart to apply changes.</string>
+
+    <!-- Compass Calibrate -->
+    <string name="menu_calibrate_compass">Calibrate Compass</string>
+    <string name="title_calibrate_compass">Calibrate Compass</string>
+    <string name="msg_calibrate_instructions">To improve precision, move your device drawing an \'8\' in the air several times.</string>
+    <string name="btn_understood">UNDERSTOOD</string>
+
+    <!-- Menu items -->
+    <string name="menu_about">About</string>
+    <string name="menu_tutorial">Tutorial</string>
+
+    <string name="splash_title">Topographic Scale Factor App</string>
+    <string name="developer_name">Developed by Attack7710</string>
+    <string name="msg_gps_activated">GPS ACTIVATED</string>
+    <string name="msg_manual_entry_hint">Please enter data manually</string>
+    <string name="msg_activate_gps">Please activate GPS on your device</string>
+    <string name="msg_point_saved_format">Point \'%1$s\' saved to Register</string>
+    <string name="msg_select_points_export">Select points to export</string>
+    <string name="msg_select_points_delete">Select points to delete</string>
+    <string name="msg_no_points_selected">No points selected</string>
+
+    <!-- Compass Specific -->
+    <string name="label_azimut_dms">AZIMUTH: %1$d° %2$02d\' %3$02d\"</string>
+    <string name="label_este_utm">EAST (E) - UTM</string>
+    <string name="label_norte_utm">NORTH (N) - UTM</string>
+    <string name="label_alt_cota">ALTITUDE (Z / COTA)</string>
+    <string name="label_comb_factor">COMBINED FACTOR</string>
+    <string name="label_press_atm">ATMOSPHERIC PRESSURE</string>
+    <string name="label_zone_hem">ZONE / HEMISPHERE</string>
+    <string name="label_unknown_location">Unknown Location</string>
+
+    <!-- Cardinal Directions -->
+    <string name="dir_n">N</string>
+    <string name="dir_ne">NE</string>
+    <string name="dir_e">E</string>
+    <string name="dir_se">SE</string>
+    <string name="dir_s">S</string>
+    <string name="dir_so">SW</string>
+    <string name="dir_o">W</string>
+    <string name="dir_no">NW</string>
+
+    <!-- Map Specific -->
+    <string name="btn_view_on_map">VIEW ON MAP</string>
+    <string name="msg_location_permission_required">Location permission required</string>
+    <string name="msg_location_error">Could not obtain current location</string>
+
+    <!-- UI Labels -->
+    <string name="label_success">Success:</string>
+    <string name="label_error">Error:</string>
+    <string name="label_warning">Warning:</string>
+    <string name="label_info">Information:</string>
+
+    <!-- Dialogs -->
+    <string name="dialog_delete_title">Confirm Deletion</string>
+    <string name="dialog_delete_msg">Are you sure you want to delete the selected records? This action cannot be undone.</string>
+    <string name="dialog_delete_msg_single">Are you sure you want to delete this record?</string>
+    <string name="btn_yes">YES, DELETE</string>
+    <string name="btn_no">CANCEL</string>
+</resources>

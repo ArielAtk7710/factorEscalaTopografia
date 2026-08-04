@@ -2,31 +2,36 @@
 <FrameLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/bg_main">
+    android:background="@color/bg_main"
+    tools:theme="@style/AppTheme"
+    tools:context=".ManualFragment">
     <ScrollView
         android:scrollbars="vertical"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:fillViewport="true">
         <LinearLayout
             android:orientation="vertical"
             android:padding="12dp"
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
+
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:textStyle="bold"
                 android:textColor="@color/text_primary"
-                android:text="Sistema de referencia WGS84"/>
+                android:text="@string/label_wgs84"/>
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:textStyle="bold"
                 android:textColor="@color/text_secondary"
                 android:layout_marginTop="8dp"
-                android:text="Proyeccion"/>
+                android:text="@string/label_projection"/>
             <Spinner
                 android:id="@+id/spGeoUtm"
                 android:layout_width="match_parent"
@@ -36,6 +41,7 @@
                 android:paddingStart="8dp"
                 android:paddingEnd="32dp" />
 
+            <!-- Geodetic Inputs -->
             <LinearLayout
                 android:orientation="vertical"
                 android:id="@+id/layGeo"
@@ -45,7 +51,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:textColor="@color/text_secondary"
-                    android:text="Latitud"/>
+                    android:text="@string/label_latitude"/>
                 <LinearLayout
                     android:orientation="horizontal"
                     android:layout_width="match_parent"
@@ -92,7 +98,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:textColor="@color/text_secondary"
-                    android:text="Longitud"/>
+                    android:text="@string/label_longitude"/>
                 <LinearLayout
                     android:orientation="horizontal"
                     android:layout_width="match_parent"
@@ -139,7 +145,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:textColor="@color/text_secondary"
-                    android:text="Altura"/>
+                    android:text="@string/label_altitude"/>
                 <EditText
                     android:id="@+id/et_alt"
                     android:layout_width="match_parent"
@@ -148,6 +154,7 @@
                     android:inputType="numberDecimal"/>
             </LinearLayout>
 
+            <!-- UTM Inputs -->
             <LinearLayout
                 android:orientation="vertical"
                 android:id="@+id/layUtm"
@@ -162,7 +169,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:textColor="@color/text_secondary"
-                        android:text="Este"
+                        android:text="@string/label_east"
                         android:layout_row="0"
                         android:layout_column="0"
                         android:layout_gravity="center_vertical"/>
@@ -188,7 +195,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:textColor="@color/text_secondary"
-                        android:text="Norte"
+                        android:text="@string/label_north"
                         android:layout_row="1"
                         android:layout_column="0"
                         android:layout_gravity="center_vertical"/>
@@ -214,7 +221,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:textColor="@color/text_secondary"
-                        android:text="Altura"
+                        android:text="@string/label_altitude"
                         android:layout_row="2"
                         android:layout_column="0"
                         android:layout_gravity="center_vertical"/>
@@ -246,7 +253,7 @@
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:textColor="@color/text_secondary"
-                        android:text="Zona"
+                        android:text="@string/label_zone"
                         android:layout_weight="1"/>
 
                     <Spinner
@@ -262,7 +269,7 @@
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:textColor="@color/text_secondary"
-                        android:text="Hemisferio"
+                        android:text="@string/label_hemisphere"
                         android:layout_weight="1"/>
                     <Spinner
                         android:id="@+id/spHemisferio"
@@ -275,6 +282,7 @@
                 </LinearLayout>
             </LinearLayout>
 
+            <!-- Buttons -->
             <LinearLayout
                 android:orientation="horizontal"
                 android:layout_marginTop="16dp"
@@ -284,14 +292,20 @@
                     android:id="@+id/btn_calcular"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:text="Calcular"
+                    android:text="@string/btn_calculate"
+                    app:backgroundTint="@color/accent_orange"
+                    android:textColor="@color/text_primary"
+                    android:textStyle="bold"
                     android:layout_weight="1"
                     android:layout_marginEnd="4dp"/>
                 <Button
                     android:id="@+id/btn_limpiar"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:text="Limpiar"
+                    android:text="@string/btn_clean"
+                    app:backgroundTint="@color/accent_orange"
+                    android:textColor="@color/text_primary"
+                    android:textStyle="bold"
                     android:layout_weight="1"
                     android:layout_marginStart="4dp"/>
             </LinearLayout>
@@ -302,7 +316,7 @@
                 android:textStyle="bold"
                 android:textColor="@color/text_secondary"
                 android:layout_marginTop="16dp"
-                android:text="Factores de corrección geométrica"/>
+                android:text="@string/title_geometric_factors"/>
 
             <!-- Factor de Escala -->
             <LinearLayout
@@ -318,7 +332,7 @@
                     android:layout_height="wrap_content"
                     android:layout_weight="1.2"
                     android:padding="3dp"
-                    android:text="Factor de Escala"
+                    android:text="@string/label_scale_factor"
                     android:textColor="@color/text_primary" />
 
                 <TextView
@@ -355,7 +369,7 @@
                     android:layout_height="wrap_content"
                     android:layout_weight="1.2"
                     android:padding="3dp"
-                    android:text="Factor de Altura"
+                    android:text="@string/label_elevation_factor"
                     android:textColor="@color/text_primary" />
 
                 <TextView
@@ -392,7 +406,7 @@
                     android:layout_height="wrap_content"
                     android:layout_weight="1.2"
                     android:padding="3dp"
-                    android:text="Altura Ortométrica"
+                    android:text="@string/label_orthometric_altitude"
                     android:textColor="@color/text_primary" />
 
                 <TextView
@@ -414,81 +428,95 @@
                     android:textColor="@color/text_secondary" />
             </LinearLayout>
 
-            <!-- Presión Atmosférica -->
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="4dp"
-                android:background="@color/bg_surface_secondary"
-                android:orientation="horizontal"
-                android:padding="4dp">
-
-                <TextView
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1.2"
-                    android:padding="3dp"
-                    android:text="Presión Estándar"
-                    android:textColor="@color/text_primary" />
-
-                <TextView
-                    android:id="@+id/txt_man_presion"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1.2"
-                    android:padding="3dp"
-                    android:text="0"
-                    android:textColor="@color/accent_orange"
-                    android:textStyle="bold" />
-
-                <TextView
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="0.8"
-                    android:padding="3dp"
-                    android:text="mmHg"
-                    android:textColor="@color/text_secondary" />
-            </LinearLayout>
-
-            <!-- RECUADRO DESTACADO: FACTOR COMBINADO (IDENTICO AL AUTOMATICO) -->
+            <!-- RECUADRO DESTACADO: RESULTADOS CLAVE -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="10dp"
                 android:background="@color/accent_primary"
-                android:orientation="horizontal"
-                android:padding="8dp">
+                android:orientation="vertical"
+                android:padding="12dp">
 
-                <TextView
-                    android:layout_width="0dp"
+                <!-- Fila 1: Factor Combinado -->
+                <LinearLayout
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_weight="1.2"
-                    android:padding="3dp"
-                    android:text="Factor Combinado"
-                    android:textSize="12sp"
-                    android:textColor="@color/text_primary"
-                    android:textStyle="bold" />
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical">
 
-                <TextView
-                    android:id="@+id/txt_man_fc"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1.2"
-                    android:padding="3dp"
-                    android:text="0"
-                    android:textColor="@color/accent_orange"
-                    android:textSize="15sp"
-                    android:textStyle="bold" />
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="@string/label_combined_factor"
+                        android:textColor="@color/text_primary"
+                        android:textStyle="bold"
+                        android:textSize="13sp" />
 
-                <TextView
-                    android:id="@+id/txt_man_fc_ppm"
-                    android:layout_width="0dp"
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:gravity="end">
+                        <TextView
+                            android:id="@+id/txt_man_fc"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="0.00000000"
+                            android:textColor="@color/accent_orange"
+                            android:textSize="18sp"
+                            android:textStyle="bold" />
+                        <TextView
+                            android:id="@+id/txt_man_fc_ppm"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="-- PPM"
+                            android:textColor="@color/text_primary"
+                            android:textSize="11sp"
+                            android:textStyle="bold"
+                            android:alpha="0.8" />
+                    </LinearLayout>
+                </LinearLayout>
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:background="#33FFFFFF"
+                    android:layout_marginVertical="8dp" />
+
+                <!-- Fila 2: Presión -->
+                <LinearLayout
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_weight="0.8"
-                    android:padding="3dp"
-                    android:text="0"
-                    android:textColor="@color/text_secondary"
-                    android:textStyle="bold" />
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical">
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="@string/label_pressure"
+                        android:textColor="@color/text_primary"
+                        android:textStyle="bold"
+                        android:textSize="13sp" />
+
+                    <TextView
+                        android:id="@+id/txt_man_presion"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="0"
+                        android:textColor="@color/accent_orange"
+                        android:textSize="18sp"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text=" mmHg"
+                        android:textColor="@color/text_primary"
+                        android:textStyle="bold"
+                        android:textSize="13sp" />
+                </LinearLayout>
             </LinearLayout>
 
             <Button

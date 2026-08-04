@@ -65,6 +65,32 @@
             android:maxLines="1"
             android:autofillHints="name" />
 
+        <!-- Observaciones -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="OBSERVACIONES"
+            android:textColor="@color/text_secondary"
+            android:textSize="10sp"
+            android:textStyle="bold"
+            android:layout_marginStart="4dp"
+            android:layout_marginTop="16dp"
+            android:layout_marginBottom="4dp"/>
+
+        <EditText
+            android:id="@+id/et_point_notes"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@drawable/bg_spinner_with_arrow"
+            android:backgroundTint="@color/bg_surface_secondary"
+            android:hint="Detalles técnicos, descripción del terreno..."
+            android:padding="12dp"
+            android:textColor="@color/text_primary"
+            android:textColorHint="@color/text_secondary"
+            android:inputType="textMultiLine"
+            android:minLines="3"
+            android:gravity="top|start" />
+
         <!-- Action Buttons -->
         <Button
             android:id="@+id/btn_dialog_save"

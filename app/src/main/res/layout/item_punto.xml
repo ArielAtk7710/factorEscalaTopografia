@@ -257,6 +257,32 @@
                 <TextView android:id="@+id/txt_det_fc" android:text="0.99912345" android:textColor="@color/accent_orange" android:textSize="16sp" android:textStyle="bold" android:layout_width="wrap_content" android:layout_height="wrap_content"/>
             </LinearLayout>
 
+            <!-- SECCIÓN DE NOTAS -->
+            <LinearLayout
+                android:id="@+id/layout_item_notas"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:layout_marginTop="8dp"
+                android:background="@color/bg_surface_secondary"
+                android:padding="8dp">
+                <TextView
+                    android:text="OBSERVACIONES"
+                    android:textSize="10sp"
+                    android:textColor="@color/text_secondary"
+                    android:textStyle="bold"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"/>
+                <TextView
+                    android:id="@+id/txt_det_notas"
+                    android:text="Sin observaciones."
+                    android:textColor="@color/text_primary"
+                    android:textSize="12sp"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="2dp"/>
+            </LinearLayout>
+
             <TextView
                 android:id="@+id/txt_item_fecha_full"
                 android:layout_width="match_parent"

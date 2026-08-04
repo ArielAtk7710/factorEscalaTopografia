@@ -13,31 +13,55 @@ import android.widget.Toast;
 public class UIUtils {
 
     public static void showSuccessToast(Context context, String message) {
-        showCustomToast(context, "success", "Éxito:", message, Toast.LENGTH_SHORT);
+        showCustomToast(context, "success", context.getString(R.string.label_success), message, Toast.LENGTH_SHORT);
     }
 
     public static void showErrorToast(Context context, String message) {
-        showCustomToast(context, "error", "Error:", message, Toast.LENGTH_LONG);
+        showCustomToast(context, "error", context.getString(R.string.label_error), message, Toast.LENGTH_LONG);
     }
 
     public static void showWarningToast(Context context, String message) {
-        showCustomToast(context, "warning", "Advertencia:", message, Toast.LENGTH_SHORT);
+        showCustomToast(context, "warning", context.getString(R.string.label_warning), message, Toast.LENGTH_SHORT);
     }
 
     public static void showInfoToast(Context context, String message) {
-        showCustomToast(context, "info", "Información:", message, Toast.LENGTH_SHORT);
+        showCustomToast(context, "info", context.getString(R.string.label_info), message, Toast.LENGTH_SHORT);
     }
 
     /**
      * Muestra un Toast de información que dura aproximadamente 5 segundos.
      */
     public static void showInfoToastLong(Context context, String message) {
-        final Toast toast = prepareCustomToast(context, "info", "Información de Ruta:", message, Toast.LENGTH_LONG);
+        final Toast toast = prepareCustomToast(context, "info", context.getString(R.string.label_info), message, Toast.LENGTH_LONG);
         if (toast != null) {
             toast.show();
             // Extender duración disparando de nuevo a los 2 segundos
             new Handler(Looper.getMainLooper()).postDelayed(toast::show, 2000);
         }
+    }
+
+    public static void showConfirmDialog(Context context, int titleRes, int msgRes, Runnable onConfirm) {
+        androidx.appcompat.app.AlertDialog.Builder builder = new androidx.appcompat.app.AlertDialog.Builder(context);
+        View view = LayoutInflater.from(context).inflate(R.layout.dialog_custom_confirm, null);
+        builder.setView(view);
+
+        androidx.appcompat.app.AlertDialog dialog = builder.create();
+        if (dialog.getWindow() != null) {
+            dialog.getWindow().setBackgroundDrawableResource(android.R.color.transparent);
+        }
+
+        TextView txtTitle = view.findViewById(R.id.txt_dialog_title);
+        TextView txtMsg = view.findViewById(R.id.txt_dialog_message);
+        txtTitle.setText(titleRes);
+        txtMsg.setText(msgRes);
+
+        view.findViewById(R.id.btn_dialog_yes).setOnClickListener(v -> {
+            onConfirm.run();
+            dialog.dismiss();
+        });
+        view.findViewById(R.id.btn_dialog_no).setOnClickListener(v -> dialog.dismiss());
+
+        dialog.show();
     }
 
     private static void showCustomToast(Context context, String type, String label, String message, int duration) {

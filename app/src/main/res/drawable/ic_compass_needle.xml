@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="100dp"
+    android:height="100dp"
+    android:viewportWidth="100"
+    android:viewportHeight="100">
+
+    <!-- Aguja Norte (Naranja Vibrante) -->
+    <path
+        android:fillColor="#F97316"
+        android:pathData="M50,15 L62,50 L50,56 L38,50 Z"/>
+
+    <!-- Aguja Sur (Blanco Puro) -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M50,85 L38,50 L50,44 L62,50 Z"/>
+
+    <!-- Punto central (Azul del proyecto) -->
+    <path
+        android:fillColor="#3B82F6"
+        android:pathData="M50,47a3,3 0,1 1,0 6a3,3 0,1 1,0 -6"/>
+</vector>
