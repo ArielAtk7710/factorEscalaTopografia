@@ -46,29 +46,30 @@ public class WeatherFragment extends Fragment {
         View rowWind = view.findViewById(R.id.detail_wind_120);
         labelWind120 = rowWind.findViewById(R.id.txt_detail_label);
         valWind120 = rowWind.findViewById(R.id.txt_detail_value);
-        labelWind120.setText("Viento (120m):");
+        labelWind120.setText(R.string.label_wind_120_v);
 
         View rowGusts = view.findViewById(R.id.detail_gusts);
         labelGusts = rowGusts.findViewById(R.id.txt_detail_label);
         valGusts = rowGusts.findViewById(R.id.txt_detail_value);
-        labelGusts.setText("Ráfagas Max:");
+        labelGusts.setText(R.string.label_gusts_max);
 
         View rowRainProb = view.findViewById(R.id.detail_rain_prob);
         labelRainProb = rowRainProb.findViewById(R.id.txt_detail_label);
         valRainProb = rowRainProb.findViewById(R.id.txt_detail_value);
-        labelRainProb.setText("Prob. Lluvia:");
+        labelRainProb.setText(R.string.label_rain_prob_v);
 
         View rowRain = view.findViewById(R.id.detail_rain);
         labelRain = rowRain.findViewById(R.id.txt_detail_label);
         valRain = rowRain.findViewById(R.id.txt_detail_value);
-        labelRain.setText("Lluvia Actual:");
+        labelRain.setText(R.string.label_rain_actual);
 
         View rowKp = view.findViewById(R.id.detail_kp);
         labelKp = rowKp.findViewById(R.id.txt_detail_label);
         valKp = rowKp.findViewById(R.id.txt_detail_value);
-        labelKp.setText("Índice Kp Solar:");
+        labelKp.setText(R.string.label_kp_solar);
 
         view.findViewById(R.id.btn_refresh_weather).setOnClickListener(v -> loadWeatherData());
+        ((android.widget.Button)view.findViewById(R.id.btn_refresh_weather)).setText(R.string.btn_refresh_data);
 
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(requireActivity());
         loadWeatherData();
@@ -90,7 +91,7 @@ public class WeatherFragment extends Fragment {
                         }
                     });
                 } else {
-                    UIUtils.showWarningToast(requireContext(), "GPS sin señal");
+                    UIUtils.showWarningToast(requireContext(), getString(R.string.msg_gps_no_signal));
                 }
             });
         } catch (SecurityException ignored) {}
@@ -104,8 +105,13 @@ public class WeatherFragment extends Fragment {
         valKp.setText(status.kp >= 0 ? String.format(Locale.getDefault(), "Kp %.2f", status.kp) : "N/A");
 
         txtTemp.setText(String.format(Locale.getDefault(), "%.1f°C", status.temperature));
-        txtForecast.setText(status.forecastDesc);
-        txtTitle.setText(status.message);
+        txtForecast.setText(getString(status.forecastDescResId));
+        
+        if (status.messageArg != null) {
+            txtTitle.setText(getString(status.messageResId, status.messageArg));
+        } else {
+            txtTitle.setText(getString(status.messageResId));
+        }
         
         int color;
         int icon;
@@ -132,5 +138,6 @@ public class WeatherFragment extends Fragment {
         
         cardStatus.setCardBackgroundColor(color);
         imgStatus.setImageResource(icon);
+        // Usaremos el txtTitle para el mensaje dinámico y desc para la recomendación general
     }
 }

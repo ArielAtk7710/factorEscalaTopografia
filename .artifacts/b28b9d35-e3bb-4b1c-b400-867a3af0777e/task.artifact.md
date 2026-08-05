@@ -1,0 +1,3 @@
+- [x] Modify `gradle.properties` to increase memory and add stability flags
+- [x] Stop running Gradle daemons
+- [x] Verify build with `clean assembleDebug`

@@ -61,14 +61,14 @@
             android:letterSpacing="0.05" />
     </LinearLayout>
 
-    <!-- INSTRUMENTO CENTRAL (MEDIANO) -->
+    <!-- INSTRUMENTO CENTRAL (MÁS PEQUEÑO) -->
     <FrameLayout
         android:id="@+id/frame_instrument"
         android:layout_width="0dp"
         android:layout_height="0dp"
         app:layout_constraintDimensionRatio="1:1"
-        android:layout_marginHorizontal="70dp"
-        android:layout_marginVertical="12dp"
+        android:layout_marginHorizontal="85dp"
+        android:layout_marginVertical="10dp"
         app:layout_constraintTop_toBottomOf="@id/layout_azimut_display"
         app:layout_constraintBottom_toTopOf="@+id/layout_technical_panel"
         app:layout_constraintStart_toStartOf="parent"

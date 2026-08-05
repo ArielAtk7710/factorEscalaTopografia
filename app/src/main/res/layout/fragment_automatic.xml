@@ -65,12 +65,11 @@
                 app:cardBackgroundColor="@color/bg_surface"
                 app:cardCornerRadius="12dp"
                 app:cardElevation="0dp">
-                <ImageView
+
+                <org.osmdroid.views.MapView
+                    android:id="@+id/mini_map_view"
                     android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:scaleType="centerCrop"
-                    android:src="@drawable/img_mapa_referencial"
-                    android:contentDescription="Minimapa" />
+                    android:layout_height="match_parent" />
             </androidx.cardview.widget.CardView>
 
             <!-- 2. BARRA DE ESTADO GPS (PRECISIÓN Y SATÉLITES) -->
@@ -164,7 +163,7 @@
             <!-- SECCIÓN 3: FACTORES DE CORRECCIÓN -->
             <TextView android:text="@string/title_geometric_factors" android:textColor="@color/text_secondary" android:textSize="12sp" android:textStyle="bold" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginBottom="8dp"/>
 
-            <GridLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:columnCount="2" android:layout_marginBottom="24dp">
+            <GridLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:columnCount="2" android:layout_marginBottom="10dp">
                 <LinearLayout android:orientation="vertical" android:layout_columnWeight="1">
                     <TextView android:text="@string/label_elevation_factor" android:textSize="10sp" android:textColor="@color/text_secondary" android:textStyle="bold" android:layout_width="wrap_content" android:layout_height="wrap_content"/>
                     <TextView android:id="@+id/txt_fa" android:text="0.00000000" android:textColor="@color/accent_orange" android:textSize="14sp" android:textStyle="bold" android:layout_width="wrap_content" android:layout_height="wrap_content"/>
@@ -185,24 +184,105 @@
                 android:orientation="vertical"
                 android:padding="12dp">
 
-                <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="horizontal" android:gravity="center_vertical">
-                    <TextView android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:text="@string/label_combined_factor" android:textColor="@color/text_primary" android:textStyle="bold" android:textSize="13sp" />
+                <!-- Fila 1: Factor Combinado -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical">
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="@string/label_combined_factor"
+                        android:textColor="@color/text_primary"
+                        android:textStyle="bold"
+                        android:textSize="13sp" />
+
                     <LinearLayout
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:orientation="vertical"
                         android:gravity="end">
-                        <TextView android:id="@+id/txt_fc" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="0.00000000" android:textColor="@color/accent_orange" android:textSize="18sp" android:textStyle="bold" />
-                        <TextView android:id="@+id/txt_fc_ppm" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="-- PPM" android:textColor="@color/text_primary" android:textSize="11sp" android:textStyle="bold" android:alpha="0.8" />
+                        <TextView
+                            android:id="@+id/txt_fc"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="0.000000000"
+                            android:textColor="@color/accent_orange"
+                            android:textSize="18sp"
+                            android:textStyle="bold" />
+                        <TextView
+                            android:id="@+id/txt_fc_ppm"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="-- PPM"
+                            android:textColor="@color/text_primary"
+                            android:textSize="11sp"
+                            android:textStyle="bold"
+                            android:alpha="0.8" />
                     </LinearLayout>
                 </LinearLayout>
 
-                <View android:layout_width="match_parent" android:layout_height="1dp" android:background="#33FFFFFF" android:layout_marginVertical="8dp" />
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:background="#33FFFFFF"
+                    android:layout_marginVertical="8dp" />
 
-                <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="horizontal" android:gravity="center_vertical">
-                    <TextView android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:text="@string/label_pressure" android:textColor="@color/text_primary" android:textStyle="bold" android:textSize="13sp" />
-                    <TextView android:id="@+id/txt_presion" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="---" android:textColor="@color/accent_orange" android:textSize="18sp" android:textStyle="bold" />
-                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text=" mmHg" android:textColor="@color/text_primary" android:textStyle="bold" android:textSize="13sp" />
+                <!-- Fila 2: Presión -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical">
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="@string/label_pressure"
+                        android:textColor="@color/text_primary"
+                        android:textStyle="bold"
+                        android:textSize="13sp" />
+
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:gravity="end">
+                        <LinearLayout
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal"
+                            android:gravity="center_vertical">
+                            <TextView
+                                android:id="@+id/txt_presion"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="---"
+                                android:textColor="@color/accent_orange"
+                                android:textSize="18sp"
+                                android:textStyle="bold" />
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text=" mmHg"
+                                android:textColor="@color/accent_orange"
+                                android:textStyle="bold"
+                                android:textSize="13sp" />
+                        </LinearLayout>
+                        <TextView
+                            android:id="@+id/txt_presion_hpa"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="-- hPa"
+                            android:textColor="@color/text_primary"
+                            android:textSize="11sp"
+                            android:textStyle="bold"
+                            android:alpha="0.8" />
+                    </LinearLayout>
                 </LinearLayout>
             </LinearLayout>
 
@@ -211,7 +291,7 @@
                 android:id="@+id/btn_guardar_punto_auto"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="32dp"
+                android:layout_marginTop="3dp"
                 android:text="@string/btn_save_point"
                 app:backgroundTint="@color/accent_orange"
                 android:textColor="@color/text_primary"

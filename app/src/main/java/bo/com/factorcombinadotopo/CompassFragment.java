@@ -88,6 +88,7 @@ public class CompassFragment extends Fragment implements SensorEventListener {
         locationCallback = new LocationCallback() {
             @Override
             public void onLocationResult(@NonNull LocationResult locationResult) {
+                if (!isAdded() || getView() == null) return;
                 for (Location location : locationResult.getLocations()) {
                     if (location != null) updateGpsUI(location);
                 }
@@ -96,6 +97,7 @@ public class CompassFragment extends Fragment implements SensorEventListener {
     }
 
     private void updateGpsUI(Location loc) {
+        if (!isAdded() || getView() == null) return;
         DecimalFormat df = new DecimalFormat("#0.00");
         DecimalFormat dfUtm = new DecimalFormat("#,##0.00");
         DecimalFormat df8 = new DecimalFormat("#0.00000000");
@@ -226,6 +228,11 @@ public class CompassFragment extends Fragment implements SensorEventListener {
         double mDouble = (val - d) * 60.0;
         int m = (int) mDouble;
         int s = (int) Math.round((mDouble - m) * 60.0);
+        
+        if (s == 60) { s = 0; m++; }
+        if (m == 60) { m = 0; d++; }
+        d %= 360;
+        
         return getString(R.string.label_azimut_dms, d, m, s);
     }
 

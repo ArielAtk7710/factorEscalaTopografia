@@ -14,13 +14,13 @@
             android:icon="@drawable/ic_compass_needle"
             android:title="Brújula Pro" />
         <item
-            android:id="@+id/nav_field_notebook"
-            android:icon="@drawable/ic_notebook"
-            android:title="Libreta de Campo" />
-        <item
             android:id="@+id/nav_map"
             android:icon="@drawable/ic_map"
             android:title="Mapa" />
+        <item
+            android:id="@+id/nav_field_notebook"
+            android:icon="@drawable/ic_notebook"
+            android:title="Libreta de Campo" />
         <item
             android:id="@+id/nav_weather"
             android:icon="@drawable/ic_pressure"

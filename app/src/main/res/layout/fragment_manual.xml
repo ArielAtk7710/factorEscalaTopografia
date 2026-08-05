@@ -16,6 +16,8 @@
         <LinearLayout
             android:orientation="vertical"
             android:padding="12dp"
+            android:paddingBottom="100dp"
+            android:clipToPadding="false"
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
 
@@ -285,7 +287,7 @@
             <!-- Buttons -->
             <LinearLayout
                 android:orientation="horizontal"
-                android:layout_marginTop="16dp"
+                android:layout_marginTop="12dp"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content">
                 <Button
@@ -315,7 +317,7 @@
                 android:layout_height="wrap_content"
                 android:textStyle="bold"
                 android:textColor="@color/text_secondary"
-                android:layout_marginTop="16dp"
+                android:layout_marginTop="8dp"
                 android:text="@string/title_geometric_factors"/>
 
             <!-- Factor de Escala -->
@@ -462,7 +464,7 @@
                             android:id="@+id/txt_man_fc"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="0.00000000"
+                            android:text="0.000000000"
                             android:textColor="@color/accent_orange"
                             android:textSize="18sp"
                             android:textStyle="bold" />
@@ -500,22 +502,42 @@
                         android:textStyle="bold"
                         android:textSize="13sp" />
 
-                    <TextView
-                        android:id="@+id/txt_man_presion"
+                    <LinearLayout
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="0"
-                        android:textColor="@color/accent_orange"
-                        android:textSize="18sp"
-                        android:textStyle="bold" />
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text=" mmHg"
-                        android:textColor="@color/text_primary"
-                        android:textStyle="bold"
-                        android:textSize="13sp" />
+                        android:orientation="vertical"
+                        android:gravity="end">
+                        <LinearLayout
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal"
+                            android:gravity="center_vertical">
+                            <TextView
+                                android:id="@+id/txt_man_presion"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="0"
+                                android:textColor="@color/accent_orange"
+                                android:textSize="18sp"
+                                android:textStyle="bold" />
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text=" mmHg"
+                                android:textColor="@color/accent_orange"
+                                android:textStyle="bold"
+                                android:textSize="13sp" />
+                        </LinearLayout>
+                        <TextView
+                            android:id="@+id/txt_man_presion_hpa"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="-- hPa"
+                            android:textColor="@color/text_primary"
+                            android:textSize="11sp"
+                            android:textStyle="bold"
+                            android:alpha="0.8" />
+                    </LinearLayout>
                 </LinearLayout>
             </LinearLayout>
 
@@ -523,7 +545,7 @@
                 android:id="@+id/btn_guardar"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="24dp"
+                android:layout_marginTop="5dp"
                 android:text="@string/btn_save_results"
                 app:backgroundTint="@color/accent_orange"
                 android:textColor="@color/text_primary"

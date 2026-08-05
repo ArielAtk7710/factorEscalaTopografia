@@ -6,7 +6,9 @@ import android.os.Looper;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.PopupWindow;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -38,6 +40,27 @@ public class UIUtils {
             // Extender duración disparando de nuevo a los 2 segundos
             new Handler(Looper.getMainLooper()).postDelayed(toast::show, 2000);
         }
+    }
+
+    /**
+     * Crea una guía técnica sobre el ajuste de barómetro mediante un Popup temporal.
+     * Retorna la instancia para permitir al llamador cerrarla manualmente.
+     */
+    public static PopupWindow showBarometerInfo(Context context, View parentView) {
+        View popupView = LayoutInflater.from(context).inflate(R.layout.layout_barometer_info, null);
+        
+        final PopupWindow popupWindow = new PopupWindow(popupView, 
+                ViewGroup.LayoutParams.WRAP_CONTENT, 
+                ViewGroup.LayoutParams.WRAP_CONTENT, true);
+
+        popupWindow.setElevation(30);
+        popupWindow.setAnimationStyle(android.R.style.Animation_Dialog);
+        
+        // Centrar en la pantalla
+        popupWindow.showAtLocation(parentView, Gravity.CENTER, 0, 0);
+
+        // Auto-dismiss opcional o manual por el llamador
+        return popupWindow;
     }
 
     public static void showConfirmDialog(Context context, int titleRes, int msgRes, Runnable onConfirm) {

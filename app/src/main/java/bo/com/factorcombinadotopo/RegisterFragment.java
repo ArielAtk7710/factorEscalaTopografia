@@ -252,29 +252,79 @@ public class RegisterFragment extends Fragment {
     }
 
     private void exportarHistorialTxt(List<Punto> lista, String sufijo) {
-        if (lista.isEmpty()) { UIUtils.showWarningToast(requireContext(), "No hay datos para exportar"); return; }
+        if (lista.isEmpty()) { UIUtils.showWarningToast(requireContext(), getString(R.string.warn_no_export_data)); return; }
         StringBuilder sb = new StringBuilder();
-        sb.append("==========================================\nREPORTE ").append(sufijo.toUpperCase()).append(" - FACTORESCALATOP\n==========================================\n\n");
+        sb.append("====================================================\n");
+        sb.append("    REPORTE TOPOGRÁFICO - FACTORESCALATOP           \n");
+        sb.append("    Tipo: ").append(sufijo.toUpperCase()).append("\n");
+        sb.append("====================================================\n\n");
+        
         for (Punto p : lista) {
-            sb.append("PUNTO: ").append(p.nombre).append(" (").append(p.fecha).append(")\n");
-            if (p.notas != null && !p.notas.isEmpty()) sb.append("  OBS: ").append(p.notas).append("\n");
-            sb.append("  UTM: E=").append(p.este).append(" | N=").append(p.norte).append("\n  LAT/LON: ").append(p.latitud).append(" / ").append(p.longitud).append("\n  ALT: Elip=").append(p.altura).append(" | Orto=").append(p.altOrto).append("\n  K COMBINADO: ").append(p.fc).append("\n------------------------------------------\n");
+            sb.append(buildPuntoInfoString(p));
+            sb.append("----------------------------------------------------\n\n");
         }
-        String fileName = "Puntos_" + sufijo + "_" + new SimpleDateFormat("yyyyMMdd_HHmm", Locale.getDefault()).format(new Date()) + ".txt";
+        
+        String timeTag = new SimpleDateFormat("yyyyMMdd_HHmm", Locale.getDefault()).format(new Date());
+        String fileName = "Reporte_Topografico_" + sufijo + "_" + timeTag + ".txt";
         FileUtils.savePublicTxtFile(requireContext(), fileName, sb.toString());
     }
 
     private void exportarLibretaTxt(List<LibretaEntry> lista, String sufijo) {
-        if (lista.isEmpty()) { UIUtils.showWarningToast(requireContext(), "No hay datos para exportar"); return; }
+        if (lista.isEmpty()) { UIUtils.showWarningToast(requireContext(), getString(R.string.warn_no_export_data)); return; }
         StringBuilder sb = new StringBuilder();
-        sb.append("==========================================\n   LIBRETA DE CAMPO - FACTORESCALATOP   \n==========================================\n\n");
+        sb.append("==========================================\n");
+        sb.append("   LIBRETA DE CAMPO - FACTORESCALATOP     \n");
+        sb.append("==========================================\n\n");
+        
         for (LibretaEntry e : lista) {
-            sb.append("FECHA: ").append(e.fecha).append("\nESTACIÓN: ").append(e.estacion).append(" (Ins: ").append(e.altIns).append("m) -> AUX: ").append(e.puntoAux).append("\nREF: ").append(e.puntoRef).append(" (Prisma: ").append(e.altPri).append("m) | ").append(e.tipoReg).append("\nCOORD: E=").append(e.este).append(" | N=").append(e.norte).append(" | Z=").append(e.cota).append("\n");
-            if (e.obs != null && !e.obs.isEmpty()) sb.append("OBS: ").append(e.obs).append("\n");
-            sb.append("------------------------------------------\n");
+            sb.append(buildLibretaInfoString(e));
+            sb.append("\n------------------------------------------\n\n");
         }
-        String fileName = "Libreta_" + sufijo + "_" + new SimpleDateFormat("yyyyMMdd_HHmm", Locale.getDefault()).format(new Date()) + ".txt";
+        
+        String timeTag = new SimpleDateFormat("yyyyMMdd_HHmm", Locale.getDefault()).format(new Date());
+        String fileName = "Libreta_" + sufijo + "_" + timeTag + ".txt";
         FileUtils.savePublicTxtFile(requireContext(), fileName, sb.toString());
+    }
+
+    private String buildPuntoInfoString(Punto p) {
+        if (!isAdded()) return "";
+        StringBuilder sb = new StringBuilder();
+        sb.append(getString(R.string.label_identification)).append(":\n");
+        sb.append("  ").append(getString(R.string.label_point)).append(": ").append(p.nombre).append("\n");
+        sb.append("  ").append(getString(R.string.label_reg_date)).append(": ").append(p.fecha).append("\n");
+        sb.append("  ").append(getString(R.string.label_observations)).append(": ").append(p.notas).append("\n\n");
+
+        sb.append(getString(R.string.title_geodetic_coords)).append(" (WGS84):\n");
+        sb.append("  ").append(getString(R.string.label_latitude)).append(": ").append(p.latitud).append("\n");
+        sb.append("  ").append(getString(R.string.label_longitude)).append(": ").append(p.longitud).append("\n");
+        sb.append("  ").append(getString(R.string.label_ellipsoidal_altitude)).append(": ").append(p.altura).append(" ").append(getString(R.string.unit_meter)).append("\n");
+        sb.append("  ").append(getString(R.string.label_orthometric_altitude)).append(": ").append(p.altOrto).append(" ").append(getString(R.string.unit_meter)).append("\n\n");
+
+        sb.append(getString(R.string.label_proyected_coords)).append(":\n");
+        sb.append("  ").append(getString(R.string.label_east_x)).append(": ").append(p.este).append(" ").append(getString(R.string.unit_meter)).append("\n");
+        sb.append("  ").append(getString(R.string.label_north_y)).append(": ").append(p.norte).append(" ").append(getString(R.string.unit_meter)).append("\n");
+        sb.append("  ").append(getString(R.string.label_zone)).append(": ").append(p.zona).append("\n");
+        sb.append("  ").append(getString(R.string.label_hemisphere)).append(": ").append(p.hemisferio).append("\n\n");
+
+        sb.append(getString(R.string.label_geometric_factors_v)).append(":\n");
+        sb.append("  ").append(getString(R.string.label_scale_factor_k)).append(": ").append(p.fe).append("\n");
+        sb.append("  ").append(getString(R.string.label_elev_factor_ha)).append(": ").append(p.fa).append("\n");
+        sb.append("  ").append(getString(R.string.label_comb_factor_k)).append(": ").append(p.fc).append("\n\n");
+
+        sb.append(getString(R.string.label_atm_data)).append(":\n");
+        sb.append("  ").append(getString(R.string.label_pressure)).append(": ").append(p.presion).append("\n");
+        return sb.toString();
+    }
+
+    private String buildLibretaInfoString(LibretaEntry e) {
+        StringBuilder sb = new StringBuilder();
+        sb.append(getString(R.string.label_libreta_title)).append(":\n");
+        sb.append("  ").append(getString(R.string.label_reg_date)).append(": ").append(e.fecha).append("\n");
+        sb.append("  ").append(getString(R.string.label_station)).append(": ").append(e.estacion).append(" (").append(getString(R.string.label_instrument)).append(": ").append(e.altIns).append(getString(R.string.unit_meter)).append(") -> AUX: ").append(e.puntoAux).append("\n");
+        sb.append("  ").append(getString(R.string.label_ref_format, e.puntoRef)).append(" (").append(getString(R.string.label_prisma)).append(": ").append(e.altPri).append(getString(R.string.unit_meter)).append(") | ").append(e.tipoReg).append("\n");
+        sb.append("  COORD: E=").append(e.este).append(" | N=").append(e.norte).append(" | Z=").append(e.cota).append("\n");
+        sb.append("  ").append(getString(R.string.label_observations)).append(": ").append((e.obs == null || e.obs.isEmpty()) ? getString(R.string.label_no_observations) : e.obs);
+        return sb.toString();
     }
 
     @Override public void onResume() { super.onResume(); cargarDatos(); }
@@ -302,14 +352,14 @@ public class RegisterFragment extends Fragment {
             h.txtDetAltOrto.setText(p.altOrto); h.txtDetPresion.setText(p.presion);
             h.txtDetSis.setText("WGS-84 " + p.zona + " " + p.hemisferio);
             h.txtDetFe.setText(p.fe); h.txtDetFa.setText(p.fa); h.txtDetFc.setText(p.fc);
-            h.txtFechaFull.setText("Registrado: " + p.fecha);
-            h.txtDetNotas.setText((p.notas != null && !p.notas.isEmpty()) ? p.notas : "Sin observaciones.");
+            h.txtFechaFull.setText(getString(R.string.label_registered_format, p.fecha));
+            h.txtDetNotas.setText((p.notas != null && !p.notas.isEmpty()) ? p.notas : getString(R.string.label_no_obs_list));
             h.cbSelect.setVisibility(isSelectionMode ? View.VISIBLE : View.GONE);
             h.cbSelect.setChecked(selectedIds.contains(p.id));
             h.cbSelect.setOnClickListener(v -> { if (h.cbSelect.isChecked()) selectedIds.add(p.id); else selectedIds.remove(p.id); });
             h.layoutExpand.setVisibility(p.isExpanded ? View.VISIBLE : View.GONE);
             h.imgArrow.setRotation(p.isExpanded ? 180 : 0);
-            h.txtExpandLabel.setText(p.isExpanded ? "Ocultar Detalles" : "Ver Detalles");
+            h.txtExpandLabel.setText(p.isExpanded ? getString(R.string.label_hide_details) : getString(R.string.label_show_details));
             h.btnExpand.setOnClickListener(v -> { p.isExpanded = !p.isExpanded; notifyItemChanged(pos); });
             h.btnCopy.setOnClickListener(v -> copiarPunto(p));
             h.btnShare.setOnClickListener(v -> compartirPunto(p));
@@ -324,13 +374,14 @@ public class RegisterFragment extends Fragment {
         }
         @Override public int getItemCount() { return list.size(); }
         private void copiarPunto(Punto p) {
-            String r = "PUNTO: " + p.nombre + "\nE: " + p.este + " N: " + p.norte + "\nZ: " + p.fc + "\nFecha: " + p.fecha;
-            ((ClipboardManager)requireContext().getSystemService(Context.CLIPBOARD_SERVICE)).setPrimaryClip(ClipData.newPlainText("Punto", r));
+            String r = buildPuntoInfoString(p);
+            ((ClipboardManager)requireContext().getSystemService(Context.CLIPBOARD_SERVICE)).setPrimaryClip(ClipData.newPlainText("Punto Topografico", r));
             UIUtils.showSuccessToast(requireContext(), getString(R.string.msg_copied_clipboard));
         }
         private void compartirPunto(Punto p) {
-            Intent si = new Intent(Intent.ACTION_SEND); si.setType("text/plain"); si.putExtra(Intent.EXTRA_TEXT, "PUNTO: " + p.nombre + "\nE: " + p.este + " N: " + p.norte);
-            startActivity(Intent.createChooser(si, "Compartir"));
+            String r = buildPuntoInfoString(p);
+            Intent si = new Intent(Intent.ACTION_SEND); si.setType("text/plain"); si.putExtra(Intent.EXTRA_TEXT, r);
+            startActivity(Intent.createChooser(si, "Compartir Punto"));
         }
         class ViewHolder extends RecyclerView.ViewHolder {
             TextView txtNombre, txtResumenUtm, txtDetLat, txtDetLon, txtDetAlt, txtDetAltOrto, txtDetPresion, txtDetSis, txtDetFe, txtDetFa, txtDetFc, txtFechaFull, txtExpandLabel, txtDetNotas;
@@ -360,16 +411,16 @@ public class RegisterFragment extends Fragment {
         }
         @Override public void onBindViewHolder(@NonNull ViewHolder h, int pos) {
             LibretaEntry e = list.get(pos);
-            h.txtNombre.setText(e.estacion + " -> " + e.puntoAux); h.txtResumen.setText("Ref: " + e.puntoRef + " | Prisma: " + e.altPri + "m");
-            h.txtDetTipo.setText(e.tipoReg); h.txtDetAltIns.setText(e.altIns + " m"); h.txtDetEste.setText(e.este);
+            h.txtNombre.setText(e.estacion + " -> " + e.puntoAux); h.txtResumen.setText(getString(R.string.label_ref_format, e.puntoRef) + " | " + getString(R.string.label_prisma) + ": " + e.altPri + getString(R.string.unit_meter));
+            h.txtDetTipo.setText(e.tipoReg); h.txtDetAltIns.setText(e.altIns + " " + getString(R.string.unit_meter)); h.txtDetEste.setText(e.este);
             h.txtDetNorte.setText(e.norte); h.txtDetCota.setText(e.cota); h.txtDetFecha.setText(e.fecha);
-            h.txtDetObs.setText((e.obs == null || e.obs.isEmpty()) ? "Sin observaciones." : e.obs);
+            h.txtDetObs.setText((e.obs == null || e.obs.isEmpty()) ? getString(R.string.label_no_obs_list) : e.obs);
             h.cbSelect.setVisibility(isSelectionMode ? View.VISIBLE : View.GONE);
             h.cbSelect.setChecked(selectedIds.contains(e.id));
             h.cbSelect.setOnClickListener(v -> { if (h.cbSelect.isChecked()) selectedIds.add(e.id); else selectedIds.remove(e.id); });
             h.layoutExpand.setVisibility(e.isExpanded ? View.VISIBLE : View.GONE);
             h.imgArrow.setRotation(e.isExpanded ? 180 : 0);
-            h.txtExpandLabel.setText(e.isExpanded ? "Ocultar Detalles" : "Ver Detalles");
+            h.txtExpandLabel.setText(e.isExpanded ? getString(R.string.label_hide_details) : getString(R.string.label_show_details));
             h.btnExpand.setOnClickListener(v -> { e.isExpanded = !e.isExpanded; notifyItemChanged(pos); });
             h.btnCopy.setOnClickListener(v -> copiarLibreta(e));
             h.btnShare.setOnClickListener(v -> compartirLibreta(e));
@@ -384,13 +435,14 @@ public class RegisterFragment extends Fragment {
         }
         @Override public int getItemCount() { return list.size(); }
         private void copiarLibreta(LibretaEntry e) {
-            String r = "LIBRETA: " + e.estacion + " -> " + e.puntoAux + "\nE: " + e.este + " N: " + e.norte + " Z: " + e.cota;
-            ((ClipboardManager)requireContext().getSystemService(Context.CLIPBOARD_SERVICE)).setPrimaryClip(ClipData.newPlainText("Libreta", r));
+            String r = buildLibretaInfoString(e);
+            ((ClipboardManager)requireContext().getSystemService(Context.CLIPBOARD_SERVICE)).setPrimaryClip(ClipData.newPlainText("Libreta de Campo", r));
             UIUtils.showSuccessToast(requireContext(), getString(R.string.msg_copied_clipboard));
         }
         private void compartirLibreta(LibretaEntry e) {
-            Intent si = new Intent(Intent.ACTION_SEND); si.setType("text/plain"); si.putExtra(Intent.EXTRA_TEXT, "LIBRETA: " + e.estacion + " -> " + e.puntoAux);
-            startActivity(Intent.createChooser(si, "Compartir"));
+            String r = buildLibretaInfoString(e);
+            Intent si = new Intent(Intent.ACTION_SEND); si.setType("text/plain"); si.putExtra(Intent.EXTRA_TEXT, r);
+            startActivity(Intent.createChooser(si, "Compartir Registro"));
         }
         class ViewHolder extends RecyclerView.ViewHolder {
             TextView txtNombre, txtResumen, txtDetTipo, txtDetAltIns, txtDetEste, txtDetNorte, txtDetCota, txtDetFecha, txtDetObs, txtExpandLabel;

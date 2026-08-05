@@ -54,6 +54,7 @@ public class ManualFragment extends Fragment {
     private TextView txt_man_fe_ppm;
     private TextView txt_man_alt_orto;
     private TextView txt_man_presion;
+    private TextView txt_man_presion_hpa;
     private TopoCalculoManager.TopoResult lastTopoResult;
 
     @Override
@@ -104,6 +105,7 @@ public class ManualFragment extends Fragment {
         this.txt_man_fc_ppm = view.findViewById(R.id.txt_man_fc_ppm);
         this.txt_man_alt_orto = view.findViewById(R.id.txt_man_alt_orto);
         this.txt_man_presion = view.findViewById(R.id.txt_man_presion);
+        this.txt_man_presion_hpa = view.findViewById(R.id.txt_man_presion_hpa);
 
         // Set listeners
         this.proyeccion.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
@@ -176,38 +178,64 @@ public class ManualFragment extends Fragment {
     }
 
     private void ejecutarGuardadoManual(String nombrePunto, String notas) {
-        // 1. Guardar en Base de Datos (Mismo esquema que el Automático)
+        if (!isAdded()) return;
         DatabaseHelper dbHelper = DatabaseHelper.getInstance(requireContext());
         ContentValues values = new ContentValues();
+        
+        // 1. Obtener Hora Local Exacta
         String timeStampLocal = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault()).format(new Date());
+        DecimalFormat df9 = new DecimalFormat("#0.000000000");
+        DecimalFormat df3 = new DecimalFormat("#0.000");
 
+        // 2. Mapear datos técnicos completos (Consistencia con Automático)
+        values.put(DatabaseHelper.COLUMN_FECHA, timeStampLocal);
         values.put(DatabaseHelper.COLUMN_NOMBRE, nombrePunto);
         
         if (lastTopoResult != null) {
-            // Guardamos siempre el set completo gracias a las nuevas funciones de TopoCalculoManager
-            DecimalFormat dfG = new DecimalFormat("#0.000");
             double lat = Math.abs(lastTopoResult.lat);
             double lon = Math.abs(lastTopoResult.lon);
-            String latStr = (lastTopoResult.lat < 0 ? "-" : "") + (int)lat + "º " + (int)((lat-(int)lat)*60) + "' " + dfG.format(((lat-(int)lat)*60 - (int)((lat-(int)lat)*60))*60) + "''";
-            String lonStr = (lastTopoResult.lon < 0 ? "-" : "") + (int)lon + "º " + (int)((lon-(int)lon)*60) + "' " + dfG.format(((lon-(int)lon)*60 - (int)((lon-(int)lon)*60))*60) + "''";
+            String latStr = (lastTopoResult.lat < 0 ? "-" : "") + (int)lat + "º " + (int)((lat-(int)lat)*60) + "' " + df3.format(((lat-(int)lat)*60 - (int)((lat-(int)lat)*60))*60) + "''";
+            String lonStr = (lastTopoResult.lon < 0 ? "-" : "") + (int)lon + "º " + (int)((lon-(int)lon)*60) + "' " + df3.format(((lon-(int)lon)*60 - (int)((lon-(int)lon)*60))*60) + "''";
 
             values.put(DatabaseHelper.COLUMN_LATITUD, latStr);
             values.put(DatabaseHelper.COLUMN_LONGITUD, lonStr);
-            values.put(DatabaseHelper.COLUMN_ESTE, String.format(Locale.US, "%.3f", lastTopoResult.este));
-            values.put(DatabaseHelper.COLUMN_NORTE, String.format(Locale.US, "%.3f", lastTopoResult.norte));
+            values.put(DatabaseHelper.COLUMN_ESTE, df3.format(lastTopoResult.este));
+            values.put(DatabaseHelper.COLUMN_NORTE, df3.format(lastTopoResult.norte));
             values.put(DatabaseHelper.COLUMN_ZONA, String.valueOf(lastTopoResult.zona));
             values.put(DatabaseHelper.COLUMN_HEMISFERIO, String.valueOf(lastTopoResult.hemisferio));
-            values.put(DatabaseHelper.COLUMN_ALTURA, String.format(Locale.US, "%.3f", lastTopoResult.altOrto + lastTopoResult.geoidN));
+            values.put(DatabaseHelper.COLUMN_ALTURA, df3.format(lastTopoResult.altOrto + lastTopoResult.geoidN));
+            values.put(DatabaseHelper.COLUMN_ALTURA_ORTO, df3.format(lastTopoResult.altOrto));
+            
+            // Guardar formato dual de presión para el reporte
+            String dualPressure = String.format(Locale.US, "%.3f mmHg | %.3f hPa", 
+                lastTopoResult.pressureMmHg, lastTopoResult.pressureHpa);
+            values.put(DatabaseHelper.COLUMN_PRESION, dualPressure);
+            
+            values.put(DatabaseHelper.COLUMN_FACTOR_ESCALA, df9.format(lastTopoResult.scaleFactor));
+            values.put(DatabaseHelper.COLUMN_FACTOR_ALTURA, df9.format(lastTopoResult.elevationFactor));
+            
+            // Guardar Factor Combinado con su PPM para el reporte
+            long ppm = Math.round((lastTopoResult.combinedFactor - 1.0) * 1000000.0);
+            String fcWithPpm = df9.format(lastTopoResult.combinedFactor) + " (" + ppm + " PPM)";
+            values.put(DatabaseHelper.COLUMN_FACTOR_COMBINADO, fcWithPpm);
+        } else {
+            values.put(DatabaseHelper.COLUMN_LATITUD, "");
+            values.put(DatabaseHelper.COLUMN_LONGITUD, "");
+            values.put(DatabaseHelper.COLUMN_ESTE, "");
+            values.put(DatabaseHelper.COLUMN_NORTE, "");
+            values.put(DatabaseHelper.COLUMN_ALTURA, "");
+            values.put(DatabaseHelper.COLUMN_ALTURA_ORTO, "");
+            values.put(DatabaseHelper.COLUMN_PRESION, "");
+            values.put(DatabaseHelper.COLUMN_FACTOR_ESCALA, "");
+            values.put(DatabaseHelper.COLUMN_FACTOR_ALTURA, "");
+            values.put(DatabaseHelper.COLUMN_FACTOR_COMBINADO, "");
         }
-
-        values.put(DatabaseHelper.COLUMN_ALTURA_ORTO, txt_man_alt_orto.getText().toString());
-        values.put(DatabaseHelper.COLUMN_PRESION, txt_man_presion.getText().toString() + " mmHg");
-        values.put(DatabaseHelper.COLUMN_FACTOR_ESCALA, txt_man_fe.getText().toString());
-        values.put(DatabaseHelper.COLUMN_FACTOR_ALTURA, txt_man_fa.getText().toString());
-        values.put(DatabaseHelper.COLUMN_FACTOR_COMBINADO, txt_man_fc.getText().toString());
-        values.put(DatabaseHelper.COLUMN_FECHA, timeStampLocal);
-        values.put(DatabaseHelper.COLUMN_NOTAS, notas);
         
+        // 3. Manejo de Notas Vacías
+        String finalNotes = (notas == null || notas.trim().isEmpty()) ? getString(R.string.label_no_observations) : notas.trim();
+        values.put(DatabaseHelper.COLUMN_NOTAS, finalNotes);
+        
+        // 4. Guardar
         dbHelper.insertarPunto(values);
         UIUtils.showSuccessToast(requireContext(), getString(R.string.msg_point_saved_format, nombrePunto));
     }
@@ -237,6 +265,7 @@ public class ManualFragment extends Fragment {
         this.txt_man_fc_ppm.setText("0");
         this.txt_man_alt_orto.setText("0");
         this.txt_man_presion.setText("0");
+        this.txt_man_presion_hpa.setText("-- hPa");
     }
 
     private void calculateWithUtm() {
@@ -264,7 +293,7 @@ public class ManualFragment extends Fragment {
             renderManualResults(lastTopoResult);
             
         } catch (NumberFormatException e) {
-            UIUtils.showErrorToast(requireContext(), "Error: Ingrese valores numéricos válidos");
+            UIUtils.showErrorToast(requireContext(), getString(R.string.err_invalid_values));
         }
     }
 
@@ -300,13 +329,13 @@ public class ManualFragment extends Fragment {
             renderManualResults(lastTopoResult);
 
         } catch (NumberFormatException e) {
-            UIUtils.showErrorToast(requireContext(), "Error: Ingrese valores numéricos válidos");
+            UIUtils.showErrorToast(requireContext(), getString(R.string.err_invalid_values));
         }
     }
 
     private void renderManualResults(TopoCalculoManager.TopoResult res) {
-        DecimalFormat formatterEsc = new DecimalFormat("#0.00000000");
-        DecimalFormat formatter = new DecimalFormat("#0.00");
+        DecimalFormat formatterEsc = new DecimalFormat("#0.000000000");
+        DecimalFormat formatter = new DecimalFormat("#0.000");
 
         this.txt_man_fe.setText(formatterEsc.format(res.scaleFactor));
         this.txt_man_fe_ppm.setText(Math.round((res.scaleFactor - 1.0) * 1000000.0) + " PPM");
@@ -315,6 +344,9 @@ public class ManualFragment extends Fragment {
         this.txt_man_fc.setText(formatterEsc.format(res.combinedFactor));
         this.txt_man_fc_ppm.setText(Math.round((res.combinedFactor - 1.0) * 1000000.0) + " PPM");
         this.txt_man_alt_orto.setText(formatter.format(res.altOrto));
-        this.txt_man_presion.setText(String.format(Locale.getDefault(), "%.1f", res.pressureMmHg));
+        
+        this.txt_man_presion.setText(String.format(Locale.getDefault(), "%.3f", res.pressureMmHg));
+        this.txt_man_presion_hpa.setText(String.format(Locale.getDefault(), "%.3f %s", 
+            res.pressureHpa, getString(R.string.unit_hpa)));
     }
 }

@@ -1,25 +1,29 @@
 package bo.com.factorcombinadotopo;
 
-import android.content.Intent;
+import android.Manifest;
+import android.content.pm.PackageManager;
 import android.location.Location;
-import android.net.Uri;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 
-import com.google.android.gms.location.FusedLocationProviderClient;
-import com.google.android.gms.location.LocationServices;
+import org.osmdroid.views.MapView;
 
-public class MapFragment extends Fragment {
+/**
+ * Fragmento principal para visualización de mapas usando OpenStreetMap.
+ */
+public class MapFragment extends Fragment implements LocationHelper.LocationUpdateListener {
 
-    private FusedLocationProviderClient fusedLocationClient;
+    private MapView mapView;
+    private MapManager mapManager;
+    private LocationHelper locationHelper;
+    private static final int PERMISSION_REQUEST_CODE = 200;
 
     @Nullable
     @Override
@@ -30,35 +34,89 @@ public class MapFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        
-        fusedLocationClient = LocationServices.getFusedLocationProviderClient(requireActivity());
-        
-        Button btnOpenMaps = view.findViewById(R.id.btn_open_google_maps);
-        btnOpenMaps.setOnClickListener(v -> openCurrentLocationInMaps());
+
+        try {
+            mapView = view.findViewById(R.id.map_view);
+            mapManager = new MapManager(requireContext(), mapView);
+            // Desactivamos el centrado automático para navegación libre
+            mapManager.setAutoCenterEnabled(false); 
+
+            locationHelper = new LocationHelper(requireContext(), this);
+
+            view.findViewById(R.id.fab_center_location).setOnClickListener(v -> {
+                if (mapManager != null) mapManager.centerOnCurrentLocation();
+            });
+
+            view.findViewById(R.id.fab_toggle_map_type).setOnClickListener(v -> {
+                if (mapManager != null) {
+                    mapManager.toggleMapType();
+                    UIUtils.showInfoToast(requireContext(), "Modo: " + mapManager.getCurrentMapModeName());
+                }
+            });
+
+            checkLocationPermissions();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
-    private void openCurrentLocationInMaps() {
-        if (ActivityCompat.checkSelfPermission(requireContext(), android.Manifest.permission.ACCESS_FINE_LOCATION) != 0) {
-            UIUtils.showWarningToast(requireContext(), getString(R.string.msg_location_permission_required));
-            return;
+    private void checkLocationPermissions() {
+        if (ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            requestPermissions(new String[]{Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION}, PERMISSION_REQUEST_CODE);
+        } else {
+            locationHelper.startLocationUpdates();
         }
+    }
 
-        fusedLocationClient.getLastLocation().addOnSuccessListener(requireActivity(), location -> {
-            if (location != null) {
-                double lat = location.getLatitude();
-                double lon = location.getLongitude();
-                String uri = String.format(java.util.Locale.US, "geo:%f,%f?q=%f,%f(Mi Ubicación)", lat, lon, lat, lon);
-                Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(uri));
-                intent.setPackage("com.google.android.apps.maps");
-                try {
-                    startActivity(intent);
-                } catch (Exception e) {
-                    // Si no tiene Google Maps, abrir en cualquier visor de geo:
-                    startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(uri)));
-                }
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        if (requestCode == PERMISSION_REQUEST_CODE) {
+            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                locationHelper.startLocationUpdates();
             } else {
-                UIUtils.showWarningToast(requireContext(), getString(R.string.msg_location_error));
+                UIUtils.showWarningToast(requireContext(), getString(R.string.warn_location_denied));
             }
-        });
+        }
+    }
+
+    @Override
+    public void onLocationUpdated(Location location) {
+        if (isAdded() && mapManager != null) {
+            // Actualizamos el marcador pero NO centramos (la lógica interna de updateMyLocation respetará autoCenterEnabled)
+            mapManager.updateMyLocation(location);
+        }
+    }
+
+    private void handleMapState(boolean active) {
+        if (!isAdded() || mapManager == null) return;
+        try {
+            if (active) {
+                mapManager.onResume();
+            } else {
+                mapManager.onPause();
+            }
+        } catch (Exception ignored) {}
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        handleMapState(true);
+        if (locationHelper != null) locationHelper.getLastLocation();
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        handleMapState(false);
+        if (locationHelper != null) locationHelper.stopLocationUpdates();
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        if (mapView != null) {
+            mapView.onDetach();
+        }
     }
 }

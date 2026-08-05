@@ -1,5 +1,6 @@
 package bo.com.factorcombinadotopo;
 
+import android.annotation.SuppressLint;
 import android.content.BroadcastReceiver;
 import android.content.ContentValues;
 import android.content.Context;
@@ -36,6 +37,7 @@ import com.google.android.gms.location.Priority;
 import com.google.android.material.switchmaterial.SwitchMaterial;
 
 import org.json.JSONObject;
+import org.osmdroid.views.MapView;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
@@ -48,26 +50,30 @@ import java.util.Locale;
 import java.util.TimeZone;
 
 public class AutomaticFragment extends Fragment {
-    private TextView txt_lat, txt_lon, txt_alt, txt_alt_orto, txt_presion;
+    private TextView txt_lat, txt_lon, txt_alt, txt_alt_orto, txt_presion, txt_presion_hpa;
     private TextView txt_este, txt_norte, txt_ref_system;
     private TextView txt_fa, txt_fa_ppm, txt_fe, txt_fe_ppm, txt_fc, txt_fc_ppm;
     private TextView txt_presicion, txt_sat, txt_temp;
     private TextView txt_geoid_undulation, txt_geoid_model;
     private SwitchMaterial switchMapa;
     private CardView cardMapa;
+    private MapView miniMapView;
     private Button btn_guardar_punto;
 
     private LocationManager mlocManager;
-    private Localizacion localizacion;
+    private MapManager miniMapManager;
+    private LocationHelper miniMapLocationHelper;
     private FusedLocationProviderClient fusedLocationClient;
     private LocationCallback locationCallback;
     private TopoCalculoManager.TopoResult lastTopoResult;
 
     private long lastTempRequestTime = 0;
+    private double currentAmbientTemp = 15.0; // Valor estándar inicial
 
     private final GnssStatus.Callback gnssCallback = new GnssStatus.Callback() {
         @Override
         public void onSatelliteStatusChanged(@NonNull GnssStatus status) {
+            if (!isAdded() || getView() == null) return;
             int satellitesInUse = 0;
             for (int i = 0; i < status.getSatelliteCount(); i++) {
                 if (status.usedInFix(i)) satellitesInUse++;
@@ -124,11 +130,13 @@ public class AutomaticFragment extends Fragment {
         }
     }
 
+    @SuppressLint("MissingPermission")
     private void restartLocationUpdates() {
-        if (ActivityCompat.checkSelfPermission(requireContext(), android.Manifest.permission.ACCESS_FINE_LOCATION) == 0) {
-            mlocManager.removeUpdates(localizacion);
-            mlocManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, localizacion);
-            mlocManager.registerGnssStatusCallback(gnssCallback, new Handler(Looper.getMainLooper()));
+        if (isAdded() && mlocManager != null) {
+            try {
+                mlocManager.unregisterGnssStatusCallback(gnssCallback);
+                mlocManager.registerGnssStatusCallback(gnssCallback, new Handler(Looper.getMainLooper()));
+            } catch (Exception ignored) {}
         }
     }
 
@@ -152,6 +160,7 @@ public class AutomaticFragment extends Fragment {
         txt_alt = view.findViewById(R.id.txt_alt);
         txt_alt_orto = view.findViewById(R.id.txt_alt_orto);
         txt_presion = view.findViewById(R.id.txt_presion);
+        txt_presion_hpa = view.findViewById(R.id.txt_presion_hpa);
         txt_este = view.findViewById(R.id.txt_este);
         txt_norte = view.findViewById(R.id.txt_norte);
         txt_ref_system = view.findViewById(R.id.txt_ref_system);
@@ -168,14 +177,27 @@ public class AutomaticFragment extends Fragment {
         txt_geoid_model = view.findViewById(R.id.txt_geoid_model);
         switchMapa = view.findViewById(R.id.switch_mapa);
         cardMapa = view.findViewById(R.id.card_mapa);
+        miniMapView = view.findViewById(R.id.mini_map_view);
         btn_guardar_punto = view.findViewById(R.id.btn_guardar_punto_auto);
 
-        localizacion = new Localizacion();
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(requireActivity());
         setupLocationCallback();
 
+        setupMiniMap();
+
         btn_guardar_punto.setOnClickListener(v -> showSavePointDialog());
-        switchMapa.setOnCheckedChangeListener((bv, isChecked) -> cardMapa.setVisibility(isChecked ? View.VISIBLE : View.GONE));
+        switchMapa.setOnCheckedChangeListener((bv, isChecked) -> {
+            try {
+                cardMapa.setVisibility(isChecked ? View.VISIBLE : View.GONE);
+                handleMapState(isChecked);
+                if (isChecked && miniMapView != null && isAdded()) {
+                    miniMapView.invalidate();
+                }
+            } catch (Exception e) {
+                // Prevenir cierre de app por error de renderizado del mapa
+                e.printStackTrace();
+            }
+        });
 
         if (ActivityCompat.checkSelfPermission(requireContext(), android.Manifest.permission.ACCESS_FINE_LOCATION) != 0) {
             ActivityCompat.requestPermissions(requireActivity(), new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION}, 1000);
@@ -184,10 +206,38 @@ public class AutomaticFragment extends Fragment {
         }
     }
 
+    private void setupMiniMap() {
+        miniMapManager = new MapManager(requireContext(), miniMapView);
+        // El minimapa sí puede centrar automáticamente la primera vez
+        miniMapManager.setAutoCenterEnabled(true); 
+        // Capa predeterminada de calles y seguimiento permanente
+        miniMapManager.enableFollowLocation(true);
+        
+        miniMapLocationHelper = new LocationHelper(requireContext(), location -> {
+            if (isAdded() && miniMapManager != null) {
+                miniMapManager.updateMyLocation(location);
+            }
+        });
+    }
+
+    private void handleMapState(boolean active) {
+        if (!isAdded() || miniMapManager == null) return;
+        try {
+            if (active) {
+                miniMapManager.onResume();
+                if (miniMapLocationHelper != null) miniMapLocationHelper.startLocationUpdates();
+            } else {
+                miniMapManager.onPause();
+                if (miniMapLocationHelper != null) miniMapLocationHelper.stopLocationUpdates();
+            }
+        } catch (Exception ignored) {}
+    }
+
     private void setupLocationCallback() {
         locationCallback = new LocationCallback() {
             @Override
             public void onLocationResult(@NonNull LocationResult locationResult) {
+                if (!isAdded() || getView() == null) return;
                 for (Location location : locationResult.getLocations()) {
                     if (location != null) processNewLocation(location);
                 }
@@ -196,6 +246,7 @@ public class AutomaticFragment extends Fragment {
     }
 
     private void processNewLocation(Location loc) {
+        if (!isAdded() || getView() == null) return;
         showGPSData(loc);
 
         // 1. Obtener Ondulación Geoidal N (EGM96) desde GeoidManager
@@ -215,16 +266,22 @@ public class AutomaticFragment extends Fragment {
 
         DecimalFormat df = new DecimalFormat("#0.00");
         DecimalFormat dfUtm = new DecimalFormat("#0.000"); // 3 decimales (milímetros)
-        DecimalFormat df8 = new DecimalFormat("#0.00000000");
+        DecimalFormat df9 = new DecimalFormat("#0.000000000");
 
         // 3. Renderizado de Altura Ortométrica y Modelo Geoidal
         if (txt_alt_orto != null) txt_alt_orto.setText(df.format(lastTopoResult.altOrto) + " m");
         if (txt_geoid_undulation != null) txt_geoid_undulation.setText(df.format(geoidN) + " m");
-        if (txt_geoid_model != null) txt_geoid_model.setText("EGM96 (Global)");
+        if (txt_geoid_model != null) txt_geoid_model.setText(R.string.geoid_model_egm96);
 
-        if (txt_presion != null) txt_presion.setText(String.format(Locale.getDefault(), "%.1f", lastTopoResult.pressureMmHg));
-        if (txt_presicion != null) txt_presicion.setText("± " + Math.round(loc.getAccuracy()) + " m");
-
+        if (txt_presion != null) {
+            txt_presion.setText(String.format(Locale.getDefault(), "%.3f", lastTopoResult.pressureMmHg));
+        }
+        if (txt_presion_hpa != null) {
+            txt_presion_hpa.setText(String.format(Locale.getDefault(), "%.3f %s", 
+                lastTopoResult.pressureHpa, getString(R.string.unit_hpa)));
+        }
+        if (txt_presicion != null) txt_presicion.setText(getString(R.string.label_precision_sign) + " " + Math.round(loc.getAccuracy()) + " " + getString(R.string.unit_meter));
+        
         // Detección automática de Zona UTM y Región
         if (txt_ref_system != null) {
             txt_ref_system.setText(GeoUtils.getUtmZoneFormatted(loc.getLatitude(), loc.getLongitude()));
@@ -234,11 +291,11 @@ public class AutomaticFragment extends Fragment {
         if (txt_este != null) txt_este.setText(dfUtm.format(lastTopoResult.este) + " m");
         if (txt_norte != null) txt_norte.setText(dfUtm.format(lastTopoResult.norte) + " m");
 
-        txt_fa.setText(df8.format(lastTopoResult.elevationFactor));
+        txt_fa.setText(df9.format(lastTopoResult.elevationFactor));
         txt_fa_ppm.setText(Math.round((lastTopoResult.elevationFactor - 1.0) * 1000000.0) + " PPM");
-        txt_fe.setText(df8.format(lastTopoResult.scaleFactor));
+        txt_fe.setText(df9.format(lastTopoResult.scaleFactor));
         txt_fe_ppm.setText(Math.round((lastTopoResult.scaleFactor - 1.0) * 1000000.0) + " PPM");
-        txt_fc.setText(df8.format(lastTopoResult.combinedFactor));
+        txt_fc.setText(df9.format(lastTopoResult.combinedFactor));
         if (txt_fc_ppm != null) txt_fc_ppm.setText(Math.round((lastTopoResult.combinedFactor - 1.0) * 1000000.0) + " PPM");
 
         updateTemperature(loc.getLatitude(), loc.getLongitude());
@@ -270,6 +327,7 @@ public class AutomaticFragment extends Fragment {
 
                     JSONObject json = new JSONObject(res.toString());
                     double temp = json.getJSONObject("current").getDouble("temperature_2m");
+                    currentAmbientTemp = temp; // Guardar para el próximo ciclo de cálculo
 
                     new Handler(Looper.getMainLooper()).post(() -> {
                         if (isAdded() && txt_temp != null) {
@@ -306,38 +364,59 @@ public class AutomaticFragment extends Fragment {
     }
 
     private void guardarPuntoEnRegistro(String name, String notes) {
+        if (!isAdded()) return;
         DatabaseHelper db = DatabaseHelper.getInstance(requireContext());
         ContentValues v = new ContentValues();
 
-        // 1. Obtener Hora Local Exacta de la Tablet/Celular
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault());
-        sdf.setTimeZone(TimeZone.getDefault());
-        String fechaHoraLocal = sdf.format(new Date());
+        // 1. Obtener Hora Local Exacta
+        String fechaHoraLocal = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault()).format(new Date());
+        DecimalFormat df9 = new DecimalFormat("#0.000000000");
+        DecimalFormat df3 = new DecimalFormat("#0.000");
 
-        // 2. Mapear datos utilizando las constantes de DatabaseHelper
+        // 2. Mapear datos técnicos completos
         v.put(DatabaseHelper.COLUMN_FECHA, fechaHoraLocal);
         v.put(DatabaseHelper.COLUMN_NOMBRE, name);
         v.put(DatabaseHelper.COLUMN_LATITUD, txt_lat.getText().toString());
         v.put(DatabaseHelper.COLUMN_LONGITUD, txt_lon.getText().toString());
-
-        if (txt_este != null) v.put(DatabaseHelper.COLUMN_ESTE, txt_este.getText().toString());
-        if (txt_norte != null) v.put(DatabaseHelper.COLUMN_NORTE, txt_norte.getText().toString());
         
         if (lastTopoResult != null) {
+            v.put(DatabaseHelper.COLUMN_ESTE, df3.format(lastTopoResult.este));
+            v.put(DatabaseHelper.COLUMN_NORTE, df3.format(lastTopoResult.norte));
             v.put(DatabaseHelper.COLUMN_ZONA, String.valueOf(lastTopoResult.zona));
             v.put(DatabaseHelper.COLUMN_HEMISFERIO, String.valueOf(lastTopoResult.hemisferio));
+            v.put(DatabaseHelper.COLUMN_ALTURA, df3.format(lastTopoResult.altOrto + lastTopoResult.geoidN));
+            v.put(DatabaseHelper.COLUMN_ALTURA_ORTO, df3.format(lastTopoResult.altOrto));
+            
+            // Guardar formato dual de presión para el reporte
+            String dualPressure = String.format(Locale.US, "%.3f mmHg | %.3f hPa", 
+                lastTopoResult.pressureMmHg, lastTopoResult.pressureHpa);
+            v.put(DatabaseHelper.COLUMN_PRESION, dualPressure);
+            
+            v.put(DatabaseHelper.COLUMN_FACTOR_ESCALA, df9.format(lastTopoResult.scaleFactor));
+            v.put(DatabaseHelper.COLUMN_FACTOR_ALTURA, df9.format(lastTopoResult.elevationFactor));
+            
+            // Guardar Factor Combinado con su PPM para el reporte
+            long ppm = Math.round((lastTopoResult.combinedFactor - 1.0) * 1000000.0);
+            String fcWithPpm = df9.format(lastTopoResult.combinedFactor) + " (" + ppm + " PPM)";
+            v.put(DatabaseHelper.COLUMN_FACTOR_COMBINADO, fcWithPpm);
+        } else {
+            v.put(DatabaseHelper.COLUMN_ESTE, "");
+            v.put(DatabaseHelper.COLUMN_NORTE, "");
+            v.put(DatabaseHelper.COLUMN_ZONA, "");
+            v.put(DatabaseHelper.COLUMN_HEMISFERIO, "");
+            v.put(DatabaseHelper.COLUMN_ALTURA, "");
+            v.put(DatabaseHelper.COLUMN_ALTURA_ORTO, "");
+            v.put(DatabaseHelper.COLUMN_PRESION, "");
+            v.put(DatabaseHelper.COLUMN_FACTOR_ESCALA, "");
+            v.put(DatabaseHelper.COLUMN_FACTOR_ALTURA, "");
+            v.put(DatabaseHelper.COLUMN_FACTOR_COMBINADO, "");
         }
+        
+        // 3. Manejo de Notas Vacías
+        String finalNotes = (notes == null || notes.trim().isEmpty()) ? getString(R.string.label_no_observations) : notes.trim();
+        v.put(DatabaseHelper.COLUMN_NOTAS, finalNotes);
 
-        if (txt_fa != null) v.put(DatabaseHelper.COLUMN_FACTOR_ALTURA, txt_fa.getText().toString());
-        if (txt_fe != null) v.put(DatabaseHelper.COLUMN_FACTOR_ESCALA, txt_fe.getText().toString());
-
-        v.put(DatabaseHelper.COLUMN_ALTURA, txt_alt.getText().toString());
-        v.put(DatabaseHelper.COLUMN_ALTURA_ORTO, txt_alt_orto.getText().toString());
-        v.put(DatabaseHelper.COLUMN_PRESION, txt_presion.getText().toString());
-        v.put(DatabaseHelper.COLUMN_FACTOR_COMBINADO, txt_fc.getText().toString());
-        v.put(DatabaseHelper.COLUMN_NOTAS, notes);
-
-        // 3. Guardar
+        // 4. Guardar
         db.insertarPunto(v);
         UIUtils.showSuccessToast(requireContext(), getString(R.string.msg_point_saved_format, name));
     }
@@ -345,6 +424,7 @@ public class AutomaticFragment extends Fragment {
     private void resetUIData() {
         txt_lat.setText("0"); txt_lon.setText("0"); txt_alt.setText("-- m");
         txt_alt_orto.setText("-- m"); txt_presion.setText("---");
+        if (txt_presion_hpa != null) txt_presion_hpa.setText("-- hPa");
         txt_fc.setText("0.00000000");
         if (txt_fc_ppm != null) txt_fc_ppm.setText("-- PPM");
         txt_sat.setText("0"); txt_temp.setText("-- °C");
@@ -356,6 +436,9 @@ public class AutomaticFragment extends Fragment {
         requireActivity().registerReceiver(gpsReceiver, new IntentFilter(LocationManager.PROVIDERS_CHANGED_ACTION));
         checkGpsState(true);
         startFusedLocationUpdates();
+        if (switchMapa != null && switchMapa.isChecked()) {
+            handleMapState(true);
+        }
     }
 
     private void startFusedLocationUpdates() {
@@ -368,21 +451,33 @@ public class AutomaticFragment extends Fragment {
     @Override
     public void onPause() {
         super.onPause();
-        requireActivity().unregisterReceiver(gpsReceiver);
+        try {
+            requireActivity().unregisterReceiver(gpsReceiver);
+        } catch (Exception ignored) {}
+        
         if (fusedLocationClient != null) fusedLocationClient.removeLocationUpdates(locationCallback);
+        
+        if (mlocManager != null) {
+            mlocManager.unregisterGnssStatusCallback(gnssCallback);
+        }
+        
         stopAlertCycles();
+        handleMapState(false);
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        if (miniMapView != null) {
+            miniMapView.onDetach();
+        }
     }
 
     private void locationStart() {
         mlocManager = (LocationManager) requireActivity().getSystemService(Context.LOCATION_SERVICE);
-        if (mlocManager.isProviderEnabled(LocationManager.GPS_PROVIDER)) restartLocationUpdates();
-    }
-
-    public class Localizacion implements LocationListener {
-        @Override public void onLocationChanged(Location loc) { processNewLocation(loc); }
-        @Override public void onProviderDisabled(@NonNull String p) {}
-        @Override public void onProviderEnabled(@NonNull String p) {}
-        @Override public void onStatusChanged(String p, int s, Bundle e) {}
+        if (mlocManager != null && mlocManager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
+            restartLocationUpdates();
+        }
     }
 
     public void showGPSData(Location loc) {

@@ -4,17 +4,13 @@ import android.graphics.Typeface;
 import android.os.Bundle;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentManager;
 import androidx.viewpager2.adapter.FragmentStateAdapter;
 import androidx.viewpager2.widget.ViewPager2;
 import androidx.appcompat.widget.Toolbar;
 import com.google.android.material.tabs.TabLayout;
 import com.google.android.material.tabs.TabLayoutMediator;
-import android.view.LayoutInflater;
-import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.TextView;
 import com.google.android.material.bottomsheet.BottomSheetDialog;
@@ -26,6 +22,14 @@ import java.util.TimeZone;
 
 import com.google.android.material.switchmaterial.SwitchMaterial;
 import android.content.SharedPreferences;
+import android.net.Uri;
+import android.os.Environment;
+import android.os.Handler;
+import android.os.Looper;
+import java.io.File;
+import android.widget.PopupWindow;
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AppCompatDelegate;
 import android.widget.Spinner;
 import android.widget.ArrayAdapter;
@@ -42,22 +46,30 @@ import androidx.core.view.GravityCompat;
 import androidx.annotation.NonNull;
 
 public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
-    private EditText et1;
-    private EditText et2;
-    private Typeface fontAwesome;
     private SectionsPagerAdapter mSectionsPagerAdapter;
     private ViewPager2 mViewPager;
     private DrawerLayout drawer;
-    private View layoutTabsBottom;
-    private View mainContentFrame;
 
     private static final String PREFS_NAME = "AppPrefs";
     private static final String KEY_LANG = "Language";
     private static final String KEY_THEME = "Theme";
     public static final String KEY_PRESSURE_OFFSET = "PressureOffset";
 
+    // Nuevas llaves para ajustes de Mapas
+    public static final String KEY_MAP_MODE = "MapMode"; // 0: Online, 1: Offline, 2: Hybrid
+    public static final String KEY_SHOW_LOCATION = "ShowLocation";
+    public static final String KEY_REAL_TIME_UPDATE = "RealTimeUpdate";
+
+    private ActivityResultLauncher<String[]> mapImportLauncher;
+    private TextView txtInstalledMapName, txtInstalledMapDetails, txtCacheSize;
+    private PopupWindow barometerInfoPopup;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        // Inicializar osmdroid antes de inflar layouts
+        org.osmdroid.config.Configuration.getInstance().load(this, 
+                getSharedPreferences("osmdroid", MODE_PRIVATE));
+
         // Cargar preferencias antes de crear la vista
         SharedPreferences prefs = getSharedPreferences(PREFS_NAME, MODE_PRIVATE);
         String lang = prefs.getString(KEY_LANG, "es");
@@ -74,8 +86,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         }
 
         drawer = findViewById(R.id.drawer_layout);
-        layoutTabsBottom = findViewById(R.id.layout_tabs_bottom);
-        mainContentFrame = findViewById(R.id.main_content_frame);
 
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
                 this, drawer, toolbar, R.string.btn_confirm, R.string.btn_cancel);
@@ -107,22 +117,12 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             }
         }).attach();
 
-        // Al tocar un tab, si estamos en un fragmento "extra", volvemos al home
-        tabLayout.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
-            @Override
-            public void onTabSelected(TabLayout.Tab tab) {
-                if (mViewPager.getVisibility() != View.VISIBLE) {
-                    showHome();
-                }
-            }
-            @Override public void onTabUnselected(TabLayout.Tab tab) {}
-            @Override public void onTabReselected(TabLayout.Tab tab) {
-                if (mViewPager.getVisibility() != View.VISIBLE) {
-                    showHome();
-                }
+        // Inicializar el importador de mapas
+        mapImportLauncher = registerForActivityResult(new ActivityResultContracts.OpenDocument(), uri -> {
+            if (uri != null) {
+                importMapFile(uri);
             }
         });
-        this.fontAwesome = Typeface.createFromAsset(getAssets(), "fonts/fontawesome-webfont.ttf");
 
         // Insertar datos de ejemplo si el registro está vacío
         DatabaseHelper dbHelper = DatabaseHelper.getInstance(this);
@@ -148,10 +148,10 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             showGnssCalendarDialog();
         } else if (id == R.id.nav_compass_pro) {
             showCompassPro();
-        } else if (id == R.id.nav_field_notebook) {
-            showFieldNotebook();
         } else if (id == R.id.nav_map) {
             showMap();
+        } else if (id == R.id.nav_field_notebook) {
+            showFieldNotebook();
         } else if (id == R.id.nav_weather) {
             showWeather();
         }
@@ -175,12 +175,12 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         hideMainAndShowFragment(new CompassFragment());
     }
 
-    private void showFieldNotebook() {
-        hideMainAndShowFragment(new FieldNotebookFragment());
-    }
-
     private void showMap() {
         hideMainAndShowFragment(new MapFragment());
+    }
+
+    private void showFieldNotebook() {
+        hideMainAndShowFragment(new FieldNotebookFragment());
     }
 
     private void showWeather() {
@@ -204,7 +204,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     }
 
     @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
+    public boolean onCreateOptionsMenu(android.view.Menu menu) {
         getMenuInflater().inflate(R.menu.menu_main, menu);
         return true;
     }
@@ -263,7 +263,81 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             public void onNothingSelected(AdapterView<?> parent) {}
         });
 
-        // 2. Configurar Tema
+        // 2. Configurar Offset de Presión (0.0 por defecto)
+        EditText etOffset = view.findViewById(R.id.et_pressure_offset);
+        float currentOffset = prefs.getFloat(KEY_PRESSURE_OFFSET, 0.0f);
+        etOffset.setText(String.valueOf(currentOffset));
+
+        View btnBarometerInfo = view.findViewById(R.id.btn_barometer_info);
+        btnBarometerInfo.setOnClickListener(v -> {
+            if (barometerInfoPopup != null && barometerInfoPopup.isShowing()) {
+                barometerInfoPopup.dismiss();
+                barometerInfoPopup = null;
+            } else {
+                barometerInfoPopup = UIUtils.showBarometerInfo(this, view);
+                // Cerrar automáticamente tras 10 segundos
+                new Handler(Looper.getMainLooper()).postDelayed(() -> {
+                    if (barometerInfoPopup != null) {
+                        barometerInfoPopup.dismiss();
+                        barometerInfoPopup = null;
+                    }
+                }, 10000);
+            }
+        });
+
+        // 3. SECCIÓN MAPAS (Online por defecto)
+        com.google.android.material.button.MaterialButtonToggleGroup toggleMapMode = view.findViewById(R.id.toggle_map_mode);
+        int savedMode = prefs.getInt(KEY_MAP_MODE, 0); // 0 es Online
+        switch (savedMode) {
+            case 0: toggleMapMode.check(R.id.btn_mode_online); break;
+            case 1: toggleMapMode.check(R.id.btn_mode_offline); break;
+            case 2: toggleMapMode.check(R.id.btn_mode_hybrid); break;
+        }
+
+        toggleMapMode.addOnButtonCheckedListener((group, checkedId, isChecked) -> {
+            if (isChecked) {
+                int mode = 0;
+                if (checkedId == R.id.btn_mode_offline) mode = 1;
+                else if (checkedId == R.id.btn_mode_hybrid) mode = 2;
+                prefs.edit().putInt(KEY_MAP_MODE, mode).apply();
+            }
+        });
+
+        // Carpeta de mapas
+        view.findViewById(R.id.btn_open_maps_folder).setOnClickListener(v -> openMapsFolder());
+
+        // Mapa Instalado
+        txtInstalledMapName = view.findViewById(R.id.txt_installed_map_name);
+        txtInstalledMapDetails = view.findViewById(R.id.txt_installed_map_details);
+        updateInstalledMapUI();
+
+        view.findViewById(R.id.btn_import_map).setOnClickListener(v -> {
+            mapImportLauncher.launch(new String[]{"*/*"});
+        });
+
+        view.findViewById(R.id.btn_delete_map).setOnClickListener(v -> {
+            UIUtils.showConfirmDialog(this, R.string.dialog_delete_title, R.string.msg_map_delete_confirm, () -> {
+                deleteInstalledMap();
+            });
+        });
+
+        // Caché
+        txtCacheSize = view.findViewById(R.id.txt_cache_size);
+        updateCacheSizeUI();
+        view.findViewById(R.id.btn_clear_cache).setOnClickListener(v -> {
+            clearMapCache();
+        });
+
+        // GPS
+        com.google.android.material.checkbox.MaterialCheckBox cbShowLoc = view.findViewById(R.id.cb_show_location);
+        com.google.android.material.checkbox.MaterialCheckBox cbUpdateRealTime = view.findViewById(R.id.cb_real_time_update);
+        cbShowLoc.setChecked(prefs.getBoolean(KEY_SHOW_LOCATION, true));
+        cbUpdateRealTime.setChecked(prefs.getBoolean(KEY_REAL_TIME_UPDATE, true));
+
+        cbShowLoc.setOnCheckedChangeListener((buttonView, isChecked) -> prefs.edit().putBoolean(KEY_SHOW_LOCATION, isChecked).apply());
+        cbUpdateRealTime.setOnCheckedChangeListener((buttonView, isChecked) -> prefs.edit().putBoolean(KEY_REAL_TIME_UPDATE, isChecked).apply());
+
+        // 4. Configurar Tema
         SwitchMaterial switchTheme = view.findViewById(R.id.switch_theme);
         TextView txtStatus = view.findViewById(R.id.txt_theme_status);
         boolean isDark = prefs.getBoolean(KEY_THEME, true);
@@ -274,11 +348,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             prefs.edit().putBoolean(KEY_THEME, isChecked).apply();
             txtStatus.setText(isChecked ? R.string.label_dark_mode : R.string.label_light_mode);
         });
-
-        // 3. Configurar Offset de Presión
-        EditText etOffset = view.findViewById(R.id.et_pressure_offset);
-        float currentOffset = prefs.getFloat(KEY_PRESSURE_OFFSET, 0f);
-        if (currentOffset != 0f) etOffset.setText(String.valueOf(currentOffset));
 
         view.findViewById(R.id.btn_close_settings).setOnClickListener(v -> {
             String offsetStr = etOffset.getText().toString();
@@ -292,6 +361,81 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         });
 
         dialog.show();
+    }
+
+    private File getMapsDirectory() {
+        File mapsDir = getExternalFilesDir("Mapas");
+        if (mapsDir != null && !mapsDir.exists()) mapsDir.mkdirs();
+        return mapsDir;
+    }
+
+    private void updateInstalledMapUI() {
+        if (txtInstalledMapName == null) return;
+        File mapsDir = getMapsDirectory();
+        if (mapsDir == null) return;
+        
+        File[] files = mapsDir.listFiles();
+        if (files != null && files.length > 0) {
+            File mapFile = files[0]; // Tomamos el primer archivo encontrado
+            txtInstalledMapName.setText(mapFile.getName());
+            String details = FileUtils.formatSize(mapFile.length()) + " | " + 
+                             new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()).format(new java.util.Date(mapFile.lastModified())) + " | " + 
+                             getString(R.string.label_success).replace(":", "");
+            txtInstalledMapDetails.setText(details);
+        } else {
+            txtInstalledMapName.setText(R.string.msg_no_map_installed);
+            txtInstalledMapDetails.setText("");
+        }
+    }
+
+    private void importMapFile(Uri uri) {
+        String name = FileUtils.getFileName(this, uri);
+        File mapsDir = getMapsDirectory();
+        if (mapsDir == null) {
+            UIUtils.showErrorToast(this, getString(R.string.err_no_storage));
+            return;
+        }
+        
+        File dest = new File(mapsDir, name);
+        if (FileUtils.copyUriToFile(this, uri, dest)) {
+            UIUtils.showSuccessToast(this, getString(R.string.msg_map_imported_success, name));
+            updateInstalledMapUI();
+        } else {
+            UIUtils.showErrorToast(this, getString(R.string.err_copy_file));
+        }
+    }
+
+    private void deleteInstalledMap() {
+        File mapsDir = getMapsDirectory();
+        FileUtils.clearDirectory(mapsDir);
+        updateInstalledMapUI();
+    }
+
+    private void updateCacheSizeUI() {
+        if (txtCacheSize == null) return;
+        File cacheDir = new File(getCacheDir(), "osmdroid");
+        long size = FileUtils.getFolderSize(cacheDir);
+        txtCacheSize.setText(FileUtils.formatSize(size));
+    }
+
+    private void clearMapCache() {
+        File cacheDir = new File(getCacheDir(), "osmdroid");
+        FileUtils.clearDirectory(cacheDir);
+        updateCacheSizeUI();
+        UIUtils.showSuccessToast(this, getString(R.string.msg_cache_cleared));
+    }
+
+    private void openMapsFolder() {
+        File mapsDir = getMapsDirectory();
+        if (mapsDir == null) return;
+        
+        Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
+        intent.setDataAndType(Uri.fromFile(mapsDir), "*/*");
+        try {
+            startActivity(Intent.createChooser(intent, getString(R.string.label_explorer_title)));
+        } catch (Exception e) {
+            UIUtils.showErrorToast(this, getString(R.string.err_no_explorer));
+        }
     }
 
     private void showCompassCalibrateDialog() {
@@ -366,26 +510,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         txtWeekNum.setText(String.format(Locale.getDefault(), "%d%d", weeks, dayOfWeekGps));
     }
 
-    public static class PlaceholderFragment extends Fragment {
-        private static final String ARG_SECTION_NUMBER = "section_number";
-
-        public static PlaceholderFragment newInstance(int sectionNumber) {
-            PlaceholderFragment fragment = new PlaceholderFragment();
-            Bundle args = new Bundle();
-            args.putInt(ARG_SECTION_NUMBER, sectionNumber);
-            fragment.setArguments(args);
-            return fragment;
-        }
-
-        @Override
-        public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-            View rootView = inflater.inflate(R.layout.fragment_main, container, false);
-            TextView textView = (TextView) rootView.findViewById(R.id.section_label);
-            textView.setText(getString(R.string.section_format, Integer.valueOf(getArguments().getInt(ARG_SECTION_NUMBER))));
-            return rootView;
-        }
-    }
-
     public class SectionsPagerAdapter extends FragmentStateAdapter {
         public SectionsPagerAdapter(AppCompatActivity activity) {
             super(activity);
@@ -402,7 +526,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 case 2:
                     return new RegisterFragment();
                 default:
-                    return PlaceholderFragment.newInstance(position + 1);
+                    return new AutomaticFragment();
             }
         }
 

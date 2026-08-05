@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    app:cardBackgroundColor="@color/bg_surface"
+    app:cardCornerRadius="12dp"
+    app:cardElevation="8dp"
+    app:strokeColor="@color/divider"
+    app:strokeWidth="1dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="16dp">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/title_barometer_guide"
+            android:textColor="@color/accent_orange"
+            android:textSize="12sp"
+            android:textStyle="bold"
+            android:layout_marginBottom="12dp" />
+
+        <TableLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:stretchColumns="0">
+
+            <!-- Headers -->
+            <TableRow android:layout_marginBottom="8dp">
+                <TextView
+                    android:text="@string/col_condition"
+                    android:textColor="@color/text_secondary"
+                    android:textSize="10sp"
+                    android:textStyle="bold"
+                    android:paddingEnd="12dp" />
+                <TextView
+                    android:text="@string/col_offset"
+                    android:textColor="@color/text_secondary"
+                    android:textSize="10sp"
+                    android:textStyle="bold"
+                    android:paddingEnd="12dp" />
+                <TextView
+                    android:text="@string/col_input"
+                    android:textColor="@color/text_secondary"
+                    android:textSize="10sp"
+                    android:textStyle="bold" />
+            </TableRow>
+
+            <View android:layout_height="1dp" android:background="@color/divider" android:layout_marginBottom="8dp" />
+
+            <!-- Row 1 -->
+            <TableRow android:layout_marginBottom="8dp">
+                <TextView android:text="@string/cond_normal" android:textColor="@color/text_primary" android:textSize="11sp" />
+                <TextView android:text="@string/val_normal_offset" android:textColor="@color/text_primary" android:textSize="11sp" />
+                <TextView android:text="@string/val_normal_input" android:textColor="@color/accent_light" android:textSize="11sp" android:textStyle="bold" />
+            </TableRow>
+
+            <!-- Row 2 -->
+            <TableRow android:layout_marginBottom="8dp">
+                <TextView android:text="@string/cond_high" android:textColor="@color/text_primary" android:textSize="11sp" />
+                <TextView android:text="@string/val_high_offset" android:textColor="@color/text_primary" android:textSize="11sp" />
+                <TextView android:text="@string/val_high_input" android:textColor="@color/accent_light" android:textSize="11sp" android:textStyle="bold" />
+            </TableRow>
+
+            <!-- Row 3 -->
+            <TableRow android:layout_marginBottom="8dp">
+                <TextView android:text="@string/cond_low" android:textColor="@color/text_primary" android:textSize="11sp" />
+                <TextView android:text="@string/val_low_offset" android:textColor="@color/text_primary" android:textSize="11sp" />
+                <TextView android:text="@string/val_low_input" android:textColor="@color/accent_light" android:textSize="11sp" android:textStyle="bold" />
+            </TableRow>
+
+            <!-- Row 4 -->
+            <TableRow>
+                <TextView android:text="@string/cond_offset" android:textColor="@color/text_primary" android:textSize="11sp" />
+                <TextView android:text="@string/val_err_offset" android:textColor="@color/text_primary" android:textSize="11sp" />
+                <TextView android:text="@string/val_offset_input" android:textColor="@color/accent_light" android:textSize="11sp" android:textStyle="bold" />
+            </TableRow>
+
+        </TableLayout>
+    </LinearLayout>
+</com.google.android.material.card.MaterialCardView>

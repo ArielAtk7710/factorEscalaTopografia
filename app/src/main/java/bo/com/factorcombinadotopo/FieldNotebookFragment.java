@@ -66,7 +66,7 @@ public class FieldNotebookFragment extends Fragment {
         String puntoAux = etPuntoAux.getText().toString().trim();
 
         if (estacion.isEmpty() || puntoAux.isEmpty()) {
-            UIUtils.showWarningToast(requireContext(), "Complete al menos Estación y Punto Auxiliar");
+            UIUtils.showWarningToast(requireContext(), getString(R.string.warn_fill_required));
             return;
         }
 
@@ -87,10 +87,10 @@ public class FieldNotebookFragment extends Fragment {
 
         long id = dbHelper.insertarLibreta(values);
         if (id != -1) {
-            UIUtils.showSuccessToast(requireContext(), "Registro guardado en Libreta de Campo");
+            UIUtils.showSuccessToast(requireContext(), getString(R.string.msg_point_saved));
             limpiarFormulario();
         } else {
-            UIUtils.showErrorToast(requireContext(), "Error al guardar en base de datos");
+            UIUtils.showErrorToast(requireContext(), getString(R.string.err_db_save));
         }
     }
 

@@ -156,44 +156,44 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         if (count == 0) {
             String timeStampLocal = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault()).format(new Date());
 
-            // Ejemplo 1: La Paz
-            insertPuntoHelper(db, "Punto_Test_LP_01", "-16º 30' 00.000''", "-68º 09' 00.000''", "3600.000", "3565.42", "495.2", "590745.230", "8175432.100", "19", "S", "0.99965432", "0.99943210", "0.99908642", timeStampLocal);
+            // Ejemplo 1: Punto de Referencia La Paz (Imagen)
+            insertPuntoHelper(db, "GPS_LP_CONTROL", "-16º 29' 45.120''", "-68º 08' 22.450''", "3962.670", "3928.15", "458.2", "595393.080", "8177115.220", "19", "S", "0.99965432", "0.99943210", "0.99909005", timeStampLocal);
 
-            // Ejemplo 2: Cochabamba
-            insertPuntoHelper(db, "Punto_Test_CBBA_02", "-17º 23' 15.500''", "-66º 09' 30.200''", "2550.000", "2532.15", "562.8", "802145.450", "8076543.220", "19", "S", "0.99971234", "0.99965432", "0.99936666", timeStampLocal);
+            // Ejemplo 2: Estación CBBA
+            insertPuntoHelper(db, "BASE_AIRPORT_CBBA", "-17º 26' 10.300''", "-66º 10' 15.200''", "2550.000", "2532.15", "562.8", "802145.450", "8076543.220", "19", "S", "0.99971234", "0.99965432", "0.99936666", timeStampLocal);
 
-            // Ejemplo 3: Santa Cruz
-            insertPuntoHelper(db, "Punto_Test_SCZ_03", "-17º 48' 02.100''", "-63º 10' 45.300''", "420.000", "435.80", "720.5", "481023.120", "8031456.780", "20", "S", "0.99960234", "0.99993412", "0.99953648", timeStampLocal);
+            // Ejemplo 3: Punto Topográfico SCZ
+            insertPuntoHelper(db, "PUNTO_MIRA_SCZ", "-17º 48' 02.100''", "-63º 10' 45.300''", "420.000", "435.80", "720.5", "481023.120", "8031456.780", "20", "S", "0.99960234", "0.99993412", "0.99953648", timeStampLocal);
 
-            // Ejemplo 4: Potosí
-            insertPuntoHelper(db, "Punto_Test_POT_04", "-19º 35' 12.400''", "-65º 45' 20.100''", "4060.000", "4020.15", "465.3", "211456.900", "7832145.600", "20", "S", "0.99984321", "0.99936123", "0.99920444", timeStampLocal);
+            // Ejemplo 4: Control Minero Potosí
+            insertPuntoHelper(db, "MINA_CONTROL_POT", "-19º 35' 12.400''", "-65º 45' 20.100''", "4060.000", "4020.15", "465.3", "211456.900", "7832145.600", "20", "S", "0.99984321", "0.99936123", "0.99920444", timeStampLocal);
 
-            // 2 Entradas de Libreta
+            // 2 Entradas de Libreta de Apuntes
             ContentValues l1 = new ContentValues();
-            l1.put(COL_LIB_ESTACION, "STATION_01");
-            l1.put(COL_LIB_ALT_INS, "1.550");
-            l1.put(COL_LIB_PUNTO_REF, "REF_01");
+            l1.put(COL_LIB_ESTACION, "EST_01");
+            l1.put(COL_LIB_ALT_INS, "1.545");
+            l1.put(COL_LIB_PUNTO_REF, "GPS_LP_CONTROL");
             l1.put(COL_LIB_ALT_PRI, "1.600");
-            l1.put(COL_LIB_PUNTO_AUX, "AUX_01");
+            l1.put(COL_LIB_PUNTO_AUX, "AUX_101");
             l1.put(COL_LIB_TIPO_REG, "Radiación");
-            l1.put(COL_LIB_ESTE, "590745.23");
-            l1.put(COL_LIB_NORTE, "8175432.10");
-            l1.put(COL_LIB_COTA, "3600.50");
-            l1.put(COL_LIB_OBS, "Punto de control principal");
+            l1.put(COL_LIB_ESTE, "595400.12");
+            l1.put(COL_LIB_NORTE, "8177120.45");
+            l1.put(COL_LIB_COTA, "3962.80");
+            l1.put(COL_LIB_OBS, "Borde de calzada norte");
             l1.put(COL_LIB_FECHA, timeStampLocal);
             db.insert(TABLE_LIBRETA, null, l1);
 
             ContentValues l2 = new ContentValues();
-            l2.put(COL_LIB_ESTACION, "STATION_01");
-            l2.put(COL_LIB_ALT_INS, "1.550");
-            l2.put(COL_LIB_PUNTO_REF, "REF_01");
+            l2.put(COL_LIB_ESTACION, "EST_01");
+            l2.put(COL_LIB_ALT_INS, "1.545");
+            l2.put(COL_LIB_PUNTO_REF, "GPS_LP_CONTROL");
             l2.put(COL_LIB_ALT_PRI, "0.000");
-            l2.put(COL_LIB_PUNTO_AUX, "AUX_02");
+            l2.put(COL_LIB_PUNTO_AUX, "AUX_102");
             l2.put(COL_LIB_TIPO_REG, "Nivelación");
-            l2.put(COL_LIB_ESTE, "590750.45");
-            l2.put(COL_LIB_NORTE, "8175440.30");
-            l2.put(COL_LIB_COTA, "3601.20");
-            l2.put(COL_LIB_OBS, "Esquina de acera");
+            l2.put(COL_LIB_ESTE, "595412.30");
+            l2.put(COL_LIB_NORTE, "8177135.60");
+            l2.put(COL_LIB_COTA, "3963.10");
+            l2.put(COL_LIB_OBS, "Punto sobre roca fija");
             l2.put(COL_LIB_FECHA, timeStampLocal);
             db.insert(TABLE_LIBRETA, null, l2);
         }
