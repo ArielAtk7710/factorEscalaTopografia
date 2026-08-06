@@ -48,7 +48,8 @@ public class TopoCalculoManager {
 
         // Presión
         r.pressureMmHg = IGMPressureCalculator.calculatePressureMmHg(r.altOrto) + pressureOffset;
-        r.pressureHpa = IGMPressureCalculator.calculatePressureHpa(r.altOrto) + pressureOffset;
+        double hpaFactor = IGMConstants.P0_HPA / IGMConstants.P0_MMHG;
+        r.pressureHpa = IGMPressureCalculator.calculatePressureHpa(r.altOrto) + (pressureOffset * hpaFactor);
 
         return r;
     }
@@ -87,7 +88,8 @@ public class TopoCalculoManager {
 
         // 4. Presión
         r.pressureMmHg = IGMPressureCalculator.calculatePressureMmHg(altOrto) + pressureOffset;
-        r.pressureHpa = IGMPressureCalculator.calculatePressureHpa(altOrto) + pressureOffset;
+        double hpaFactor = IGMConstants.P0_HPA / IGMConstants.P0_MMHG;
+        r.pressureHpa = IGMPressureCalculator.calculatePressureHpa(altOrto) + (pressureOffset * hpaFactor);
 
         return r;
     }

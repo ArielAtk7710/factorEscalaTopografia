@@ -1,3 +1,4 @@
-- [x] Modify `gradle.properties` to increase memory and add stability flags
-- [x] Stop running Gradle daemons
-- [x] Verify build with `clean assembleDebug`
+- [/] Update `MapManager.java` to support MBTiles and standard paths
+- [ ] Synchronize map directories in `MainActivity.java`
+- [ ] Update help strings to reflect the new `osmdroid` path
+- [ ] Final build and verification

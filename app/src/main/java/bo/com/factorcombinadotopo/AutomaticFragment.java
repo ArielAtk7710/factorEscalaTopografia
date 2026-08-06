@@ -180,6 +180,10 @@ public class AutomaticFragment extends Fragment {
         miniMapView = view.findViewById(R.id.mini_map_view);
         btn_guardar_punto = view.findViewById(R.id.btn_guardar_punto_auto);
 
+        view.findViewById(R.id.fab_mini_center_location).setOnClickListener(v -> {
+            if (miniMapManager != null) miniMapManager.centerOnCurrentLocation();
+        });
+
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(requireActivity());
         setupLocationCallback();
 
@@ -264,20 +268,16 @@ public class AutomaticFragment extends Fragment {
                 offset
         );
 
-        DecimalFormat df = new DecimalFormat("#0.00");
-        DecimalFormat dfUtm = new DecimalFormat("#0.000"); // 3 decimales (milímetros)
-        DecimalFormat df9 = new DecimalFormat("#0.000000000");
-
         // 3. Renderizado de Altura Ortométrica y Modelo Geoidal
-        if (txt_alt_orto != null) txt_alt_orto.setText(df.format(lastTopoResult.altOrto) + " m");
-        if (txt_geoid_undulation != null) txt_geoid_undulation.setText(df.format(geoidN) + " m");
+        if (txt_alt_orto != null) txt_alt_orto.setText(GeoUtils.formatCoord(lastTopoResult.altOrto) + " m");
+        if (txt_geoid_undulation != null) txt_geoid_undulation.setText(GeoUtils.formatCoord(geoidN) + " m");
         if (txt_geoid_model != null) txt_geoid_model.setText(R.string.geoid_model_egm96);
 
         if (txt_presion != null) {
-            txt_presion.setText(String.format(Locale.getDefault(), "%.3f", lastTopoResult.pressureMmHg));
+            txt_presion.setText(GeoUtils.formatCoord(lastTopoResult.pressureMmHg));
         }
         if (txt_presion_hpa != null) {
-            txt_presion_hpa.setText(String.format(Locale.getDefault(), "%.3f %s", 
+            txt_presion_hpa.setText(String.format(Locale.US, "%.3f %s", 
                 lastTopoResult.pressureHpa, getString(R.string.unit_hpa)));
         }
         if (txt_presicion != null) txt_presicion.setText(getString(R.string.label_precision_sign) + " " + Math.round(loc.getAccuracy()) + " " + getString(R.string.unit_meter));
@@ -288,14 +288,14 @@ public class AutomaticFragment extends Fragment {
         }
 
         // Renderizado en tiempo real de coordenadas UTM
-        if (txt_este != null) txt_este.setText(dfUtm.format(lastTopoResult.este) + " m");
-        if (txt_norte != null) txt_norte.setText(dfUtm.format(lastTopoResult.norte) + " m");
+        if (txt_este != null) txt_este.setText(GeoUtils.formatCoord(lastTopoResult.este) + " m");
+        if (txt_norte != null) txt_norte.setText(GeoUtils.formatCoord(lastTopoResult.norte) + " m");
 
-        txt_fa.setText(df9.format(lastTopoResult.elevationFactor));
+        txt_fa.setText(GeoUtils.formatFactor(lastTopoResult.elevationFactor));
         txt_fa_ppm.setText(Math.round((lastTopoResult.elevationFactor - 1.0) * 1000000.0) + " PPM");
-        txt_fe.setText(df9.format(lastTopoResult.scaleFactor));
+        txt_fe.setText(GeoUtils.formatFactor(lastTopoResult.scaleFactor));
         txt_fe_ppm.setText(Math.round((lastTopoResult.scaleFactor - 1.0) * 1000000.0) + " PPM");
-        txt_fc.setText(df9.format(lastTopoResult.combinedFactor));
+        txt_fc.setText(GeoUtils.formatFactor(lastTopoResult.combinedFactor));
         if (txt_fc_ppm != null) txt_fc_ppm.setText(Math.round((lastTopoResult.combinedFactor - 1.0) * 1000000.0) + " PPM");
 
         updateTemperature(loc.getLatitude(), loc.getLongitude());
@@ -330,7 +330,7 @@ public class AutomaticFragment extends Fragment {
                     currentAmbientTemp = temp; // Guardar para el próximo ciclo de cálculo
 
                     new Handler(Looper.getMainLooper()).post(() -> {
-                        if (isAdded() && txt_temp != null) {
+                        if (isAdded() && getView() != null && txt_temp != null) {
                             txt_temp.setText(String.format(Locale.getDefault(), "%.1f °C", temp));
                         }
                     });
@@ -370,8 +370,6 @@ public class AutomaticFragment extends Fragment {
 
         // 1. Obtener Hora Local Exacta
         String fechaHoraLocal = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault()).format(new Date());
-        DecimalFormat df9 = new DecimalFormat("#0.000000000");
-        DecimalFormat df3 = new DecimalFormat("#0.000");
 
         // 2. Mapear datos técnicos completos
         v.put(DatabaseHelper.COLUMN_FECHA, fechaHoraLocal);
@@ -380,25 +378,21 @@ public class AutomaticFragment extends Fragment {
         v.put(DatabaseHelper.COLUMN_LONGITUD, txt_lon.getText().toString());
         
         if (lastTopoResult != null) {
-            v.put(DatabaseHelper.COLUMN_ESTE, df3.format(lastTopoResult.este));
-            v.put(DatabaseHelper.COLUMN_NORTE, df3.format(lastTopoResult.norte));
+            v.put(DatabaseHelper.COLUMN_ESTE, GeoUtils.formatCoord(lastTopoResult.este));
+            v.put(DatabaseHelper.COLUMN_NORTE, GeoUtils.formatCoord(lastTopoResult.norte));
             v.put(DatabaseHelper.COLUMN_ZONA, String.valueOf(lastTopoResult.zona));
             v.put(DatabaseHelper.COLUMN_HEMISFERIO, String.valueOf(lastTopoResult.hemisferio));
-            v.put(DatabaseHelper.COLUMN_ALTURA, df3.format(lastTopoResult.altOrto + lastTopoResult.geoidN));
-            v.put(DatabaseHelper.COLUMN_ALTURA_ORTO, df3.format(lastTopoResult.altOrto));
+            v.put(DatabaseHelper.COLUMN_ALTURA, GeoUtils.formatCoord(lastTopoResult.altOrto + lastTopoResult.geoidN));
+            v.put(DatabaseHelper.COLUMN_ALTURA_ORTO, GeoUtils.formatCoord(lastTopoResult.altOrto));
             
-            // Guardar formato dual de presión para el reporte
-            String dualPressure = String.format(Locale.US, "%.3f mmHg | %.3f hPa", 
-                lastTopoResult.pressureMmHg, lastTopoResult.pressureHpa);
-            v.put(DatabaseHelper.COLUMN_PRESION, dualPressure);
+            // Guardar solo valor numérico (mmHg) para integridad de datos
+            v.put(DatabaseHelper.COLUMN_PRESION, GeoUtils.formatCoord(lastTopoResult.pressureMmHg));
             
-            v.put(DatabaseHelper.COLUMN_FACTOR_ESCALA, df9.format(lastTopoResult.scaleFactor));
-            v.put(DatabaseHelper.COLUMN_FACTOR_ALTURA, df9.format(lastTopoResult.elevationFactor));
+            v.put(DatabaseHelper.COLUMN_FACTOR_ESCALA, GeoUtils.formatFactor(lastTopoResult.scaleFactor));
+            v.put(DatabaseHelper.COLUMN_FACTOR_ALTURA, GeoUtils.formatFactor(lastTopoResult.elevationFactor));
             
-            // Guardar Factor Combinado con su PPM para el reporte
-            long ppm = Math.round((lastTopoResult.combinedFactor - 1.0) * 1000000.0);
-            String fcWithPpm = df9.format(lastTopoResult.combinedFactor) + " (" + ppm + " PPM)";
-            v.put(DatabaseHelper.COLUMN_FACTOR_COMBINADO, fcWithPpm);
+            // Guardar Factor Combinado ATÓMICO (solo el número)
+            v.put(DatabaseHelper.COLUMN_FACTOR_COMBINADO, GeoUtils.formatFactor(lastTopoResult.combinedFactor));
         } else {
             v.put(DatabaseHelper.COLUMN_ESTE, "");
             v.put(DatabaseHelper.COLUMN_NORTE, "");
@@ -481,12 +475,16 @@ public class AutomaticFragment extends Fragment {
     }
 
     public void showGPSData(Location loc) {
-        DecimalFormat df = new DecimalFormat("#0.000");
         double lat = Math.abs(loc.getLatitude());
         double lon = Math.abs(loc.getLongitude());
-        txt_lat.setText((loc.getLatitude() < 0 ? "-" : "") + (int)lat + "º " + (int)((lat-(int)lat)*60) + "' " + df.format(((lat-(int)lat)*60 - (int)((lat-(int)lat)*60))*60) + "''");
-        txt_lon.setText((loc.getLongitude() < 0 ? "-" : "") + (int)lon + "º " + (int)((lon-(int)lon)*60) + "' " + df.format(((lon-(int)lon)*60 - (int)((lon-(int)lon)*60))*60) + "''");
-        txt_alt.setText(df.format(loc.getAltitude()) + " m");
+        
+        // Formato DMS para lectura humana (se mantiene igual pero asegurando Locale)
+        String latStr = (loc.getLatitude() < 0 ? "-" : "") + (int)lat + "º " + (int)((lat-(int)lat)*60) + "' " + GeoUtils.formatCoord(((lat-(int)lat)*60 - (int)((lat-(int)lat)*60))*60) + "''";
+        String lonStr = (loc.getLongitude() < 0 ? "-" : "") + (int)lon + "º " + (int)((lon-(int)lon)*60) + "' " + GeoUtils.formatCoord(((lon-(int)lon)*60 - (int)((lon-(int)lon)*60))*60) + "''";
+        
+        txt_lat.setText(latStr);
+        txt_lon.setText(lonStr);
+        txt_alt.setText(GeoUtils.formatCoord(loc.getAltitude()) + " m");
     }
 
     private final Handler gpsCheckHandler = new Handler(Looper.getMainLooper());

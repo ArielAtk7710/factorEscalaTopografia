@@ -125,24 +125,4 @@ public class GeoidManager {
 
         return ((y2 - lat) / (y2 - y1)) * r1 + ((lat - y1) / (y2 - y1)) * r2;
     }
-
-    /**
-     * Calcula la presión atmosférica estimada en mmHg basándose en la altura ortométrica.
-     * Basado en el modelo de atmósfera estándar con calibración local.
-     */
-    public static double calculatePressureMmHg(double altitudeZ) {
-        // 1. Fórmula Física Base (hPa)
-        double p0 = 1013.25;
-        double l = 0.0065;
-        double t0 = 288.15;
-        double exponent = 5.25588;
-
-        double phPa = p0 * Math.pow(1 - (l * altitudeZ) / t0, exponent);
-
-        // 2. Conversión a mmHg
-        double pMmHg = phPa * 0.750062;
-
-        // 3. Ajuste por Calibración Local (Deducido de datos de campo)
-        return pMmHg * 1.00823;
-    }
 }

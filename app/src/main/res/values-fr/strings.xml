@@ -5,6 +5,7 @@
     <string name="tab_text_1">Automatique</string>
     <string name="tab_text_2">Manuel</string>
     <string name="tab_text_3">Registre</string>
+    <string name="tab_text_map">Carte</string>
     <string name="section_format">Section %1$d</string>
 
     <!-- General Labels -->
@@ -26,8 +27,8 @@
     <string name="label_map">Carte</string>
 
     <!-- Factors -->
-    <string name="title_geodetic_coords">COORDONNÉES GÉODÉSIQUES</string>
-    <string name="title_utm_coords">COORDONNÉES UTM</string>
+    <string name="title_geodetic_coords">COORDENÉES GÉODÉSIQUES</string>
+    <string name="title_utm_coords">COORDENÉES UTM</string>
     <string name="title_geometric_factors">FACTEURS DE CORRECTION GÉOMÉTRIQUE</string>
     <string name="label_scale_factor">Facteur d\'Échelle</string>
     <string name="label_elevation_factor">Facteur d\'Élévation</string>
@@ -88,8 +89,8 @@
     <string name="cond_low">Basse pression</string>
     <string name="cond_offset">Baromètre décalé</string>
     <string name="val_normal_input">0 ou vide</string>
-    <string name="val_high_input">1.5 ou 2.3</string>
-    <string name="val_low_input">-1.5 ou -0.8</string>
+    <string name="val_high_input">1.5 o 2.3</string>
+    <string name="val_low_input">-1.5 o -0.8</string>
     <string name="val_offset_input">Calibrer</string>
     <string name="msg_restart_required">L\'application redémarrera pour appliquer les modifications.</string>
 
@@ -110,7 +111,7 @@
     <string name="btn_clear_cache">VIDER LE CACHE</string>
     <string name="label_gps_settings">GPS</string>
     <string name="label_show_location">Afficher ma position</string>
-    <string name="label_real_time_update">Mise à jour en temps réel</string>
+    <string name="label_real_time_update">Mise à jour en tiempo real</string>
     <string name="msg_map_imported_success">Carte importée avec succès : %1$s</string>
     <string name="msg_map_delete_confirm">Êtes-vous sûr de vouloir supprimer la carte installée ?</string>
     <string name="msg_cache_cleared">Cache de la carte vidé.</string>
@@ -120,7 +121,7 @@
     <string name="err_no_explorer">Aucun explorateur de fichiers compatible trouvé.</string>
     <string name="err_invalid_values">Erreur : Veuillez saisir des valeurs numériques valides</string>
     <string name="err_import_map">Erreur lors de l\'importation de la carte.</string>
-    <string name="warn_fill_required">Remplissez au moins la station et le point auxiliaire</string>
+    <string name="warn_fill_required">Remplissez au menos la station et le point auxiliaire</string>
     <string name="warn_location_denied">Autorisation de localisation refusée. La carte n\'affichera pas votre position.</string>
     <string name="warn_no_export_data">Aucune donnée à exporter</string>
     <string name="label_explorer_title">Explorer le dossier des cartes</string>
@@ -148,6 +149,11 @@
     <string name="safety_msg_rain_detected">Alerte Rouge : Pluie détectée (%1$.1f mm). Risque de court-circuit.</string>
     <string name="safety_msg_rain_prob_mid">Alerte Jaune : Risque de pluie (%1$d%%). Vol sous surveillance.</string>
     <string name="label_wind_120_v">Vent (120m) :</string>
+    <string name="label_wind_sustained">Vent Soutenu :</string>
+    <string name="label_wind_direction">Dir. Vent :</string>
+    <string name="label_apparent_temp">Temp. Ressentie :</string>
+    <string name="label_cloud_cover">Nuages :</string>
+    <string name="label_visibility">Visibilité :</string>
     <string name="label_gusts_max">Rafales Max :</string>
     <string name="label_rain_prob_v">Prob. Pluie :</string>
     <string name="label_rain_actual">Pluie Actuelle :</string>
@@ -157,17 +163,20 @@
     <string name="msg_weather_caution">Attention. Interférences GPS possibles.</string>
     <string name="msg_weather_safe">Environnement sûr pour l\'opération de drones.</string>
     <string name="label_geoid_model">Modèle Géoïdal</string>
-    <string name="label_geoid_undulation">Ondulation Géoïdale</string>
+    <string name="label_geoid_undulation">Ondulación Géoïdale</string>
     <string name="label_temp_ambient">Température Ambiante</string>
     <string name="label_analysis_cond">ANALYSE DES CONDITIONS</string>
     <string name="btn_refresh_data">METTRE À JOUR LES DONNÉES</string>
     <string name="label_registered_format">Enregistré le : %1$s</string>
     <string name="label_ref_format">Réf : %1$s</string>
+    <string name="label_thermal_comfort">CONFORT THERMIQUE</string>
+    <string name="label_wind_precip">VENTS ET PRÉCIPITATIONS</string>
+    <string name="label_electronic_safety">SÉCURITÉ ÉLECTRONIQUE / GNSS</string>
     <string name="geoid_model_egm96">EGM96 (Global)</string>
     <string name="label_no_observations">Aucune observation</string>
-    <string name="label_no_obs_list">Aucune observation.</string>
+    <string name="label_no_obs_list">Sem observaciones.</string>
     <string name="label_hide_details">Masquer les détails</string>
-    <string name="label_show_details">Afficher les détails</string>
+    <string name="label_show_details">Afficher les detalles</string>
     <string name="label_identification">IDENTIFICATION</string>
     <string name="label_point">POINT</string>
     <string name="label_reg_date">DATE D\'ENREGISTREMENT</string>
@@ -193,7 +202,7 @@
     <!-- Compass Calibrate -->
     <string name="menu_calibrate_compass">Calibrer la Boussole</string>
     <string name="title_calibrate_compass">Calibrer la Boussole</string>
-    <string name="msg_calibrate_instructions">Pour améliorer la précision, déplacez votre appareil en dessinant un \'8\' dans l\'air plusieurs fois.</string>
+    <string name="msg_calibrate_instructions">Pour améliorer la précision, déplacez votre appareil en dessinant un \'8\' dans l\'air plusieurs veces.</string>
     <string name="btn_understood">COMPRIS</string>
 
     <!-- Menu items -->
@@ -242,9 +251,18 @@
     <string name="label_info">Information:</string>
 
     <!-- Dialogs -->
+    <!-- Map Help Strings -->
+    <string name="title_map_download_guide">GUIDE D\'OBTENTION DES CARTES</string>
+    <string name="msg_map_download_instr">1. Téléchargez le fichier : Vous pouvez obtenir des extraits d\'OpenStreetMap (formats .sqlite ou .mbtiles) à partir de sources como BBBike ou utilizar des outils como Mobile Atlas Creator (MOBAC).\n\n2. Chemin d\'installation : Vous devez copier le fichier vers ce chemin exact : Stockage Interne > Android > data > bo.com.factorcombinadotopo > files > osmdroid\n\n3. Une fois copié, l\'application activera les modes Hybride et Hors ligne.</string>
+
+    <string name="title_map_import_guide">GUIDE D\'IMPORTATION</string>
+    <string name="msg_map_import_instr">1. Appuyez sur el botón "IMPORTER UNE CARTE".\n\n2. Sélectionnez votre fichier de carte (.sqlite ou .mbtiles) depuis votre explorateur de fichiers.\n\n3. Attendez le message de confirmation.\n\n4. L\'application copiera le fichier en interne pour vous.</string>
+
     <string name="dialog_delete_title">Confirmer la suppression</string>
     <string name="dialog_delete_msg">Êtes-vous sûr de vouloir supprimer les enregistrements sélectionnés ? Cette action est irréversible.</string>
     <string name="dialog_delete_msg_single">Êtes-vous sûr de vouloir supprimer cet enregistrement ?</string>
     <string name="btn_yes">OUI, SUPPRIMER</string>
     <string name="btn_no">ANNULER</string>
+    <string name="menu_weather_drone">Météo Vol Drone</string>
+    <string name="msg_weather_accuracy_tip">Les informations de prévisions météorologiques sont calculées en fonction de votre position, elles peuvent parfois varier légèrement.</string>
 </resources>

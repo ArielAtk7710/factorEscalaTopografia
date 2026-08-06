@@ -100,9 +100,9 @@ public class FieldNotebookFragment extends Fragment {
         etPuntoRef.setText("");
         etAltPrisma.setText("");
         etPuntoAux.setText("");
-        etEste.setText("0.000");
-        etNorte.setText("0.000");
-        etCota.setText("0.000");
+        etEste.setText("");
+        etNorte.setText("");
+        etCota.setText("");
         etObs.setText("");
         spTipoReg.setSelection(0);
     }

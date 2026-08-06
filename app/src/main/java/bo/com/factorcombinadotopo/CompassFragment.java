@@ -36,7 +36,7 @@ import java.util.Locale;
 public class CompassFragment extends Fragment implements SensorEventListener {
 
     private ImageView imgDial, imgBubble, imgNeedle;
-    private TextView txtAzimut, txtAzimutDms, txtEste, txtNorte, txtAlt, txtFc, txtPresion, txtRef, txtLocation;
+    private TextView txtAzimut, txtAzimutDms, txtEste, txtNorte, txtAlt, txtRef, txtLocation;
     private SensorManager sensorManager;
     private Sensor accelerometer, magnetometer;
     
@@ -70,8 +70,6 @@ public class CompassFragment extends Fragment implements SensorEventListener {
         txtEste = view.findViewById(R.id.txt_comp_este);
         txtNorte = view.findViewById(R.id.txt_comp_norte);
         txtAlt = view.findViewById(R.id.txt_comp_alt);
-        txtFc = view.findViewById(R.id.txt_comp_fc);
-        txtPresion = view.findViewById(R.id.txt_comp_presion);
         txtRef = view.findViewById(R.id.txt_comp_ref);
 
         sensorManager = (SensorManager) requireActivity().getSystemService(Context.SENSOR_SERVICE);
@@ -98,9 +96,6 @@ public class CompassFragment extends Fragment implements SensorEventListener {
 
     private void updateGpsUI(Location loc) {
         if (!isAdded() || getView() == null) return;
-        DecimalFormat df = new DecimalFormat("#0.00");
-        DecimalFormat dfUtm = new DecimalFormat("#,##0.00");
-        DecimalFormat df8 = new DecimalFormat("#0.00000000");
         
         double geoidN = GeoidManager.getGeoidUndulation(loc.getLatitude(), loc.getLongitude());
         SharedPreferences prefs = requireActivity().getSharedPreferences("AppPrefs", Context.MODE_PRIVATE);
@@ -109,13 +104,11 @@ public class CompassFragment extends Fragment implements SensorEventListener {
         TopoCalculoManager.TopoResult res = TopoCalculoManager.calculateAll(
                 loc.getLatitude(), loc.getLongitude(), loc.getAltitude(), geoidN, offset);
         
-        txtAlt.setText(df.format(res.altOrto) + " m");
-        txtEste.setText(dfUtm.format(res.este) + " m");
-        txtNorte.setText(dfUtm.format(res.norte) + " m");
-        txtFc.setText(df8.format(res.combinedFactor));
-        // Presión en hPa (1 mmHg = 1.33322 hPa)
-        txtPresion.setText(String.format(Locale.getDefault(), "%.1f hPa", res.pressureMmHg * 1.33322));
-        txtRef.setText(String.format(Locale.getDefault(), "%d%c (WGS84)", res.zona, res.hemisferio));
+        txtAlt.setText(GeoUtils.formatCoord(res.altOrto) + " m");
+        txtEste.setText(GeoUtils.formatCoord(res.este) + " m");
+        txtNorte.setText(GeoUtils.formatCoord(res.norte) + " m");
+        
+        txtRef.setText(String.format(Locale.US, "%d%c (WGS84)", res.zona, res.hemisferio));
 
         updateLocationName(loc.getLatitude(), loc.getLongitude());
     }

@@ -7,22 +7,31 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 
+import org.osmdroid.api.IGeoPoint;
+import org.osmdroid.events.MapListener;
+import org.osmdroid.events.ScrollEvent;
+import org.osmdroid.events.ZoomEvent;
 import org.osmdroid.views.MapView;
+
+import java.util.Locale;
 
 /**
  * Fragmento principal para visualización de mapas usando OpenStreetMap.
+ * Incluye mira central naranja y visualización de coordenadas en tiempo real.
  */
 public class MapFragment extends Fragment implements LocationHelper.LocationUpdateListener {
 
     private MapView mapView;
     private MapManager mapManager;
     private LocationHelper locationHelper;
+    private TextView txtLat, txtLon;
     private static final int PERMISSION_REQUEST_CODE = 200;
 
     @Nullable
@@ -37,9 +46,12 @@ public class MapFragment extends Fragment implements LocationHelper.LocationUpda
 
         try {
             mapView = view.findViewById(R.id.map_view);
+            txtLat = view.findViewById(R.id.txt_map_lat);
+            txtLon = view.findViewById(R.id.txt_map_lon);
+
             mapManager = new MapManager(requireContext(), mapView);
-            // Desactivamos el centrado automático para navegación libre
-            mapManager.setAutoCenterEnabled(false); 
+            // Activamos el centrado automático inicial (se ejecutará solo la 1ra vez)
+            mapManager.setAutoCenterEnabled(true); 
 
             locationHelper = new LocationHelper(requireContext(), this);
 
@@ -54,10 +66,40 @@ public class MapFragment extends Fragment implements LocationHelper.LocationUpda
                 }
             });
 
+            setupMapListener();
             checkLocationPermissions();
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    private void setupMapListener() {
+        if (mapView == null) return;
+
+        mapView.addMapListener(new MapListener() {
+            @Override
+            public boolean onScroll(ScrollEvent event) {
+                updateCenterCoordinates();
+                return true;
+            }
+
+            @Override
+            public boolean onZoom(ZoomEvent event) {
+                updateCenterCoordinates();
+                return true;
+            }
+        });
+
+        // Inicializar con el centro actual
+        updateCenterCoordinates();
+    }
+
+    private void updateCenterCoordinates() {
+        if (mapView == null || txtLat == null || txtLon == null) return;
+        
+        IGeoPoint center = mapView.getMapCenter();
+        txtLat.setText(String.format(Locale.getDefault(), "LAT: %.6f", center.getLatitude()));
+        txtLon.setText(String.format(Locale.getDefault(), "LON: %.6f", center.getLongitude()));
     }
 
     private void checkLocationPermissions() {
@@ -102,6 +144,9 @@ public class MapFragment extends Fragment implements LocationHelper.LocationUpda
     public void onResume() {
         super.onResume();
         handleMapState(true);
+        if (mapManager != null) {
+            mapManager.invalidate(); // Forzar renderizado de mosaicos
+        }
         if (locationHelper != null) locationHelper.getLastLocation();
     }
 

@@ -15,7 +15,7 @@
         android:textSize="20sp"
         android:textStyle="bold"
         android:gravity="center"
-        android:layout_marginBottom="10dp" />
+        android:layout_marginBottom="6dp" />
 
     <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"
@@ -44,7 +44,7 @@
                 android:layout_height="wrap_content"
                 android:background="@drawable/bg_spinner_with_arrow"
                 android:padding="12dp"
-                android:layout_marginBottom="8dp" />
+                android:layout_marginBottom="6dp" />
 
             <TextView
                 android:layout_width="wrap_content"
@@ -53,14 +53,14 @@
                 android:textColor="@color/text_secondary"
                 android:textSize="12sp"
                 android:textStyle="bold"
-                android:layout_marginBottom="8dp" />
+                android:layout_marginBottom="4dp" />
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
                 android:gravity="center_vertical"
-                android:layout_marginBottom="8dp">
+                android:layout_marginBottom="6dp">
 
                 <EditText
                     android:id="@+id/et_pressure_offset"
@@ -87,14 +87,29 @@
             </LinearLayout>
 
             <!-- SECCIÓN MAPAS -->
-            <TextView
-                android:layout_width="wrap_content"
+            <LinearLayout
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="@string/label_maps"
-                android:textColor="@color/text_primary"
-                android:textSize="16sp"
-                android:textStyle="bold"
-                android:layout_marginBottom="8dp" />
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:layout_marginBottom="4dp">
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="@string/label_maps"
+                    android:textColor="@color/text_primary"
+                    android:textSize="16sp"
+                    android:textStyle="bold" />
+                <ImageButton
+                    android:id="@+id/btn_map_download_info"
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
+                    android:background="?attr/selectableItemBackgroundBorderless"
+                    android:src="@drawable/ic_info"
+                    app:tint="@color/accent_light"
+                    android:contentDescription="Guía de descarga de mapas" />
+            </LinearLayout>
 
             <!-- Modo del mapa -->
             <TextView
@@ -104,7 +119,7 @@
                 android:textColor="@color/text_secondary"
                 android:textSize="12sp"
                 android:textStyle="bold"
-                android:layout_marginBottom="8dp" />
+                android:layout_marginBottom="4dp" />
 
             <com.google.android.material.button.MaterialButtonToggleGroup
                 android:id="@+id/toggle_map_mode"
@@ -112,7 +127,7 @@
                 android:layout_height="wrap_content"
                 app:singleSelection="true"
                 app:selectionRequired="true"
-                android:layout_marginBottom="8dp">
+                android:layout_marginBottom="6dp">
                 <Button
                     android:id="@+id/btn_mode_online"
                     style="?attr/materialButtonOutlinedStyle"
@@ -163,39 +178,69 @@
                 android:layout_height="wrap_content"
                 android:padding="12dp"
                 android:orientation="vertical"
-                android:layout_marginBottom="8dp">
+                android:layout_marginBottom="6dp"
+                android:background="@color/bg_surface">
 
                 <TextView
                     android:id="@+id/txt_maps_folder_path"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="Android > data > bo.com.factorcombinadotopo > Mapas"
+                    android:text="Android > data > bo.com.factorcombinadotopo > files > osmdroid"
                     android:textColor="@color/text_primary"
                     android:textSize="10sp"
-                    android:textStyle="bold"
-                    android:layout_marginBottom="8dp" />
-
-                <Button
-                    android:id="@+id/btn_open_maps_folder"
-                    android:layout_width="match_parent"
-                    android:layout_height="36dp"
-                    android:padding="0dp"
-                    android:text="@string/btn_open_folder"
-                    android:textSize="11sp"
-                    android:textColor="@color/text_primary"
-                    android:textStyle="bold"
-                    app:backgroundTint="@color/accent_light" />
+                    android:textStyle="bold" />
             </LinearLayout>
 
-            <!-- Mapa instalado -->
+            <!-- Export Path Section -->
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/label_installed_map"
+                android:text="@string/label_export_directory"
                 android:textColor="@color/text_secondary"
                 android:textSize="12sp"
                 android:textStyle="bold"
-                android:layout_marginBottom="3dp" />
+                android:layout_marginBottom="4dp" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@color/bg_surface"
+                android:padding="16dp"
+                android:orientation="vertical"
+                android:layout_marginBottom="6dp">
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/text_export_path"
+                    android:textColor="@color/accent_light"
+                    android:textSize="13sp"
+                    android:textStyle="bold" />
+            </LinearLayout>
+
+            <!-- Mapa instalado -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:layout_marginBottom="2dp">
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="@string/label_installed_map"
+                    android:textColor="@color/text_secondary"
+                    android:textSize="12sp"
+                    android:textStyle="bold" />
+                <ImageButton
+                    android:id="@+id/btn_map_import_info"
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
+                    android:background="?attr/selectableItemBackgroundBorderless"
+                    android:src="@drawable/ic_info"
+                    app:tint="@color/accent_light"
+                    android:contentDescription="Guía de importación de mapas" />
+            </LinearLayout>
 
             <LinearLayout
                 android:id="@+id/layout_map_info"
@@ -204,7 +249,7 @@
                 android:background="@color/bg_surface"
                 android:padding="12dp"
                 android:orientation="vertical"
-                android:layout_marginBottom="8dp">
+                android:layout_marginBottom="6dp">
                 <TextView
                     android:id="@+id/txt_installed_map_name"
                     android:layout_width="match_parent"
@@ -227,7 +272,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
-                android:layout_marginBottom="8dp">
+                android:layout_marginBottom="6dp">
                 <Button
                     android:id="@+id/btn_import_map"
                     android:layout_width="0dp"
@@ -256,14 +301,14 @@
                 android:textColor="@color/text_secondary"
                 android:textSize="12sp"
                 android:textStyle="bold"
-                android:layout_marginBottom="8dp" />
+                android:layout_marginBottom="4dp" />
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
                 android:gravity="center_vertical"
-                android:layout_marginBottom="8dp">
+                android:layout_marginBottom="6dp">
 
                 <LinearLayout
                     android:layout_width="0dp"
@@ -311,7 +356,7 @@
                 android:textColor="@color/text_secondary"
                 android:textSize="12sp"
                 android:textStyle="bold"
-                android:layout_marginBottom="8dp" />
+                android:layout_marginBottom="4dp" />
 
             <com.google.android.material.checkbox.MaterialCheckBox
                 android:id="@+id/cb_show_location"
@@ -328,51 +373,26 @@
                 android:text="@string/label_real_time_update"
                 android:textColor="@color/text_primary"
                 android:checked="true"
-                android:layout_marginBottom="8dp" />
+                android:layout_marginBottom="6dp" />
 
-
-            <!-- Export Path Section -->
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/label_export_directory"
-                android:textColor="@color/text_secondary"
-                android:textSize="12sp"
-                android:textStyle="bold"
-                android:layout_marginBottom="8dp" />
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:background="@color/bg_surface"
-                android:padding="16dp"
-                android:orientation="vertical"
-                android:layout_marginBottom="8dp">
-                <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="@string/text_export_path"
-                    android:textColor="@color/accent_light"
-                    android:textSize="13sp"
-                    android:textStyle="bold" />
-            </LinearLayout>
 
             <!-- Theme Section -->
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_marginBottom="4dp"
                 android:text="@string/label_theme"
                 android:textColor="@color/text_secondary"
                 android:textSize="12sp"
-                android:textStyle="bold"
-                android:layout_marginBottom="8dp" />
+                android:textStyle="bold" />
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:gravity="center_vertical"
+                android:layout_marginBottom="6dp"
                 android:background="@color/bg_surface"
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
                 android:padding="16dp">
 
                 <TextView

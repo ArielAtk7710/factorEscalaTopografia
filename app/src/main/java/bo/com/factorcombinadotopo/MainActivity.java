@@ -11,6 +11,7 @@ import com.google.android.material.tabs.TabLayout;
 import com.google.android.material.tabs.TabLayoutMediator;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 import com.google.android.material.bottomsheet.BottomSheetDialog;
@@ -42,6 +43,7 @@ import androidx.drawerlayout.widget.DrawerLayout;
 import com.google.android.material.navigation.NavigationView;
 import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.core.view.GravityCompat;
+import androidx.core.content.FileProvider;
 
 import androidx.annotation.NonNull;
 
@@ -62,7 +64,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     private ActivityResultLauncher<String[]> mapImportLauncher;
     private TextView txtInstalledMapName, txtInstalledMapDetails, txtCacheSize;
-    private PopupWindow barometerInfoPopup;
+    private Button btnModeHybrid; // Referencia para habilitar/deshabilitar dinámicamente
+    private PopupWindow barometerInfoPopup, mapDownloadInfoPopup, mapImportInfoPopup;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -98,6 +101,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         this.mSectionsPagerAdapter = new SectionsPagerAdapter(this);
         this.mViewPager = findViewById(R.id.container);
         this.mViewPager.setAdapter(this.mSectionsPagerAdapter);
+        this.mViewPager.setUserInputEnabled(false); // Desactivar deslizamiento para no interferir con el mapa
         
         TabLayout tabLayout = findViewById(R.id.tabs);
         new TabLayoutMediator(tabLayout, mViewPager, (tab, position) -> {
@@ -111,11 +115,31 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                     tab.setIcon(R.drawable.ic_manual);
                     break;
                 case 2:
+                    tab.setText(R.string.tab_text_map);
+                    tab.setIcon(R.drawable.ic_map);
+                    break;
+                case 3:
                     tab.setText(R.string.tab_text_3);
                     tab.setIcon(R.drawable.ic_register);
                     break;
             }
         }).attach();
+
+        // Sincronización del menú inferior con las pantallas secundarias
+        tabLayout.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
+            @Override
+            public void onTabSelected(TabLayout.Tab tab) {
+                if (mViewPager.getVisibility() != View.VISIBLE) {
+                    showHome();
+                }
+            }
+            @Override public void onTabUnselected(TabLayout.Tab tab) {}
+            @Override public void onTabReselected(TabLayout.Tab tab) {
+                if (mViewPager.getVisibility() != View.VISIBLE) {
+                    showHome();
+                }
+            }
+        });
 
         // Inicializar el importador de mapas
         mapImportLauncher = registerForActivityResult(new ActivityResultContracts.OpenDocument(), uri -> {
@@ -148,8 +172,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             showGnssCalendarDialog();
         } else if (id == R.id.nav_compass_pro) {
             showCompassPro();
-        } else if (id == R.id.nav_map) {
-            showMap();
         } else if (id == R.id.nav_field_notebook) {
             showFieldNotebook();
         } else if (id == R.id.nav_weather) {
@@ -162,9 +184,11 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     private void showHome() {
         // Remover cualquier fragmento adicional que se haya puesto sobre el FrameLayout
+        // Filtramos para NO remover los fragmentos que pertenecen al ViewPager2
         for (Fragment fragment : getSupportFragmentManager().getFragments()) {
-            if (fragment instanceof CompassFragment || fragment instanceof MapFragment 
-                    || fragment instanceof FieldNotebookFragment || fragment instanceof WeatherFragment) {
+            if (fragment instanceof CompassFragment || 
+                fragment instanceof FieldNotebookFragment || 
+                fragment instanceof WeatherFragment) {
                 getSupportFragmentManager().beginTransaction().remove(fragment).commit();
             }
         }
@@ -173,10 +197,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     private void showCompassPro() {
         hideMainAndShowFragment(new CompassFragment());
-    }
-
-    private void showMap() {
-        hideMainAndShowFragment(new MapFragment());
     }
 
     private void showFieldNotebook() {
@@ -286,8 +306,33 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         });
 
         // 3. SECCIÓN MAPAS (Online por defecto)
+        View btnMapDownloadInfo = view.findViewById(R.id.btn_map_download_info);
+        btnMapDownloadInfo.setOnClickListener(v -> {
+            if (mapDownloadInfoPopup != null && mapDownloadInfoPopup.isShowing()) {
+                mapDownloadInfoPopup.dismiss();
+                mapDownloadInfoPopup = null;
+            } else {
+                mapDownloadInfoPopup = UIUtils.showPopupInfo(this, view, 
+                        getString(R.string.title_map_download_guide), 
+                        getString(R.string.msg_map_download_instr));
+            }
+        });
+
         com.google.android.material.button.MaterialButtonToggleGroup toggleMapMode = view.findViewById(R.id.toggle_map_mode);
+        btnModeHybrid = view.findViewById(R.id.btn_mode_hybrid);
+        
+        // Verificar si hay mapas importados para habilitar/deshabilitar opción Híbrido
+        boolean hasMaps = hasImportedMaps();
+        btnModeHybrid.setEnabled(hasMaps);
+
         int savedMode = prefs.getInt(KEY_MAP_MODE, 0); // 0 es Online
+        
+        // Si el modo guardado es Híbrido pero no hay mapas, forzar a Online
+        if (savedMode == 2 && !hasMaps) {
+            savedMode = 0;
+            prefs.edit().putInt(KEY_MAP_MODE, 0).apply();
+        }
+
         switch (savedMode) {
             case 0: toggleMapMode.check(R.id.btn_mode_online); break;
             case 1: toggleMapMode.check(R.id.btn_mode_offline); break;
@@ -303,13 +348,22 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             }
         });
 
-        // Carpeta de mapas
-        view.findViewById(R.id.btn_open_maps_folder).setOnClickListener(v -> openMapsFolder());
-
         // Mapa Instalado
         txtInstalledMapName = view.findViewById(R.id.txt_installed_map_name);
         txtInstalledMapDetails = view.findViewById(R.id.txt_installed_map_details);
         updateInstalledMapUI();
+
+        View btnMapImportInfo = view.findViewById(R.id.btn_map_import_info);
+        btnMapImportInfo.setOnClickListener(v -> {
+            if (mapImportInfoPopup != null && mapImportInfoPopup.isShowing()) {
+                mapImportInfoPopup.dismiss();
+                mapImportInfoPopup = null;
+            } else {
+                mapImportInfoPopup = UIUtils.showPopupInfo(this, view, 
+                        getString(R.string.title_map_import_guide), 
+                        getString(R.string.msg_map_import_instr));
+            }
+        });
 
         view.findViewById(R.id.btn_import_map).setOnClickListener(v -> {
             mapImportLauncher.launch(new String[]{"*/*"});
@@ -360,12 +414,22 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             recreate(); // Reiniciar para aplicar cambios
         });
 
+        dialog.setOnDismissListener(d -> {
+            btnModeHybrid = null;
+            txtInstalledMapName = null;
+            txtInstalledMapDetails = null;
+            txtCacheSize = null;
+            if (barometerInfoPopup != null) barometerInfoPopup.dismiss();
+            if (mapDownloadInfoPopup != null) mapDownloadInfoPopup.dismiss();
+            if (mapImportInfoPopup != null) mapImportInfoPopup.dismiss();
+        });
+
         dialog.show();
     }
 
     private File getMapsDirectory() {
-        File mapsDir = getExternalFilesDir("Mapas");
-        if (mapsDir != null && !mapsDir.exists()) mapsDir.mkdirs();
+        File mapsDir = new File(getExternalFilesDir(null), "osmdroid");
+        if (!mapsDir.exists()) mapsDir.mkdirs();
         return mapsDir;
     }
 
@@ -375,7 +439,24 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         if (mapsDir == null) return;
         
         File[] files = mapsDir.listFiles();
-        if (files != null && files.length > 0) {
+        boolean hasMaps = files != null && files.length > 0;
+
+        // Actualizar estado del botón Híbrido si el diálogo está abierto
+        if (btnModeHybrid != null) {
+            btnModeHybrid.setEnabled(hasMaps);
+            if (!hasMaps) {
+                View parent = (View) btnModeHybrid.getParent();
+                if (parent instanceof com.google.android.material.button.MaterialButtonToggleGroup) {
+                    com.google.android.material.button.MaterialButtonToggleGroup group = (com.google.android.material.button.MaterialButtonToggleGroup) parent;
+                    if (group.getCheckedButtonId() == R.id.btn_mode_hybrid || group.getCheckedButtonId() == R.id.btn_mode_offline) {
+                        group.check(R.id.btn_mode_online);
+                        getSharedPreferences(PREFS_NAME, MODE_PRIVATE).edit().putInt(KEY_MAP_MODE, 0).apply();
+                    }
+                }
+            }
+        }
+
+        if (hasMaps) {
             File mapFile = files[0]; // Tomamos el primer archivo encontrado
             txtInstalledMapName.setText(mapFile.getName());
             String details = FileUtils.formatSize(mapFile.length()) + " | " + 
@@ -411,31 +492,25 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         updateInstalledMapUI();
     }
 
+    private boolean hasImportedMaps() {
+        File mapsDir = getMapsDirectory();
+        if (mapsDir == null) return false;
+        File[] files = mapsDir.listFiles();
+        return files != null && files.length > 0;
+    }
+
     private void updateCacheSizeUI() {
         if (txtCacheSize == null) return;
-        File cacheDir = new File(getCacheDir(), "osmdroid");
+        File cacheDir = new File(new File(getExternalFilesDir(null), "osmdroid"), "tiles");
         long size = FileUtils.getFolderSize(cacheDir);
         txtCacheSize.setText(FileUtils.formatSize(size));
     }
 
     private void clearMapCache() {
-        File cacheDir = new File(getCacheDir(), "osmdroid");
+        File cacheDir = new File(new File(getExternalFilesDir(null), "osmdroid"), "tiles");
         FileUtils.clearDirectory(cacheDir);
         updateCacheSizeUI();
         UIUtils.showSuccessToast(this, getString(R.string.msg_cache_cleared));
-    }
-
-    private void openMapsFolder() {
-        File mapsDir = getMapsDirectory();
-        if (mapsDir == null) return;
-        
-        Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
-        intent.setDataAndType(Uri.fromFile(mapsDir), "*/*");
-        try {
-            startActivity(Intent.createChooser(intent, getString(R.string.label_explorer_title)));
-        } catch (Exception e) {
-            UIUtils.showErrorToast(this, getString(R.string.err_no_explorer));
-        }
     }
 
     private void showCompassCalibrateDialog() {
@@ -524,6 +599,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 case 1:
                     return new ManualFragment();
                 case 2:
+                    return new MapFragment();
+                case 3:
                     return new RegisterFragment();
                 default:
                     return new AutomaticFragment();
@@ -532,7 +609,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
         @Override
         public int getItemCount() {
-            return 3;
+            return 4;
         }
     }
 }

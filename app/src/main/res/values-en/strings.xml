@@ -5,6 +5,7 @@
     <string name="tab_text_1">Automatic</string>
     <string name="tab_text_2">Manual</string>
     <string name="tab_text_3">Register</string>
+    <string name="tab_text_map">Map</string>
     <string name="section_format">Section %1$d</string>
 
     <!-- General Labels -->
@@ -152,6 +153,11 @@
     <string name="safety_msg_rain_detected">Red Alert: Rain detected (%1$.1f mm). Risk of short circuit.</string>
     <string name="safety_msg_rain_prob_mid">Yellow Alert: Risk of rain (%1$d%%). Flight under supervision.</string>
     <string name="label_wind_120_v">Wind (120m):</string>
+    <string name="label_wind_sustained">Sustained Wind:</string>
+    <string name="label_wind_direction">Wind Direction:</string>
+    <string name="label_apparent_temp">Apparent Temp:</string>
+    <string name="label_cloud_cover">Cloud Cover:</string>
+    <string name="label_visibility">Visibility:</string>
     <string name="label_gusts_max">Max Gusts:</string>
     <string name="label_rain_prob_v">Rain Prob.:</string>
     <string name="label_rain_actual">Actual Rain:</string>
@@ -246,9 +252,18 @@
     <string name="label_info">Information:</string>
 
     <!-- Dialogs -->
+    <!-- Map Help Strings -->
+    <string name="title_map_download_guide">MAP DOWNLOAD GUIDE</string>
+    <string name="msg_map_download_instr">1. Download the file: You can obtain OpenStreetMap extracts (.sqlite or .mbtiles formats) from sources like BBBike or use tools like Mobile Atlas Creator (MOBAC).\n\n2. Installation path: You must copy the file to this exact path: Internal Storage > Android > data > bo.com.factorcombinadotopo > files > osmdroid\n\n3. Once copied, the app will enable Hybrid and Offline modes.</string>
+
+    <string name="title_map_import_guide">IMPORT GUIDE</string>
+    <string name="msg_map_import_instr">1. Press the "IMPORT MAP" button.\n\n2. Select your map file (.sqlite or .mbtiles) from your file explorer.\n\n3. Wait for the confirmation message.\n\n4. The app will copy the file internally for you.</string>
+
     <string name="dialog_delete_title">Confirm Deletion</string>
     <string name="dialog_delete_msg">Are you sure you want to delete the selected records? This action cannot be undone.</string>
     <string name="dialog_delete_msg_single">Are you sure you want to delete this record?</string>
     <string name="btn_yes">YES, DELETE</string>
     <string name="btn_no">CANCEL</string>
+    <string name="menu_weather_drone">Drone Flight Weather</string>
+    <string name="msg_weather_accuracy_tip">Weather forecast information is calculated based on your location, it may sometimes vary slightly.</string>
 </resources>

@@ -25,7 +25,7 @@
             <ImageView
                 android:layout_width="32dp"
                 android:layout_height="32dp"
-                android:src="@drawable/ic_location_pin"
+                android:src="@drawable/ic_map_pin"
                 android:padding="4dp"
                 android:background="@drawable/bg_spinner_with_arrow"
                 android:backgroundTint="@color/bg_surface_secondary"/>

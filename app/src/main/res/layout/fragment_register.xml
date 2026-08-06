@@ -91,7 +91,7 @@
             android:layout_width="36dp"
             android:layout_height="36dp"
             android:padding="8dp"
-            android:src="@drawable/ic_toast_close"
+            android:src="@drawable/ic_close"
             app:tint="@color/text_secondary"
             android:visibility="gone"
             android:layout_marginStart="8dp"

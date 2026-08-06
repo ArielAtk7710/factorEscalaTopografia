@@ -66,10 +66,28 @@
                 app:cardCornerRadius="12dp"
                 app:cardElevation="0dp">
 
-                <org.osmdroid.views.MapView
-                    android:id="@+id/mini_map_view"
+                <FrameLayout
                     android:layout_width="match_parent"
-                    android:layout_height="match_parent" />
+                    android:layout_height="match_parent">
+
+                    <org.osmdroid.views.MapView
+                        android:id="@+id/mini_map_view"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent" />
+
+                    <com.google.android.material.floatingactionbutton.FloatingActionButton
+                        android:id="@+id/fab_mini_center_location"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="bottom|end"
+                        android:layout_margin="12dp"
+                        android:src="@drawable/ic_map_pin"
+                        app:backgroundTint="@color/accent_orange"
+                        app:fabSize="mini"
+                        app:tint="@android:color/white"
+                        android:contentDescription="Centrar Ubicación" />
+
+                </FrameLayout>
             </androidx.cardview.widget.CardView>
 
             <!-- 2. BARRA DE ESTADO GPS (PRECISIÓN Y SATÉLITES) -->

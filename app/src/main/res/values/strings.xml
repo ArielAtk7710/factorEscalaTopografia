@@ -5,6 +5,7 @@
     <string name="tab_text_1">Automático</string>
     <string name="tab_text_2">Manual</string>
     <string name="tab_text_3">Registro</string>
+    <string name="tab_text_map">Mapa</string>
     <string name="section_format">Sección %1$d</string>
 
     <!-- General Labels -->
@@ -152,6 +153,11 @@
     <string name="safety_msg_rain_detected">Alerta Roja: Lluvia detectada (%1$.1f mm). Riesgo de cortocircuito.</string>
     <string name="safety_msg_rain_prob_mid">Alerta Amarilla: Riesgo de lluvia (%1$d%%). Vuelo bajo supervisión.</string>
     <string name="label_wind_120_v">Viento (120m):</string>
+    <string name="label_wind_sustained">Viento Sostenido:</string>
+    <string name="label_wind_direction">Dir. Viento:</string>
+    <string name="label_apparent_temp">Sensación Térmica:</string>
+    <string name="label_cloud_cover">Nubosidad:</string>
+    <string name="label_visibility">Visibilidad:</string>
     <string name="label_gusts_max">Ráfagas Max:</string>
     <string name="label_rain_prob_v">Prob. Lluvia:</string>
     <string name="label_rain_actual">Lluvia Actual:</string>
@@ -167,6 +173,9 @@
     <string name="btn_refresh_data">ACTUALIZAR DATOS</string>
     <string name="label_registered_format">Registrado: %1$s</string>
     <string name="label_ref_format">Ref: %1$s</string>
+    <string name="label_thermal_comfort">CONFORT TÉRMICO</string>
+    <string name="label_wind_precip">VIENTOS Y PRECIPITACIÓN</string>
+    <string name="label_electronic_safety">SEGURIDAD ELECTRÓNICA / GNSS</string>
     <string name="geoid_model_egm96">EGM96 (Global)</string>
     <string name="label_no_observations">Ninguna Observacion</string>
     <string name="label_no_obs_list">Sin observaciones.</string>
@@ -246,9 +255,18 @@
     <string name="label_info">Información:</string>
 
     <!-- Dialogs -->
+    <!-- Map Help Strings -->
+    <string name="title_map_download_guide">GUÍA DE OBTENCIÓN DE MAPAS</string>
+    <string name="msg_map_download_instr">1. Descarga el archivo: Puedes obtener extractos de OpenStreetMap (formatos .sqlite o .mbtiles) desde fuentes como BBBike o usar herramientas como Mobile Atlas Creator (MOBAC).\n\n2. Ruta de instalación: Debes copiar el archivo a esta ruta exacta: Almacenamiento Interno > Android > data > bo.com.factorcombinadotopo > files > osmdroid\n\n3. Una vez copiado, la app habilitará los modos Híbrido y Offline.</string>
+
+    <string name="title_map_import_guide">GUÍA DE IMPORTACIÓN</string>
+    <string name="msg_map_import_instr">1. Presiona el botón "IMPORTAR MAPA".\n\n2. Selecciona tu archivo de mapa (.sqlite o .mbtiles) desde tu explorador de archivos.\n\n3. Espera el mensaje de confirmación.\n\n4. La app copiará el archivo internamente por ti.</string>
+
     <string name="dialog_delete_title">Confirmar Eliminación</string>
     <string name="dialog_delete_msg">¿Está seguro de que desea eliminar los registros seleccionados? Esta acción no se puede deshacer.</string>
     <string name="dialog_delete_msg_single">¿Está seguro de que desea eliminar este registro?</string>
     <string name="btn_yes">SÍ, BORRAR</string>
     <string name="btn_no">CANCELAR</string>
+    <string name="menu_weather_drone">Clima Vuelo Dron</string>
+    <string name="msg_weather_accuracy_tip">La informacion del pronostico del clima se calcula en base a su ubicacion, aveces puede variar un poco.</string>
 </resources>

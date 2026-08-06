@@ -289,6 +289,13 @@ public class RegisterFragment extends Fragment {
     private String buildPuntoInfoString(Punto p) {
         if (!isAdded()) return "";
         StringBuilder sb = new StringBuilder();
+        
+        // Re-formatear datos numéricos para el reporte
+        double fcVal = Double.parseDouble(p.fc.replace(",", "."));
+        double presVal = Double.parseDouble(p.presion.replace(",", "."));
+        String formattedFc = GeoUtils.formatFactorWithPpm(fcVal);
+        String formattedPres = GeoUtils.formatPressureDual(presVal);
+
         sb.append(getString(R.string.label_identification)).append(":\n");
         sb.append("  ").append(getString(R.string.label_point)).append(": ").append(p.nombre).append("\n");
         sb.append("  ").append(getString(R.string.label_reg_date)).append(": ").append(p.fecha).append("\n");
@@ -309,10 +316,10 @@ public class RegisterFragment extends Fragment {
         sb.append(getString(R.string.label_geometric_factors_v)).append(":\n");
         sb.append("  ").append(getString(R.string.label_scale_factor_k)).append(": ").append(p.fe).append("\n");
         sb.append("  ").append(getString(R.string.label_elev_factor_ha)).append(": ").append(p.fa).append("\n");
-        sb.append("  ").append(getString(R.string.label_comb_factor_k)).append(": ").append(p.fc).append("\n\n");
+        sb.append("  ").append(getString(R.string.label_comb_factor_k)).append(": ").append(formattedFc).append("\n\n");
 
         sb.append(getString(R.string.label_atm_data)).append(":\n");
-        sb.append("  ").append(getString(R.string.label_pressure)).append(": ").append(p.presion).append("\n");
+        sb.append("  ").append(getString(R.string.label_pressure)).append(": ").append(formattedPres).append("\n");
         return sb.toString();
     }
 
@@ -322,7 +329,17 @@ public class RegisterFragment extends Fragment {
         sb.append("  ").append(getString(R.string.label_reg_date)).append(": ").append(e.fecha).append("\n");
         sb.append("  ").append(getString(R.string.label_station)).append(": ").append(e.estacion).append(" (").append(getString(R.string.label_instrument)).append(": ").append(e.altIns).append(getString(R.string.unit_meter)).append(") -> AUX: ").append(e.puntoAux).append("\n");
         sb.append("  ").append(getString(R.string.label_ref_format, e.puntoRef)).append(" (").append(getString(R.string.label_prisma)).append(": ").append(e.altPri).append(getString(R.string.unit_meter)).append(") | ").append(e.tipoReg).append("\n");
-        sb.append("  COORD: E=").append(e.este).append(" | N=").append(e.norte).append(" | Z=").append(e.cota).append("\n");
+        
+        // Coordenadas con formato profesional US
+        try {
+            double este = Double.parseDouble(e.este.replace(",", "."));
+            double norte = Double.parseDouble(e.norte.replace(",", "."));
+            double cota = Double.parseDouble(e.cota.replace(",", "."));
+            sb.append("  COORD: E=").append(GeoUtils.formatCoord(este)).append(" | N=").append(GeoUtils.formatCoord(norte)).append(" | Z=").append(GeoUtils.formatCoord(cota)).append("\n");
+        } catch (Exception ex) {
+            sb.append("  COORD: E=").append(e.este).append(" | N=").append(e.norte).append(" | Z=").append(e.cota).append("\n");
+        }
+
         sb.append("  ").append(getString(R.string.label_observations)).append(": ").append((e.obs == null || e.obs.isEmpty()) ? getString(R.string.label_no_observations) : e.obs);
         return sb.toString();
     }
@@ -349,9 +366,21 @@ public class RegisterFragment extends Fragment {
             Punto p = list.get(pos);
             h.txtNombre.setText(p.nombre); h.txtResumenUtm.setText("E: " + p.este + " | N: " + p.norte);
             h.txtDetLat.setText(p.latitud); h.txtDetLon.setText(p.longitud); h.txtDetAlt.setText(p.altura);
-            h.txtDetAltOrto.setText(p.altOrto); h.txtDetPresion.setText(p.presion);
+            h.txtDetAltOrto.setText(p.altOrto);
+            
+            // Re-formatear para UI (Datos limpios en DB -> Etiquetas en UI)
+            try {
+                double fcVal = Double.parseDouble(p.fc.replace(",", "."));
+                double presVal = Double.parseDouble(p.presion.replace(",", "."));
+                h.txtDetFc.setText(GeoUtils.formatFactorWithPpm(fcVal));
+                h.txtDetPresion.setText(GeoUtils.formatPressureDual(presVal));
+            } catch (Exception e) {
+                h.txtDetFc.setText(p.fc);
+                h.txtDetPresion.setText(p.presion);
+            }
+
             h.txtDetSis.setText("WGS-84 " + p.zona + " " + p.hemisferio);
-            h.txtDetFe.setText(p.fe); h.txtDetFa.setText(p.fa); h.txtDetFc.setText(p.fc);
+            h.txtDetFe.setText(p.fe); h.txtDetFa.setText(p.fa);
             h.txtFechaFull.setText(getString(R.string.label_registered_format, p.fecha));
             h.txtDetNotas.setText((p.notas != null && !p.notas.isEmpty()) ? p.notas : getString(R.string.label_no_obs_list));
             h.cbSelect.setVisibility(isSelectionMode ? View.VISIBLE : View.GONE);

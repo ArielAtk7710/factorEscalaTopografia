@@ -55,4 +55,41 @@ public class GeoUtils {
     public static double getCentralMeridian(int zone) {
         return (zone * 6) - 183;
     }
+
+    /**
+     * Formatea un factor y su equivalente en PPM (Partes por Millón).
+     * Asegura el uso de punto decimal para compatibilidad con ingeniería.
+     */
+    public static String formatFactorWithPpm(double factor) {
+        return formatFactor(factor) + " (" + Math.round((factor - 1.0) * 1000000.0) + " PPM)";
+    }
+
+    /**
+     * Formatea la presión en formato dual para visualización y reportes.
+     */
+    public static String formatPressureDual(double mmHg) {
+        double hPa = mmHg * (1013.25 / 759.99); // Relación estándar basada en IGMConstants
+        return String.format(java.util.Locale.US, "%.3f mmHg | %.3f hPa", mmHg, hPa);
+    }
+
+    /**
+     * Formatea una coordenada UTM o Altura (3 decimales).
+     */
+    public static String formatCoord(double value) {
+        return String.format(java.util.Locale.US, "%.3f", value);
+    }
+
+    /**
+     * Formatea un factor topográfico (9 decimales).
+     */
+    public static String formatFactor(double value) {
+        return String.format(java.util.Locale.US, "%.9f", value);
+    }
+
+    /**
+     * Formatea una coordenada geográfica en grados decimales (6 decimales).
+     */
+    public static String formatLatLon(double value) {
+        return String.format(java.util.Locale.US, "%.6f", value);
+    }
 }

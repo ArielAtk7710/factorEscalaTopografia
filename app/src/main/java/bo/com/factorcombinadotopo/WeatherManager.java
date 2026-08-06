@@ -1,5 +1,6 @@
 package bo.com.factorcombinadotopo;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -19,17 +20,35 @@ public class WeatherManager {
 
     public enum SafetyLevel { GREEN, YELLOW, RED }
 
+    public static class HourlyStatus {
+        public String time;
+        public double wind;
+        public double gusts;
+        public int rainProb;
+        public int cloudCover;
+        public int weatherCode;
+        public SafetyLevel level;
+    }
+
     public static class SafetyStatus {
         public SafetyLevel level;
         public int messageResId;
-        public Object messageArg; // Valor dinámico (km/h, %, mm)
+        public Object messageArg; 
         public double wind120;
+        public double windSustained;
+        public int windDirection;
         public double gusts;
         public double kp;
         public double rain;
         public double temperature;
+        public double apparentTemperature;
+        public int cloudCover;
+        public double visibility;
         public int rainProbability;
         public int forecastDescResId;
+        
+        public String recommendation;
+        public List<HourlyStatus> hourlyList = new ArrayList<>();
 
         public SafetyStatus(SafetyLevel level, int messageResId) {
             this.level = level;
@@ -65,18 +84,15 @@ public class WeatherManager {
         void onError(String error);
     }
 
-    /**
-     * Ejecuta las peticiones de clima e índice Kp en paralelo para reducir latencia.
-     */
     public static void checkFlightSafety(double lat, double lon, WeatherCallback callback) {
         AtomicReference<WeatherResponse> weatherRef = new AtomicReference<>(null);
         AtomicReference<Double> kpRef = new AtomicReference<>(null);
         AtomicBoolean weatherFailed = new AtomicBoolean(false);
 
-        String currentParams = "wind_speed_10m,wind_speed_80m,wind_speed_120m,wind_direction_120m,wind_gusts_10m,precipitation,temperature_2m,weather_code";
-        String hourlyParams = "precipitation_probability";
+        // Parametros ampliados para Dron incluyendo Horario
+        String currentParams = "wind_speed_10m,wind_speed_80m,wind_speed_120m,wind_direction_10m,wind_gusts_10m,precipitation,temperature_2m,apparent_temperature,cloud_cover,visibility,weather_code";
+        String hourlyParams = "temperature_2m,precipitation_probability,weather_code,wind_speed_10m,wind_gusts_10m,cloud_cover";
 
-        // 1. Lanzar petición de Clima
         getApiService().getDroneWeather(lat, lon, currentParams, hourlyParams, "ecmwf_ifs025")
                 .enqueue(new Callback<WeatherResponse>() {
             @Override
@@ -97,7 +113,6 @@ public class WeatherManager {
             }
         });
 
-        // 2. Lanzar petición de Kp Index simultáneamente
         getApiService().getKpIndex("https://services.swpc.noaa.gov/products/noaa-planetary-k-index.json")
                 .enqueue(new Callback<List<List<String>>>() {
             @Override
@@ -115,7 +130,7 @@ public class WeatherManager {
 
             @Override
             public void onFailure(Call<List<List<String>>> call, Throwable t) {
-                kpRef.set(-1.0); // No bloqueamos por Kp
+                kpRef.set(-1.0);
                 if (!weatherFailed.get()) checkCompletion(weatherRef, kpRef, callback);
             }
         });
@@ -140,44 +155,104 @@ public class WeatherManager {
             rainProb = weather.hourly.precipitationProbability.get(0);
         }
 
-        // Reglas de Negocio
-        if (cur.windSpeed120m > 30) {
+        // Lógica de Seguridad Senior para RPAS/Dron
+        if (cur.windSpeed120m > 35) {
             level = SafetyLevel.RED;
             msgRes = R.string.safety_msg_wind_120;
             arg = cur.windSpeed120m;
-        } else if (cur.windGusts10m > 40) {
+        } else if (cur.windGusts10m > 45) {
             level = SafetyLevel.RED;
             msgRes = R.string.safety_msg_gusts;
             arg = cur.windGusts10m;
-        } else if (rainProb > 60) {
+        } else if (rainProb > 20) {
             level = SafetyLevel.RED;
             msgRes = R.string.safety_msg_rain_prob_high;
             arg = rainProb;
+        } else if (cur.windSpeed120m > 25 || cur.windGusts10m > 35 || rainProb > 10) {
+            level = SafetyLevel.YELLOW;
+            msgRes = R.string.msg_weather_caution;
         } else if (kp >= 5) {
             level = SafetyLevel.YELLOW;
             msgRes = R.string.safety_msg_kp_high;
             arg = kp;
-        } else if (cur.precipitation > 0.5) {
-            level = SafetyLevel.RED;
-            msgRes = R.string.safety_msg_rain_detected;
-            arg = cur.precipitation;
-        } else if (cur.precipitation > 0.1 || rainProb > 30) {
-            level = SafetyLevel.YELLOW;
-            msgRes = R.string.safety_msg_rain_prob_mid;
-            arg = rainProb;
         }
 
         SafetyStatus status = new SafetyStatus(level, msgRes);
         status.messageArg = arg;
         status.wind120 = cur.windSpeed120m;
+        status.windSustained = cur.windSpeed10m;
+        status.windDirection = cur.windDirection10m;
         status.gusts = cur.windGusts10m;
         status.kp = kp;
         status.rain = cur.precipitation;
         status.temperature = cur.temperature2m;
+        status.apparentTemperature = cur.apparentTemperature;
+        status.cloudCover = cur.cloudCover;
+        status.visibility = cur.visibility;
         status.rainProbability = rainProb;
         status.forecastDescResId = getWeatherDescRes(cur.weatherCode);
         
+        // Procesar Horarios
+        if (weather.hourly != null && weather.hourly.time != null) {
+            int startIdx = 0;
+            // Opcional: Filtrar para mostrar solo las próximas 24 horas desde la actual
+            for (int i = 0; i < Math.min(24, weather.hourly.time.size()); i++) {
+                HourlyStatus hs = new HourlyStatus();
+                String fullTime = weather.hourly.time.get(i);
+                hs.time = fullTime.substring(fullTime.length() - 5); // Tomar solo HH:mm
+                hs.wind = weather.hourly.windSpeed10m.get(i);
+                hs.gusts = weather.hourly.windGusts10m.get(i);
+                hs.rainProb = weather.hourly.precipitationProbability.get(i);
+                hs.cloudCover = weather.hourly.cloudCover.get(i);
+                hs.weatherCode = weather.hourly.weatherCode.get(i);
+                
+                // Evaluar nivel horario
+                if (hs.wind > 35 || hs.gusts > 45 || hs.rainProb > 30) hs.level = SafetyLevel.RED;
+                else if (hs.wind > 25 || hs.rainProb > 10) hs.level = SafetyLevel.YELLOW;
+                else hs.level = SafetyLevel.GREEN;
+                
+                status.hourlyList.add(hs);
+            }
+        }
+        
+        status.recommendation = generateRecommendation(status.hourlyList);
+        
         callback.onSuccess(status);
+    }
+
+    private static String generateRecommendation(List<HourlyStatus> list) {
+        if (list.isEmpty()) return "";
+        
+        int bestStart = -1;
+        int count = 0;
+        int maxWindow = 0;
+        int finalStart = -1;
+        
+        for (int i = 0; i < list.size(); i++) {
+            if (list.get(i).level == SafetyLevel.GREEN) {
+                if (bestStart == -1) bestStart = i;
+                count++;
+            } else {
+                if (count > maxWindow) {
+                    maxWindow = count;
+                    finalStart = bestStart;
+                }
+                bestStart = -1;
+                count = 0;
+            }
+        }
+        if (count > maxWindow) {
+            maxWindow = count;
+            finalStart = bestStart;
+        }
+
+        if (finalStart != -1 && maxWindow >= 2) {
+            return "Ventana óptima detectada entre las " + list.get(finalStart).time + 
+                   " y las " + list.get(finalStart + maxWindow - 1).time + 
+                   " con vientos favorables.";
+        } else {
+            return "Condiciones variables el resto del día. Se recomienda monitorear ráfagas antes de despegar.";
+        }
     }
 
     private static int getWeatherDescRes(int code) {

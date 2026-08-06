@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<paths>
+    <!-- Mapeo para la carpeta externa privada de la app (Donde están los mapas) -->
+    <external-path name="my_maps" path="Android/data/bo.com.factorcombinadotopo/files/Mapas" />
+    <external-files-path name="app_maps" path="Mapas" />
+</paths>

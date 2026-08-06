@@ -7,188 +7,194 @@
     android:background="#000000"
     tools:context=".CompassFragment">
 
-    <!-- HEADER: UBICACIÓN MINIMALISTA -->
-    <LinearLayout
-        android:id="@+id/layout_location_header"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:gravity="center"
-        android:layout_marginTop="20dp"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent">
-
-        <TextView
-            android:id="@+id/txt_comp_location"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Ubicación Actual"
-            android:textColor="#FFFFFF"
-            android:textSize="12sp"
-            android:textStyle="bold"
-            android:alpha="0.8" />
-
-    </LinearLayout>
-
-    <!-- LECTURA PRINCIPAL -->
-    <LinearLayout
-        android:id="@+id/layout_azimut_display"
+    <ScrollView
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:gravity="center"
-        android:layout_marginTop="8dp"
-        app:layout_constraintTop_toBottomOf="@id/layout_location_header">
+        android:layout_height="match_parent"
+        android:fillViewport="true"
+        android:scrollbars="vertical"
+        android:clipToPadding="false"
+        android:paddingBottom="100dp">
 
-        <TextView
-            android:id="@+id/txt_compass_pro_azimut"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="0° N"
-            android:textColor="#FFFFFF"
-            android:textSize="46sp"
-            android:fontFamily="sans-serif-thin" />
-
-        <TextView
-            android:id="@+id/txt_comp_azimut_dms"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="AZIMUT: 0° 00' 00&quot;"
-            android:textColor="@color/accent_orange"
-            android:textSize="10sp"
-            android:textStyle="bold"
-            android:letterSpacing="0.05" />
-    </LinearLayout>
-
-    <!-- INSTRUMENTO CENTRAL (MÁS PEQUEÑO) -->
-    <FrameLayout
-        android:id="@+id/frame_instrument"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        app:layout_constraintDimensionRatio="1:1"
-        android:layout_marginHorizontal="85dp"
-        android:layout_marginVertical="10dp"
-        app:layout_constraintTop_toBottomOf="@id/layout_azimut_display"
-        app:layout_constraintBottom_toTopOf="@+id/layout_technical_panel"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent">
-
-        <!-- FLECHA INDICADORA SUPERIOR (ESTÁTICA) -->
-        <ImageView
-            android:layout_width="24dp"
-            android:layout_height="24dp"
-            android:layout_gravity="top|center_horizontal"
-            android:src="@drawable/ic_simple_arrow"
-            android:rotation="180"
-            app:tint="#F97316"
-            android:translationY="-10dp" />
-
-        <!-- Dial -->
-        <ImageView
-            android:id="@+id/img_compass_dial"
+        <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:src="@drawable/ic_compass_pro_dial"
-            android:padding="2dp"/>
+            android:layout_height="wrap_content">
 
-        <!-- AGUJA / FLECHA CENTRAL (ROTATIVA) -->
-        <ImageView
-            android:id="@+id/img_compass_needle"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:src="@drawable/ic_compass_needle"
-            android:padding="45dp" />
+            <!-- HEADER: UBICACIÓN MINIMALISTA -->
+            <LinearLayout
+                android:id="@+id/layout_location_header"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center"
+                android:layout_marginTop="20dp"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent">
 
-        <!-- Nivel -->
-        <ImageView
-            android:layout_width="56dp"
-            android:layout_height="56dp"
-            android:layout_gravity="center"
-            android:src="@drawable/ic_level_circle"
-            app:tint="#223B82F6" />
+                <TextView
+                    android:id="@+id/txt_comp_location"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Ubicación Actual"
+                    android:textColor="#FFFFFF"
+                    android:textSize="12sp"
+                    android:textStyle="bold"
+                    android:alpha="0.8" />
 
-        <ImageView
-            android:id="@+id/img_level_bubble"
-            android:layout_width="18dp"
-            android:layout_height="18dp"
-            android:layout_gravity="center"
-            android:src="@drawable/ic_level_bubble" />
-
-        <!-- Crosshair Sutil (AZUL) -->
-        <View
-            android:layout_width="1dp"
-            android:layout_height="40dp"
-            android:layout_gravity="center"
-            android:background="#803B82F6" />
-        <View
-            android:layout_width="40dp"
-            android:layout_height="1dp"
-            android:layout_gravity="center"
-            android:background="#803B82F6" />
-
-    </FrameLayout>
-
-    <!-- PANEL TÉCNICO MINIMALISTA (Paleta Proyecto) -->
-    <LinearLayout
-        android:id="@+id/layout_technical_panel"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:background="#0A0F1E"
-        android:padding="16dp"
-        app:layout_constraintBottom_toBottomOf="parent">
-
-        <GridLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:columnCount="2"
-            android:alignmentMode="alignMargins"
-            android:useDefaultMargins="false">
-
-            <!-- E | N -->
-            <LinearLayout android:orientation="vertical" android:layout_columnWeight="1" android:layout_marginBottom="12dp">
-                <TextView android:text="@string/label_este_utm" android:textSize="8sp" android:textColor="@color/text_secondary" android:textStyle="bold" android:layout_width="wrap_content" android:layout_height="wrap_content"/>
-                <TextView android:id="@+id/txt_comp_este" android:text="0.00 m" android:textColor="@color/accent_orange" android:textSize="13sp" android:textStyle="bold" android:layout_width="wrap_content" android:layout_height="wrap_content"/>
             </LinearLayout>
 
-            <LinearLayout android:orientation="vertical" android:layout_columnWeight="1" android:layout_marginBottom="12dp">
-                <TextView android:text="@string/label_norte_utm" android:textSize="8sp" android:textColor="@color/text_secondary" android:textStyle="bold" android:layout_width="wrap_content" android:layout_height="wrap_content"/>
-                <TextView android:id="@+id/txt_comp_norte" android:text="0.00 m" android:textColor="@color/accent_orange" android:textSize="13sp" android:textStyle="bold" android:layout_width="wrap_content" android:layout_height="wrap_content"/>
+            <!-- LECTURA PRINCIPAL -->
+            <LinearLayout
+                android:id="@+id/layout_azimut_display"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:gravity="center"
+                android:layout_marginTop="8dp"
+                app:layout_constraintTop_toBottomOf="@id/layout_location_header">
+
+                <TextView
+                    android:id="@+id/txt_compass_pro_azimut"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="0° N"
+                    android:textColor="#FFFFFF"
+                    android:textSize="46sp"
+                    android:fontFamily="sans-serif-thin" />
+
+                <TextView
+                    android:id="@+id/txt_comp_azimut_dms"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="AZIMUT: 0° 00' 00&quot;"
+                    android:textColor="@color/accent_orange"
+                    android:textSize="10sp"
+                    android:textStyle="bold"
+                    android:letterSpacing="0.05" />
             </LinearLayout>
 
-            <!-- Z | FC -->
-            <LinearLayout android:orientation="vertical" android:layout_columnWeight="1" android:layout_marginBottom="12dp">
-                <TextView android:text="@string/label_alt_cota" android:textSize="8sp" android:textColor="@color/text_secondary" android:textStyle="bold" android:layout_width="wrap_content" android:layout_height="wrap_content"/>
-                <TextView android:id="@+id/txt_comp_alt" android:text="0.00 m" android:textColor="@color/accent_orange" android:textSize="13sp" android:textStyle="bold" android:layout_width="wrap_content" android:layout_height="wrap_content"/>
+            <!-- INSTRUMENTO CENTRAL (MÁS PEQUEÑO) -->
+            <FrameLayout
+                android:id="@+id/frame_instrument"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                app:layout_constraintDimensionRatio="1:1"
+                android:layout_marginHorizontal="85dp"
+                android:layout_marginVertical="10dp"
+                app:layout_constraintTop_toBottomOf="@id/layout_azimut_display"
+                app:layout_constraintBottom_toTopOf="@+id/layout_technical_panel"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent">
+
+                <!-- FLECHA INDICADORA SUPERIOR (ESTÁTICA) -->
+                <ImageView
+                    android:layout_width="28dp"
+                    android:layout_height="28dp"
+                    android:layout_gravity="top|center_horizontal"
+                    android:src="@drawable/ic_simple_arrow"
+                    android:rotation="180"
+                    app:tint="#F97316"
+                    android:translationY="-10dp" />
+
+                <!-- Dial -->
+                <ImageView
+                    android:id="@+id/img_compass_dial"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:src="@drawable/ic_compass_pro_dial"
+                    android:padding="2dp"/>
+
+                <!-- AGUJA / FLECHA CENTRAL (ROTATIVA) -->
+                <ImageView
+                    android:id="@+id/img_compass_needle"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:src="@drawable/ic_compass_needle"
+                    android:padding="45dp" />
+
+                <!-- Nivel -->
+                <ImageView
+                    android:layout_width="56dp"
+                    android:layout_height="56dp"
+                    android:layout_gravity="center"
+                    android:src="@drawable/ic_level_circle"
+                    app:tint="#223B82F6" />
+
+                <ImageView
+                    android:id="@+id/img_level_bubble"
+                    android:layout_width="18dp"
+                    android:layout_height="18dp"
+                    android:layout_gravity="center"
+                    android:src="@drawable/ic_level_bubble" />
+
+                <!-- Crosshair Sutil (AZUL) -->
+                <View
+                    android:layout_width="1dp"
+                    android:layout_height="40dp"
+                    android:layout_gravity="center"
+                    android:background="#803B82F6" />
+                <View
+                    android:layout_width="40dp"
+                    android:layout_height="1dp"
+                    android:layout_gravity="center"
+                    android:background="#803B82F6" />
+
+            </FrameLayout>
+
+            <!-- PANEL TÉCNICO MINIMALISTA (Paleta Proyecto) -->
+            <LinearLayout
+                android:id="@+id/layout_technical_panel"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:background="#0A0F1E"
+                android:padding="16dp"
+                app:layout_constraintBottom_toBottomOf="parent">
+
+                <GridLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:columnCount="2"
+                    android:alignmentMode="alignMargins"
+                    android:useDefaultMargins="false">
+
+                    <!-- E | N -->
+                    <LinearLayout android:orientation="vertical" android:layout_columnWeight="1" android:layout_marginBottom="12dp">
+                        <TextView android:text="@string/label_este_utm" android:textSize="8sp" android:textColor="@color/text_secondary" android:textStyle="bold" android:layout_width="wrap_content" android:layout_height="wrap_content"/>
+                        <TextView android:id="@+id/txt_comp_este" android:text="0.00 m" android:textColor="@color/accent_orange" android:textSize="13sp" android:textStyle="bold" android:layout_width="wrap_content" android:layout_height="wrap_content"/>
+                    </LinearLayout>
+
+                    <LinearLayout android:orientation="vertical" android:layout_columnWeight="1" android:layout_marginBottom="12dp">
+                        <TextView android:text="@string/label_norte_utm" android:textSize="8sp" android:textColor="@color/text_secondary" android:textStyle="bold" android:layout_width="wrap_content" android:layout_height="wrap_content"/>
+                        <TextView android:id="@+id/txt_comp_norte" android:text="0.00 m" android:textColor="@color/accent_orange" android:textSize="13sp" android:textStyle="bold" android:layout_width="wrap_content" android:layout_height="wrap_content"/>
+                    </LinearLayout>
+
+                    <!-- Z | Ref -->
+                    <LinearLayout android:orientation="vertical" android:layout_columnWeight="1" android:layout_marginBottom="12dp">
+                        <TextView android:text="@string/label_alt_cota" android:textSize="8sp" android:textColor="@color/text_secondary" android:textStyle="bold" android:layout_width="wrap_content" android:layout_height="wrap_content"/>
+                        <TextView android:id="@+id/txt_comp_alt" android:text="0.00 m" android:textColor="@color/accent_orange" android:textSize="13sp" android:textStyle="bold" android:layout_width="wrap_content" android:layout_height="wrap_content"/>
+                    </LinearLayout>
+
+                    <LinearLayout android:orientation="vertical" android:layout_columnWeight="1" android:layout_marginBottom="12dp">
+                        <TextView android:text="@string/label_zone_hem" android:textSize="8sp" android:textColor="@color/text_secondary" android:textStyle="bold" android:layout_width="wrap_content" android:layout_height="wrap_content"/>
+                        <TextView android:id="@+id/txt_comp_ref" android:text="--- (WGS84)" android:textColor="@color/accent_orange" android:textSize="13sp" android:textStyle="bold" android:layout_width="wrap_content" android:layout_height="wrap_content"/>
+                    </LinearLayout>
+
+                    </GridLayout>
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="MANTENER DISPOSITIVO HORIZONTAL PARA MÁXIMA PRECISIÓN"
+                    android:textColor="#374151"
+                    android:textSize="7sp"
+                    android:gravity="center"
+                    android:layout_marginTop="10dp"
+                    android:textStyle="bold" />
             </LinearLayout>
 
-            <LinearLayout android:orientation="vertical" android:layout_columnWeight="1" android:layout_marginBottom="12dp">
-                <TextView android:text="@string/label_comb_factor" android:textSize="8sp" android:textColor="@color/text_secondary" android:textStyle="bold" android:layout_width="wrap_content" android:layout_height="wrap_content"/>
-                <TextView android:id="@+id/txt_comp_fc" android:text="0.00000000" android:textColor="@color/accent_orange" android:textSize="13sp" android:textStyle="bold" android:layout_width="wrap_content" android:layout_height="wrap_content"/>
-            </LinearLayout>
+        </androidx.constraintlayout.widget.ConstraintLayout>
 
-            <!-- Presion | Ref -->
-            <LinearLayout android:orientation="vertical" android:layout_columnWeight="1">
-                <TextView android:text="@string/label_press_atm" android:textSize="8sp" android:textColor="@color/text_secondary" android:textStyle="bold" android:layout_width="wrap_content" android:layout_height="wrap_content"/>
-                <TextView android:id="@+id/txt_comp_presion" android:text="0.0 hPa" android:textColor="@color/accent_orange" android:textSize="13sp" android:textStyle="bold" android:layout_width="wrap_content" android:layout_height="wrap_content"/>
-            </LinearLayout>
-
-            <LinearLayout android:orientation="vertical" android:layout_columnWeight="1">
-                <TextView android:text="@string/label_zone_hem" android:textSize="8sp" android:textColor="@color/text_secondary" android:textStyle="bold" android:layout_width="wrap_content" android:layout_height="wrap_content"/>
-                <TextView android:id="@+id/txt_comp_ref" android:text="--- (WGS84)" android:textColor="@color/accent_orange" android:textSize="13sp" android:textStyle="bold" android:layout_width="wrap_content" android:layout_height="wrap_content"/>
-            </LinearLayout>
-        </GridLayout>
-
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="MANTENER DISPOSITIVO HORIZONTAL PARA MÁXIMA PRECISIÓN"
-            android:textColor="#374151"
-            android:textSize="7sp"
-            android:gravity="center"
-            android:layout_marginTop="16dp"
-            android:textStyle="bold" />
-    </LinearLayout>
+    </ScrollView>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

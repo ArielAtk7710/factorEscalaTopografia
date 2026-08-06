@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="40dp"
+    android:height="40dp"
+    android:viewportWidth="40"
+    android:viewportHeight="40">
+
+    <!-- Outlined Map Trapezoid (Bottom) -->
+    <path
+        android:pathData="M34,36 H6 L10,26 H30 L34,36 Z"
+        android:strokeColor="#FFFFFF"
+        android:strokeWidth="2.5"
+        android:fillColor="#00000000"
+        android:strokeLineJoin="round" />
+
+    <!-- Outlined Map Pin (Top) -->
+    <path
+        android:pathData="M20,32 C20,32 30,22 30,14 C30,8.5 25.5,4 20,4 C14.5,4 10,8.5 10,14 C10,22 20,32 20,32 Z"
+        android:strokeColor="#FFFFFF"
+        android:strokeWidth="2.5"
+        android:fillColor="#00000000"
+        android:strokeLineJoin="round" />
+
+    <!-- Inner Circle for Pin Head -->
+    <path
+        android:pathData="M20,14 m-5,0 a5,5 0 1,1 10,0 a5,5 0 1,1 -10,0"
+        android:strokeColor="#FFFFFF"
+        android:strokeWidth="2.5"
+        android:fillColor="#00000000" />
+
+</vector>

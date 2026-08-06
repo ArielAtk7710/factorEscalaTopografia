@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="40dp"
+    android:height="40dp"
+    android:viewportWidth="40"
+    android:viewportHeight="40">
+
+    <!-- Solid White Pin Body -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M20,2 C13.37,2 8,7.37 8,14 c0,9 12,22 12,22 s12,-13 12,-22 c0,-6.63 -5.37,-12 -12,-12 Z" />
+
+    <!-- Circle Hole (Using even-odd or a slightly different color to simulate transparency over blue) -->
+    <!-- We'll use the accent_primary color for the circle background to match the button -->
+    <path
+        android:fillColor="#2563EB"
+        android:pathData="M20,14 m-7,0 a7,7 0 1,1 14,0 a7,7 0 1,1 -14,0" />
+
+    <!-- Stylish "i" Symbol inside the circle (White) -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M19,21 h2 v-7 h-2 v7 Z M19,11 h2 v-2 h-2 v2 Z M18,21 h4 v-1 h-4 v1 Z M18.5,14 h3 v-1 h-3 v1 Z" />
+
+</vector>

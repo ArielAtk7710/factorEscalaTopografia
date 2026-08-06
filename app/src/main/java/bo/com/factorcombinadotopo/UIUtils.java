@@ -63,6 +63,30 @@ public class UIUtils {
         return popupWindow;
     }
 
+    /**
+     * Crea una ventana flotante genérica con un título y un mensaje.
+     */
+    public static PopupWindow showPopupInfo(Context context, View parentView, String title, String message) {
+        View popupView = LayoutInflater.from(context).inflate(R.layout.layout_map_guide, null);
+        
+        TextView txtTitle = popupView.findViewById(R.id.txt_guide_title);
+        TextView txtContent = popupView.findViewById(R.id.txt_guide_content);
+        
+        txtTitle.setText(title);
+        txtContent.setText(message);
+
+        final PopupWindow popupWindow = new PopupWindow(popupView, 
+                ViewGroup.LayoutParams.WRAP_CONTENT, 
+                ViewGroup.LayoutParams.WRAP_CONTENT, true);
+
+        popupWindow.setElevation(30);
+        popupWindow.setAnimationStyle(android.R.style.Animation_Dialog);
+        
+        popupWindow.showAtLocation(parentView, Gravity.CENTER, 0, 0);
+
+        return popupWindow;
+    }
+
     public static void showConfirmDialog(Context context, int titleRes, int msgRes, Runnable onConfirm) {
         androidx.appcompat.app.AlertDialog.Builder builder = new androidx.appcompat.app.AlertDialog.Builder(context);
         View view = LayoutInflater.from(context).inflate(R.layout.dialog_custom_confirm, null);
