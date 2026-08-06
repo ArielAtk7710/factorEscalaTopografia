@@ -432,6 +432,13 @@ public class AutomaticFragment extends Fragment {
         startFusedLocationUpdates();
         if (switchMapa != null && switchMapa.isChecked()) {
             handleMapState(true);
+            if (miniMapManager != null) {
+                new Handler(Looper.getMainLooper()).postDelayed(() -> {
+                    if (isAdded() && miniMapManager != null) {
+                        miniMapManager.refreshMap();
+                    }
+                }, 300);
+            }
         }
     }
 
@@ -462,9 +469,7 @@ public class AutomaticFragment extends Fragment {
     @Override
     public void onDestroyView() {
         super.onDestroyView();
-        if (miniMapView != null) {
-            miniMapView.onDetach();
-        }
+        // Evitamos onDetach() para persistencia en ViewPager2
     }
 
     private void locationStart() {

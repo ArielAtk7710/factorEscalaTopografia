@@ -1,39 +1,36 @@
-# Plan de Implementación - Corrección de Inicialización de Mapa (Primer Inicio)
+# Plan de Implementación - Corrección de Persistencia en Vista de Mapa
 
-Este plan soluciona el problema donde el mapa aparece en blanco (rejilla gris) tras la primera instalación y requiere una configuración manual para activarse. El error se debe a que la configuración crítica de `osmdroid` (User-Agent y rutas) se está aplicando después de que la interfaz de usuario ya ha intentado cargar el mapa.
-
-## User Review Required
-
-> [!IMPORTANT]
-> **Cambio de Inicialización**: Moveré la configuración de `osmdroid` al inicio absoluto de `MainActivity.onCreate`. Esto garantiza que desde el primer segundo la app tenga "permiso" de los servidores de mapas para descargar datos.
+Este plan soluciona el problema donde el mapa aparece vacío (rejilla gris) o pierde la ubicación al regresar a la pestaña de **MAPA** desde otras secciones. El error se debe a una pérdida de estado en los hilos de renderizado de `osmdroid` durante el ciclo de vida del `ViewPager2`.
 
 ## Cambios Propuestos
 
-### 1. Inicialización Global y Temprana
+### 1. Robustez en el Ciclo de Vida del Fragmento
 
-#### [MODIFY] [MainActivity.java](file:///D:/Desarrollo-Software/Proyectos%20Android/factorEscala/app/src/main/java/bo/com/factorcombinadotopo/MainActivity.java)
-- **User-Agent Único**: Configurar el `User-Agent` con el nombre del paquete antes de `setContentView`. Sin esto, los servidores de OpenStreetMap bloquean la conexión por seguridad en el primer intento.
-- **Rutas Consolidadas**: Establecer las rutas de base y caché de forma global para que todos los fragmentos (Automático y Mapa) compartan la misma configuración.
-- **Modo Online por Defecto**: Asegurar que si no hay una preferencia guardada, se fuerce explícitamente el modo Online.
+#### [MODIFY] [MapFragment.java](file:///D:/Desarrollo-Software/Proyectos%20Android/factorEscala/app/src/main/java/bo/com/factorcombinadotopo/MapFragment.java)
+- **Re-suscripción de Ubicación**: Asegurar que en cada `onResume`, el `locationHelper` fuerce una actualización inmediata de la última posición conocida.
+- **Refresco de Capa**: Implementar una llamada al método `refresh()` del `MapManager` para forzar al motor del mapa a reconectarse a los servidores de mosaicos.
+- **Manejo de Memoria**: Ajustar la limpieza en `onDestroyView` para evitar que el `onDetach()` bloquee futuras inicializaciones.
 
-### 2. Sincronización del Motor de Mapas
+### 2. Optimización del Motor de Mapas
 
 #### [MODIFY] [MapManager.java](file:///D:/Desarrollo-Software/Proyectos%20Android/factorEscala/app/src/main/java/bo/com/factorcombinadotopo/MapManager.java)
-- **Consistencia de Modos**: Sincronizar los códigos de modo (0: Online, 1: Offline, 2: Híbrido) con los de `MainActivity`.
-- **Carga Inteligente**: Al iniciarse, el `MapManager` detectará si el modo es Híbrido y activará la capa satelital automáticamente, o mantendrá Mapnik si es Online.
+- **Método `refresh()`**: Crear un método que re-asigne la fuente de mosaicos (`TileSource`) actual. Esto es un "truco" técnico efectivo en `osmdroid` para reiniciar los hilos de descarga que se hayan quedado inactivos por el cambio de pestañas.
+- **Sincronización de Preferencias**: Asegurar que `initConfiguration` sea redundante y fuerce la política de conexión a datos cada vez que la vista se recrea.
+- **Protección de Overlays**: Verificar que el `locationOverlay` se re-vincule correctamente si la instancia del mapa ha cambiado.
 
-### 3. Actualización de Rutas en Ajustes
+### 3. Ajuste de Navegación Global
 
-#### [MODIFY] [dialog_settings.xml](file:///D:/Desarrollo-Software/Proyectos%20Android/factorEscala/app/src/main/res/layout/dialog_settings.xml)
-- Actualizar el texto informativo de la ruta para que coincida exactamente con la ubicación técnica: `Android > data > bo.com.factorcombinadotopo > files > osmdroid`.
+#### [MODIFY] [MainActivity.java](file:///D:/Desarrollo-Software/Proyectos%20Android/factorEscala/app/src/main/java/bo/com/factorcombinadotopo/MainActivity.java)
+- **ViewPager Offscreen Limit**: Configurar `mViewPager.setOffscreenPageLimit(1)`. Esto mantendrá la pestaña de Mapa "viva" en memoria aunque el usuario esté en la pestaña de al lado, evitando que Android destruya la vista del mapa constantemente y mejorando la velocidad de respuesta.
 
 ## Plan de Verificación
 
-### Prueba de "Primera Ejecución" (Simulada)
-1.  Limpiar datos de la aplicación o desinstalar/reinstalar.
-2.  Abrir la aplicación por primera vez.
-3.  Navegar directamente a la pestaña **MAPA**.
-4.  **Resultado esperado**: El mapa debe cargar las calles (Online) inmediatamente sin tocar los ajustes.
+### Prueba de Navegación
+1. Abrir la app e ir a **MAPA** (Verificar que carga).
+2. Ir a **AUTOMÁTICO** o **REGISTRO**.
+3. Regresar a **MAPA**.
+4. **Resultado esperado**: El mapa debe aparecer instantáneamente con los mismos niveles de zoom y la ubicación (punto azul) activa.
 
-### Prueba de Robustez
-- Verificar que los botones de **Importar** y **Eliminar** mapa en los ajustes siguen apuntando a la carpeta correcta y actualizan la interfaz al instante.
+### Verificación de Estabilidad
+- Cambiar de pestaña rápidamente varias veces y confirmar que el mapa no se queda bloqueado en blanco.
+- Verificar que el consumo de batería no se eleve (el mapa se pausará correctamente al salir de la app, pero se mantendrá listo al cambiar de pestañas).

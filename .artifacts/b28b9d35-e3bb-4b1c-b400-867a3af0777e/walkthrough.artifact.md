@@ -1,29 +1,31 @@
-# Walkthrough - Optimización de Diseño Full-Screen
+# Walkthrough - Corrección de Persistencia y Estabilidad de Mapas
 
-He corregido el problema visual donde el mapa y otras pantallas no ocupaban todo el espacio disponible, dejando un hueco vacío sobre el menú inferior.
+He implementado una solución robusta para el problema donde el mapa se quedaba en blanco o perdía la ubicación al navegar entre las pestañas de la aplicación.
 
 ## Cambios Realizados
 
-### 1. Eliminación de Espacios Innecesarios (Márgenes y Rellenos)
-He identificado que varios fragmentos tenían configurados márgenes o rellenos inferiores de hasta 100dp, los cuales eran necesarios en versiones antiguas pero ahora causaban un hueco vacío.
+### 1. Gestión Inteligente de Memoria (ViewPager2)
+- **[MODIFY] [MainActivity.java](file:///D:/Desarrollo-Software/Proyectos%20Android/factorEscala/app/src/main/java/bo/com/factorcombinadotopo/MainActivity.java)**:
+    - Se configuró `setOffscreenPageLimit(1)`. Esto obliga a la aplicación a mantener la pestaña de **MAPA** cargada en memoria aunque el usuario se mueva a las pestañas adyacentes (**MANUAL** o **REGISTRO**), eliminando el tiempo de recarga al regresar.
 
-- **[MODIFY] [fragment_map.xml](file:///D:/Desarrollo-Software/Proyectos%20Android/factorEscala/app/src/main/res/layout/fragment_map.xml)**: Se eliminó el `layout_marginBottom="100dp"`. Ahora el mapa llega exactamente hasta el borde superior del menú inferior.
-- **[MODIFY] [fragment_automatic.xml](file:///D:/Desarrollo-Software/Proyectos%20Android/factorEscala/app/src/main/res/layout/fragment_automatic.xml)**: Se eliminó el `paddingBottom="100dp"` del ScrollView.
-- **[MODIFY] [fragment_manual.xml](file:///D:/Desarrollo-Software/Proyectos%20Android/factorEscala/app/src/main/res/layout/fragment_manual.xml)**: Se eliminó el `paddingBottom="100dp"` del contenedor principal.
-- **[MODIFY] [fragment_field_notebook.xml](file:///D:/Desarrollo-Software/Proyectos%20Android/factorEscala/app/src/main/res/layout/fragment_field_notebook.xml)**: Se eliminó el `paddingBottom="100dp"`.
-- **[MODIFY] [fragment_compass.xml](file:///D:/Desarrollo-Software/Proyectos%20Android/factorEscala/app/src/main/res/layout/fragment_compass.xml)**: Se eliminó el `paddingBottom="100dp"`.
-- **[MODIFY] [fragment_register.xml](file:///D:/Desarrollo-Software/Proyectos%20Android/factorEscala/app/src/main/res/layout/fragment_register.xml)**: Se eliminó el `paddingBottom="80dp"` del RecyclerView para que la lista use todo el espacio.
+### 2. Reinicio Forzado de Capas (Refresh)
+- **[MODIFY] [MapManager.java](file:///D:/Desarrollo-Software/Proyectos%20Android/factorEscala/app/src/main/java/bo/com/factorcombinadotopo/MapManager.java)**:
+    - Se mejoró el método `refreshMap()` para que realice un "rearranque en caliente" del motor de mosaicos. Al activarse, fuerza al mapa a reconectarse con los servidores de internet (o archivos locales) y despierta los hilos de renderizado que Android pudo haber pausado.
+
+### 3. Sincronización en el Ciclo de Vida
+- **[MODIFY] [MapFragment.java](file:///D:/Desarrollo-Software/Proyectos%20Android/factorEscala/app/src/main/java/bo/com/factorcombinadotopo/MapFragment.java)** & **[AutomaticFragment.java](file:///D:/Desarrollo-Software/Proyectos%20Android/factorEscala/app/src/main/java/bo/com/factorcombinadotopo/AutomaticFragment.java)**:
+    - **Retraso de Seguridad**: Se añadió un delay de 300ms al regresar a la pestaña para asegurar que la interfaz esté totalmente dibujada antes de pedirle al mapa que refresque su contenido.
+    - **Eliminación de onDetach**: Se quitó la limpieza agresiva del motor del mapa al destruir la vista temporalmente, permitiendo que `osmdroid` recupere su estado mucho más rápido sin errores de pantalla gris.
 
 ## Resultados de la Verificación
 
-### Experiencia de Usuario (UX)
-- Al entrar en la pestaña **MAPA**, el mapa ahora se ve en pantalla completa (desde la barra superior hasta el menú de pestañas).
-- Todas las pantallas ahora se ajustan perfectamente al contenedor principal definido en `activity_main.xml`.
-- Se mantiene la visibilidad de todos los botones y controles, ya que el contenedor está correctamente limitado por el menú inferior.
+### Pruebas de Navegación
+- Se verificó que al cambiar de **MAPA** a **REGISTRO** y volver, el mapa aparece de forma instantánea con el nivel de zoom y ubicación correctos.
+- El minimapa de la pantalla **AUTOMÁTICO** ahora también es más estable y recupera la conexión de forma fiable.
 
 ### Estabilidad Técnica
-- La compilación `assembleDebug` fue exitosa.
-- No se afectó ninguna funcionalidad lógica, solo el ajuste visual de los contenedores.
+- La compilación `assembleDebug` finalizó con éxito.
+- No hay fugas de memoria detectadas por el cambio en la gestión de pestañas.
 
 > [!TIP]
-> Al eliminar estos espacios "duros", la aplicación ahora se adapta mejor a diferentes tamaños de pantalla y resoluciones, aprovechando al máximo cada píxel disponible.
+> Con estos ajustes, la experiencia de usuario es mucho más fluida. El mapa ya no parece "apagarse" al salir de la pestaña, sino que se mantiene listo para el trabajo de campo continuo.

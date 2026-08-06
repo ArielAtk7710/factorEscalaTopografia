@@ -145,9 +145,17 @@ public class MapFragment extends Fragment implements LocationHelper.LocationUpda
         super.onResume();
         handleMapState(true);
         if (mapManager != null) {
-            mapManager.invalidate(); // Forzar renderizado de mosaicos
+            // Usar un pequeño delay para asegurar que el motor de renderizado esté listo
+            new android.os.Handler(android.os.Looper.getMainLooper()).postDelayed(() -> {
+                if (isAdded() && mapManager != null) {
+                    mapManager.refreshMap();
+                }
+            }, 300);
         }
-        if (locationHelper != null) locationHelper.getLastLocation();
+        if (locationHelper != null) {
+            locationHelper.startLocationUpdates();
+            locationHelper.getLastLocation();
+        }
     }
 
     @Override
@@ -160,8 +168,7 @@ public class MapFragment extends Fragment implements LocationHelper.LocationUpda
     @Override
     public void onDestroyView() {
         super.onDestroyView();
-        if (mapView != null) {
-            mapView.onDetach();
-        }
+        // Evitamos onDetach() aquí para mantener el estado del motor 
+        // cuando ViewPager2 intercambia fragmentos
     }
 }

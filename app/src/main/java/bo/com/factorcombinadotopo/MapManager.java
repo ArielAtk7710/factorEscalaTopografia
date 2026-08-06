@@ -105,6 +105,41 @@ public class MapManager {
         }
         locationOverlay.disableFollowLocation(); // Evitar saltos de cámara bruscos
         mapView.getOverlays().add(locationOverlay);
+
+        // Forzar arranque de hilos de renderizado (Fix para el primer inicio)
+        mapView.onResume(); 
+        mapView.invalidate();
+    }
+
+    /**
+     * Refresca el estado del mapa y reconecta con el proveedor de mosaicos.
+     * Útil al regresar de otras pestañas.
+     */
+    public void refreshMap() {
+        if (mapView == null) return;
+        
+        SharedPreferences prefs = context.getSharedPreferences("AppPrefs", Context.MODE_PRIVATE);
+        int mapMode = prefs.getInt("MapMode", 0);
+        
+        // Forzar reinicio de hilos de conexión y renderizado
+        mapView.onResume(); 
+        mapView.setUseDataConnection(mapMode != 1);
+        
+        // Re-asignar TileSource para forzar recarga de mosaicos
+        if (mapMode == 2) {
+            setSatelliteMode(true);
+        } else if (mapMode == 1) {
+            // Modo offline puro: osmdroid buscará en el basePath (osmdroid/)
+            mapView.setTileSource(TileSourceFactory.MAPNIK);
+        } else {
+            mapView.setTileSource(TileSourceFactory.MAPNIK);
+        }
+        
+        if (locationOverlay != null) {
+            locationOverlay.enableMyLocation();
+        }
+        
+        mapView.invalidate();
     }
 
     /**

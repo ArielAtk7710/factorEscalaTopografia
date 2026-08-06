@@ -1,4 +1,4 @@
-- [ ] Early initialization of osmdroid in `MainActivity.java`
-- [ ] Align `MapManager.java` with preference codes and connection logic
-- [ ] Final UI path label check in `dialog_settings.xml`
-- [ ] Verification of "First Run" map loading
+- [ ] Configure `setOffscreenPageLimit` in `MainActivity.java`
+- [ ] Add `refreshMap()` method to `MapManager.java`
+- [ ] Update `MapFragment.java` to handle visibility and location refresh
+- [ ] Final verification of tab switching persistence
