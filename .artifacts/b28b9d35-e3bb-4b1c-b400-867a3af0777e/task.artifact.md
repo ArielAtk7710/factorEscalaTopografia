@@ -1,4 +1,4 @@
-- [ ] Configure `setOffscreenPageLimit` in `MainActivity.java`
-- [ ] Add `refreshMap()` method to `MapManager.java`
-- [ ] Update `MapFragment.java` to handle visibility and location refresh
-- [ ] Final verification of tab switching persistence
+- [x] Implement GPS precision traffic light logic in `AutomaticFragment.java` (10m threshold)
+- [x] Remove delay and optimize `onResume` in `MapFragment.java`
+- [x] Minor optimization in `MapManager.java#refreshMap`
+- [ ] Final verification and push to Git

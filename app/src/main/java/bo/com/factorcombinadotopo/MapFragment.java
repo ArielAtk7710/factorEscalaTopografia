@@ -145,12 +145,8 @@ public class MapFragment extends Fragment implements LocationHelper.LocationUpda
         super.onResume();
         handleMapState(true);
         if (mapManager != null) {
-            // Usar un pequeño delay para asegurar que el motor de renderizado esté listo
-            new android.os.Handler(android.os.Looper.getMainLooper()).postDelayed(() -> {
-                if (isAdded() && mapManager != null) {
-                    mapManager.refreshMap();
-                }
-            }, 300);
+            mapManager.refreshMap();
+            mapManager.invalidate(); 
         }
         if (locationHelper != null) {
             locationHelper.startLocationUpdates();

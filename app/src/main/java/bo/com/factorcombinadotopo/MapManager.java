@@ -127,12 +127,12 @@ public class MapManager {
         
         // Re-asignar TileSource para forzar recarga de mosaicos
         if (mapMode == 2) {
-            setSatelliteMode(true);
+            if (currentMapMode != 1) setSatelliteMode(true);
         } else if (mapMode == 1) {
-            // Modo offline puro: osmdroid buscará en el basePath (osmdroid/)
+            // Modo offline puro
             mapView.setTileSource(TileSourceFactory.MAPNIK);
         } else {
-            mapView.setTileSource(TileSourceFactory.MAPNIK);
+            if (currentMapMode != 0) setSatelliteMode(false);
         }
         
         if (locationOverlay != null) {

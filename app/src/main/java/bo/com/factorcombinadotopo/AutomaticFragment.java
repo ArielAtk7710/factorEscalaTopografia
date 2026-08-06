@@ -280,7 +280,27 @@ public class AutomaticFragment extends Fragment {
             txt_presion_hpa.setText(String.format(Locale.US, "%.3f %s", 
                 lastTopoResult.pressureHpa, getString(R.string.unit_hpa)));
         }
-        if (txt_presicion != null) txt_presicion.setText(getString(R.string.label_precision_sign) + " " + Math.round(loc.getAccuracy()) + " " + getString(R.string.unit_meter));
+        
+        if (txt_presicion != null) {
+            float accuracy = loc.getAccuracy();
+            int color;
+            String status;
+            
+            if (accuracy < 5) {
+                color = androidx.core.content.ContextCompat.getColor(requireContext(), R.color.state_success);
+                status = "Excelente";
+            } else if (accuracy <= 10) {
+                color = androidx.core.content.ContextCompat.getColor(requireContext(), R.color.state_warning);
+                status = "Buena";
+            } else {
+                color = androidx.core.content.ContextCompat.getColor(requireContext(), R.color.state_error);
+                status = "Baja";
+            }
+            
+            txt_presicion.setTextColor(color);
+            txt_presicion.setText(String.format(Locale.getDefault(), "%s %.0fm - %s", 
+                getString(R.string.label_precision_sign), accuracy, status));
+        }
         
         // Detección automática de Zona UTM y Región
         if (txt_ref_system != null) {
