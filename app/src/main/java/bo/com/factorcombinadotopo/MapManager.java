@@ -5,7 +5,6 @@ import android.content.SharedPreferences;
 import android.location.Location;
 
 import org.osmdroid.api.IMapController;
-import org.osmdroid.config.Configuration;
 import org.osmdroid.tileprovider.tilesource.OnlineTileSourceBase;
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory;
 import org.osmdroid.util.GeoPoint;
@@ -72,25 +71,22 @@ public class MapManager {
     }
 
     private void initConfiguration() {
-        // Configurar User-Agent obligatorio
-        Configuration.getInstance().setUserAgentValue(context.getPackageName());
-
-        // Configuración de rutas estándar para osmdroid (necesario para detectar MBTiles)
-        File osmdroidDir = new File(context.getExternalFilesDir(null), "osmdroid");
-        if (!osmdroidDir.exists()) osmdroidDir.mkdirs();
-        
-        Configuration.getInstance().setOsmdroidBasePath(osmdroidDir);
-        Configuration.getInstance().setOsmdroidTileCache(new File(osmdroidDir, "tiles"));
-
+        // La configuración base ya se hizo en MainActivity para asegurar el primer inicio.
         SharedPreferences prefs = context.getSharedPreferences("AppPrefs", Context.MODE_PRIVATE);
-        int mapMode = prefs.getInt("MapMode", 0); 
+        int mapMode = prefs.getInt("MapMode", 0); // 0: Online, 1: Offline, 2: Hybrid
         boolean showLocation = prefs.getBoolean("ShowLocation", true);
 
-        // Gestión de conexión: Bloquear internet en modo Offline
+        // Gestión de conexión: Bloquear internet solo en modo Offline estricto
         mapView.setUseDataConnection(mapMode != 1); 
 
-        // Configuración inicial de visualización
-        mapView.setTileSource(TileSourceFactory.MAPNIK);
+        // Configuración inicial de visualización basada en el modo
+        if (mapMode == 2) {
+            // Si es híbrido, empezamos con satélite por defecto pero permitimos offline
+            setSatelliteMode(true);
+        } else {
+            mapView.setTileSource(TileSourceFactory.MAPNIK);
+        }
+        
         mapView.setMultiTouchControls(true);
 
         // Cámara Inicial: Centrar en Bolivia (-17.0, -65.0) con zoom de terreno

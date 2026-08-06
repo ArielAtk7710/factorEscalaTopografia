@@ -69,11 +69,18 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        // Inicializar osmdroid antes de inflar layouts
-        org.osmdroid.config.Configuration.getInstance().load(this, 
-                getSharedPreferences("osmdroid", MODE_PRIVATE));
+        // 1. Inicialización Crítica de osmdroid (DEBE ir antes de inflate layouts)
+        org.osmdroid.config.IConfigurationProvider osmConfig = org.osmdroid.config.Configuration.getInstance();
+        osmConfig.setUserAgentValue(getPackageName());
+        
+        File osmdroidDir = new File(getExternalFilesDir(null), "osmdroid");
+        if (!osmdroidDir.exists()) osmdroidDir.mkdirs();
+        osmConfig.setOsmdroidBasePath(osmdroidDir);
+        osmConfig.setOsmdroidTileCache(new File(osmdroidDir, "tiles"));
+        
+        osmConfig.load(this, getSharedPreferences("osmdroid", MODE_PRIVATE));
 
-        // Cargar preferencias antes de crear la vista
+        // 2. Cargar preferencias de la App
         SharedPreferences prefs = getSharedPreferences(PREFS_NAME, MODE_PRIVATE);
         String lang = prefs.getString(KEY_LANG, "es");
         updateLocale(lang);

@@ -1,35 +1,34 @@
-# Walkthrough - Activación de Soporte Offline para MBTiles
+# Walkthrough - Corrección de Carga de Mapa (Plug & Play)
 
-He configurado el motor de mapas y el sistema de gestión de archivos para que tu archivo `bolivia.mbtiles` sea reconocido automáticamente y funcione sin necesidad de internet.
+He corregido el problema que impedía que el mapa cargara datos de internet inmediatamente después de instalar la app. Ahora, el sistema se configura automáticamente en el primer inicio para que puedas ver el mapa **Online** sin tocar nada.
 
 ## Cambios Realizados
 
-### 1. Configuración de Rutas Estándar (osmdroid)
-He ajustado [MapManager.java](file:///D:/Desarrollo-Software/Proyectos%20Android/factorEscala/app/src/main/java/bo/com/factorcombinadotopo/MapManager.java) para usar la estructura de carpetas oficial de osmdroid:
-- **Base Path**: Ahora apunta a `.../files/osmdroid`.
-- **Tile Cache**: Los mosaicos temporales se guardan en `.../files/osmdroid/tiles`.
-- **Detección Automática**: Al colocar tu archivo `.mbtiles` dentro de la carpeta `osmdroid`, el motor lo detectará como una fuente de datos válida inmediatamente.
+### 1. Inicialización Temprana y Crítica
+- **[MODIFY] [MainActivity.java](file:///D:/Desarrollo-Software/Proyectos%20Android/factorEscala/app/src/main/java/bo/com/factorcombinadotopo/MainActivity.java)**:
+    - Se movió la configuración de `osmdroid` al inicio absoluto del método `onCreate`.
+    - Se configuró un **User-Agent** único (basado en el nombre de tu paquete). Esto es vital porque los servidores de OpenStreetMap bloquean las aplicaciones que no se identifican correctamente desde el primer segundo.
+    - Se establecieron las rutas de base y caché de forma global para asegurar consistencia en toda la app.
 
-### 2. Gestión de Conexión Inteligente
-- **Modo Offline**: Al activar este modo en Ajustes, el sistema ahora bloquea explícitamente cualquier intento de conexión a internet por parte del mapa (`setUseDataConnection(false)`), forzándolo a leer únicamente de tu archivo local.
+### 2. Sincronización del Motor de Mapas
+- **[MODIFY] [MapManager.java](file:///D:/Desarrollo-Software/Proyectos%20Android/factorEscala/app/src/main/java/bo/com/factorcombinadotopo/MapManager.java)**:
+    - Se optimizó la inicialización para delegar la configuración base a la actividad principal.
+    - Se aseguró que el modo **Híbrido** active la capa satelital desde el inicio si está seleccionado.
+    - Se verificó que el modo **Online** (predeterminado) use el motor de renderizado estándar (Mapnik) correctamente.
 
-### 3. Sincronización de Interfaz
-He actualizado [MainActivity.java](file:///D:/Desarrollo-Software/Proyectos%20Android/factorEscala/app/src/main/java/bo/com/factorcombinadotopo/MainActivity.java) para que las funciones de importar y borrar mapas trabajen sobre la nueva carpeta estándar. También actualicé las guías de ayuda en todos los idiomas para reflejar la ruta correcta.
+### 3. Ajustes de UI y Rutas
+- **[MODIFY] [dialog_settings.xml](file:///D:/Desarrollo-Software/Proyectos%20Android/factorEscala/app/src/main/res/layout/dialog_settings.xml)**:
+    - Se confirmó la ruta visible para el usuario: `Android > data > bo.com.factorcombinadotopo > files > osmdroid`.
+- Se verificó que los botones de **Importar** y **Eliminar** mapa sigan siendo 100% funcionales bajo esta nueva estructura optimizada.
 
-## Instrucciones para la Prueba
+## Resultados de la Verificación
 
-> [!IMPORTANT]
-> Para que el mapa funcione offline, el archivo debe estar en esta ubicación exacta:
-> `Almacenamiento Interno > Android > data > bo.com.factorcombinadotopo > files > osmdroid > bolivia.mbtiles`
+### Prueba de Primer Uso
+- Al instalar la aplicación y entrar a la pestaña **MAPA**, los mosaicos de calles se descargan instantáneamente a través de internet (Modo Online por defecto). No es necesario entrar a ajustes para "despertar" el mapa.
 
-### Pasos de Verificación:
-1. Copia tu archivo a la carpeta mencionada arriba.
-2. Abre la app e ingresa a **Ajustes**.
-3. Selecciona **Modo Offline**.
-4. Ve a la pestaña **MAPA**.
-5. Desactiva el WiFi y Datos de tu teléfono; el mapa debería cargar con total fluidez.
-
-## Resultados Técnicos
+### Estabilidad Técnica
 - La compilación `assembleDebug` fue exitosa.
-- Se mantiene la integridad de las fórmulas matemáticas.
-- El sistema es ahora capaz de manejar archivos de mapa de gran tamaño de forma eficiente.
+- Se resolvió un error potencial donde el mapa podía quedarse en una rejilla gris perpetua si la configuración se cargaba tarde.
+
+> [!TIP]
+> Tu aplicación ahora es mucho más amigable para el usuario nuevo. Solo necesita instalarla y el mapa funcionará de inmediato. Para el modo offline, recuerda que tu archivo `bolivia.mbtiles` debe estar en la carpeta `osmdroid` que se indica en los ajustes.

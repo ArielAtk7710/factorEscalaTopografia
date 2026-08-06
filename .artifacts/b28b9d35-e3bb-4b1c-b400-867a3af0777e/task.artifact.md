@@ -1,4 +1,4 @@
-- [/] Update `MapManager.java` to support MBTiles and standard paths
-- [ ] Synchronize map directories in `MainActivity.java`
-- [ ] Update help strings to reflect the new `osmdroid` path
-- [ ] Final build and verification
+- [ ] Early initialization of osmdroid in `MainActivity.java`
+- [ ] Align `MapManager.java` with preference codes and connection logic
+- [ ] Final UI path label check in `dialog_settings.xml`
+- [ ] Verification of "First Run" map loading
