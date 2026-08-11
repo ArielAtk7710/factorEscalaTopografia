@@ -9,11 +9,19 @@ import android.content.pm.PackageManager;
 import android.graphics.drawable.GradientDrawable;
 import android.location.LocationManager;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.content.ContentValues;
+import androidx.appcompat.app.AlertDialog;
+import com.google.android.material.button.MaterialButtonToggleGroup;
+import java.util.Date;
+import java.text.SimpleDateFormat;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -41,6 +49,7 @@ public class MapFragment extends Fragment {
     private View sepAlt;
     private LinearLayout layoutCoords;
     private SurveyViewModel viewModel;
+    private android.location.Location lastGpsLocation;
     private static final int PERMISSION_REQUEST_CODE = 200;
 
     private final BroadcastReceiver gpsStatusReceiver = new BroadcastReceiver() {
@@ -86,7 +95,7 @@ public class MapFragment extends Fragment {
 
             view.findViewById(R.id.fab_mark_point).setOnClickListener(v -> {
                 if (mapManager != null && mapView != null) {
-                    mapManager.addManualMarker(mapView.getMapCenter());
+                    showSavePointDialogMap();
                 }
             });
 
@@ -105,11 +114,163 @@ public class MapFragment extends Fragment {
     private void setupViewModelObservers() {
         viewModel.getRawLocation().observe(getViewLifecycleOwner(), location -> {
             if (isAdded() && mapManager != null && location != null) {
+                this.lastGpsLocation = location;
                 mapManager.updateMyLocation(location);
                 if (txtAlt != null) {
                     txtAlt.setText(String.format(Locale.getDefault(), "ALT: %.1fm", location.getAltitude()));
                 }
             }
+        });
+    }
+
+    private void showSavePointDialogMap() {
+        if (!isAdded()) return;
+
+        View dv = getLayoutInflater().inflate(R.layout.dialog_save_point_map, null);
+        AlertDialog.Builder b = new AlertDialog.Builder(requireContext());
+        AlertDialog d = b.create();
+        if (d.getWindow() != null) d.getWindow().setBackgroundDrawableResource(android.R.color.transparent);
+        d.setView(dv);
+
+        EditText etN = dv.findViewById(R.id.et_point_name);
+        EditText etObs = dv.findViewById(R.id.et_point_notes);
+        MaterialButtonToggleGroup toggleGps = dv.findViewById(R.id.toggle_gps_selection);
+        View btnInfo = dv.findViewById(R.id.btn_gps_info);
+
+        if (btnInfo != null) {
+            btnInfo.setOnClickListener(v -> {
+                UIUtils.showPopupInfo(requireContext(), dv, 
+                        "Información de Altura", 
+                        getString(R.string.msg_gps_toggle_info));
+            });
+        }
+
+        dv.findViewById(R.id.btn_dialog_save).setOnClickListener(v -> {
+            String name = etN.getText().toString().trim();
+            if (name.isEmpty()) { etN.setError(getString(R.string.hint_point_name)); return; }
+
+            boolean useGps = toggleGps.getCheckedButtonId() == R.id.btn_toggle_gps_on;
+            ejecutarGuardadoMapa(name, etObs.getText().toString(), useGps);
+            d.dismiss();
+        });
+
+        dv.findViewById(R.id.btn_dialog_cancel).setOnClickListener(v -> d.dismiss());
+        d.show();
+    }
+
+    private void ejecutarGuardadoMapa(String name, String notes, boolean useGps) {
+        // 1. Mostrar Spin de Carga
+        View progressView = getLayoutInflater().inflate(R.layout.layout_dialog_progress, null);
+        TextView txtProgress = progressView.findViewById(R.id.txt_progress_label);
+        if (txtProgress != null) txtProgress.setText("Guardando datos...");
+
+        AlertDialog progressDialog = new AlertDialog.Builder(requireContext())
+                .setView(progressView)
+                .setCancelable(false)
+                .create();
+        if (progressDialog.getWindow() != null) progressDialog.getWindow().setBackgroundDrawableResource(android.R.color.transparent);
+        progressDialog.show();
+
+        // 2. Obtener Coordenada del Centro (Cruz Naranja)
+        IGeoPoint center = mapView.getMapCenter();
+        double lat = center.getLatitude();
+        double lon = center.getLongitude();
+
+        if (useGps) {
+            // MODO CON GPS: Usar altura del sensor y marcar como Copernicus
+            android.location.Location targetLoc = new android.location.Location("map");
+            targetLoc.setLatitude(lat);
+            targetLoc.setLongitude(lon);
+            targetLoc.setAltitude(lastGpsLocation != null ? lastGpsLocation.getAltitude() : 0.0);
+
+            TopographyRepository.getInstance(requireContext()).calculateCompleteAsync(targetLoc, new TopographyRepository.CalculationCallback() {
+                @Override
+                public void onResult(TopoCalculoManager.TopoResult res, boolean isMgb) {
+                    persistirPuntoMapa(res, name, notes, isMgb, "Copernicus DEM GLO-90", "Métrica (Mapa)", progressDialog, center);
+                }
+                @Override public void onError(Exception e) { handleGuardadoError(e, progressDialog); }
+            });
+
+        } else {
+            // MODO SIN GPS: Consultar API de Elevación
+            TopographyRepository repo = TopographyRepository.getInstance(requireContext());
+            repo.fetchElevationAsync(lat, lon, new TopographyRepository.ElevationCallback() {
+                @Override
+                public void onResult(double elevationOrto) {
+                    // La API devolvió la cota. Reconstruir elipsoidal y calcular forzando MGBol08
+                    repo.calculateFromOrthometricAsync(lat, lon, elevationOrto, new TopographyRepository.CalculationCallback() {
+                        @Override
+                        public void onResult(TopoCalculoManager.TopoResult res, boolean isMgb) {
+                            persistirPuntoMapa(res, name, notes, true, "Open-Meteo API", "Digital (DEM)", progressDialog, center);
+                        }
+                        @Override public void onError(Exception e) { handleGuardadoError(e, progressDialog); }
+                    });
+                }
+
+                @Override
+                public void onError(String error) {
+                    // Fallback Local por error de red
+                    android.location.Location targetLoc = new android.location.Location("map");
+                    targetLoc.setLatitude(lat);
+                    targetLoc.setLongitude(lon);
+                    targetLoc.setAltitude(lastGpsLocation != null ? lastGpsLocation.getAltitude() : 0.0);
+                    
+                    String fallbackNotes = notes + "\n(Nota: Se guardó con ubicación GPS por falta de conexión a la red)";
+                    
+                    repo.calculateCompleteAsync(targetLoc, new TopographyRepository.CalculationCallback() {
+                        @Override
+                        public void onResult(TopoCalculoManager.TopoResult res, boolean isMgb) {
+                            persistirPuntoMapa(res, name, fallbackNotes, isMgb, "GPS Dispositivo (Fallback)", "Métrica (Offline)", progressDialog, center);
+                        }
+                        @Override public void onError(Exception e) { handleGuardadoError(e, progressDialog); }
+                    });
+                }
+            });
+        }
+    }
+
+    private void persistirPuntoMapa(TopoCalculoManager.TopoResult res, String name, String notes, boolean isMgb, String dem, String prec, AlertDialog dialog, IGeoPoint center) {
+        DatabaseHelper db = DatabaseHelper.getInstance(requireContext());
+        ContentValues v = new ContentValues();
+        String time = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault()).format(new Date());
+
+        v.put(DatabaseHelper.COLUMN_FECHA, time);
+        v.put(DatabaseHelper.COLUMN_NOMBRE, name);
+        v.put(DatabaseHelper.COLUMN_LATITUD, GeoUtils.formatLatLon(res.lat));
+        v.put(DatabaseHelper.COLUMN_LONGITUD, GeoUtils.formatLatLon(res.lon));
+        v.put(DatabaseHelper.COLUMN_ESTE, GeoUtils.formatCoord(res.este));
+        v.put(DatabaseHelper.COLUMN_NORTE, GeoUtils.formatCoord(res.norte));
+        v.put(DatabaseHelper.COLUMN_ZONA, String.valueOf(res.zona));
+        v.put(DatabaseHelper.COLUMN_HEMISFERIO, String.valueOf(res.hemisferio));
+        v.put(DatabaseHelper.COLUMN_ALTURA, GeoUtils.formatCoord(res.altEllipsoidal));
+        v.put(DatabaseHelper.COLUMN_ALTURA_ORTO, GeoUtils.formatCoord(res.altOrto));
+        v.put(DatabaseHelper.COLUMN_PRESION, GeoUtils.formatCoord(res.pressureMmHg));
+        v.put(DatabaseHelper.COLUMN_FACTOR_ESCALA, GeoUtils.formatFactor(res.scaleFactor));
+        v.put(DatabaseHelper.COLUMN_FACTOR_ALTURA, GeoUtils.formatFactor(res.elevationFactor));
+        v.put(DatabaseHelper.COLUMN_FACTOR_COMBINADO, GeoUtils.formatFactor(res.combinedFactor));
+        
+        // Forzar MGBol08 si es modo API o si el repo lo detectó
+        v.put(DatabaseHelper.COLUMN_MODELO_GEOIDAL, isMgb ? "MGBol08" : "EGM96 (Global)");
+        v.put(DatabaseHelper.COLUMN_MODELO_DEM, dem);
+        v.put(DatabaseHelper.COLUMN_TIPO_REGISTRO, getString(R.string.label_reg_map));
+        v.put(DatabaseHelper.COLUMN_PRECISION, prec);
+        v.put(DatabaseHelper.COLUMN_SATELITES, "Ninguno");
+        v.put(DatabaseHelper.COLUMN_TEMPERATURA, String.format(Locale.getDefault(), "%.1f°C", TopographyRepository.getInstance(requireContext()).getCurrentAmbientTemp()));
+        v.put(DatabaseHelper.COLUMN_NOTAS, notes.isEmpty() ? getString(R.string.label_no_observations) : notes);
+
+        db.insertarPunto(v);
+
+        new Handler(Looper.getMainLooper()).postDelayed(() -> {
+            dialog.dismiss();
+            UIUtils.showSuccessToast(requireContext(), getString(R.string.msg_point_saved_format, name));
+            if (mapManager != null) mapManager.addManualMarker(center, name);
+        }, 500);
+    }
+
+    private void handleGuardadoError(Exception e, AlertDialog dialog) {
+        new Handler(Looper.getMainLooper()).post(() -> {
+            if (dialog != null) dialog.dismiss();
+            UIUtils.showErrorToast(requireContext(), "Error técnico: " + e.getMessage());
         });
     }
 

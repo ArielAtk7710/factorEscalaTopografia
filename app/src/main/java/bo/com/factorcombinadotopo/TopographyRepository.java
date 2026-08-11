@@ -4,6 +4,10 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.location.Location;
 import android.util.Log;
+import bo.com.factorcombinadotopo.models.ElevationResponse;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 import org.json.JSONObject;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
@@ -40,6 +44,74 @@ public class TopographyRepository {
     public interface CalculationCallback {
         void onResult(TopoCalculoManager.TopoResult result, boolean usesMgb);
         void onError(Exception e);
+    }
+
+    public interface ElevationCallback {
+        void onResult(double elevation);
+        void onError(String error);
+    }
+
+    /**
+     * Obtiene la elevación ortométrica desde la API de Open-Meteo.
+     */
+    public void fetchElevationAsync(double lat, double lon, ElevationCallback callback) {
+        WeatherManager.getApiService().getElevation(lat, lon).enqueue(new Callback<ElevationResponse>() {
+            @Override
+            public void onResponse(Call<ElevationResponse> call, Response<ElevationResponse> response) {
+                if (response.isSuccessful() && response.body() != null) {
+                    callback.onResult(response.body().getFirstElevation());
+                } else {
+                    callback.onError("Error API Elevation: " + response.code());
+                }
+            }
+
+            @Override
+            public void onFailure(Call<ElevationResponse> call, Throwable t) {
+                callback.onError(t.getMessage());
+            }
+        });
+    }
+
+    /**
+     * Realiza el cálculo topográfico partiendo de una altura ortométrica (H).
+     * Reconstruye la altura elipsoidal (h = H + N) para el motor IGM.
+     */
+    public void calculateFromOrthometricAsync(double lat, double lon, double altOrtoApi, CalculationCallback callback) {
+        executor.execute(() -> {
+            try {
+                // Obtener ondulación N forzando MGBol08 si es posible
+                double geoidN = 0.0;
+                boolean isMgb = false;
+                
+                if (MGBEngine.getInstance().estaLista()) {
+                    double nMgb = MGBEngine.getInstance().getGeoidUndulation(lat, lon);
+                    if (nMgb != 0.0) {
+                        geoidN = nMgb;
+                        isMgb = true;
+                    }
+                }
+                
+                if (!isMgb) {
+                    geoidN = EGM96Engine.getEGM96Undulation(lat, lon);
+                }
+
+                // Reconstruir h (Elipsoidal) = H (Ortométrica) + N (Ondulación)
+                double reconstructedHEl = altOrtoApi + geoidN;
+
+                SharedPreferences prefs = context.getSharedPreferences("AppPrefs", Context.MODE_PRIVATE);
+                float pressureOffset = prefs.getFloat(MainActivity.KEY_PRESSURE_OFFSET, 0f);
+
+                TopoCalculoManager.TopoResult res = TopoCalculoManager.calculateAll(
+                        lat, lon, reconstructedHEl, geoidN, (double) pressureOffset);
+
+                callback.onResult(res, isMgb);
+
+                fetchTemperatureIfNeeded(lat, lon);
+
+            } catch (Exception e) {
+                callback.onError(e);
+            }
+        });
     }
 
     /**

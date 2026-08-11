@@ -215,6 +215,7 @@ public class RegisterFragment extends Fragment {
                 p.precision = cursor.getString(cursor.getColumnIndexOrThrow(DatabaseHelper.COLUMN_PRECISION));
                 p.satelites = cursor.getString(cursor.getColumnIndexOrThrow(DatabaseHelper.COLUMN_SATELITES));
                 p.temperatura = cursor.getString(cursor.getColumnIndexOrThrow(DatabaseHelper.COLUMN_TEMPERATURA));
+                p.modeloDem = cursor.getString(cursor.getColumnIndexOrThrow(DatabaseHelper.COLUMN_MODELO_DEM));
                 p.fecha = cursor.getString(cursor.getColumnIndexOrThrow(DatabaseHelper.COLUMN_FECHA));
                 p.notas = cursor.getString(cursor.getColumnIndexOrThrow(DatabaseHelper.COLUMN_NOTAS));
                 puntosList.add(p);
@@ -328,6 +329,7 @@ public class RegisterFragment extends Fragment {
 
         sb.append("FACTORES Y DATOS TÉCNICOS:\n");
         sb.append("  Modelo Geoidal:    ").append(p.geoidModel).append("\n");
+        sb.append("  Modelo DEM:        ").append(p.modeloDem).append("\n");
         sb.append("  Factor de Escala:  ").append(p.fe).append("\n");
         sb.append("  Factor de Altura:  ").append(p.fa).append("\n");
         sb.append("  Factor Combinado:  ").append(formattedFc).append("\n");
@@ -365,7 +367,7 @@ public class RegisterFragment extends Fragment {
     @Override public void onResume() { super.onResume(); cargarDatos(); }
 
     private static class Punto {
-        int id; String nombre, latitud, longitud, altura, altOrto, presion, este, norte, zona, hemisferio, fe, fa, fc, geoidModel, tipoRegistro, precision, satelites, temperatura, fecha, notas;
+        int id; String nombre, latitud, longitud, altura, altOrto, presion, este, norte, zona, hemisferio, fe, fa, fc, geoidModel, modeloDem, tipoRegistro, precision, satelites, temperatura, fecha, notas;
         boolean isExpanded = false;
     }
 
@@ -400,6 +402,7 @@ public class RegisterFragment extends Fragment {
 
             h.txtDetSis.setText("WGS-84 " + p.zona + " " + p.hemisferio);
             h.txtDetGeoid.setText(p.geoidModel);
+            h.txtDetDem.setText(p.modeloDem);
             h.txtTipoReg.setText(p.tipoRegistro);
             h.txtDetPrecision.setText(p.precision);
             h.txtDetSat.setText(p.satelites);
@@ -437,7 +440,7 @@ public class RegisterFragment extends Fragment {
             startActivity(Intent.createChooser(si, "Compartir Punto"));
         }
         class ViewHolder extends RecyclerView.ViewHolder {
-            TextView txtNombre, txtResumenUtm, txtDetLat, txtDetLon, txtDetAlt, txtDetAltOrto, txtDetPresion, txtDetSis, txtDetGeoid, txtDetFe, txtDetFa, txtDetFc, txtFechaFull, txtExpandLabel, txtDetNotas, txtTipoReg, txtDetPrecision, txtDetSat, txtDetTemp;
+            TextView txtNombre, txtResumenUtm, txtDetLat, txtDetLon, txtDetAlt, txtDetAltOrto, txtDetPresion, txtDetSis, txtDetGeoid, txtDetDem, txtDetFe, txtDetFa, txtDetFc, txtFechaFull, txtExpandLabel, txtDetNotas, txtTipoReg, txtDetPrecision, txtDetSat, txtDetTemp;
             ImageView btnDelete, btnCopy, btnShare, imgArrow; CheckBox cbSelect; LinearLayout layoutExpand, btnExpand;
             ViewHolder(View v) {
                 super(v);
@@ -450,6 +453,7 @@ public class RegisterFragment extends Fragment {
                 txtDetAlt = v.findViewById(R.id.txt_det_alt); txtDetAltOrto = v.findViewById(R.id.txt_det_alt_orto);
                 txtDetPresion = v.findViewById(R.id.txt_det_presion); txtDetSis = v.findViewById(R.id.txt_det_sis);
                 txtDetGeoid = v.findViewById(R.id.txt_det_geoid_model);
+                txtDetDem = v.findViewById(R.id.txt_det_dem_model);
                 txtTipoReg = v.findViewById(R.id.txt_item_tipo_registro);
                 txtDetPrecision = v.findViewById(R.id.txt_det_precision);
                 txtDetSat = v.findViewById(R.id.txt_det_sat);

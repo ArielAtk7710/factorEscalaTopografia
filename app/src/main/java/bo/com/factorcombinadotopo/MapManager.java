@@ -3,6 +3,7 @@ package bo.com.factorcombinadotopo;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.location.Location;
+import android.widget.TextView;
 
 import org.osmdroid.api.IMapController;
 import org.osmdroid.api.IGeoPoint;
@@ -13,6 +14,7 @@ import org.osmdroid.util.MapTileIndex;
 import org.osmdroid.views.MapView;
 import org.osmdroid.views.overlay.CopyrightOverlay;
 import org.osmdroid.views.overlay.Marker;
+import org.osmdroid.views.overlay.infowindow.MarkerInfoWindow;
 import org.osmdroid.views.overlay.mylocation.GpsMyLocationProvider;
 import org.osmdroid.views.overlay.mylocation.MyLocationNewOverlay;
 
@@ -234,14 +236,30 @@ public class MapManager {
     }
 
     /**
-     * Añade un marcador manual color naranja en la posición indicada.
+     * Ventana de información personalizada para mostrar solo el nombre en un cuadro naranja.
      */
-    public void addManualMarker(IGeoPoint point) {
+    private static class LabelInfoWindow extends MarkerInfoWindow {
+        public LabelInfoWindow(int layoutResId, MapView mapView) {
+            super(layoutResId, mapView);
+        }
+        @Override
+        public void onOpen(Object item) {
+            Marker marker = (Marker) item;
+            TextView txt = mView.findViewById(R.id.txt_marker_name);
+            if (txt != null) txt.setText(marker.getTitle());
+        }
+    }
+
+    /**
+     * Añade un marcador manual color naranja con etiqueta de nombre.
+     */
+    public void addManualMarker(IGeoPoint point, String name) {
         if (mapView == null || point == null) return;
 
         Marker marker = new Marker(mapView);
         marker.setPosition(new GeoPoint(point.getLatitude(), point.getLongitude()));
         marker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM);
+        marker.setTitle(name);
         
         // Configurar Icono Naranja
         Drawable icon = ContextCompat.getDrawable(context, R.drawable.ic_map_pin);
@@ -250,10 +268,11 @@ public class MapManager {
             marker.setIcon(icon);
         }
 
-        // Sin popup por ahora, solo visual
-        marker.setInfoWindow(null);
+        // Configurar Etiqueta Superior Naranja
+        marker.setInfoWindow(new LabelInfoWindow(R.layout.layout_marker_label, mapView));
         
         mapView.getOverlays().add(marker);
+        marker.showInfoWindow(); // Mostrar nombre automáticamente
         mapView.invalidate();
     }
 

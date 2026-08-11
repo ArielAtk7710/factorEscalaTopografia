@@ -322,6 +322,7 @@
     <string name="label_reg_auto">Automatic Record</string>
     <string name="label_reg_map">Map Record</string>
     <string name="label_searching_location">Searching location...</string>
+    <string name="msg_gps_toggle_info">Device GPS: saves the altitude obtained from your GPS, Online Height: saves the altitude obtained from the Open-Meteo API (Copernicus DEM), which globally uses the EGM2008 vertical reference system, based on the marked latitude and longitude.</string>
 
     <!-- Terms and Conditions -->
     <string name="title_terms_conditions">📜 Terms and Conditions of Use</string>

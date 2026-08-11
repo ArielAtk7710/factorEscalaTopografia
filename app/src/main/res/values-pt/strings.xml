@@ -319,6 +319,7 @@
     <string name="label_reg_auto">Registro Automático</string>
     <string name="label_reg_map">Registro Mapa</string>
     <string name="label_searching_location">Buscando localização...</string>
+    <string name="msg_gps_toggle_info">GPS Dispositivo: guarda a altitude obtida do seu GPS, Altitude online: guarda a altitude obtida da API Open-Meteo (Copernicus DEM), que utiliza globalmente o sistema de referência vertical EGM2008, com base na latitude e longitude marcadas.</string>
 
     <!-- Terms and Conditions -->
     <string name="title_terms_conditions">📜 Termos e Condições de Uso</string>

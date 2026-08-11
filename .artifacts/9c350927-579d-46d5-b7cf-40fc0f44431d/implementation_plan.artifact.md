@@ -1,32 +1,35 @@
-# Plan de Creación: Diálogo de Guardado para MAPA (Selector GPS)
+# Plan de Implementación: Etiquetas de Nombre en Pines del Mapa
 
-Este plan detalla la creación de un nuevo diseño de diálogo específico para la pestaña de mapas, el cual incluirá un selector profesional para decidir si el punto se guarda con o sin información de GPS.
+Este plan detalla la adición de etiquetas visuales (cuadros naranjas con el nombre) sobre los pines manuales del mapa para identificar los puntos guardados de forma inmediata.
 
 ## Proposed Changes
 
-### 1. Recursos Visuales (Estilo del Selector)
-- **[NEW] [bg_toggle_selector_map.xml](file:///D:/Desarrollo-Software/Proyectos Android/factorEscala/app/src/main/res/drawable/bg_toggle_selector_map.xml)**:
-    - Selector de estado para el fondo de los botones.
-    - **Activo:** Fondo Naranja (`@color/accent_orange`).
-    - **Inactivo:** Fondo Blanco (`#FFFFFF`).
-- **[NEW] [color_toggle_text_map.xml](file:///D:/Desarrollo-Software/Proyectos Android/factorEscala/app/src/main/res/color/color_toggle_text_map.xml)**:
-    - Selector de estado para el color del texto.
-    - **Activo:** Texto Blanco.
-    - **Inactivo:** Texto Naranja.
+### 1. Diseño de la Etiqueta (`layout_marker_label.xml`)
+- **[NEW] [layout_marker_label.xml](file:///D:/Desarrollo-Software/Proyectos Android/factorEscala/app/src/main/res/layout/layout_marker_label.xml)**:
+    - Crear un diseño minimalista consistente en un `TextView` con:
+        - Fondo: Naranja (`@color/accent_orange`).
+        - Texto: Blanco, negrita, tamaño pequeño (10sp - 11sp).
+        - Bordes: Redondeados (4dp - 6dp).
+        - Padding: Ajustado para que parezca un cuadro pequeño.
 
-### 2. Diseño del Diálogo (`dialog_save_point_map.xml`)
-- **[NEW] [dialog_save_point_map.xml](file:///D:/Desarrollo-Software/Proyectos Android/factorEscala/app/src/main/res/layout/dialog_save_point_map.xml)**:
-    - Basado en el diseño actual de `dialog_save_point.xml`.
-    - **Adición:** Debajo del campo "Nombre del Punto", se añadirá un `MaterialButtonToggleGroup` con dos botones: **"GPS"** y **"SIN GPS"**.
-    - **Estilo:** Bordes naranjas permanentes, esquinas redondeadas y tipografía técnica.
+### 2. Motor de Gestión de Etiquetas (`MapManager.java`)
+- **[MODIFY] [MapManager.java](file:///D:/Desarrollo-Software/Proyectos Android/factorEscala/app/src/main/java/bo/com/factorcombinadotopo/MapManager.java)**:
+    - Actualizar `addManualMarker(IGeoPoint point)` $\rightarrow$ `addManualMarker(IGeoPoint point, String name)`.
+    - Implementar una clase personalizada que extienda de `MarkerInfoWindow` para usar el nuevo layout.
+    - Configurar el marcador para que muestre su ventana de información (`showInfoWindow()`) automáticamente al ser creado.
 
-### 3. Sincronización de Identificadores
-- Se mantendrán los IDs `et_point_name`, `et_point_notes`, `btn_dialog_save` y `btn_dialog_cancel` para facilitar su futura implementación en Java.
-- Se añadirá el ID `toggle_gps_selection` para el nuevo grupo de botones.
+### 3. Sincronización de Guardado (`MapFragment.java`)
+- **[MODIFY] [MapFragment.java](file:///D:/Desarrollo-Software/Proyectos Android/factorEscala/app/src/main/java/bo/com/factorcombinadotopo/MapFragment.java)**:
+    - Actualizar la llamada final en `persistirPuntoMapa` para pasar el nombre del punto al método del gestor de mapas.
+
+## Beneficios
+- **Identificación Inmediata:** El topógrafo puede ver el nombre de sus puntos de control sin necesidad de hacer clic en cada uno.
+- **Claridad Visual:** El cuadro naranja resalta sobre el mapa de fondo (especialmente en modo satélite).
 
 ## Plan de Verificación
 
 ### Manual Verification
-1.  **Renderizado:** Previsualizar el XML y verificar que el selector de GPS aparezca con bordes naranjas.
-2.  **Estados:** Verificar visualmente (vía preview) que el botón seleccionado se vea naranja con letras blancas y el no seleccionado blanco con letras naranjas.
-3.  **Alineación:** Confirmar que el nuevo componente no rompa la estructura del `CardView`.
+1.  **Guardar Punto:** Marcar un punto en el mapa, ponerle el nombre "PC-01" y guardarlo.
+2.  **Visualización:** Verificar que aparezca el pin naranja y, justo encima de él, un recuadro naranja con el texto "PC-01" en blanco.
+3.  **Navegación:** Desplazar el mapa y verificar que la etiqueta se mueve solidariamente con el pin.
+4.  **Múltiples Etiquetas:** Guardar varios puntos seguidos y confirmar que cada uno mantiene su etiqueta con el nombre correspondiente.

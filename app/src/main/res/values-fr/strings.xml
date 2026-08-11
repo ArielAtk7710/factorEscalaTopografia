@@ -321,6 +321,7 @@
     <string name="label_reg_auto">Enregistrement Automatique</string>
     <string name="label_reg_map">Enregistrement Carte</string>
     <string name="label_searching_location">Recherche de l\'emplacement...</string>
+    <string name="msg_gps_toggle_info">GPS Appareil : enregistre l\'altitude obtenue de votre GPS, Altitude en ligne : enregistre l\'altitude obtenue de l\'API Open-Meteo (Copernicus DEM), qui utilise globalement le système de référence vertical EGM2008, sur la base de la latitude et de la longitude marquées.</string>
 
     <!-- Terms and Conditions -->
     <string name="title_terms_conditions">📜 Conditions Générales d\'Utilisation</string>

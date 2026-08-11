@@ -23,4 +23,10 @@ public interface ApiService {
 
     @GET
     Call<java.util.List<bo.com.factorcombinadotopo.models.KpIndex>> getKpIndex(@Url String url);
+
+    @GET("https://api.open-meteo.com/v1/elevation")
+    Call<bo.com.factorcombinadotopo.models.ElevationResponse> getElevation(
+            @Query("latitude") double lat,
+            @Query("longitude") double lon
+    );
 }

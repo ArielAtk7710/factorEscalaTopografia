@@ -65,47 +65,65 @@
             android:inputType="text"
             android:maxLines="1" />
 
-        <!-- GPS / SIN GPS Toggle Section -->
-        <com.google.android.material.button.MaterialButtonToggleGroup
-            android:id="@+id/toggle_gps_selection"
+        <!-- GPS / SIN GPS Toggle Section with Info Icon -->
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="12dp"
-            app:singleSelection="true"
-            app:selectionRequired="true"
-            app:checkedButton="@+id/btn_toggle_gps_on">
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
 
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/btn_toggle_gps_on"
-                style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+            <com.google.android.material.button.MaterialButtonToggleGroup
+                android:id="@+id/toggle_gps_selection"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:text="GPS"
-                android:textSize="12sp"
-                android:textStyle="bold"
-                app:backgroundTint="@drawable/bg_toggle_selector_map"
-                app:textColor="@color/color_toggle_text_map"
-                app:strokeColor="@color/accent_orange"
-                app:strokeWidth="1.5dp"
-                app:cornerRadius="8dp" />
+                app:singleSelection="true"
+                app:selectionRequired="true"
+                app:checkedButton="@+id/btn_toggle_gps_on">
 
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/btn_toggle_gps_off"
-                style="@style/Widget.MaterialComponents.Button.OutlinedButton"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="SIN GPS"
-                android:textSize="12sp"
-                android:textStyle="bold"
-                app:backgroundTint="@drawable/bg_toggle_selector_map"
-                app:textColor="@color/color_toggle_text_map"
-                app:strokeColor="@color/accent_orange"
-                app:strokeWidth="1.5dp"
-                app:cornerRadius="8dp" />
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btn_toggle_gps_on"
+                    style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1.2"
+                    android:text="GPS Dispositivo"
+                    android:textSize="11sp"
+                    android:textStyle="bold"
+                    app:backgroundTint="@drawable/bg_toggle_selector_map"
+                    app:textColor="@color/color_toggle_text_map"
+                    app:strokeColor="@color/accent_orange"
+                    app:strokeWidth="1.5dp"
+                    app:cornerRadius="8dp" />
 
-        </com.google.android.material.button.MaterialButtonToggleGroup>
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btn_toggle_gps_off"
+                    style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1.2"
+                    android:text="Altura online"
+                    android:textSize="11sp"
+                    android:textStyle="bold"
+                    app:backgroundTint="@drawable/bg_toggle_selector_map"
+                    app:textColor="@color/color_toggle_text_map"
+                    app:strokeColor="@color/accent_orange"
+                    app:strokeWidth="1.5dp"
+                    app:cornerRadius="8dp" />
+
+            </com.google.android.material.button.MaterialButtonToggleGroup>
+
+            <ImageButton
+                android:id="@+id/btn_gps_info"
+                android:layout_width="32dp"
+                android:layout_height="32dp"
+                android:layout_marginStart="8dp"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:src="@drawable/ic_info"
+                app:tint="@color/accent_orange"
+                android:contentDescription="Info" />
+        </LinearLayout>
 
         <!-- Observaciones -->
         <TextView

@@ -77,7 +77,7 @@ public class WeatherManager {
 
     private static ApiService apiService;
 
-    private static ApiService getApiService() {
+    public static ApiService getApiService() {
         if (apiService == null) {
             HttpLoggingInterceptor logging = new HttpLoggingInterceptor();
             logging.setLevel(HttpLoggingInterceptor.Level.BASIC);

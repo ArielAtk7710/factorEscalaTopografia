@@ -1,26 +1,31 @@
-# Nuevo Diseño de Diálogo para MAPA (Selector de Datos)
+# Implementación de Etiquetas de Nombre en Pines del Mapa
 
-He completado la creación del nuevo diseño de diálogo específico para la pestaña de mapas, incorporando el selector de captura de datos solicitado.
+He completado la implementación de las etiquetas visuales para los pines del mapa, permitiendo una identificación inmediata de los puntos guardados mediante un diseño profesional y coherente.
 
-## Mejoras y Adiciones
+## Mejoras Implementadas
 
-### 1. Nuevo Layout: `dialog_save_point_map.xml`
-Se ha creado una variante del diálogo de guardado estándar optimizada para cartografía:
-- **Selector de GPS:** Se añadió un grupo de botones debajo del nombre del punto que permite elegir entre las opciones **"GPS"** y **"SIN GPS"**.
-- **Jerarquía Visual:** El selector utiliza un estilo moderno de "Toggle Button" que facilita la decisión rápida en campo.
+### 1. Nuevo Diseño de Etiqueta (`layout_marker_label.xml`)
+- Se creó un componente visual minimalista para los nombres:
+    - **Estilo:** Un recuadro naranja con bordes redondeados.
+    - **Texto:** Blanco, en negrita (`bold`), garantizando legibilidad total sobre cualquier fondo (calles o satélite).
 
-### 2. Sistema de Estados Inteligente
-He implementado selectores de color personalizados para cumplir con tus requisitos estéticos exactos:
-- **Bordes:** Se mantienen permanentemente en **Naranja** (`accent_orange`) para resaltar el componente.
-- **Estado ACTIVO:** El botón seleccionado cambia a fondo naranja con texto blanco.
-- **Estado INACTIVO:** El botón no seleccionado permanece con fondo blanco y texto naranja.
+### 2. Motor de Marcado Inteligente (`MapManager.java`)
+- Se actualizó el gestor de mapas para soportar metadatos en los marcadores.
+- **Ventana de Información Personalizada:** Se implementó la clase `LabelInfoWindow` para inflar el nuevo diseño de etiqueta naranja justo encima del pin.
+- **Apertura Automática:** Ahora, al añadir un pin tras el guardado, la etiqueta con el nombre aparece automáticamente sin necesidad de que el usuario haga clic.
 
-### 3. Recursos Técnicos Incorporados
-Para lograr este diseño, se crearon los siguientes archivos de soporte:
-- `bg_toggle_selector_map.xml`: Gestiona el intercambio de fondos naranja/blanco.
-- `color_toggle_text_map.xml`: Gestiona el intercambio de color de fuente blanco/naranja.
+### 3. Sincronización con el Flujo de Guardado
+- Se vinculó el nombre ingresado por el usuario en el diálogo de guardado con la creación del marcador en el mapa.
+- **Identificación en Tiempo Real:** En cuanto presionas "Guardar Punto", el mapa se actualiza mostrando el pin naranja con su nombre asignado (ej: `PC_01`).
+
+## Verificación Realizada
+- [x] El recuadro naranja aparece correctamente posicionado sobre el pin.
+- [x] Las etiquetas son visibles y el texto es nítido.
+- [x] El sistema permite múltiples pines con nombres diferentes simultáneamente.
 
 > [!SUCCESS]
-> El diseño está listo para ser inflado desde `MapFragment.java`. Los botones utilizan tipografía en negrita (`bold`) y esquinas redondeadas de 8dp para un acabado profesional y ergonómico.
+> Con esta mejora, tu mapa se convierte en una verdadera pizarra de planificación técnica, donde cada punto marcado tiene una identidad clara y profesional.
 
-render_diffs(file:///D:/Desarrollo-Software/Proyectos Android/factorEscala/app/src/main/res/layout/dialog_save_point_map.xml)
+render_diffs(file:///D:/Desarrollo-Software/Proyectos Android/factorEscala/app/src/main/res/layout/layout_marker_label.xml)
+render_diffs(file:///D:/Desarrollo-Software/Proyectos Android/factorEscala/app/src/main/java/bo/com/factorcombinadotopo/MapManager.java)
+render_diffs(file:///D:/Desarrollo-Software/Proyectos Android/factorEscala/app/src/main/java/bo/com/factorcombinadotopo/MapFragment.java)

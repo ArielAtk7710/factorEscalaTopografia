@@ -356,6 +356,7 @@
     <string name="label_reg_auto">Registro Automático</string>
     <string name="label_reg_map">Registro Mapa</string>
     <string name="label_searching_location">Buscando ubicación...</string>
+    <string name="msg_gps_toggle_info">GPS Dispositivo: guarda la altura obtenida de tu GPS, Altura online: guarda la altura obtenida de la API de Open-Meteo (Copernicus DEM), que utiliza de forma global el sistema de referencia vertical EGM2008, basadas en la latitud y longitud marcada.</string>
 
     <!-- Terms and Conditions -->
     <string name="title_terms_conditions">📜 Términos y Condiciones de Uso</string>
