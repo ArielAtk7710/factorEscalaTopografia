@@ -21,7 +21,12 @@ import android.content.ContentValues;
 import androidx.appcompat.app.AlertDialog;
 import com.google.android.material.button.MaterialButtonToggleGroup;
 import java.util.Date;
+import java.util.List;
+import java.util.ArrayList;
 import java.text.SimpleDateFormat;
+import android.database.Cursor;
+import org.osmdroid.util.GeoPoint;
+import org.osmdroid.api.IMapController;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -97,6 +102,14 @@ public class MapFragment extends Fragment {
                 if (mapManager != null && mapView != null) {
                     showSavePointDialogMap();
                 }
+            });
+
+            view.findViewById(R.id.fab_view_list).setOnClickListener(v -> {
+                showPointSelectionDialog();
+            });
+
+            view.findViewById(R.id.fab_go_to_coords).setOnClickListener(v -> {
+                showGoToCoordsDialog();
             });
 
             setupMapListener();
@@ -186,7 +199,7 @@ public class MapFragment extends Fragment {
             TopographyRepository.getInstance(requireContext()).calculateCompleteAsync(targetLoc, new TopographyRepository.CalculationCallback() {
                 @Override
                 public void onResult(TopoCalculoManager.TopoResult res, boolean isMgb) {
-                    persistirPuntoMapa(res, name, notes, isMgb, "Copernicus DEM GLO-90", "Métrica (Mapa)", progressDialog, center);
+                    persistirPuntoMapa(res, name, notes, isMgb, "Copernicus DEM GLO-90", "Métrica (Mapa)", progressDialog);
                 }
                 @Override public void onError(Exception e) { handleGuardadoError(e, progressDialog); }
             });
@@ -201,7 +214,7 @@ public class MapFragment extends Fragment {
                     repo.calculateFromOrthometricAsync(lat, lon, elevationOrto, new TopographyRepository.CalculationCallback() {
                         @Override
                         public void onResult(TopoCalculoManager.TopoResult res, boolean isMgb) {
-                            persistirPuntoMapa(res, name, notes, true, "Open-Meteo API", "Digital (DEM)", progressDialog, center);
+                            persistirPuntoMapa(res, name, notes, true, "Open-Meteo API", "Digital (DEM)", progressDialog);
                         }
                         @Override public void onError(Exception e) { handleGuardadoError(e, progressDialog); }
                     });
@@ -220,7 +233,7 @@ public class MapFragment extends Fragment {
                     repo.calculateCompleteAsync(targetLoc, new TopographyRepository.CalculationCallback() {
                         @Override
                         public void onResult(TopoCalculoManager.TopoResult res, boolean isMgb) {
-                            persistirPuntoMapa(res, name, fallbackNotes, isMgb, "GPS Dispositivo (Fallback)", "Métrica (Offline)", progressDialog, center);
+                            persistirPuntoMapa(res, name, fallbackNotes, isMgb, "GPS Dispositivo (Fallback)", "Métrica (Offline)", progressDialog);
                         }
                         @Override public void onError(Exception e) { handleGuardadoError(e, progressDialog); }
                     });
@@ -229,7 +242,7 @@ public class MapFragment extends Fragment {
         }
     }
 
-    private void persistirPuntoMapa(TopoCalculoManager.TopoResult res, String name, String notes, boolean isMgb, String dem, String prec, AlertDialog dialog, IGeoPoint center) {
+    private void persistirPuntoMapa(TopoCalculoManager.TopoResult res, String name, String notes, boolean isMgb, String dem, String prec, AlertDialog dialog) {
         DatabaseHelper db = DatabaseHelper.getInstance(requireContext());
         ContentValues v = new ContentValues();
         String time = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault()).format(new Date());
@@ -263,7 +276,6 @@ public class MapFragment extends Fragment {
         new Handler(Looper.getMainLooper()).postDelayed(() -> {
             dialog.dismiss();
             UIUtils.showSuccessToast(requireContext(), getString(R.string.msg_point_saved_format, name));
-            if (mapManager != null) mapManager.addManualMarker(center, name);
         }, 500);
     }
 
@@ -272,6 +284,97 @@ public class MapFragment extends Fragment {
             if (dialog != null) dialog.dismiss();
             UIUtils.showErrorToast(requireContext(), "Error técnico: " + e.getMessage());
         });
+    }
+
+    private void showPointSelectionDialog() {
+        DatabaseHelper db = DatabaseHelper.getInstance(requireContext());
+        Cursor cursor = db.obtenerPuntos();
+        if (cursor == null) return;
+
+        List<PointRef> allPoints = new ArrayList<>();
+        while (cursor.moveToNext()) {
+            PointRef p = new PointRef();
+            p.nombre = cursor.getString(cursor.getColumnIndexOrThrow(DatabaseHelper.COLUMN_NOMBRE));
+            try {
+                p.lat = Double.parseDouble(cursor.getString(cursor.getColumnIndexOrThrow(DatabaseHelper.COLUMN_LATITUD)));
+                p.lon = Double.parseDouble(cursor.getString(cursor.getColumnIndexOrThrow(DatabaseHelper.COLUMN_LONGITUD)));
+                allPoints.add(p);
+            } catch (Exception ignored) {}
+        }
+        cursor.close();
+
+        if (allPoints.isEmpty()) {
+            UIUtils.showInfoToast(requireContext(), "No hay puntos registrados");
+            return;
+        }
+
+        String[] names = new String[allPoints.size()];
+        boolean[] checked = new boolean[allPoints.size()];
+        for (int i = 0; i < allPoints.size(); i++) names[i] = allPoints.get(i).nombre;
+
+        new AlertDialog.Builder(requireContext())
+            .setTitle("Seleccionar puntos para ver")
+            .setMultiChoiceItems(names, checked, (dialog, which, isChecked) -> checked[which] = isChecked)
+            .setPositiveButton("Mostrar", (dialog, which) -> {
+                if (mapManager != null) {
+                    mapManager.clearManualMarkers();
+                    for (int i = 0; i < checked.length; i++) {
+                        if (checked[i]) {
+                            PointRef p = allPoints.get(i);
+                            mapManager.addManualMarker(new GeoPoint(p.lat, p.lon), p.nombre);
+                        }
+                    }
+                }
+            })
+            .setNegativeButton("Cerrar", null)
+            .setNeutralButton("Limpiar Todo", (dialog, which) -> {
+                if (mapManager != null) mapManager.clearManualMarkers();
+            })
+            .show();
+    }
+
+    private void showGoToCoordsDialog() {
+        if (!isAdded()) return;
+
+        View dv = getLayoutInflater().inflate(R.layout.dialog_go_to_coords, null);
+        AlertDialog.Builder b = new AlertDialog.Builder(requireContext());
+        AlertDialog d = b.create();
+        if (d.getWindow() != null) d.getWindow().setBackgroundDrawableResource(android.R.color.transparent);
+        d.setView(dv);
+
+        EditText etLat = dv.findViewById(R.id.et_go_lat);
+        EditText etLon = dv.findViewById(R.id.et_go_lon);
+
+        dv.findViewById(R.id.btn_go_to_pos).setOnClickListener(v -> {
+            String latStr = etLat.getText().toString().trim();
+            String lonStr = etLon.getText().toString().trim();
+
+            if (latStr.isEmpty() || lonStr.isEmpty()) {
+                UIUtils.showWarningToast(requireContext(), "Ingrese coordenadas válidas");
+                return;
+            }
+
+            try {
+                double lat = Double.parseDouble(latStr);
+                double lon = Double.parseDouble(lonStr);
+
+                if (mapView != null) {
+                    mapView.getController().animateTo(new GeoPoint(lat, lon));
+                    UIUtils.showInfoToast(requireContext(), "Navegando a posición...");
+                }
+                d.dismiss();
+            } catch (Exception e) {
+                UIUtils.showErrorToast(requireContext(), "Formato numérico inválido");
+            }
+        });
+
+        dv.findViewById(R.id.btn_go_cancel).setOnClickListener(v -> d.dismiss());
+        d.show();
+    }
+
+    private static class PointRef {
+        String nombre;
+        double lat, lon;
     }
 
     private void setupMapListener() {

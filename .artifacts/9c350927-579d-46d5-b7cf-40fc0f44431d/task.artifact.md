@@ -1,11 +1,18 @@
-# Task List - Pin Name Labels in Map View
+# Task List - Preserving Master Classes (Commented State)
 
-- `[/]` **Step 1: UI Resources**
-    - `[ ]` Create `layout_marker_label.xml` (Orange box style)
-- `[ ]` **Step 2: Map Engine Update**
-    - `[ ]` Implement `addManualMarker(IGeoPoint point, String name)` in `MapManager.java`
-    - `[ ]` Create custom `MarkerInfoWindow` class to use the orange layout
-- `[ ]` **Step 3: Fragment Integration**
-    - `[ ]` Update `persistirPuntoMapa` in `MapFragment.java` to pass point name
-- `[ ]` **Step 4: Verification**
-    - `[ ]` Add a point and verify orange name box visibility
+- `[/]` **Step 1: Comment out unused master classes**
+    - `[ ]` Comment `IGMGeodesicCalculator.java`
+    - `[ ]` Comment `IGMSurveyCalculator.java`
+    - `[ ]` Comment `IGMEcefConverter.java`
+    - `[ ]` Comment `IGMEnuConverter.java`
+    - `[ ]` Comment `IGMLambertConverter.java`
+    - `[ ]` Comment `IGMDistanceReducer.java`
+    - `[ ]` Comment `IGMTmConverter.java`
+    - `[ ]` Comment `IGMLineCalculator.java`
+    - `[ ]` Comment `IGMPlateVelocityCalculator.java`
+    - `[ ]` Comment `IGMRasterProcessor.java`
+    - `[ ]` Comment `TopoAlgorithmTest.java`
+- `[ ]` **Step 2: Restore missing class**
+    - `[ ]` Recreate `IGMDatumTransformer.java` (commented)
+- `[ ]` **Step 3: Final Compilation Check**
+    - `[ ]` Execute `gradle_build("assembleDebug")`

@@ -1,9 +1,10 @@
 package bo.com.factorcombinadotopo;
 
+/*
 /**
  * Transversal Mercator general configurable.
  * Fórmulas idénticas a calcular6_1 del JS.
- */
+ * /
 public class IGMTmConverter {
 
     /**
@@ -16,7 +17,7 @@ public class IGMTmConverter {
      * @param falseEasting falso este
      * @param falseNorthing falso norte
      * @param ellip elipsoide
-     */
+     * /
     public static IGMCoordinate.UtmPoint forward(double lat, double lon,
                                                   double centralMeridian, double k0,
                                                   double falseEasting, double falseNorthing,
@@ -56,3 +57,4 @@ public class IGMTmConverter {
         return new IGMCoordinate.UtmPoint(easting, northing, 0, hemisphere);
     }
 }
+*/

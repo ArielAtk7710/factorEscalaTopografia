@@ -38,6 +38,8 @@ public class MapManager {
     private static boolean isFirstFix = true; // Estático para que solo centre una vez por sesión de app
     private boolean autoCenterEnabled = true;
     private int currentMapMode = 0; // 0: Predeterminado (OSM), 1: Satélite (ArcGIS)
+    
+    private final java.util.List<Marker> manualMarkers = new java.util.ArrayList<>();
 
     public static final String KEY_MAP_TYPE = "MapType"; // 0: Street, 1: Sat
 
@@ -251,6 +253,18 @@ public class MapManager {
     }
 
     /**
+     * Elimina todos los marcadores manuales (pines naranjas) del mapa.
+     */
+    public void clearManualMarkers() {
+        if (mapView == null) return;
+        for (Marker m : manualMarkers) {
+            mapView.getOverlays().remove(m);
+        }
+        manualMarkers.clear();
+        mapView.invalidate();
+    }
+
+    /**
      * Añade un marcador manual color naranja con etiqueta de nombre.
      */
     public void addManualMarker(IGeoPoint point, String name) {
@@ -272,6 +286,7 @@ public class MapManager {
         marker.setInfoWindow(new LabelInfoWindow(R.layout.layout_marker_label, mapView));
         
         mapView.getOverlays().add(marker);
+        manualMarkers.add(marker); // Registrar para poder borrarlo después
         marker.showInfoWindow(); // Mostrar nombre automáticamente
         mapView.invalidate();
     }

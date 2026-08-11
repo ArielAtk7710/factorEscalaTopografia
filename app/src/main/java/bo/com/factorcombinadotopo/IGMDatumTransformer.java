@@ -1,15 +1,16 @@
 package bo.com.factorcombinadotopo;
 
+/*
 /**
  * Transformación de datum PSAD56 <-> WGS84.
  * Fórmulas idénticas a calcular_1, calcular_2, calcular_3 y calcular_4 del JS.
  * Método de Molodensky-Badekas con 7 parámetros.
- */
+ * /
 public class IGMDatumTransformer {
 
     /**
      * PSAD56 -> WGS84 (calcular_1 del JS).
-     */
+     * /
     public static IGMCoordinate.GeoPoint psad56ToWgs84(double lat, double lon, double h) {
         IGMConstants.Ellipsoid psad = IGMConstants.Ellipsoid.CLARKE_1866;
         IGMConstants.Ellipsoid wgs = IGMConstants.Ellipsoid.WGS84;
@@ -52,7 +53,7 @@ public class IGMDatumTransformer {
 
     /**
      * WGS84 -> PSAD56 (calcular_2 del JS).
-     */
+     * /
     public static IGMCoordinate.GeoPoint wgs84ToPsad56(double lat, double lon, double h) {
         IGMConstants.Ellipsoid wgs = IGMConstants.Ellipsoid.WGS84;
         IGMConstants.Ellipsoid psad = IGMConstants.Ellipsoid.CLARKE_1866;
@@ -96,14 +97,14 @@ public class IGMDatumTransformer {
     /**
      * Transformación de coordenadas ECEF (calcular_3 del JS).
      * ITRF/PSAD56 con punto de origen.
-     */
+     * /
     public static IGMCoordinate.EcefPoint transformEcef(double x, double y, double z,
                                                          double dx, double dy, double dz,
                                                          double rx, double ry, double rz,
                                                          double ds, boolean inverseScale) {
-        double x0 = IGMConstants.DATUM_X0;
-        double y0 = IGMConstants.DATUM_Y0;
-        double z0 = IGMConstants.DATUM_Z0;
+        double x0 = 0.0;
+        double y0 = 0.0;
+        double z0 = 0.0;
 
         double[] xyz = {x0 + dx, y0 + dy, z0 + dz};
         double[][] m = {
@@ -132,3 +133,4 @@ public class IGMDatumTransformer {
         return new IGMCoordinate.EcefPoint(resp[0], resp[1], resp[2]);
     }
 }
+*/

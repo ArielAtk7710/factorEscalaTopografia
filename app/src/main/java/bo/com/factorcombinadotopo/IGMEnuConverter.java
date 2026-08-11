@@ -1,14 +1,15 @@
 package bo.com.factorcombinadotopo;
 
+/*
 /**
  * Conversión ECEF <-> ENU (Sistema Topocéntrico Local).
  * Fórmulas idénticas a calcular_B03 y calcular_B04 del JS.
- */
+ * /
 public class IGMEnuConverter {
 
     /**
      * ECEF -> ENU (calcular_B03 del JS).
-     */
+     * /
     public static IGMCoordinate.EnuPoint toEnu(double x, double y, double z,
                                                 double x0, double y0, double z0,
                                                 double lat0, double lon0) {
@@ -31,7 +32,7 @@ public class IGMEnuConverter {
 
     /**
      * ENU -> ECEF (calcular_B04 del JS).
-     */
+     * /
     public static IGMCoordinate.EcefPoint fromEnu(IGMCoordinate.EnuPoint enu,
                                                    double x0, double y0, double z0,
                                                    double lat0, double lon0) {
@@ -50,3 +51,4 @@ public class IGMEnuConverter {
         return new IGMCoordinate.EcefPoint(x0 + dx, y0 + dy, z0 + dz);
     }
 }
+*/

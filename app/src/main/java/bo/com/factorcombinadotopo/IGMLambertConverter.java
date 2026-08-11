@@ -1,9 +1,10 @@
 package bo.com.factorcombinadotopo;
 
+/*
 /**
  * Proyección Lambert Conforme Cónica (Bolivia).
  * Fórmulas idénticas a calcular_B071 y calcular_B062 del JS.
- */
+ * /
 public class IGMLambertConverter {
 
     private final double n, F, r0, lambda0Rad;
@@ -38,7 +39,7 @@ public class IGMLambertConverter {
 
     /**
      * Forward: Geo -> Lambert (calcular_B071 del JS).
-     */
+     * /
     public IGMCoordinate.LambertPoint forward(double lat, double lon) {
         double latRad = Math.toRadians(lat);
         double lonRad = Math.toRadians(lon);
@@ -54,7 +55,7 @@ public class IGMLambertConverter {
     /**
      * Inverse: Lambert -> Geo (calcular_B062 del JS).
      * Búsqueda numérica robusta para el hemisferio sur (n < 0).
-     */
+     * /
     public IGMCoordinate.GeoPoint inverse(double x, double y) {
         double dx = x - IGMConstants.LAMBERT_BOLIVIA_FE;
         double dy = r0 - y;
@@ -84,3 +85,4 @@ public class IGMLambertConverter {
         return geo;
     }
 }
+*/

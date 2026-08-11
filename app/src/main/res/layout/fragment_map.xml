@@ -84,7 +84,6 @@
 
     </FrameLayout>
 
-    <!-- Overlay Controls -->
     <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -92,6 +91,17 @@
         android:orientation="vertical"
         app:layout_constraintBottom_toBottomOf="@+id/map_container"
         app:layout_constraintEnd_toEndOf="parent">
+
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
+            android:id="@+id/fab_go_to_coords"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="12dp"
+            android:contentDescription="Ir a Coordenadas"
+            android:src="@drawable/ic_search_pro"
+            app:backgroundTint="@color/primary_dark"
+            app:fabSize="mini"
+            app:tint="@android:color/white" />
 
         <com.google.android.material.floatingactionbutton.FloatingActionButton
             android:id="@+id/fab_view_list"

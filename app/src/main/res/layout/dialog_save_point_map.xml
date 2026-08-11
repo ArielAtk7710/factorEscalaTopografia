@@ -92,7 +92,7 @@
                     android:textSize="11sp"
                     android:textStyle="bold"
                     app:backgroundTint="@drawable/bg_toggle_selector_map"
-                    app:textColor="@color/color_toggle_text_map"
+                    android:textColor="@color/color_toggle_text_map"
                     app:strokeColor="@color/accent_orange"
                     app:strokeWidth="1.5dp"
                     app:cornerRadius="8dp" />
@@ -107,7 +107,7 @@
                     android:textSize="11sp"
                     android:textStyle="bold"
                     app:backgroundTint="@drawable/bg_toggle_selector_map"
-                    app:textColor="@color/color_toggle_text_map"
+                    android:textColor="@color/color_toggle_text_map"
                     app:strokeColor="@color/accent_orange"
                     app:strokeWidth="1.5dp"
                     app:cornerRadius="8dp" />

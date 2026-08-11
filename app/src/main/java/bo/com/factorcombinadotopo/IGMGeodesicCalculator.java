@@ -1,10 +1,11 @@
 package bo.com.factorcombinadotopo;
 
+/*
 /**
  * Cálculos geodésicos: Bowring y Vincenty.
  * Fórmulas idénticas a calcular_1_004, calcular_2_004,
  * calcular_3_004 y calcular_4_004 del JS.
- */
+ * /
 public class IGMGeodesicCalculator {
 
     public static class GeoResult {
@@ -17,7 +18,7 @@ public class IGMGeodesicCalculator {
 
     /**
      * Bowring Directo (calcular_1_004 del JS).
-     */
+     * /
     public static GeoResult bowringDirect(double lat1, double lon1, double azimuth,
                                           double distance, IGMConstants.Ellipsoid ellip) {
         double a = ellip.a;
@@ -70,7 +71,7 @@ public class IGMGeodesicCalculator {
 
     /**
      * Bowring Inverso (calcular_2_004 del JS).
-     */
+     * /
     public static GeoResult bowringInverse(double lat1, double lon1, double lat2, double lon2,
                                            IGMConstants.Ellipsoid ellip) {
         double a = ellip.a;
@@ -89,9 +90,9 @@ public class IGMGeodesicCalculator {
         double sinU1 = Math.sin(u1), cosU1 = Math.cos(u1);
         double sinU2 = Math.sin(u2), cosU2 = Math.cos(u2);
 
-        double sigma, sinSigma, cosSigma;
-        double sinAlpha, cos2Alpha;
-        double cos2SigmaM;
+        double sigma = 0.0, sinSigma = 0.0, cosSigma = 0.0;
+        double sinAlpha = 0.0, cos2Alpha = 0.0;
+        double cos2SigmaM = 0.0;
         double lambda = dLon;
 
         for (int i = 0; i < 4; i++) {
@@ -130,7 +131,7 @@ public class IGMGeodesicCalculator {
     /**
      * Vincenty Directo (calcular_3_004 del JS).
      * Iterativo con while (sigma - lastSigma > 1e-15).
-     */
+     * /
     public static GeoResult vincentyDirect(double lat1, double lon1, double azimuth,
                                            double distance, IGMConstants.Ellipsoid ellip) {
         double a = ellip.a;
@@ -186,7 +187,7 @@ public class IGMGeodesicCalculator {
 
     /**
      * Vincenty Inverso (calcular_4_004 del JS).
-     */
+     * /
     public static GeoResult vincentyInverse(double lat1, double lon1, double lat2, double lon2,
                                             IGMConstants.Ellipsoid ellip) {
         double a = ellip.a;
@@ -205,9 +206,9 @@ public class IGMGeodesicCalculator {
         double sinU1 = Math.sin(u1), cosU1 = Math.cos(u1);
         double sinU2 = Math.sin(u2), cosU2 = Math.cos(u2);
 
-        double sigma, sinSigma, cosSigma;
-        double sinAlpha, cos2Alpha;
-        double cos2SigmaM;
+        double sigma = 0.0, sinSigma = 0.0, cosSigma = 0.0;
+        double sinAlpha = 0.0, cos2Alpha = 0.0;
+        double cos2SigmaM = 0.0;
         double lambda = dLon;
         double lastLambda;
         int iter = 0;
@@ -246,3 +247,4 @@ public class IGMGeodesicCalculator {
         return r;
     }
 }
+*/

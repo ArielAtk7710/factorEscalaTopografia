@@ -1,14 +1,15 @@
 package bo.com.factorcombinadotopo;
 
+/*
 /**
  * Conversión ECEF <-> Geográficas.
  * Fórmulas idénticas a calcular_B01 y calcular_B02 del JS.
- */
+ * /
 public class IGMEcefConverter {
 
     /**
      * Geográficas -> ECEF (calcular_B02 del JS).
-     */
+     * /
     public static IGMCoordinate.EcefPoint toEcef(double lat, double lon, double h,
                                                    IGMConstants.Ellipsoid ellip) {
         double a = ellip.a;
@@ -25,7 +26,7 @@ public class IGMEcefConverter {
     /**
      * ECEF -> Geográficas (calcular_B01 del JS).
      * Método iterativo de Bowring con 4 iteraciones.
-     */
+     * /
     public static IGMCoordinate.GeoPoint fromEcef(double x, double y, double z,
                                                    IGMConstants.Ellipsoid ellip) {
         double a = ellip.a;
@@ -54,3 +55,4 @@ public class IGMEcefConverter {
         return geo;
     }
 }
+*/
