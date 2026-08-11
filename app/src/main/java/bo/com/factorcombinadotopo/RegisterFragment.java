@@ -210,6 +210,11 @@ public class RegisterFragment extends Fragment {
                 p.fe = cursor.getString(cursor.getColumnIndexOrThrow(DatabaseHelper.COLUMN_FACTOR_ESCALA));
                 p.fa = cursor.getString(cursor.getColumnIndexOrThrow(DatabaseHelper.COLUMN_FACTOR_ALTURA));
                 p.fc = cursor.getString(cursor.getColumnIndexOrThrow(DatabaseHelper.COLUMN_FACTOR_COMBINADO));
+                p.geoidModel = cursor.getString(cursor.getColumnIndexOrThrow(DatabaseHelper.COLUMN_MODELO_GEOIDAL));
+                p.tipoRegistro = cursor.getString(cursor.getColumnIndexOrThrow(DatabaseHelper.COLUMN_TIPO_REGISTRO));
+                p.precision = cursor.getString(cursor.getColumnIndexOrThrow(DatabaseHelper.COLUMN_PRECISION));
+                p.satelites = cursor.getString(cursor.getColumnIndexOrThrow(DatabaseHelper.COLUMN_SATELITES));
+                p.temperatura = cursor.getString(cursor.getColumnIndexOrThrow(DatabaseHelper.COLUMN_TEMPERATURA));
                 p.fecha = cursor.getString(cursor.getColumnIndexOrThrow(DatabaseHelper.COLUMN_FECHA));
                 p.notas = cursor.getString(cursor.getColumnIndexOrThrow(DatabaseHelper.COLUMN_NOTAS));
                 puntosList.add(p);
@@ -266,7 +271,12 @@ public class RegisterFragment extends Fragment {
         
         String timeTag = new SimpleDateFormat("yyyyMMdd_HHmm", Locale.getDefault()).format(new Date());
         String fileName = "Reporte_Topografico_" + sufijo + "_" + timeTag + ".txt";
-        FileUtils.savePublicTxtFile(requireContext(), fileName, sb.toString());
+        
+        String successMsg = sufijo.equals("Completo") ? 
+            getString(R.string.msg_export_all_success) : 
+            getString(R.string.msg_export_selected_success);
+            
+        FileUtils.savePublicTxtFile(requireContext(), fileName, sb.toString(), successMsg);
     }
 
     private void exportarLibretaTxt(List<LibretaEntry> lista, String sufijo) {
@@ -283,43 +293,51 @@ public class RegisterFragment extends Fragment {
         
         String timeTag = new SimpleDateFormat("yyyyMMdd_HHmm", Locale.getDefault()).format(new Date());
         String fileName = "Libreta_" + sufijo + "_" + timeTag + ".txt";
-        FileUtils.savePublicTxtFile(requireContext(), fileName, sb.toString());
+
+        String successMsg = sufijo.equals("Completo_Libreta") ? 
+            getString(R.string.msg_export_all_success) : 
+            getString(R.string.msg_export_selected_success);
+            
+        FileUtils.savePublicTxtFile(requireContext(), fileName, sb.toString(), successMsg);
     }
 
     private String buildPuntoInfoString(Punto p) {
         if (!isAdded()) return "";
         StringBuilder sb = new StringBuilder();
         
-        // Re-formatear datos numéricos para el reporte
+        // Re-formatear datos numéricos para el reporte (usando Locale US para punto decimal)
         double fcVal = Double.parseDouble(p.fc.replace(",", "."));
-        double presVal = Double.parseDouble(p.presion.replace(",", "."));
         String formattedFc = GeoUtils.formatFactorWithPpm(fcVal);
-        String formattedPres = GeoUtils.formatPressureDual(presVal);
+        
+        sb.append("IDENTIFICACIÓN DEL PUNTO:\n");
+        sb.append("  Nombre: ").append(p.nombre).append("\n");
+        sb.append("  Origen: ").append(p.tipoRegistro).append("\n");
+        sb.append("  Fecha:  ").append(p.fecha).append("\n");
+        sb.append("  Notas:  ").append(p.notas).append("\n\n");
 
-        sb.append(getString(R.string.label_identification)).append(":\n");
-        sb.append("  ").append(getString(R.string.label_point)).append(": ").append(p.nombre).append("\n");
-        sb.append("  ").append(getString(R.string.label_reg_date)).append(": ").append(p.fecha).append("\n");
-        sb.append("  ").append(getString(R.string.label_observations)).append(": ").append(p.notas).append("\n\n");
+        sb.append("COORDENADAS GEODÉSICAS (WGS84):\n");
+        sb.append("  Latitud:   ").append(p.latitud).append("\n");
+        sb.append("  Longitud:  ").append(p.longitud).append("\n");
+        sb.append("  Alt. Elipsoidal: ").append(p.altura).append(" m\n");
+        sb.append("  Alt. Ortométrica: ").append(p.altOrto).append(" m\n\n");
 
-        sb.append(getString(R.string.title_geodetic_coords)).append(" (WGS84):\n");
-        sb.append("  ").append(getString(R.string.label_latitude)).append(": ").append(p.latitud).append("\n");
-        sb.append("  ").append(getString(R.string.label_longitude)).append(": ").append(p.longitud).append("\n");
-        sb.append("  ").append(getString(R.string.label_ellipsoidal_altitude)).append(": ").append(p.altura).append(" ").append(getString(R.string.unit_meter)).append("\n");
-        sb.append("  ").append(getString(R.string.label_orthometric_altitude)).append(": ").append(p.altOrto).append(" ").append(getString(R.string.unit_meter)).append("\n\n");
+        sb.append("PROYECCIÓN CARTOGRÁFICA (UTM):\n");
+        sb.append("  Este (X):  ").append(p.este).append(" m\n");
+        sb.append("  Norte (Y): ").append(p.norte).append(" m\n");
+        sb.append("  Zona/Hem:  ").append(p.zona).append(p.hemisferio).append("\n\n");
 
-        sb.append(getString(R.string.label_proyected_coords)).append(":\n");
-        sb.append("  ").append(getString(R.string.label_east_x)).append(": ").append(p.este).append(" ").append(getString(R.string.unit_meter)).append("\n");
-        sb.append("  ").append(getString(R.string.label_north_y)).append(": ").append(p.norte).append(" ").append(getString(R.string.unit_meter)).append("\n");
-        sb.append("  ").append(getString(R.string.label_zone)).append(": ").append(p.zona).append("\n");
-        sb.append("  ").append(getString(R.string.label_hemisphere)).append(": ").append(p.hemisferio).append("\n\n");
+        sb.append("FACTORES Y DATOS TÉCNICOS:\n");
+        sb.append("  Modelo Geoidal:    ").append(p.geoidModel).append("\n");
+        sb.append("  Factor de Escala:  ").append(p.fe).append("\n");
+        sb.append("  Factor de Altura:  ").append(p.fa).append("\n");
+        sb.append("  Factor Combinado:  ").append(formattedFc).append("\n");
+        sb.append("  Presión Atmo.:     ").append(p.presion).append("\n\n");
 
-        sb.append(getString(R.string.label_geometric_factors_v)).append(":\n");
-        sb.append("  ").append(getString(R.string.label_scale_factor_k)).append(": ").append(p.fe).append("\n");
-        sb.append("  ").append(getString(R.string.label_elev_factor_ha)).append(": ").append(p.fa).append("\n");
-        sb.append("  ").append(getString(R.string.label_comb_factor_k)).append(": ").append(formattedFc).append("\n\n");
-
-        sb.append(getString(R.string.label_atm_data)).append(":\n");
-        sb.append("  ").append(getString(R.string.label_pressure)).append(": ").append(formattedPres).append("\n");
+        sb.append("CONDICIONES DE CAPTURA:\n");
+        sb.append("  Precisión GPS: ").append(p.precision).append("\n");
+        sb.append("  Satélites:     ").append(p.satelites).append("\n");
+        sb.append("  Temperatura:   ").append(p.temperatura).append("\n");
+        
         return sb.toString();
     }
 
@@ -347,7 +365,7 @@ public class RegisterFragment extends Fragment {
     @Override public void onResume() { super.onResume(); cargarDatos(); }
 
     private static class Punto {
-        int id; String nombre, latitud, longitud, altura, altOrto, presion, este, norte, zona, hemisferio, fe, fa, fc, fecha, notas;
+        int id; String nombre, latitud, longitud, altura, altOrto, presion, este, norte, zona, hemisferio, fe, fa, fc, geoidModel, tipoRegistro, precision, satelites, temperatura, fecha, notas;
         boolean isExpanded = false;
     }
 
@@ -365,8 +383,9 @@ public class RegisterFragment extends Fragment {
         @Override public void onBindViewHolder(@NonNull ViewHolder h, int pos) {
             Punto p = list.get(pos);
             h.txtNombre.setText(p.nombre); h.txtResumenUtm.setText("E: " + p.este + " | N: " + p.norte);
-            h.txtDetLat.setText(p.latitud); h.txtDetLon.setText(p.longitud); h.txtDetAlt.setText(p.altura);
-            h.txtDetAltOrto.setText(p.altOrto);
+            h.txtDetLat.setText(p.latitud); h.txtDetLon.setText(p.longitud); 
+            h.txtDetAlt.setText(p.altura + " m");
+            h.txtDetAltOrto.setText(p.altOrto + " m");
             
             // Re-formatear para UI (Datos limpios en DB -> Etiquetas en UI)
             try {
@@ -380,6 +399,11 @@ public class RegisterFragment extends Fragment {
             }
 
             h.txtDetSis.setText("WGS-84 " + p.zona + " " + p.hemisferio);
+            h.txtDetGeoid.setText(p.geoidModel);
+            h.txtTipoReg.setText(p.tipoRegistro);
+            h.txtDetPrecision.setText(p.precision);
+            h.txtDetSat.setText(p.satelites);
+            h.txtDetTemp.setText(p.temperatura);
             h.txtDetFe.setText(p.fe); h.txtDetFa.setText(p.fa);
             h.txtFechaFull.setText(getString(R.string.label_registered_format, p.fecha));
             h.txtDetNotas.setText((p.notas != null && !p.notas.isEmpty()) ? p.notas : getString(R.string.label_no_obs_list));
@@ -413,7 +437,7 @@ public class RegisterFragment extends Fragment {
             startActivity(Intent.createChooser(si, "Compartir Punto"));
         }
         class ViewHolder extends RecyclerView.ViewHolder {
-            TextView txtNombre, txtResumenUtm, txtDetLat, txtDetLon, txtDetAlt, txtDetAltOrto, txtDetPresion, txtDetSis, txtDetFe, txtDetFa, txtDetFc, txtFechaFull, txtExpandLabel, txtDetNotas;
+            TextView txtNombre, txtResumenUtm, txtDetLat, txtDetLon, txtDetAlt, txtDetAltOrto, txtDetPresion, txtDetSis, txtDetGeoid, txtDetFe, txtDetFa, txtDetFc, txtFechaFull, txtExpandLabel, txtDetNotas, txtTipoReg, txtDetPrecision, txtDetSat, txtDetTemp;
             ImageView btnDelete, btnCopy, btnShare, imgArrow; CheckBox cbSelect; LinearLayout layoutExpand, btnExpand;
             ViewHolder(View v) {
                 super(v);
@@ -425,6 +449,11 @@ public class RegisterFragment extends Fragment {
                 txtDetLat = v.findViewById(R.id.txt_det_lat); txtDetLon = v.findViewById(R.id.txt_det_lon);
                 txtDetAlt = v.findViewById(R.id.txt_det_alt); txtDetAltOrto = v.findViewById(R.id.txt_det_alt_orto);
                 txtDetPresion = v.findViewById(R.id.txt_det_presion); txtDetSis = v.findViewById(R.id.txt_det_sis);
+                txtDetGeoid = v.findViewById(R.id.txt_det_geoid_model);
+                txtTipoReg = v.findViewById(R.id.txt_item_tipo_registro);
+                txtDetPrecision = v.findViewById(R.id.txt_det_precision);
+                txtDetSat = v.findViewById(R.id.txt_det_sat);
+                txtDetTemp = v.findViewById(R.id.txt_det_temp);
                 txtDetFe = v.findViewById(R.id.txt_det_fe); txtDetFa = v.findViewById(R.id.txt_det_fa);
                 txtDetFc = v.findViewById(R.id.txt_det_fc); txtFechaFull = v.findViewById(R.id.txt_item_fecha_full);
                 txtDetNotas = v.findViewById(R.id.txt_det_notas);
@@ -440,9 +469,9 @@ public class RegisterFragment extends Fragment {
         }
         @Override public void onBindViewHolder(@NonNull ViewHolder h, int pos) {
             LibretaEntry e = list.get(pos);
-            h.txtNombre.setText(e.estacion + " -> " + e.puntoAux); h.txtResumen.setText(getString(R.string.label_ref_format, e.puntoRef) + " | " + getString(R.string.label_prisma) + ": " + e.altPri + getString(R.string.unit_meter));
-            h.txtDetTipo.setText(e.tipoReg); h.txtDetAltIns.setText(e.altIns + " " + getString(R.string.unit_meter)); h.txtDetEste.setText(e.este);
-            h.txtDetNorte.setText(e.norte); h.txtDetCota.setText(e.cota); h.txtDetFecha.setText(e.fecha);
+            h.txtNombre.setText(e.estacion + " -> " + e.puntoAux); h.txtResumen.setText(getString(R.string.label_ref_format, e.puntoRef) + " | " + getString(R.string.label_prisma) + ": " + e.altPri + " " + getString(R.string.unit_meter));
+            h.txtDetTipo.setText(e.tipoReg); h.txtDetAltIns.setText(e.altIns + " " + getString(R.string.unit_meter)); h.txtDetEste.setText(e.este + " " + getString(R.string.unit_meter));
+            h.txtDetNorte.setText(e.norte + " " + getString(R.string.unit_meter)); h.txtDetCota.setText(e.cota + " " + getString(R.string.unit_meter)); h.txtDetFecha.setText(e.fecha);
             h.txtDetObs.setText((e.obs == null || e.obs.isEmpty()) ? getString(R.string.label_no_obs_list) : e.obs);
             h.cbSelect.setVisibility(isSelectionMode ? View.VISIBLE : View.GONE);
             h.cbSelect.setChecked(selectedIds.contains(e.id));

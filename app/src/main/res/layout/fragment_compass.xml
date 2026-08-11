@@ -33,7 +33,7 @@
                     android:id="@+id/txt_comp_location"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Ubicación Actual"
+                    android:text="@string/label_current_location"
                     android:textColor="#FFFFFF"
                     android:textSize="12sp"
                     android:textStyle="bold"
@@ -178,12 +178,23 @@
                         <TextView android:id="@+id/txt_comp_ref" android:text="--- (WGS84)" android:textColor="@color/accent_orange" android:textSize="13sp" android:textStyle="bold" android:layout_width="wrap_content" android:layout_height="wrap_content"/>
                     </LinearLayout>
 
+                    <!-- Modelo Geoidal | Ondulación -->
+                    <LinearLayout android:orientation="vertical" android:layout_columnWeight="1">
+                        <TextView android:text="@string/label_geoid_model" android:textSize="8sp" android:textColor="@color/text_secondary" android:textStyle="bold" android:layout_width="wrap_content" android:layout_height="wrap_content"/>
+                        <TextView android:id="@+id/txt_comp_geoid_model" android:text="---" android:textColor="@color/accent_orange" android:textSize="12sp" android:textStyle="bold" android:layout_width="wrap_content" android:layout_height="wrap_content"/>
+                    </LinearLayout>
+
+                    <LinearLayout android:orientation="vertical" android:layout_columnWeight="1">
+                        <TextView android:text="@string/label_geoid_undulation" android:textSize="8sp" android:textColor="@color/text_secondary" android:textStyle="bold" android:layout_width="wrap_content" android:layout_height="wrap_content"/>
+                        <TextView android:id="@+id/txt_comp_geoid_undulation" android:text="---" android:textColor="@color/accent_orange" android:textSize="12sp" android:textStyle="bold" android:layout_width="wrap_content" android:layout_height="wrap_content"/>
+                    </LinearLayout>
+
                     </GridLayout>
 
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="MANTENER DISPOSITIVO HORIZONTAL PARA MÁXIMA PRECISIÓN"
+                    android:text="@string/msg_compass_horizontal_hint"
                     android:textColor="#374151"
                     android:textSize="7sp"
                     android:gravity="center"

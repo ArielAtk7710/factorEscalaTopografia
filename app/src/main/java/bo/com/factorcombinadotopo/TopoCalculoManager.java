@@ -1,5 +1,9 @@
 package bo.com.factorcombinadotopo;
 
+/**
+ * Orquestador principal de cálculos topográficos.
+ * Mantiene compatibilidad total con ManualFragment y toda la app.
+ */
 public class TopoCalculoManager {
 
     public static class TopoResult {
@@ -10,6 +14,7 @@ public class TopoCalculoManager {
         public double combinedFactor;
         public double pressureMmHg;
         public double pressureHpa;
+        public double altEllipsoidal;
         public double altOrto;
         public double geoidN;
         public double este;
@@ -20,36 +25,36 @@ public class TopoCalculoManager {
 
     /**
      * Cálculo completo desde coordenadas geográficas (WGS84).
+     * Fórmulas idénticas a calcular5_1 del JS.
      */
-    public static TopoResult calculateAll(double lat, double lon, double hEl, double geoidN, double pressureOffset) {
+    public static TopoResult calculateAll(double lat, double lon, double hEl,
+                                           double geoidN, double pressureOffset) {
         TopoResult r = new TopoResult();
         r.lat = lat;
         r.lon = lon;
         r.geoidN = geoidN;
+        r.altEllipsoidal = hEl;
         r.altOrto = hEl - geoidN;
-        r.zona = GeoUtils.getUtmZone(lon);
-        r.hemisferio = GeoUtils.getUtmHemisphere(lat);
+        r.zona = IGMUtmConverter.getZone(lon);
+        r.hemisferio = IGMUtmConverter.getHemisphere(lat);
 
-        // UTM Directa
-        IGMUtmConverter.UtmPoint utm = IGMUtmConverter.forward(lat, lon);
+        IGMCoordinate.UtmPoint utm = IGMUtmConverter.forward(lat, lon, IGMConstants.Ellipsoid.WGS84);
         r.este = utm.easting;
         r.norte = utm.northing;
 
-        // Factores
         double latRad = Math.toRadians(lat);
         double lonRad = Math.toRadians(lon);
         double lon0Rad = Math.toRadians(IGMUtmConverter.getCentralMeridian(r.zona));
 
-        r.scaleFactor = IGMScaleCalculator.calculateScaleFactor(latRad, lonRad, lon0Rad, IGMConstants.K0);
+        r.scaleFactor = IGMScaleCalculator.calculateScaleFactor(latRad, lonRad, lon0Rad,
+                IGMConstants.K0, IGMConstants.Ellipsoid.WGS84);
 
-        double rm = IGMElevationCalculator.calculateMeanRadius(latRad);
+        double rm = IGMElevationCalculator.calculateMeanRadius(latRad, IGMConstants.Ellipsoid.WGS84);
         r.elevationFactor = IGMElevationCalculator.calculateElevationFactor(rm, r.altOrto);
         r.combinedFactor = r.scaleFactor * r.elevationFactor;
-
-        // Presión
         r.pressureMmHg = IGMPressureCalculator.calculatePressureMmHg(r.altOrto) + pressureOffset;
-        double hpaFactor = IGMConstants.P0_HPA / IGMConstants.P0_MMHG;
-        r.pressureHpa = IGMPressureCalculator.calculatePressureHpa(r.altOrto) + (pressureOffset * hpaFactor);
+        double hpaOffset = pressureOffset * (IGMConstants.P0_HPA / IGMConstants.P0_MMHG);
+        r.pressureHpa = IGMPressureCalculator.calculatePressureHpa(r.altOrto) + hpaOffset;
 
         return r;
     }
@@ -59,11 +64,14 @@ public class TopoCalculoManager {
     }
 
     /**
-     * Cálculo completo desde coordenadas UTM.
+     * Cálculo completo desde coordenadas UTM (WGS84).
+     * Fórmulas idénticas a calcular5_2 del JS.
      */
-    public static TopoResult calculateFromUtm(double este, double norte, int zona, String hemisferio, double altOrto, double pressureOffset) {
-        // 1. Inverso preciso UTM → Geo
-        IGMUtmConverter.GeoPoint geo = IGMUtmConverter.inverse(este, norte, zona, hemisferio.charAt(0));
+    public static TopoResult calculateFromUtm(double este, double norte, int zona,
+                                               String hemisferio, double altOrto,
+                                               double pressureOffset) {
+        IGMCoordinate.GeoPoint geo = IGMUtmConverter.inverse(este, norte, zona,
+                hemisferio.charAt(0), IGMConstants.Ellipsoid.WGS84);
 
         TopoResult r = new TopoResult();
         r.lat = geo.lat;
@@ -74,27 +82,25 @@ public class TopoCalculoManager {
         r.hemisferio = hemisferio.charAt(0);
         r.altOrto = altOrto;
 
-        // 2. Factor de escala exacto desde geográficas
         double latRad = Math.toRadians(r.lat);
         double lonRad = Math.toRadians(r.lon);
         double lon0Rad = Math.toRadians(IGMUtmConverter.getCentralMeridian(zona));
 
-        r.scaleFactor = IGMScaleCalculator.calculateScaleFactor(latRad, lonRad, lon0Rad, IGMConstants.K0);
+        r.scaleFactor = IGMScaleCalculator.calculateScaleFactor(latRad, lonRad, lon0Rad,
+                IGMConstants.K0, IGMConstants.Ellipsoid.WGS84);
 
-        // 3. Factor de elevación con radio medio LOCAL
-        double rm = IGMElevationCalculator.calculateMeanRadius(latRad);
+        double rm = IGMElevationCalculator.calculateMeanRadius(latRad, IGMConstants.Ellipsoid.WGS84);
         r.elevationFactor = IGMElevationCalculator.calculateElevationFactor(rm, altOrto);
         r.combinedFactor = r.scaleFactor * r.elevationFactor;
-
-        // 4. Presión
         r.pressureMmHg = IGMPressureCalculator.calculatePressureMmHg(altOrto) + pressureOffset;
-        double hpaFactor = IGMConstants.P0_HPA / IGMConstants.P0_MMHG;
-        r.pressureHpa = IGMPressureCalculator.calculatePressureHpa(altOrto) + (pressureOffset * hpaFactor);
+        double hpaOffset = pressureOffset * (IGMConstants.P0_HPA / IGMConstants.P0_MMHG);
+        r.pressureHpa = IGMPressureCalculator.calculatePressureHpa(altOrto) + hpaOffset;
 
         return r;
     }
 
-    public static TopoResult calculateFromUtm(double este, double norte, int zona, String hemisferio, double altOrto) {
+    public static TopoResult calculateFromUtm(double este, double norte, int zona,
+                                               String hemisferio, double altOrto) {
         return calculateFromUtm(este, norte, zona, hemisferio, altOrto, 0.0);
     }
 }

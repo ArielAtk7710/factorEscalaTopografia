@@ -1,5 +1,6 @@
 package bo.com.factorcombinadotopo;
 
+import android.content.Context;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
@@ -18,7 +19,7 @@ import retrofit2.converter.gson.GsonConverterFactory;
 
 public class WeatherManager {
 
-    public enum SafetyLevel { GREEN, YELLOW, RED }
+    public enum SafetyLevel { GREEN, YELLOW, ORANGE, RED }
 
     public static class HourlyStatus {
         public String time;
@@ -28,6 +29,14 @@ public class WeatherManager {
         public int cloudCover;
         public int weatherCode;
         public SafetyLevel level;
+    }
+
+    public static class DailyForecast {
+        public String date;
+        public int weatherCode;
+        public double tempMax;
+        public double tempMin;
+        public int rainProb;
     }
 
     public static class SafetyStatus {
@@ -42,13 +51,23 @@ public class WeatherManager {
         public double rain;
         public double temperature;
         public double apparentTemperature;
+        public int isDay;
         public int cloudCover;
         public double visibility;
         public int rainProbability;
         public int forecastDescResId;
         
+        // Professional Recommendations (Deprecated in favor of safetyAnalysis)
+        public int detailedTitleResId;
+        public int detailedDescResId;
+        public int detailedRecResId;
+
         public String recommendation;
         public List<HourlyStatus> hourlyList = new ArrayList<>();
+        public List<DailyForecast> dailyList = new ArrayList<>();
+        
+        // New advanced analysis result
+        public FlightSafetyResult safetyAnalysis;
 
         public SafetyStatus(SafetyLevel level, int messageResId) {
             this.level = level;
@@ -84,22 +103,23 @@ public class WeatherManager {
         void onError(String error);
     }
 
-    public static void checkFlightSafety(double lat, double lon, WeatherCallback callback) {
+    public static void checkFlightSafety(Context context, double lat, double lon, double pdop, WeatherCallback callback) {
         AtomicReference<WeatherResponse> weatherRef = new AtomicReference<>(null);
         AtomicReference<Double> kpRef = new AtomicReference<>(null);
         AtomicBoolean weatherFailed = new AtomicBoolean(false);
 
-        // Parametros ampliados para Dron incluyendo Horario
-        String currentParams = "wind_speed_10m,wind_speed_80m,wind_speed_120m,wind_direction_10m,wind_gusts_10m,precipitation,temperature_2m,apparent_temperature,cloud_cover,visibility,weather_code";
+        // Parametros ampliados para Dron incluyendo Horario y Diario
+        String currentParams = "wind_speed_10m,wind_speed_80m,wind_speed_120m,wind_direction_10m,wind_gusts_10m,precipitation,temperature_2m,apparent_temperature,cloud_cover,visibility,weather_code,is_day";
         String hourlyParams = "temperature_2m,precipitation_probability,weather_code,wind_speed_10m,wind_gusts_10m,cloud_cover";
+        String dailyParams = "weather_code,temperature_2m_max,temperature_2m_min,precipitation_probability_max";
 
-        getApiService().getDroneWeather(lat, lon, currentParams, hourlyParams, "ecmwf_ifs025")
+        getApiService().getDroneWeather(lat, lon, currentParams, hourlyParams, dailyParams, "auto", "ecmwf_ifs025")
                 .enqueue(new Callback<WeatherResponse>() {
             @Override
             public void onResponse(Call<WeatherResponse> call, Response<WeatherResponse> response) {
                 if (response.isSuccessful() && response.body() != null) {
                     weatherRef.set(response.body());
-                    checkCompletion(weatherRef, kpRef, callback);
+                    checkCompletion(context, weatherRef, kpRef, pdop, callback);
                 } else {
                     weatherFailed.set(true);
                     callback.onError("Error en clima: " + response.code());
@@ -114,71 +134,45 @@ public class WeatherManager {
         });
 
         getApiService().getKpIndex("https://services.swpc.noaa.gov/products/noaa-planetary-k-index.json")
-                .enqueue(new Callback<List<List<String>>>() {
+                .enqueue(new Callback<List<bo.com.factorcombinadotopo.models.KpIndex>>() {
             @Override
-            public void onResponse(Call<List<List<String>>> call, Response<List<List<String>>> response) {
+            public void onResponse(Call<List<bo.com.factorcombinadotopo.models.KpIndex>> call, Response<List<bo.com.factorcombinadotopo.models.KpIndex>> response) {
                 double kp = -1;
-                if (response.isSuccessful() && response.body() != null && response.body().size() > 1) {
-                    List<String> lastEntry = response.body().get(response.body().size() - 1);
-                    try {
-                        kp = Double.parseDouble(lastEntry.get(1));
-                    } catch (Exception ignored) {}
+                if (response.isSuccessful() && response.body() != null && !response.body().isEmpty()) {
+                    bo.com.factorcombinadotopo.models.KpIndex lastEntry = response.body().get(response.body().size() - 1);
+                    kp = lastEntry.kp;
                 }
                 kpRef.set(kp);
-                if (!weatherFailed.get()) checkCompletion(weatherRef, kpRef, callback);
+                if (!weatherFailed.get()) checkCompletion(context, weatherRef, kpRef, pdop, callback);
             }
 
             @Override
-            public void onFailure(Call<List<List<String>>> call, Throwable t) {
+            public void onFailure(Call<List<bo.com.factorcombinadotopo.models.KpIndex>> call, Throwable t) {
                 kpRef.set(-1.0);
-                if (!weatherFailed.get()) checkCompletion(weatherRef, kpRef, callback);
+                if (!weatherFailed.get()) checkCompletion(context, weatherRef, kpRef, pdop, callback);
             }
         });
     }
 
-    private static void checkCompletion(AtomicReference<WeatherResponse> weatherRef, 
+    private static void checkCompletion(Context context,
+                                        AtomicReference<WeatherResponse> weatherRef, 
                                         AtomicReference<Double> kpRef, 
+                                        double pdop,
                                         WeatherCallback callback) {
         if (weatherRef.get() != null && kpRef.get() != null) {
-            evaluateSafety(weatherRef.get(), kpRef.get(), callback);
+            evaluateSafety(context, weatherRef.get(), kpRef.get(), pdop, callback);
         }
     }
 
-    private static void evaluateSafety(WeatherResponse weather, double kp, WeatherCallback callback) {
+    private static void evaluateSafety(Context context, WeatherResponse weather, double kp, double pdop, WeatherCallback callback) {
         WeatherResponse.CurrentWeather cur = weather.current;
-        SafetyLevel level = SafetyLevel.GREEN;
-        int msgRes = R.string.safety_msg_optimal;
-        Object arg = null;
-
         int rainProb = 0;
         if (weather.hourly != null && weather.hourly.precipitationProbability != null && !weather.hourly.precipitationProbability.isEmpty()) {
             rainProb = weather.hourly.precipitationProbability.get(0);
         }
 
-        // Lógica de Seguridad Senior para RPAS/Dron
-        if (cur.windSpeed120m > 35) {
-            level = SafetyLevel.RED;
-            msgRes = R.string.safety_msg_wind_120;
-            arg = cur.windSpeed120m;
-        } else if (cur.windGusts10m > 45) {
-            level = SafetyLevel.RED;
-            msgRes = R.string.safety_msg_gusts;
-            arg = cur.windGusts10m;
-        } else if (rainProb > 20) {
-            level = SafetyLevel.RED;
-            msgRes = R.string.safety_msg_rain_prob_high;
-            arg = rainProb;
-        } else if (cur.windSpeed120m > 25 || cur.windGusts10m > 35 || rainProb > 10) {
-            level = SafetyLevel.YELLOW;
-            msgRes = R.string.msg_weather_caution;
-        } else if (kp >= 5) {
-            level = SafetyLevel.YELLOW;
-            msgRes = R.string.safety_msg_kp_high;
-            arg = kp;
-        }
-
-        SafetyStatus status = new SafetyStatus(level, msgRes);
-        status.messageArg = arg;
+        // Basic status for legacy UI
+        SafetyStatus status = new SafetyStatus(SafetyLevel.GREEN, R.string.safety_msg_optimal);
         status.wind120 = cur.windSpeed120m;
         status.windSustained = cur.windSpeed10m;
         status.windDirection = cur.windDirection10m;
@@ -187,26 +181,24 @@ public class WeatherManager {
         status.rain = cur.precipitation;
         status.temperature = cur.temperature2m;
         status.apparentTemperature = cur.apparentTemperature;
+        status.isDay = cur.isDay;
         status.cloudCover = cur.cloudCover;
         status.visibility = cur.visibility;
         status.rainProbability = rainProb;
         status.forecastDescResId = getWeatherDescRes(cur.weatherCode);
-        
+
         // Procesar Horarios
         if (weather.hourly != null && weather.hourly.time != null) {
-            int startIdx = 0;
-            // Opcional: Filtrar para mostrar solo las próximas 24 horas desde la actual
             for (int i = 0; i < Math.min(24, weather.hourly.time.size()); i++) {
                 HourlyStatus hs = new HourlyStatus();
                 String fullTime = weather.hourly.time.get(i);
-                hs.time = fullTime.substring(fullTime.length() - 5); // Tomar solo HH:mm
+                hs.time = fullTime.substring(fullTime.length() - 5); 
                 hs.wind = weather.hourly.windSpeed10m.get(i);
                 hs.gusts = weather.hourly.windGusts10m.get(i);
                 hs.rainProb = weather.hourly.precipitationProbability.get(i);
                 hs.cloudCover = weather.hourly.cloudCover.get(i);
                 hs.weatherCode = weather.hourly.weatherCode.get(i);
                 
-                // Evaluar nivel horario
                 if (hs.wind > 35 || hs.gusts > 45 || hs.rainProb > 30) hs.level = SafetyLevel.RED;
                 else if (hs.wind > 25 || hs.rainProb > 10) hs.level = SafetyLevel.YELLOW;
                 else hs.level = SafetyLevel.GREEN;
@@ -214,45 +206,34 @@ public class WeatherManager {
                 status.hourlyList.add(hs);
             }
         }
-        
-        status.recommendation = generateRecommendation(status.hourlyList);
-        
-        callback.onSuccess(status);
-    }
 
-    private static String generateRecommendation(List<HourlyStatus> list) {
-        if (list.isEmpty()) return "";
-        
-        int bestStart = -1;
-        int count = 0;
-        int maxWindow = 0;
-        int finalStart = -1;
-        
-        for (int i = 0; i < list.size(); i++) {
-            if (list.get(i).level == SafetyLevel.GREEN) {
-                if (bestStart == -1) bestStart = i;
-                count++;
-            } else {
-                if (count > maxWindow) {
-                    maxWindow = count;
-                    finalStart = bestStart;
-                }
-                bestStart = -1;
-                count = 0;
+        // Procesar Pronóstico Diario
+        if (weather.daily != null && weather.daily.time != null) {
+            for (int i = 0; i < weather.daily.time.size(); i++) {
+                DailyForecast df = new DailyForecast();
+                df.date = weather.daily.time.get(i);
+                df.weatherCode = weather.daily.weatherCode.get(i);
+                df.tempMax = weather.daily.tempMax.get(i);
+                df.tempMin = weather.daily.tempMin.get(i);
+                df.rainProb = weather.daily.rainProbMax.get(i);
+                status.dailyList.add(df);
             }
         }
-        if (count > maxWindow) {
-            maxWindow = count;
-            finalStart = bestStart;
-        }
 
-        if (finalStart != -1 && maxWindow >= 2) {
-            return "Ventana óptima detectada entre las " + list.get(finalStart).time + 
-                   " y las " + list.get(finalStart + maxWindow - 1).time + 
-                   " con vientos favorables.";
-        } else {
-            return "Condiciones variables el resto del día. Se recomienda monitorear ráfagas antes de despegar.";
+        // 💡 ADVANCED ANALYSIS INTEGRATION
+        FlightSafetyAnalyzer analyzer = new FlightSafetyAnalyzer(context);
+        status.safetyAnalysis = analyzer.analyze(status, status.hourlyList, pdop);
+        
+        // Sync legacy fields with advanced analysis
+        switch(status.safetyAnalysis.nivel) {
+            case ROJO: status.level = SafetyLevel.RED; break;
+            case NARANJA: status.level = SafetyLevel.ORANGE; break;
+            case AMARILLO: status.level = SafetyLevel.YELLOW; break;
+            default: status.level = SafetyLevel.GREEN;
         }
+        
+        status.recommendation = status.safetyAnalysis.ventanaOptima;
+        callback.onSuccess(status);
     }
 
     private static int getWeatherDescRes(int code) {

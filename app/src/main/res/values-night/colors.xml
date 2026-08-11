@@ -27,4 +27,10 @@
     <color name="nav_background">@color/bg_main</color>
     <color name="nav_selected">@color/accent_light</color>
     <color name="nav_unselected">@color/text_secondary</color>
+
+    <!-- Weather UI / Pro Icons (Color Faltante Agregado) -->
+    <color name="weather_blue_active">#2196F3</color>
+    <color name="weather_text_primary">#111827</color> <!-- O el color de texto claro que prefieras -->
+    <color name="weather_green_safe">#10B981</color>
+    <color name="weather_orange">#F97316</color>
 </resources>

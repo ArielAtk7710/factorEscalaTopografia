@@ -1,22 +1,24 @@
 package bo.com.factorcombinadotopo;
 
+/**
+ * Presión atmosférica.
+ * Fórmulas idénticas a calcular5_1 y calcular5_2 del JS.
+ */
 public class IGMPressureCalculator {
 
-    /** Presión en mmHg (modelo calibrado del JS) */
+    /**
+     * Presión en mmHg (modelo exacto del JS).
+     */
     public static double calculatePressureMmHg(double altitude) {
         if (altitude < 0) altitude = 0;
-        return IGMConstants.P0_MMHG * Math.pow(1.0 - IGMConstants.PRESSURE_COEFF * altitude, IGMConstants.PRESSURE_EXP);
+        return 759.99 * Math.pow(1.0 - 0.0000225577 * altitude, 5.2559);
     }
 
-    /** Presión en hPa (modelo calibrado del JS) */
+    /**
+     * Presión en hPa (modelo exacto del JS).
+     */
     public static double calculatePressureHpa(double altitude) {
         if (altitude < 0) altitude = 0;
-        return IGMConstants.P0_HPA * Math.pow(1.0 - IGMConstants.PRESSURE_COEFF * altitude, IGMConstants.PRESSURE_EXP);
-    }
-
-    /** Presión en mmHg (modelo ISO/ICAO) */
-    public static double calculatePressureIso(double altitude) {
-        if (altitude < 0) altitude = 0;
-        return IGMConstants.P0_MMHG_ISO * Math.pow(1.0 - IGMConstants.PRESSURE_COEFF * altitude, IGMConstants.PRESSURE_EXP_ISO);
+        return 1013.25 * Math.pow(1.0 - 0.0000225577 * altitude, 5.2559);
     }
 }

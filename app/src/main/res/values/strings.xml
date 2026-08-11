@@ -4,7 +4,7 @@
     <string name="action_settings">Ajustes</string>
     <string name="tab_text_1">Automático</string>
     <string name="tab_text_2">Manual</string>
-    <string name="tab_text_3">Registro</string>
+    <string name="tab_text_3">REGISTROS</string>
     <string name="tab_text_map">Mapa</string>
     <string name="section_format">Sección %1$d</string>
 
@@ -45,7 +45,7 @@
     <string name="btn_delete">Borrar</string>
 
     <!-- History / Register -->
-    <string name="title_register">Registro</string>
+    <string name="title_register">REGISTROS</string>
     <string name="title_register_history">HISTORIAL DE PUNTOS</string>
     <string name="msg_no_registered_points">No hay puntos registrados aún.</string>
     <string name="dialog_register_point">Registrar Nuevo Punto</string>
@@ -110,8 +110,10 @@
     <string name="msg_no_map_installed">No existe ningún mapa instalado.</string>
     <string name="btn_import_map">IMPORTAR MAPA</string>
     <string name="btn_delete_map">ELIMINAR MAPA</string>
-    <string name="label_cache">Caché</string>
-    <string name="label_space_used">Espacio utilizado</string>
+    <string name="label_cache">Caché del Sistema</string>
+    <string name="label_cache_street">Mapa Callejero</string>
+    <string name="label_cache_sat">Mapa Satelital</string>
+    <string name="label_space_used">Espacio ocupado</string>
     <string name="btn_clear_cache">LIMPIAR CACHÉ</string>
     <string name="label_gps_settings">GPS</string>
     <string name="label_show_location">Mostrar mi ubicación</string>
@@ -136,6 +138,33 @@
     <string name="label_field_book">Libreta de Campo</string>
 
     <!-- Weather & Drone Safety -->
+    <!-- Drone Flight Assistant - Specialized Messages -->
+    <string name="safety_assistant_title">ASISTENTE DE VUELO DRON</string>
+    <string name="safety_cause_wind_critical">Vientos/Ráfagas críticas en altura</string>
+    <string name="safety_cause_wind_high">Viento elevado en zona de operación</string>
+    <string name="safety_cause_rain_imminent">Precipitación detectada o inminente</string>
+    <string name="safety_cause_rain_mod">Probabilidad de lluvia moderada</string>
+    <string name="safety_cause_vis_critical">Visibilidad crítica para VLOS</string>
+    <string name="safety_cause_vis_low">Visibilidad reducida</string>
+    <string name="safety_cause_solar_high">Actividad solar alta (Kp %1$.1f)</string>
+    <string name="safety_cause_solar_mod">Kp moderado (Posible inestabilidad GNSS)</string>
+    <string name="safety_cause_pdop_high">Geometría satelital pobre (PDOP elevado)</string>
+    <string name="safety_cause_pdop_def">Geometría satelital deficiente</string>
+
+    <string name="safety_short_msg_danger">Operación no recomendada. Riesgo crítico.</string>
+    <string name="safety_short_msg_caution">Riesgo elevado. Revise telemetría.</string>
+    <string name="safety_short_msg_variable">Precaución. Condiciones variables.</string>
+    <string name="safety_short_msg_safe">Entorno seguro para despegue.</string>
+
+    <string name="safety_optimal_window_prefix">Ventana óptima detectada entre las %1$s y las %2$s.</string>
+    <string name="safety_optimal_window_none">Condiciones variables. Monitorear ráfagas antes del despegue.</string>
+    <string name="safety_optimal_window_loading">Analizando ventana de seguridad operativa...</string>
+
+    <string name="safety_report_title">REPORTE DE SEGURIDAD OPERATIVA</string>
+    <string name="safety_risk_combined_title">Riesgo Combinado</string>
+    <string name="safety_risk_combined_desc">Se detectan múltiples factores desfavorables combinados. La estabilidad y el RTH del dron pueden verse comprometidos.</string>
+    <string name="safety_risk_combined_rec">Extrema las precauciones, reduce el radio de vuelo y considera posponer la misión.</string>
+
     <string name="weather_desc_0">Cielo despejado</string>
     <string name="weather_desc_1_3">Nubosidad parcial</string>
     <string name="weather_desc_45_48">Niebla</string>
@@ -150,18 +179,49 @@
     <string name="safety_msg_gusts">Alerta Roja: Ráfagas peligrosas detectadas (%1$.1f km/h)</string>
     <string name="safety_msg_rain_prob_high">Alerta Roja: Alta probabilidad de lluvia (%1$d%%). No volar.</string>
     <string name="safety_msg_kp_high">Alerta Amarilla: Posible inestabilidad en señal GPS por tormenta solar (Kp %1$.1f)</string>
+
+    <!-- Professional Topographic Alerts -->
+    <string name="safety_solar_title">Interferencia Ionosférica (Kp Alto)</string>
+    <string name="safety_solar_desc">La alta actividad solar está perturbando la ionosfera, lo que retrasa la señal de los satélites. Es probable que experimentes pérdida de precisión centimétrica o falsos \"FIX\" en equipos RTK.</string>
+    <string name="safety_solar_rec">Recomendación: Aumenta el tiempo de lectura de tus puntos o pospón levantamientos de alta precisión.</string>
+
+    <string name="safety_geometry_title">Geometría Satelital Deficiente</string>
+    <string name="safety_geometry_desc">Los satélites visibles están agrupados en una sola zona del cielo o hay muy pocos disponibles, aumentando el margen de error métrico.</string>
+    <string name="safety_geometry_rec">Recomendación: Evita tomar puntos de control críticos. Aléjate de edificios altos, cañadones o árboles densos que bloqueen el horizonte.</string>
+
+    <string name="safety_wind_title">Alerta de Vientos Fuertes</string>
+    <string name="safety_wind_desc">Se detectan ráfagas que superan el límite seguro de operación. Esto causará vibraciones severas en el bastón RTK (error de plomada) y riesgo de accidente en drones.</string>
+    <string name="safety_wind_rec">Recomendación: Cancela los vuelos aerofotogramétricos y asegura firmemente el bípode si realizas estática.</string>
+
+    <string name="safety_storm_title">Condiciones Atmosféricas Adversas</string>
+    <string name="safety_storm_desc">Las nubes densas y precipitaciones fuertes pueden generar refracción troposférica y degradar la señal de radio UHF entre la base y el rover.</string>
+    <string name="safety_storm_rec">Recomendación: Protege los equipos electrónicos del agua y suspende el vuelo de drones (riesgo de pérdida de señal y daños en motores).</string>
+
+    <string name="safety_optimal_title">Ventana de Operación Óptima</string>
+    <string name="safety_optimal_desc">El clima espacial (actividad solar) y las condiciones atmosféricas son estables. Las señales GNSS viajan sin interferencias mayores.</string>
+    <string name="safety_optimal_rec">Recomendación: Excelente momento para levantamientos RTK, estática de alta precisión y vuelos fotogramétricos automatizados.</string>
     <string name="safety_msg_rain_detected">Alerta Roja: Lluvia detectada (%1$.1f mm). Riesgo de cortocircuito.</string>
     <string name="safety_msg_rain_prob_mid">Alerta Amarilla: Riesgo de lluvia (%1$d%%). Vuelo bajo supervisión.</string>
-    <string name="label_wind_120_v">Viento (120m):</string>
-    <string name="label_wind_sustained">Viento Sostenido:</string>
-    <string name="label_wind_direction">Dir. Viento:</string>
+    <string name="msg_safety_disclaimer">Este análisis es orientativo y no sustituye la evaluación del piloto, las condiciones reales del entorno ni la normativa aeronáutica aplicable.</string>
+    <string name="label_detected_causes">Causas detectadas:</string>
+
+    <string name="title_forecast_24h">PRONÓSTICO PRÓXIMAS 24 HORAS</string>
+    <string name="title_forecast_7d">PRONÓSTICO 7 DÍAS</string>
+    <string name="label_thermal_comfort">CONFORT TÉRMICO</string>
     <string name="label_apparent_temp">Sensación Térmica:</string>
     <string name="label_cloud_cover">Nubosidad:</string>
     <string name="label_visibility">Visibilidad:</string>
+    <string name="label_wind_precip">VIENTOS Y PRECIPITACIÓN</string>
+    <string name="label_wind_120_v">Viento (120m):</string>
+    <string name="label_wind_sustained">Viento Sostenido:</string>
+    <string name="label_wind_direction">Dir. Viento:</string>
     <string name="label_gusts_max">Ráfagas Max:</string>
     <string name="label_rain_prob_v">Prob. Lluvia:</string>
     <string name="label_rain_actual">Lluvia Actual:</string>
+    <string name="label_electronic_safety">SEGURIDAD ELECTRÓNICA / GNSS</string>
     <string name="label_kp_solar">Índice Kp Solar:</string>
+    <string name="btn_refresh_weather_pro">↻  ACTUALIZAR DATOS</string>
+
     <string name="msg_gps_no_signal">GPS sin señal</string>
     <string name="msg_weather_danger">Peligro detectado. No se recomienda el despegue.</string>
     <string name="msg_weather_caution">Precaución. Interferencias GPS posibles.</string>
@@ -173,11 +233,7 @@
     <string name="btn_refresh_data">ACTUALIZAR DATOS</string>
     <string name="label_registered_format">Registrado: %1$s</string>
     <string name="label_ref_format">Ref: %1$s</string>
-    <string name="label_thermal_comfort">CONFORT TÉRMICO</string>
-    <string name="label_wind_precip">VIENTOS Y PRECIPITACIÓN</string>
-    <string name="label_electronic_safety">SEGURIDAD ELECTRÓNICA / GNSS</string>
-    <string name="geoid_model_egm96">EGM96 (Global)</string>
-    <string name="label_no_observations">Ninguna Observacion</string>
+    <string name="label_no_observations">Ninguna Observación</string>
     <string name="label_no_obs_list">Sin observaciones.</string>
     <string name="label_hide_details">Ocultar Detalles</string>
     <string name="label_show_details">Ver Detalles</string>
@@ -185,6 +241,8 @@
     <string name="label_point">PUNTO</string>
     <string name="label_reg_date">FECHA REGISTRO</string>
     <string name="label_observations">OBSERVACIONES</string>
+    <string name="label_observations_hint">Detalles técnicos, descripción del terreno...</string>
+    <string name="label_ref_system">SISTEMA DE REF.</string>
     <string name="label_proyected_coords">COORDENADAS PROYECTADAS (UTM)</string>
     <string name="label_east_x">ESTE (X)</string>
     <string name="label_north_y">NORTE (Y)</string>
@@ -200,7 +258,7 @@
     <string name="unit_meter">m</string>
     <string name="unit_kmh">km/h</string>
     <string name="unit_mm">mm</string>
-    <string name="unit_hpa">hPa</string>
+    <string name="unit_hpa">HPa</string>
     <string name="label_precision_sign">±</string>
 
     <!-- Compass Calibrate -->
@@ -216,6 +274,8 @@
     <string name="splash_title">App Factor Escala Topográfica</string>
     <string name="developer_name">Desarrollado por Attack7710</string>
     <string name="msg_gps_activated">GPS ACTIVADO</string>
+    <string name="msg_gps_deactivated">GPS DESACTIVADO</string>
+    <string name="msg_gps_required">Por favor, encienda su GPS para operar correctamente.</string>
     <string name="msg_manual_entry_hint">Ingrese los datos de forma manual</string>
     <string name="msg_activate_gps">Active el GPS de su dispositivo</string>
     <string name="msg_point_saved_format">Punto \'%1$s\' guardado en Registro</string>
@@ -243,6 +303,27 @@
     <string name="dir_o">O</string>
     <string name="dir_no">NO</string>
 
+    <string name="msg_compass_horizontal_hint">MANTENER DISPOSITIVO HORIZONTAL PARA MÁXIMA PRECISIÓN</string>
+    <string name="label_current_location">Ubicación Actual</string>
+    <string name="msg_consulting">Consultando...</string>
+    <string name="msg_evaluating_safety">Evaluando seguridad...</string>
+    <string name="label_flight_assistant">ASISTENTE DE VUELO</string>
+    <string name="msg_analyzing_window">Analizando ventana de vuelo segura...</string>
+    <string name="title_station_base">1. ESTACIÓN BASE (OCUPACIÓN)</string>
+    <string name="title_orientation">2. ORIENTACIÓN (VISTA ATRÁS)</string>
+    <string name="title_point_aux">3. PUNTO AUXILIAR / DETALLE</string>
+    <string name="label_station_id">ID Estación</string>
+    <string name="label_alt_ins_m">Alt. Instrumento (m)</string>
+    <string name="label_ref_point">Punto Referencia</string>
+    <string name="label_alt_prisma_m">Alt. Prisma (m)</string>
+    <string name="label_point_aux_id">ID Punto Auxiliar</string>
+    <string name="label_reg_type">Tipo de Registro</string>
+    <string name="label_east_e">Este (E):</string>
+    <string name="label_north_n">Norte (N):</string>
+    <string name="label_alt_z">Altura / Cota (Z):</string>
+    <string name="label_field_obs">Observaciones de Campo</string>
+    <string name="btn_save_notebook">Guardar en Libreta</string>
+
     <!-- Map Specific -->
     <string name="btn_view_on_map">VER EN MAPA</string>
     <string name="msg_location_permission_required">Permiso de ubicación necesario</string>
@@ -254,19 +335,86 @@
     <string name="label_warning">Advertencia:</string>
     <string name="label_info">Información:</string>
 
-    <!-- Dialogs -->
-    <!-- Map Help Strings -->
-    <string name="title_map_download_guide">GUÍA DE OBTENCIÓN DE MAPAS</string>
-    <string name="msg_map_download_instr">1. Descarga el archivo: Puedes obtener extractos de OpenStreetMap (formatos .sqlite o .mbtiles) desde fuentes como BBBike o usar herramientas como Mobile Atlas Creator (MOBAC).\n\n2. Ruta de instalación: Debes copiar el archivo a esta ruta exacta: Almacenamiento Interno > Android > data > bo.com.factorcombinadotopo > files > osmdroid\n\n3. Una vez copiado, la app habilitará los modos Híbrido y Offline.</string>
-
-    <string name="title_map_import_guide">GUÍA DE IMPORTACIÓN</string>
-    <string name="msg_map_import_instr">1. Presiona el botón "IMPORTAR MAPA".\n\n2. Selecciona tu archivo de mapa (.sqlite o .mbtiles) desde tu explorador de archivos.\n\n3. Espera el mensaje de confirmación.\n\n4. La app copiará el archivo internamente por ti.</string>
-
+    <string name="msg_map_offline_auto">Se activará Automáticamente el Modo Offline usando tus mapas cargados en el caché</string>
     <string name="dialog_delete_title">Confirmar Eliminación</string>
     <string name="dialog_delete_msg">¿Está seguro de que desea eliminar los registros seleccionados? Esta acción no se puede deshacer.</string>
     <string name="dialog_delete_msg_single">¿Está seguro de que desea eliminar este registro?</string>
     <string name="btn_yes">SÍ, BORRAR</string>
     <string name="btn_no">CANCELAR</string>
     <string name="menu_weather_drone">Clima Vuelo Dron</string>
-    <string name="msg_weather_accuracy_tip">La informacion del pronostico del clima se calcula en base a su ubicacion, aveces puede variar un poco.</string>
+    <string name="msg_weather_accuracy_tip">La información del pronóstico del clima se calcula con base en su ubicación, a veces puede variar un poco.</string>
+    <string name="desc_map_info">Información de modo automático</string>
+    <string name="title_geoid_adjustment">Modelo Geoidal</string>
+    <string name="opt_mgb">MGBol08</string>
+    <string name="opt_egm96">EGM96 (Global)</string>
+    <string name="msg_geoid_mgb_info">El modelo MGBol08 Modelo Geoidal Bolivia está basado en el modelo EGM2008.</string>
+    <string name="desc_geoid_info">Información de modelo geoidal</string>
+    <string name="msg_fallback_egm96">Se cambió al Modelo EGM96 (Global)</string>
+    <string name="msg_using_egm96">Se usará el modelo EGM96 (Global)</string>
+    <string name="msg_using_mgbol">Se usará el modelo MGBol08</string>
+    <string name="label_reg_manual">Registro Manual</string>
+    <string name="label_reg_auto">Registro Automático</string>
+    <string name="label_reg_map">Registro Mapa</string>
+    <string name="label_searching_location">Buscando ubicación...</string>
+
+    <!-- Terms and Conditions -->
+    <string name="title_terms_conditions">📜 Términos y Condiciones de Uso</string>
+    <string name="terms_body">Al utilizar FactorEscalaTop 2.3, aceptas formalmente los siguientes términos y condiciones:\n\n
+        <b>Alcance Geográfico:</b> La aplicación está diseñada y calibrada exclusivamente para los sistemas de referencia y la grilla cartográfica de Bolivia.\n\n
+        <b>Herramienta de Apoyo Técnico:</b> Los datos suministrados son de carácter orientativo y no sustituyen los procedimientos, controles técnicos ni equipos profesionales requeridos para levantamientos oficiales o legales.\n\n
+        <b>Precisión Variable:</b> La exactitud de los resultados está sujeta a la calidad del hardware GNSS del dispositivo, las coordenadas ingresadas, las condiciones ambientales y las fuentes de información externas.\n\n
+        <b>Responsabilidad del Usuario:</b> Es obligación exclusiva del profesional verificar, validar y certificar todos los cálculos antes de su aplicación en proyectos formales.\n\n
+        <b>Límite de Responsabilidad:</b> En la máxima medida permitida por la ley, el desarrollador no asume responsabilidad por daños directos, indirectos, lucro cesante o pérdidas financieras derivadas del uso o la dependencia de los cálculos de la aplicación.\n\n
+        <b>Propiedad Intelectual:</b> Queda estrictamente prohibida la ingeniería inversa, modificación o distribución no autorizada del software y su contenido.\n\n
+        <b>Servicios de Terceros:</b> La app utiliza servicios de infraestructura estándar (incluyendo Google Play Services para mapas y ubicación, y APIs meteorológicas gratuitas). El funcionamiento de estos servicios externos depende de sus propios proveedores y disponibilidad.\n\n
+        <b>Suscripciones (Versión PRO):</b> Las compras y actualizaciones de la versión PRO se gestionan a través de Google Play Store, sujetas a las políticas de pago y reembolso de Google.\n\n
+        <b>Cumplimiento Normativo:</b> El usuario se compromete a utilizar la herramienta en conformidad con la normativa vigente en el Estado Plurinacional de Bolivia.</string>
+
+    <string name="title_privacy_policy">🔒 Política de Privacidad</string>
+    <string name="privacy_body">En cumplimiento con las directrices de Google Play para la protección de datos, esta política detalla cómo se gestiona la información:\n\n
+        <b>Uso de la Ubicación (GPS):</b> La aplicación recopila y procesa datos de geolocalización en tiempo real únicamente para ejecutar los cálculos geodésicos y topográficos solicitados por el usuario en pantalla.\n\n
+        <b>Almacenamiento Local:</b> Los puntos, registros y configuraciones del usuario se almacenan de manera local en la memoria interna del dispositivo. No se suben bases de datos de proyectos personales a servidores externos del desarrollador.\n\n
+        <b>Herramientas de Google Play Services:</b> La aplicación utiliza componentes estándar de Google Play Services (necesarios para el funcionamiento de mapas y geolocalización nativa del sistema operativo).\n\n
+        <b>Publicidad y Monetización:</b> Si la aplicación muestra anuncios a través de redes publicitarias compatibles (como Google AdMob), estas plataformas pueden utilizar identificadores de publicidad del dispositivo para mostrar anuncios contextuales o genéricos conforme a las políticas de Google.\n\n
+        <b>No Venta de Datos:</b> El desarrollador no vende, transfiere ni cede datos personales ni de ubicación a terceros con fines comerciales.</string>
+
+    <string name="btn_accept_continue">ACEPTAR Y CONTINUAR</string>
+    <string name="btn_exit">SALIR</string>
+
+    <!-- About Section -->
+    <string name="title_about_detailed">ℹ️ Acerca de FactorEscalaTop</string>
+    <string name="about_version_region"><b>Versión:</b> 2.3 (Gratuita / PRO)\n<b>Región:</b> Estado Plurinacional de Bolivia</string>
+    <string name="about_app_description">Aplicación especializada para el apoyo topográfico, calibrada específicamente para la grilla cartográfica boliviana. Permite a topógrafos, ingenieros y estudiantes optimizar su trabajo en campo mediante:\n\n
+        • Cálculo automatizado de los factores de escala, elevación y combinado.\n
+        • Posicionamiento GNSS y gestión de coordenadas.\n
+        • Visualización de mapas y registro de puntos topográficos.\n
+        • Información meteorológica en tiempo real para planificación.\n\n
+        <b>🎖️ Orgullosamente avalada por el Colegio de Topógrafos de La Paz.</b></string>
+
+    <string name="title_collaborators">👥 Desarrolladores y Colaboradores</string>
+    <string name="about_collaborators_body">Este proyecto ha sido impulsado gracias al esfuerzo conjunto de ingeniería de software y la experiencia técnica en campo:\n\n
+        <b>Desarrollo de Software &amp; Arquitectura:</b> Equipo Técnico de FactorCombinadoTopo.\n\n
+        <b>Asesoría Geodésica y Validación de Campo:</b> Especialistas y topógrafos asociados del Colegio de Topógrafos de La Paz.\n\n
+        <b>Colaboradores Topógrafos:</b> Profesionales del área que aportaron con pruebas de campo en Topografía y Geodesia, asimismo en la validación de la grilla MGB08 basada en la EGM2008 en el altiplano, valles y llanos de Bolivia.</string>
+
+    <string name="about_legal_note"><b>Nota importante:</b> Esta aplicación es una herramienta de apoyo técnico. Para trabajos que exijan rigor oficial, los resultados deben ser verificados con equipos topográficos certificados.</string>
+
+    <!-- Cache Management -->
+    <string name="title_confirm_cache_clear">Confirmar Limpieza de Caché</string>
+    <string name="msg_confirm_cache_clear">¿Desea eliminar los mapas guardados en la memoria temporal?</string>
+    <string name="warn_cache_clear">⚠️ ADVERTENCIA: Si borra la caché, no podrá visualizar estas zonas del mapa sin conexión a Internet (Modo Offline).</string>
+
+    <!-- Export Success Messages -->
+    <string name="msg_export_all_success">Todos los registros exportados satisfactoriamente.</string>
+    <string name="msg_export_selected_success">Registros seleccionados exportados satisfactoriamente.</string>
+    <string name="msg_export_libreta_all_success">Toda la libreta exportada satisfactoriamente.</string>
+    <string name="msg_export_libreta_selected_success">Registros de libreta seleccionados exportados.</string>
+    <!-- Layout specific strings extracted -->
+    <string name="msg_starting_systems">Iniciando sistemas…</string>
+    <string name="label_tech_warning">Advertencia técnica</string>
+    <string name="msg_searching">Buscando…</string>
+    <string name="label_lat_short">LAT: %1$.6f</string>
+    <string name="label_lon_short">LON: %1$.6f</string>
+    <string name="msg_touch_outside_close">Toca fuera para cerrar</string>
+    <string name="desc_high_precision">Topografía de Alta Precisión</string>
 </resources>

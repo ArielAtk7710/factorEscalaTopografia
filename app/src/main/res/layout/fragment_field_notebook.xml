@@ -45,7 +45,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="1. ESTACIÓN BASE (OCUPACIÓN)"
+                android:text="@string/title_station_base"
                 android:textColor="@color/text_secondary"
                 android:textSize="12sp"
                 android:textStyle="bold"
@@ -57,11 +57,11 @@
                 android:orientation="horizontal"
                 android:layout_marginBottom="10dp">
                 <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:orientation="vertical" android:layout_marginEnd="8dp">
-                    <TextView android:text="ID Estación" android:textSize="10sp" android:textColor="@color/text_secondary" android:textStyle="bold" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginBottom="4dp"/>
+                    <TextView android:text="@string/label_station_id" android:textSize="10sp" android:textColor="@color/text_secondary" android:textStyle="bold" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginBottom="4dp"/>
                     <EditText android:id="@+id/et_lib_estacion" android:layout_width="match_parent" android:layout_height="wrap_content" android:background="@drawable/bg_spinner_with_arrow" android:backgroundTint="@color/bg_surface_secondary" android:padding="12dp" android:textColor="@color/text_primary" android:inputType="text" android:hint="GPS-01"/>
                 </LinearLayout>
                 <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:orientation="vertical">
-                    <TextView android:text="Alt. Instrumento (m)" android:textSize="10sp" android:textColor="@color/text_secondary" android:textStyle="bold" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginBottom="4dp"/>
+                    <TextView android:text="@string/label_alt_ins_m" android:textSize="10sp" android:textColor="@color/text_secondary" android:textStyle="bold" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginBottom="4dp"/>
                     <EditText android:id="@+id/et_lib_alt_ins" android:layout_width="match_parent" android:layout_height="wrap_content" android:background="@drawable/bg_spinner_with_arrow" android:backgroundTint="@color/bg_surface_secondary" android:padding="12dp" android:textColor="@color/text_primary" android:inputType="numberDecimal" android:hint="1.545"/>
                 </LinearLayout>
             </LinearLayout>
@@ -70,7 +70,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="2. ORIENTACIÓN (VISTA ATRÁS)"
+                android:text="@string/title_orientation"
                 android:textColor="@color/text_secondary"
                 android:textSize="12sp"
                 android:textStyle="bold"
@@ -82,11 +82,11 @@
                 android:orientation="horizontal"
                 android:layout_marginBottom="10dp">
                 <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:orientation="vertical" android:layout_marginEnd="8dp">
-                    <TextView android:text="Punto Referencia" android:textSize="10sp" android:textColor="@color/text_secondary" android:textStyle="bold" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginBottom="4dp"/>
+                    <TextView android:text="@string/label_ref_point" android:textSize="10sp" android:textColor="@color/text_secondary" android:textStyle="bold" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginBottom="4dp"/>
                     <EditText android:id="@+id/et_lib_punto_ref" android:layout_width="match_parent" android:layout_height="wrap_content" android:background="@drawable/bg_spinner_with_arrow" android:backgroundTint="@color/bg_surface_secondary" android:padding="12dp" android:textColor="@color/text_primary" android:inputType="text" android:hint="GPS-02"/>
                 </LinearLayout>
                 <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:orientation="vertical">
-                    <TextView android:text="Alt. Prisma (m)" android:textSize="10sp" android:textColor="@color/text_secondary" android:textStyle="bold" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginBottom="4dp"/>
+                    <TextView android:text="@string/label_alt_prisma_m" android:textSize="10sp" android:textColor="@color/text_secondary" android:textStyle="bold" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginBottom="4dp"/>
                     <EditText android:id="@+id/et_lib_alt_prisma" android:layout_width="match_parent" android:layout_height="wrap_content" android:background="@drawable/bg_spinner_with_arrow" android:backgroundTint="@color/bg_surface_secondary" android:padding="12dp" android:textColor="@color/text_primary" android:inputType="numberDecimal" android:hint="1.600"/>
                 </LinearLayout>
             </LinearLayout>
@@ -95,7 +95,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="3. PUNTO AUXILIAR / DETALLE"
+                android:text="@string/title_point_aux"
                 android:textColor="@color/text_secondary"
                 android:textSize="12sp"
                 android:textStyle="bold"
@@ -107,11 +107,11 @@
                 android:orientation="horizontal"
                 android:layout_marginBottom="10dp">
                 <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1.2" android:orientation="vertical" android:layout_marginEnd="8dp">
-                    <TextView android:text="ID Punto Auxiliar" android:textSize="10sp" android:textColor="@color/text_secondary" android:textStyle="bold" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginBottom="4dp"/>
+                    <TextView android:text="@string/label_point_aux_id" android:textSize="10sp" android:textColor="@color/text_secondary" android:textStyle="bold" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginBottom="4dp"/>
                     <EditText android:id="@+id/et_lib_punto_aux" android:layout_width="match_parent" android:layout_height="wrap_content" android:background="@drawable/bg_spinner_with_arrow" android:backgroundTint="@color/bg_surface_secondary" android:padding="12dp" android:textColor="@color/accent_orange" android:textStyle="bold" android:inputType="text" android:hint="AUX-01"/>
                 </LinearLayout>
                 <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:orientation="vertical">
-                    <TextView android:text="Tipo de Registro" android:textSize="10sp" android:textColor="@color/text_secondary" android:textStyle="bold" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginBottom="4dp"/>
+                    <TextView android:text="@string/label_reg_type" android:textSize="10sp" android:textColor="@color/text_secondary" android:textStyle="bold" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginBottom="4dp"/>
                     <Spinner android:id="@+id/sp_lib_tipo_reg" android:layout_width="match_parent" android:layout_height="wrap_content" android:background="@drawable/bg_spinner_with_arrow" android:backgroundTint="@color/bg_surface_secondary" android:padding="12dp"/>
                 </LinearLayout>
             </LinearLayout>
@@ -126,7 +126,7 @@
                 android:layout_marginBottom="16dp">
 
                 <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="horizontal" android:gravity="center_vertical" android:layout_marginBottom="8dp">
-                    <TextView android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:text="Este (E):" android:textColor="@color/accent_light" android:textSize="13sp" android:textStyle="bold"/>
+                    <TextView android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:text="@string/label_east_e" android:textColor="@color/accent_light" android:textSize="13sp" android:textStyle="bold"/>
                     <EditText
                         android:id="@+id/et_lib_este"
                         android:layout_width="wrap_content"
@@ -144,7 +144,7 @@
                 </LinearLayout>
 
                 <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="horizontal" android:gravity="center_vertical" android:layout_marginBottom="8dp">
-                    <TextView android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:text="Norte (N):" android:textColor="@color/accent_light" android:textSize="13sp" android:textStyle="bold"/>
+                    <TextView android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:text="@string/label_north_n" android:textColor="@color/accent_light" android:textSize="13sp" android:textStyle="bold"/>
                     <EditText
                         android:id="@+id/et_lib_norte"
                         android:layout_width="wrap_content"
@@ -162,7 +162,7 @@
                 </LinearLayout>
 
                 <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="horizontal" android:gravity="center_vertical">
-                    <TextView android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:text="Altura / Cota (Z):" android:textColor="@color/accent_light" android:textSize="13sp" android:textStyle="bold"/>
+                    <TextView android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:text="@string/label_alt_z" android:textColor="@color/accent_light" android:textSize="13sp" android:textStyle="bold"/>
                     <EditText
                         android:id="@+id/et_lib_cota"
                         android:layout_width="wrap_content"
@@ -184,7 +184,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Observaciones de Campo"
+                android:text="@string/label_field_obs"
                 android:textColor="@color/text_secondary"
                 android:textSize="12sp"
                 android:textStyle="bold"
@@ -216,7 +216,7 @@
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:text="Cancelar"
+                    android:text="@string/btn_cancel"
                     android:textColor="@color/text_secondary"
                     android:textStyle="bold"
                     android:gravity="center"
@@ -228,7 +228,7 @@
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1.5"
-                    android:text="Guardar en Libreta"
+                    android:text="@string/btn_save_notebook"
                     android:textAllCaps="false"
                     android:textStyle="bold"
                     app:backgroundTint="@color/accent_orange"

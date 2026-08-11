@@ -5,15 +5,22 @@ import android.content.SharedPreferences;
 import android.location.Location;
 
 import org.osmdroid.api.IMapController;
+import org.osmdroid.api.IGeoPoint;
 import org.osmdroid.tileprovider.tilesource.OnlineTileSourceBase;
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory;
 import org.osmdroid.util.GeoPoint;
 import org.osmdroid.util.MapTileIndex;
 import org.osmdroid.views.MapView;
 import org.osmdroid.views.overlay.CopyrightOverlay;
+import org.osmdroid.views.overlay.Marker;
 import org.osmdroid.views.overlay.mylocation.GpsMyLocationProvider;
 import org.osmdroid.views.overlay.mylocation.MyLocationNewOverlay;
 
+import android.graphics.PorterDuff;
+import android.graphics.drawable.Drawable;
+import androidx.core.content.ContextCompat;
+
+import android.graphics.Color;
 import java.io.File;
 
 /**
@@ -26,9 +33,11 @@ public class MapManager {
     private final MapView mapView;
     private final Context context;
     private MyLocationNewOverlay locationOverlay;
-    private boolean isFirstFix = true;
+    private static boolean isFirstFix = true; // Estático para que solo centre una vez por sesión de app
     private boolean autoCenterEnabled = true;
     private int currentMapMode = 0; // 0: Predeterminado (OSM), 1: Satélite (ArcGIS)
+
+    public static final String KEY_MAP_TYPE = "MapType"; // 0: Street, 1: Sat
 
     /**
      * Proveedor de mosaicos personalizado para ArcGIS World Imagery.
@@ -73,18 +82,25 @@ public class MapManager {
     private void initConfiguration() {
         // La configuración base ya se hizo en MainActivity para asegurar el primer inicio.
         SharedPreferences prefs = context.getSharedPreferences("AppPrefs", Context.MODE_PRIVATE);
-        int mapMode = prefs.getInt("MapMode", 0); // 0: Online, 1: Offline, 2: Hybrid
         boolean showLocation = prefs.getBoolean("ShowLocation", true);
+        
+        // Recuperar el último tipo de mapa usado (Callejero o Satélite)
+        int mapType = prefs.getInt(KEY_MAP_TYPE, 0); 
 
-        // Gestión de conexión: Bloquear internet solo en modo Offline estricto
-        mapView.setUseDataConnection(mapMode != 1); 
+        // Configurar ruta de caché específica para cada tipo (Street vs Sat)
+        File osmdroidDir = new File(context.getExternalFilesDir(null), "osmdroid");
+        String cacheFolder = (mapType == 1) ? "tiles_sat" : "tiles_street";
+        org.osmdroid.config.Configuration.getInstance().setOsmdroidTileCache(new File(osmdroidDir, cacheFolder));
 
-        // Configuración inicial de visualización basada en el modo
-        if (mapMode == 2) {
-            // Si es híbrido, empezamos con satélite por defecto pero permitimos offline
+        // Conexión siempre activa para modo Online Pro
+        mapView.setUseDataConnection(true); 
+
+        // Aplicar el tipo de mapa guardado
+        if (mapType == 1) {
             setSatelliteMode(true);
         } else {
             mapView.setTileSource(TileSourceFactory.MAPNIK);
+            currentMapMode = 0;
         }
         
         mapView.setMultiTouchControls(true);
@@ -94,19 +110,19 @@ public class MapManager {
         mapController.setZoom(18.0);
         mapController.setCenter(new GeoPoint(-17.0, -65.0));
 
-        // Atribución Legal (Copyright) - Requerido por Google Play y Esri
+        // 1. Atribución Legal (Copyright)
         CopyrightOverlay copyrightOverlay = new CopyrightOverlay(context);
         mapView.getOverlays().add(copyrightOverlay);
 
-        // Capa de Ubicación (Punto azul)
+        // 3. Capa de Ubicación (Punto azul)
         locationOverlay = new MyLocationNewOverlay(new GpsMyLocationProvider(context), mapView);
         if (showLocation) {
             locationOverlay.enableMyLocation();
         }
-        locationOverlay.disableFollowLocation(); // Evitar saltos de cámara bruscos
+        locationOverlay.disableFollowLocation(); 
         mapView.getOverlays().add(locationOverlay);
 
-        // Forzar arranque de hilos de renderizado (Fix para el primer inicio)
+        // Forzar arranque de hilos de renderizado
         mapView.onResume(); 
         mapView.invalidate();
     }
@@ -119,18 +135,20 @@ public class MapManager {
         if (mapView == null) return;
         
         SharedPreferences prefs = context.getSharedPreferences("AppPrefs", Context.MODE_PRIVATE);
-        int mapMode = prefs.getInt("MapMode", 0);
+        int mapType = prefs.getInt(KEY_MAP_TYPE, 0);
         
+        // Actualizar ruta de caché dinámica para respetar la separación
+        File osmdroidDir = new File(context.getExternalFilesDir(null), "osmdroid");
+        String cacheFolder = (mapType == 1) ? "tiles_sat" : "tiles_street";
+        org.osmdroid.config.Configuration.getInstance().setOsmdroidTileCache(new File(osmdroidDir, cacheFolder));
+
         // Forzar reinicio de hilos de conexión y renderizado
         mapView.onResume(); 
-        mapView.setUseDataConnection(mapMode != 1);
+        mapView.setUseDataConnection(true);
         
-        // Re-asignar TileSource para forzar recarga de mosaicos
-        if (mapMode == 2) {
+        // Re-asignar TileSource según selección
+        if (mapType == 1) {
             if (currentMapMode != 1) setSatelliteMode(true);
-        } else if (mapMode == 1) {
-            // Modo offline puro
-            mapView.setTileSource(TileSourceFactory.MAPNIK);
         } else {
             if (currentMapMode != 0) setSatelliteMode(false);
         }
@@ -146,7 +164,12 @@ public class MapManager {
      * Establece el modo satelital con corrección de coordenadas y limpieza de caché.
      */
     public void setSatelliteMode(boolean enableSatellite) {
+        if (mapView == null) return;
         try {
+            // Guardar preferencia para persistencia
+            SharedPreferences prefs = context.getSharedPreferences("AppPrefs", Context.MODE_PRIVATE);
+            prefs.edit().putInt(KEY_MAP_TYPE, enableSatellite ? 1 : 0).apply();
+
             // Limpiar la caché de los mosaicos cargados actualmente para evitar el efecto "barajado"
             if (mapView.getTileProvider() != null) {
                 mapView.getTileProvider().clearTileCache();
@@ -160,6 +183,11 @@ public class MapManager {
                 currentMapMode = 0;
                 mapView.setTileSource(TileSourceFactory.MAPNIK);
             }
+
+            // Actualizar la ruta de la caché global inmediatamente al cambiar modo
+            File osmdroidDir = new File(context.getExternalFilesDir(null), "osmdroid");
+            String cacheFolder = (enableSatellite) ? "tiles_sat" : "tiles_street";
+            org.osmdroid.config.Configuration.getInstance().setOsmdroidTileCache(new File(osmdroidDir, cacheFolder));
 
             mapView.invalidate(); // Refrescar renderizado
         } catch (Exception e) {
@@ -189,9 +217,8 @@ public class MapManager {
      * Centra el mapa en la posición real capturada por el sensor.
      */
     public void centerOnCurrentLocation() {
-        if (locationOverlay != null && locationOverlay.getMyLocation() != null) {
-            mapView.getController().animateTo(locationOverlay.getMyLocation());
-        }
+        if (mapView == null || locationOverlay == null || locationOverlay.getMyLocation() == null) return;
+        mapView.getController().animateTo(locationOverlay.getMyLocation());
     }
 
     /**
@@ -206,8 +233,35 @@ public class MapManager {
         }
     }
 
+    /**
+     * Añade un marcador manual color naranja en la posición indicada.
+     */
+    public void addManualMarker(IGeoPoint point) {
+        if (mapView == null || point == null) return;
+
+        Marker marker = new Marker(mapView);
+        marker.setPosition(new GeoPoint(point.getLatitude(), point.getLongitude()));
+        marker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM);
+        
+        // Configurar Icono Naranja
+        Drawable icon = ContextCompat.getDrawable(context, R.drawable.ic_map_pin);
+        if (icon != null) {
+            icon.setTint(ContextCompat.getColor(context, R.color.accent_orange));
+            marker.setIcon(icon);
+        }
+
+        // Sin popup por ahora, solo visual
+        marker.setInfoWindow(null);
+        
+        mapView.getOverlays().add(marker);
+        mapView.invalidate();
+    }
+
     public void onResume() {
-        if (mapView != null) mapView.onResume();
+        if (mapView != null) {
+            mapView.onResume();
+            mapView.invalidate();
+        }
         if (locationOverlay != null) {
             locationOverlay.enableMyLocation();
         }

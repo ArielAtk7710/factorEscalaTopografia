@@ -4,7 +4,7 @@
     <string name="action_settings">Paramètres</string>
     <string name="tab_text_1">Automatique</string>
     <string name="tab_text_2">Manuel</string>
-    <string name="tab_text_3">Registre</string>
+    <string name="tab_text_3">REGISTRES</string>
     <string name="tab_text_map">Carte</string>
     <string name="section_format">Section %1$d</string>
 
@@ -45,7 +45,7 @@
     <string name="btn_delete">Supprimer</string>
 
     <!-- History / Register -->
-    <string name="title_register">Registre</string>
+    <string name="title_register">REGISTRES</string>
     <string name="title_register_history">HISTORIQUE DES POINTS</string>
     <string name="msg_no_registered_points">Aucun point enregistré pour le moment.</string>
     <string name="dialog_register_point">Enregistrer un Nouveau Point</string>
@@ -106,12 +106,14 @@
     <string name="msg_no_map_installed">Aucune carte installée.</string>
     <string name="btn_import_map">IMPORTER UNE CARTE</string>
     <string name="btn_delete_map">SUPPRIMER LA CARTE</string>
-    <string name="label_cache">Cache</string>
-    <string name="label_space_used">Espace utilisé</string>
+    <string name="label_cache">Cache du Système</string>
+    <string name="label_cache_street">Carte Routière</string>
+    <string name="label_cache_sat">Carte Satellite</string>
+    <string name="label_space_used">Espace occupé</string>
     <string name="btn_clear_cache">VIDER LE CACHE</string>
     <string name="label_gps_settings">GPS</string>
     <string name="label_show_location">Afficher ma position</string>
-    <string name="label_real_time_update">Mise à jour en tiempo real</string>
+    <string name="label_real_time_update">Mise à jour en temps réel</string>
     <string name="msg_map_imported_success">Carte importée avec succès : %1$s</string>
     <string name="msg_map_delete_confirm">Êtes-vous sûr de vouloir supprimer la carte installée ?</string>
     <string name="msg_cache_cleared">Cache de la carte vidé.</string>
@@ -121,7 +123,7 @@
     <string name="err_no_explorer">Aucun explorateur de fichiers compatible trouvé.</string>
     <string name="err_invalid_values">Erreur : Veuillez saisir des valeurs numériques valides</string>
     <string name="err_import_map">Erreur lors de l\'importation de la carte.</string>
-    <string name="warn_fill_required">Remplissez au menos la station et le point auxiliaire</string>
+    <string name="warn_fill_required">Remplissez au moins la station et le point auxiliaire</string>
     <string name="warn_location_denied">Autorisation de localisation refusée. La carte n\'affichera pas votre position.</string>
     <string name="warn_no_export_data">Aucune donnée à exporter</string>
     <string name="label_explorer_title">Explorer le dossier des cartes</string>
@@ -138,7 +140,7 @@
     <string name="weather_desc_51_55">Bruine</string>
     <string name="weather_desc_61_65">Pluie modérée</string>
     <string name="weather_desc_71_75">Neige</string>
-    <string name="weather_desc_80_82">Chubascos</string>
+    <string name="weather_desc_80_82">Averses</string>
     <string name="weather_desc_95_99">Orage</string>
     <string name="weather_desc_unknown">Climat variable</string>
     <string name="safety_msg_optimal">Conditions optimales pour voler</string>
@@ -146,8 +148,31 @@
     <string name="safety_msg_gusts">Alerte Rouge : Rafales dangereuses détectées (%1$.1f km/h)</string>
     <string name="safety_msg_rain_prob_high">Alerte Rouge : Forte probabilité de pluie (%1$d%%). Ne volez pas.</string>
     <string name="safety_msg_kp_high">Alerte Jaune : Instabilité possible du signal GPS due à une tempête solaire (Kp %1$.1f)</string>
+
+    <!-- Professional Topographic Alerts -->
+    <string name="safety_solar_title">Interférence Ionosphérique (Kp Élevé)</string>
+    <string name="safety_solar_desc">La forte activité solaire perturbe l\'ionosphère, retardant le signal des satellites. Il est probable que vous constatiez une perte de précision centimétrique ou de faux \"FIX\" sur les équipements RTK.</string>
+    <string name="safety_solar_rec">Recommandation : Augmentez le temps de lecture de vos points ou reportez les levés de haute précision.</string>
+
+    <string name="safety_geometry_title">Mauvaise Géométrie Satellitaire</string>
+    <string name="safety_geometry_desc">Les satellites visibles sont regroupés dans une seule zone du ciel ou trop peu sont disponibles, augmentant la marge d\'erreur métrique.</string>
+    <string name="safety_geometry_rec">Recommandation : Évitez de prendre des points de contrôle critiques. Éloignez-vous des bâtiments élevés, des canyons ou des arbres denses qui bloquent l\'horizon.</string>
+
+    <string name="safety_wind_title">Alerte de Vents Forts</string>
+    <string name="safety_wind_desc">Des rafales dépassant la limite de sécurité d\'opération sont détectées. Cela causera des vibrations sévères sur la canne RTK (erreur de plomb) et un risque d\'accident pour les drones.</string>
+    <string name="safety_wind_rec">Recommandation : Annulez les vols photogrammétriques et fixez fermement le bipied si vous effectuez des levés statiques.</string>
+
+    <string name="safety_storm_title">Conditions Atmosphériques Adverses</string>
+    <string name="safety_storm_desc">Les nuages denses et les précipitations fortes peuvent générer une réfraction troposphérique et dégrader le signal radio UHF entre la base et le mobile.</string>
+    <string name="safety_storm_rec">Recommandation : Protégez les équipements électroniques de l\'eau et suspendez le vol des drones (risque de perte de signal et de dommages aux moteurs).</string>
+
+    <string name="safety_optimal_title">Fenêtre d\'Opération Optimale</string>
+    <string name="safety_optimal_desc">La météo spatiale (activité solaire) et les conditions atmosphériques sont stables. Les signaux GNSS voyagent sans interférences majeures.</string>
+    <string name="safety_optimal_rec">Recommandation : Excellent moment pour les levés RTK, la statique de haute précision et les vols photogrammétriques automatisés.</string>
     <string name="safety_msg_rain_detected">Alerte Rouge : Pluie détectée (%1$.1f mm). Risque de court-circuit.</string>
     <string name="safety_msg_rain_prob_mid">Alerte Jaune : Risque de pluie (%1$d%%). Vol sous surveillance.</string>
+    <string name="msg_safety_disclaimer">Cette analyse est purement indicative et ne remplace pas l\'évaluation du pilote, les conditions réelles de l\'environnement ni les réglementations aéronautiques en vigueur.</string>
+    <string name="label_detected_causes">Causes détectées :</string>
     <string name="label_wind_120_v">Vent (120m) :</string>
     <string name="label_wind_sustained">Vent Soutenu :</string>
     <string name="label_wind_direction">Dir. Vent :</string>
@@ -163,7 +188,7 @@
     <string name="msg_weather_caution">Attention. Interférences GPS possibles.</string>
     <string name="msg_weather_safe">Environnement sûr pour l\'opération de drones.</string>
     <string name="label_geoid_model">Modèle Géoïdal</string>
-    <string name="label_geoid_undulation">Ondulación Géoïdale</string>
+    <string name="label_geoid_undulation">Ondulation Géoïdale</string>
     <string name="label_temp_ambient">Température Ambiante</string>
     <string name="label_analysis_cond">ANALYSE DES CONDITIONS</string>
     <string name="btn_refresh_data">METTRE À JOUR LES DONNÉES</string>
@@ -172,7 +197,6 @@
     <string name="label_thermal_comfort">CONFORT THERMIQUE</string>
     <string name="label_wind_precip">VENTS ET PRÉCIPITATIONS</string>
     <string name="label_electronic_safety">SÉCURITÉ ÉLECTRONIQUE / GNSS</string>
-    <string name="geoid_model_egm96">EGM96 (Global)</string>
     <string name="label_no_observations">Aucune observation</string>
     <string name="label_no_obs_list">Sem observaciones.</string>
     <string name="label_hide_details">Masquer les détails</string>
@@ -181,7 +205,9 @@
     <string name="label_point">POINT</string>
     <string name="label_reg_date">DATE D\'ENREGISTREMENT</string>
     <string name="label_observations">OBSERVATIONS</string>
-    <string name="label_proyected_coords">COORDONNÉES PROJETÉES (UTM)</string>
+    <string name="label_observations_hint">Détails techniques, description du terrain...</string>
+    <string name="label_ref_system">RÉF. SYSTÈME</string>
+    <string name="label_proyected_coords">COORDENÉES PROJETÉES (UTM)</string>
     <string name="label_east_x">EST (X)</string>
     <string name="label_north_y">NORD (Y)</string>
     <string name="label_geometric_factors_v">FACTEURS DE CORRECTION</string>
@@ -196,13 +222,13 @@
     <string name="unit_meter">m</string>
     <string name="unit_kmh">km/h</string>
     <string name="unit_mm">mm</string>
-    <string name="unit_hpa">hPa</string>
+    <string name="unit_hpa">HPa</string>
     <string name="label_precision_sign">±</string>
 
     <!-- Compass Calibrate -->
     <string name="menu_calibrate_compass">Calibrer la Boussole</string>
     <string name="title_calibrate_compass">Calibrer la Boussole</string>
-    <string name="msg_calibrate_instructions">Pour améliorer la précision, déplacez votre appareil en dessinant un \'8\' dans l\'air plusieurs veces.</string>
+    <string name="msg_calibrate_instructions">Pour améliorer la précision, déplacez votre appareil en dessinant un \'8\' dans l\'air plusieurs fois.</string>
     <string name="btn_understood">COMPRIS</string>
 
     <!-- Menu items -->
@@ -212,6 +238,8 @@
     <string name="splash_title">App Facteur d\'Échelle Topographique</string>
     <string name="developer_name">Développé par Attack7710</string>
     <string name="msg_gps_activated">GPS ACTIVÉ</string>
+    <string name="msg_gps_deactivated">GPS DÉSACTIVÉ</string>
+    <string name="msg_gps_required">Veuillez activer votre GPS pour fonctionner correctamente.</string>
     <string name="msg_manual_entry_hint">Veuillez saisir les données manuellement</string>
     <string name="msg_activate_gps">Veuillez activer le GPS sur votre appareil</string>
     <string name="msg_point_saved_format">Point \'%1$s\' enregistré dans le Registre</string>
@@ -239,6 +267,28 @@
     <string name="dir_o">O</string>
     <string name="dir_no">NO</string>
 
+    <string name="msg_compass_horizontal_hint">GARDER L\'APPAREIL HORIZONTAL POUR UNE PRÉCISION MAXIMALE</string>
+    <string name="label_current_location">Emplacement Actuel</string>
+    <string name="title_forecast_24h">PRÉVISIONS 24 HEURES</string>
+    <string name="msg_consulting">Consultation...</string>
+    <string name="msg_evaluating_safety">Évaluation de la sécurité...</string>
+    <string name="label_flight_assistant">ASSISTANT DE VOL</string>
+    <string name="msg_analyzing_window">Analyse de la fenêtre de vol sûre...</string>
+    <string name="title_station_base">1. STATION DE BASE (OCCUPATION)</string>
+    <string name="title_orientation">2. ORIENTATION (VISÉE ARRIÈRE)</string>
+    <string name="title_point_aux">3. POINT AUXILIAIRE / DÉTAIL</string>
+    <string name="label_station_id">ID Station</string>
+    <string name="label_alt_ins_m">Haut. Inst. (m)</string>
+    <string name="label_ref_point">Point de Référence</string>
+    <string name="label_alt_prisma_m">Haut. Prisme (m)</string>
+    <string name="label_point_aux_id">ID Point Auxiliaire</string>
+    <string name="label_reg_type">Type d\'Enregistrement</string>
+    <string name="label_east_e">Est (E) :</string>
+    <string name="label_north_n">Nord (N) :</string>
+    <string name="label_alt_z">Haut. / Élévation (Z) :</string>
+    <string name="label_field_obs">Observations de Terrain</string>
+    <string name="btn_save_notebook">Enregistrer dans le Carnet</string>
+
     <!-- Map Specific -->
     <string name="btn_view_on_map">VOIR SUR LA CARTE</string>
     <string name="msg_location_permission_required">Autorisation d\'emplacement requise</string>
@@ -246,18 +296,11 @@
 
     <!-- UI Labels -->
     <string name="label_success">Succès:</string>
-    <string name="label_error">Erreur:</string>
+    <string name="label_error">Error:</string>
     <string name="label_warning">Avertissement:</string>
     <string name="label_info">Information:</string>
 
-    <!-- Dialogs -->
-    <!-- Map Help Strings -->
-    <string name="title_map_download_guide">GUIDE D\'OBTENTION DES CARTES</string>
-    <string name="msg_map_download_instr">1. Téléchargez le fichier : Vous pouvez obtenir des extraits d\'OpenStreetMap (formats .sqlite ou .mbtiles) à partir de sources como BBBike ou utilizar des outils como Mobile Atlas Creator (MOBAC).\n\n2. Chemin d\'installation : Vous devez copier le fichier vers ce chemin exact : Stockage Interne > Android > data > bo.com.factorcombinadotopo > files > osmdroid\n\n3. Une fois copié, l\'application activera les modes Hybride et Hors ligne.</string>
-
-    <string name="title_map_import_guide">GUIDE D\'IMPORTATION</string>
-    <string name="msg_map_import_instr">1. Appuyez sur el botón "IMPORTER UNE CARTE".\n\n2. Sélectionnez votre fichier de carte (.sqlite ou .mbtiles) depuis votre explorateur de fichiers.\n\n3. Attendez le message de confirmation.\n\n4. L\'application copiera le fichier en interne pour vous.</string>
-
+    <string name="msg_map_offline_auto">Le mode hors ligne sera activé automatiquement à l\'aide de vos cartes mises en cache</string>
     <string name="dialog_delete_title">Confirmer la suppression</string>
     <string name="dialog_delete_msg">Êtes-vous sûr de vouloir supprimer les enregistrements sélectionnés ? Cette action est irréversible.</string>
     <string name="dialog_delete_msg_single">Êtes-vous sûr de vouloir supprimer cet enregistrement ?</string>
@@ -265,4 +308,78 @@
     <string name="btn_no">ANNULER</string>
     <string name="menu_weather_drone">Météo Vol Drone</string>
     <string name="msg_weather_accuracy_tip">Les informations de prévisions météorologiques sont calculées en fonction de votre position, elles peuvent parfois varier légèrement.</string>
+    <string name="desc_map_info">Informations sur le mode automatique</string>
+    <string name="title_geoid_adjustment">Modèle Géoïdal</string>
+    <string name="opt_mgb">MGBol08</string>
+    <string name="opt_egm96">EGM96 (Global)</string>
+    <string name="msg_geoid_mgb_info">Le modèle MGBol08 modèle géoïdal Bolivie est basé sur le modèle EGM2008.</string>
+    <string name="desc_geoid_info">Informations sur le modelo géoïdal</string>
+    <string name="msg_fallback_egm96">Passé au modèle EGM96 (Global)</string>
+    <string name="msg_using_egm96">Le modèle EGM96 (Global) sera utilisé</string>
+    <string name="msg_using_mgbol">Le modèle MGBol08 sera utilisé</string>
+    <string name="label_reg_manual">Enregistrement Manuel</string>
+    <string name="label_reg_auto">Enregistrement Automatique</string>
+    <string name="label_reg_map">Enregistrement Carte</string>
+    <string name="label_searching_location">Recherche de l\'emplacement...</string>
+
+    <!-- Terms and Conditions -->
+    <string name="title_terms_conditions">📜 Conditions Générales d\'Utilisation</string>
+    <string name="terms_body">En utilisant FactorEscalaTop 2.3, vous acceptez formellement les conditions générales suivantes :\n\n
+        <b>Portée Géographique :</b> L\'application est conçue et calibrée exclusivement pour les systèmes de référence et la grille cartographique de Bolivie.\n\n
+        <b>Outil de Support Técnico :</b> Les données fournies sont à titre indicatif uniquement et ne remplacent pas les procédures, contrôles techniques ou équipements professionnels requis pour les levés officiels ou légaux.\n\n
+        <b>Précision Variable :</b> L\'exactitude des résultats est soumise à la qualité du matériel GNSS de l\'appareil, aux coordonnées saisies, aux conditions environnementales et aux sources d\'informations externes.\n\n
+        <b>Responsabilité de l\'Utilisateur :</b> Il appartient exclusivement au professionnel de vérifier, valider et certifier tous les calculs avant leur application dans des projets formels.\n\n
+        <b>Limite de Responsabilité :</b> Dans la mesure maximale permise par la loi, le développeur n\'assume aucune responsabilité pour les dommages directs, indirects, la perte de profits ou les pertes financières découlant de l\'utilisation ou de la confiance accordée aux calculs de l\'application.\n\n
+        <b>Propriété Intellectuelle :</b> L\'ingénierie inverse, la modification ou la distribution non autorisée du logiciel et de son contenu sont strictement interdites.\n\n
+        <b>Services Tiers :</b> L\'application utilise des services d\'infrastructure standard (y compris Google Play Services pour les cartes et la localisation, et des API météo gratuites). Le fonctionnement de ces services externes dépend de leurs propres fournisseurs et disponibilité.\n\n
+        <b>Abonnements (Version PRO) :</b> Les achats et les mises à jour de la version PRO sont gérés via le Google Play Store, soumis aux politiques de paiement et de remboursement de Google.\n\n
+        <b>Conformité Réglementaire :</b> L\'utilisateur accepte d\'utiliser l\'outil conformément aux réglementations en vigueur dans l\'État plurinational de Bolivie.</string>
+
+    <string name="title_privacy_policy">🔒 Politique de Confidentialité</string>
+    <string name="privacy_body">Conformément aux directives de Google Play pour la protection des données, cette politique détaille la gestion des informations :\n\n
+        <b>Utilisation de la Localisation (GPS) :</b> L\'application collecte et traite les données de géolocalisation en temps réel uniquement pour exécuter les calculs géodésiques et topographiques demandés par l\'utilisateur à l\'écran.\n\n
+        <b>Stockage Local :</b> Les points, enregistrements et paramètres de l\'utilisateur sont stockés localement dans la mémoire interne de l\'appareil. Les bases de données des projets personnels ne sont pas téléchargées sur les serveurs externes du développeur.\n\n
+        <b>Outils Google Play Services :</b> L\'application utilise des composants standard de Google Play Services (nécessaires au fonctionnement des cartes et de la géolocalisation native du système d\'exploitation).\n\n
+        <b>Publicité et Monétisation :</b> Si l\'application affiche des annonces via des réseaux publicitaires compatibles (tels que Google AdMob), ces plateformes peuvent utiliser des identifiants publicitaires de l\'appareil pour afficher des annonces contextuelles ou génériques conformément aux politiques de Google.\n\n
+        <b>Pas de Vente de Données :</b> Le développeur ne vend, ne transfère ni ne cède de données personnelles ou de localisation à des tiers à des fins commerciales.</string>
+
+    <string name="btn_accept_continue">ACCEPTER ET CONTINUER</string>
+    <string name="btn_exit">QUITTER</string>
+
+    <!-- About Section -->
+    <string name="title_about_detailed">ℹ️ À propos de FactorEscalaTop</string>
+    <string name="about_version_region"><b>Version :</b> 2.3 (Gratuit / PRO)\n<b>Région :</b> État Plurinational de Bolivie</string>
+    <string name="about_app_description">Application spécialisée pour le support topographique, spécifiquement calibrée pour la grille cartographique bolivienne. Elle permet aux géomètres, ingénieurs et étudiants d\'optimiser leur travail sur le terrain grâce à :\n\n
+        • Calcul automatisé des facteurs d\'échelle, d\'élévation et combinés.\n
+        • Positionnement GNSS et gestion des coordonnées.\n
+        • Visualisation de cartes et enregistrement de points topographiques.\n
+        • Informations météo en temps réel pour la planification.\n\n
+        <b>🎖️ Fièrement parrainé par le Collège des Géomètres de La Paz.</b></string>
+
+    <string name="title_collaborators">👥 Développeurs et Collaborateurs</string>
+    <string name="about_collaborators_body">Ce projet a été impulsé grâce à l\'effort conjoint de l\'ingénierie logicielle et de l\'expérience technique sur le terrain :\n\n
+        <b>Développement Logiciel &amp; Architecture :</b> Équipe technique de FactorCombinadoTopo.\n\n
+        <b>Conseil Géodésique et Validation de Terrain :</b> Spécialistes et géomètres associés du Collège des Géomètres de La Paz.\n\n
+        <b>Collaborateurs Géomètres :</b> Professionnels du secteur qui ont contribué à des tests sur le terrain en topographie et géodésie, ainsi qu\'à la validation de la grille MGB08 basée sur EGM2008 dans les hautes terres, les vallées et les plaines de Bolivie.</string>
+
+    <string name="about_legal_note"><b>Note Importante :</b> Cette application est un outil de support technique. Pour les travaux exigeant une rigueur officielle, les résultats doivent être vérifiés avec un équipement topographique certifié.</string>
+
+    <!-- Cache Management -->
+    <string name="title_confirm_cache_clear">Confirmer le Nettoyage du Cache</string>
+    <string name="msg_confirm_cache_clear">Voulez-vous supprimer les cartes enregistrées dans la mémoire temporaire ?</string>
+    <string name="warn_cache_clear">⚠️ AVERTISSEMENT : Si vous videz le cache, vous ne pourrez pas visualiser ces zones de la carte sans connexion Internet (Mode Hors Ligne).</string>
+
+    <!-- Export Success Messages -->
+    <string name="msg_export_all_success">Tous les enregistrements ont été exportés avec succès.</string>
+    <string name="msg_export_selected_success">Les enregistrements sélectionnés ont été exportés avec succès.</string>
+    <string name="msg_export_libreta_all_success">Tout le carnet de terrain a été exporté avec succès.</string>
+    <string name="msg_export_libreta_selected_success">Les enregistrements du carnet sélectionnés ont été exportés.</string>
+    <!-- Layout specific strings extracted -->
+    <string name="msg_starting_systems">Démarrage des systèmes…</string>
+    <string name="label_tech_warning">Avertissement technique</string>
+    <string name="msg_searching">Recherche en cours…</string>
+    <string name="label_lat_short">LAT : %1$.6f</string>
+    <string name="label_lon_short">LON : %1$.6f</string>
+    <string name="msg_touch_outside_close">Touchez l\'extérieur pour fermer</string>
+    <string name="desc_high_precision">Topographie de Haute Précision</string>
 </resources>

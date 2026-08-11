@@ -9,8 +9,10 @@ import android.os.Looper;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.PopupWindow;
 import android.widget.TextView;
 
@@ -24,28 +26,44 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
+import com.google.android.material.card.MaterialCardView;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
 public class WeatherFragment extends Fragment {
 
-    private CardView cardStatus;
-    private ImageView imgStatus;
-    private TextView txtTitle, txtForecast, txtTemp;
-    private TextView valWind120, valWindSustained, valWindDirection, valGusts, valKp, valRain, valRainProb;
-    private TextView valApparentTemp, valCloudCover, valVisibility;
-    private TextView txtRecommendation;
-    
-    private RecyclerView rvHourly;
+    // Main Card
+    private MaterialCardView cardMain;
+    private ImageView imgMainIcon;
+    private TextView txtMainTemp, txtMainCondition, txtLocationName;
+    private LinearLayout layoutGpsWarning;
+    private TextView txtGpsWarning;
+
+    // Recommendation
+    private MaterialCardView cardAssistant;
+    private ImageView imgAssistantIcon;
+    private TextView txtAssistantTitle, txtFlightRec;
+
+    // Lists
+    private RecyclerView rvHourly, rvWeekly;
     private HourlyAdapter hourlyAdapter;
+    private WeeklyAdapter weeklyAdapter;
     private final List<WeatherManager.HourlyStatus> hourlyList = new ArrayList<>();
-    
+    private final List<WeatherManager.DailyForecast> weeklyList = new ArrayList<>();
+
+    // Technical Details
+    private View detApparent, detCloud, detVis;
+    private View detWind120, detWindSust, detWindDir, detGusts, detRainProb, detRainAct;
+    private View detKp;
+
     private FusedLocationProviderClient fusedLocationClient;
     private final Handler timeoutHandler = new Handler(Looper.getMainLooper());
     private boolean isDataLoaded = false;
-    private PopupWindow infoPopup;
+    private WeatherManager.SafetyStatus lastStatus;
 
     @Nullable
     @Override
@@ -56,77 +74,123 @@ public class WeatherFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        
-        cardStatus = view.findViewById(R.id.card_safety_status);
-        imgStatus = view.findViewById(R.id.img_status_icon);
-        txtTitle = view.findViewById(R.id.txt_safety_title);
-        txtForecast = view.findViewById(R.id.txt_weather_forecast);
-        txtTemp = view.findViewById(R.id.txt_weather_temp);
-        txtRecommendation = view.findViewById(R.id.txt_recommendation_msg);
 
-        // Bindings de detalle
-        valApparentTemp = view.findViewById(R.id.detail_apparent_temp).findViewById(R.id.txt_detail_value);
-        ((TextView)view.findViewById(R.id.detail_apparent_temp).findViewById(R.id.txt_detail_label)).setText(R.string.label_apparent_temp);
+        // Bind Main Card
+        cardMain = view.findViewById(R.id.card_main_weather);
+        imgMainIcon = view.findViewById(R.id.img_main_weather_icon);
+        txtMainTemp = view.findViewById(R.id.txt_main_temp);
+        txtLocationName = view.findViewById(R.id.txt_location_name);
+        txtMainCondition = view.findViewById(R.id.txt_main_condition);
+        layoutGpsWarning = view.findViewById(R.id.layout_gps_warning);
+        txtGpsWarning = view.findViewById(R.id.txt_gps_warning);
 
-        valCloudCover = view.findViewById(R.id.detail_cloud_cover).findViewById(R.id.txt_detail_value);
-        ((TextView)view.findViewById(R.id.detail_cloud_cover).findViewById(R.id.txt_detail_label)).setText(R.string.label_cloud_cover);
+        // Bind Rec
+        cardAssistant = view.findViewById(R.id.card_assistant);
+        imgAssistantIcon = view.findViewById(R.id.img_assistant_icon);
+        txtAssistantTitle = view.findViewById(R.id.txt_assistant_title);
+        txtFlightRec = view.findViewById(R.id.txt_flight_rec);
 
-        valVisibility = view.findViewById(R.id.detail_visibility).findViewById(R.id.txt_detail_value);
-        ((TextView)view.findViewById(R.id.detail_visibility).findViewById(R.id.txt_detail_label)).setText(R.string.label_visibility);
-
-        valWind120 = view.findViewById(R.id.detail_wind_120).findViewById(R.id.txt_detail_value);
-        ((TextView)view.findViewById(R.id.detail_wind_120).findViewById(R.id.txt_detail_label)).setText(R.string.label_wind_120_v);
-
-        valWindSustained = view.findViewById(R.id.detail_wind_sustained).findViewById(R.id.txt_detail_value);
-        ((TextView)view.findViewById(R.id.detail_wind_sustained).findViewById(R.id.txt_detail_label)).setText(R.string.label_wind_sustained);
-
-        valWindDirection = view.findViewById(R.id.detail_wind_direction).findViewById(R.id.txt_detail_value);
-        ((TextView)view.findViewById(R.id.detail_wind_direction).findViewById(R.id.txt_detail_label)).setText(R.string.label_wind_direction);
-
-        valGusts = view.findViewById(R.id.detail_gusts).findViewById(R.id.txt_detail_value);
-        ((TextView)view.findViewById(R.id.detail_gusts).findViewById(R.id.txt_detail_label)).setText(R.string.label_gusts_max);
-
-        valRainProb = view.findViewById(R.id.detail_rain_prob).findViewById(R.id.txt_detail_value);
-        ((TextView)view.findViewById(R.id.detail_rain_prob).findViewById(R.id.txt_detail_label)).setText(R.string.label_rain_prob_v);
-
-        valRain = view.findViewById(R.id.detail_rain).findViewById(R.id.txt_detail_value);
-        ((TextView)view.findViewById(R.id.detail_rain).findViewById(R.id.txt_detail_label)).setText(R.string.label_rain_actual);
-
-        valKp = view.findViewById(R.id.detail_kp).findViewById(R.id.txt_detail_value);
-        ((TextView)view.findViewById(R.id.detail_kp).findViewById(R.id.txt_detail_label)).setText(R.string.label_kp_solar);
-
-        // Setup Info Button toggle
-        ImageButton btnInfoTip = view.findViewById(R.id.btn_weather_info_tip);
-        btnInfoTip.setOnClickListener(v -> toggleInfoPopup(btnInfoTip));
-
-        // Setup RecyclerView
+        // Bind Lists
         rvHourly = view.findViewById(R.id.rv_hourly_weather);
-        rvHourly.setLayoutManager(new LinearLayoutManager(requireContext(), LinearLayoutManager.HORIZONTAL, false));
-        hourlyAdapter = new HourlyAdapter(hourlyList);
-        rvHourly.setAdapter(hourlyAdapter);
+        rvWeekly = view.findViewById(R.id.rv_weekly_forecast);
+
+        // Bind Details
+        detApparent = view.findViewById(R.id.detail_apparent);
+        detCloud = view.findViewById(R.id.detail_cloud);
+        detVis = view.findViewById(R.id.detail_vis);
+        detWind120 = view.findViewById(R.id.detail_wind_120);
+        detWindSust = view.findViewById(R.id.detail_wind_sust);
+        detWindDir = view.findViewById(R.id.detail_wind_dir);
+        detGusts = view.findViewById(R.id.detail_gusts);
+        detRainProb = view.findViewById(R.id.detail_rain_prob);
+        detRainAct = view.findViewById(R.id.detail_rain_act);
+        detKp = view.findViewById(R.id.detail_kp);
+
+        setupTechnicalLabels();
+        setupRecyclerViews();
 
         view.findViewById(R.id.btn_refresh_weather).setOnClickListener(v -> loadWeatherData());
+        
+        cardMain.setOnClickListener(v -> {
+            if (lastStatus != null) showSafetyDetailsDialog(lastStatus);
+        });
+        
+        cardAssistant.setOnClickListener(v -> {
+            if (lastStatus != null) showSafetyDetailsDialog(lastStatus);
+        });
 
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(requireActivity());
         loadWeatherData();
     }
 
+    private void setupTechnicalLabels() {
+        setDetailLabel(detApparent, R.string.label_apparent_temp, R.drawable.ic_temp_pro);
+        setDetailLabel(detCloud, R.string.label_cloud_cover, R.drawable.ic_humidity_pro);
+        setDetailLabel(detVis, R.string.label_visibility, R.drawable.ic_visibility_pro);
+
+        setDetailLabel(detWind120, R.string.label_wind_120_v, R.drawable.ic_wind_pro);
+        setDetailLabel(detWindSust, R.string.label_wind_sustained, R.drawable.ic_wind_pro);
+        setDetailLabel(detWindDir, R.string.label_wind_direction, R.drawable.ic_info);
+        setDetailLabel(detGusts, R.string.label_gusts_max, R.drawable.ic_wind_pro);
+        setDetailLabel(detRainProb, R.string.label_rain_prob_v, R.drawable.ic_rain_drop_pro);
+        setDetailLabel(detRainAct, R.string.label_rain_actual, R.drawable.ic_rain_drop_pro);
+
+        setDetailLabel(detKp, R.string.label_kp_solar, R.drawable.ic_shield_pro);
+    }
+
+    private void setDetailLabel(View container, int labelRes, int iconRes) {
+        if (container == null) return;
+        TextView label = container.findViewById(R.id.txt_detail_label);
+        ImageView icon = container.findViewById(R.id.img_detail_icon);
+        if (label != null) label.setText(labelRes);
+        if (icon != null) icon.setImageResource(iconRes);
+    }
+
+    private void setDetailValue(View container, String value) {
+        if (container == null) return;
+        TextView txtValue = container.findViewById(R.id.txt_detail_value);
+        if (txtValue != null) txtValue.setText(value);
+    }
+
+    private void setDetailValue(View container, String value, int color) {
+        if (container == null) return;
+        TextView txtValue = container.findViewById(R.id.txt_detail_value);
+        if (txtValue != null) {
+            txtValue.setText(value);
+            txtValue.setTextColor(color);
+        }
+    }
+
+    private void setupRecyclerViews() {
+        rvHourly.setLayoutManager(new LinearLayoutManager(requireContext(), LinearLayoutManager.HORIZONTAL, false));
+        hourlyAdapter = new HourlyAdapter(hourlyList);
+        rvHourly.setAdapter(hourlyAdapter);
+
+        rvWeekly.setLayoutManager(new LinearLayoutManager(requireContext(), LinearLayoutManager.HORIZONTAL, false));
+        weeklyAdapter = new WeeklyAdapter(weeklyList);
+        rvWeekly.setAdapter(weeklyAdapter);
+    }
+
     private void loadWeatherData() {
         isDataLoaded = false;
-        // Iniciar temporizador de 5 segundos para el Toast de espera
         timeoutHandler.postDelayed(() -> {
             if (!isDataLoaded && isAdded()) {
-                UIUtils.showInfoToastLong(requireContext(), "Espere de 10 seg. a 20 seg. para obtener la informacion.");
+                UIUtils.showInfoToast(requireContext(), "Actualizando información meteorológica...");
             }
-        }, 5000);
+        }, 3000);
 
         try {
             fusedLocationClient.getLastLocation().addOnSuccessListener(requireActivity(), location -> {
                 if (location != null) {
-                    WeatherManager.checkFlightSafety(location.getLatitude(), location.getLongitude(), new WeatherManager.WeatherCallback() {
+                    updateLocationName(location.getLatitude(), location.getLongitude());
+                    // Simular captura de PDOP (en una app real vendría de GnssStatus o extras)
+                    double currentPdop = 1.8; 
+
+                    WeatherManager.checkFlightSafety(requireContext(), location.getLatitude(), location.getLongitude(), currentPdop, new WeatherManager.WeatherCallback() {
                         @Override
                         public void onSuccess(WeatherManager.SafetyStatus status) {
                             isDataLoaded = true;
+                            lastStatus = status;
                             if (isAdded()) updateUI(status);
                         }
 
@@ -146,54 +210,119 @@ public class WeatherFragment extends Fragment {
         }
     }
 
+    private void updateLocationName(double lat, double lon) {
+        if (!isAdded()) return;
+        
+        new Thread(() -> {
+            try {
+                android.location.Geocoder geocoder = new android.location.Geocoder(requireContext(), Locale.getDefault());
+                List<android.location.Address> addresses = geocoder.getFromLocation(lat, lon, 1);
+                if (addresses != null && !addresses.isEmpty()) {
+                    android.location.Address address = addresses.get(0);
+                    String cityName = address.getLocality();
+                    String countryName = address.getCountryName();
+                    
+                    final String locationDisplay = (cityName != null ? cityName : "") + 
+                                                   (cityName != null && countryName != null ? ", " : "") + 
+                                                   (countryName != null ? countryName : "");
+                    
+                    if (!locationDisplay.isEmpty()) {
+                        new Handler(Looper.getMainLooper()).post(() -> {
+                            if (isAdded() && txtLocationName != null) {
+                                txtLocationName.setText(locationDisplay);
+                            }
+                        });
+                    }
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }).start();
+    }
+
     private void updateUI(WeatherManager.SafetyStatus status) {
-        if (getContext() == null || !isAdded()) return;
+        if (!isAdded()) return;
 
-        txtTemp.setText(String.format(Locale.getDefault(), "%.1f°C", status.temperature));
-        txtForecast.setText(getString(status.forecastDescResId));
-        txtRecommendation.setText(status.recommendation);
+        // Main Card
+        txtMainTemp.setText(String.format(Locale.getDefault(), "%.1f°C", status.temperature));
+        txtMainCondition.setText(getString(status.forecastDescResId));
+        imgMainIcon.setImageResource(obtenerIconoClima(status.forecastDescResId, status.isDay == 1));
         
-        valApparentTemp.setText(String.format(Locale.getDefault(), "%.1f°C", status.apparentTemperature));
-        valCloudCover.setText(status.cloudCover + "%");
-        valVisibility.setText(String.format(Locale.getDefault(), "%.1f km", status.visibility));
+        // Dynamic background
+        int cardBg = ContextCompat.getColor(requireContext(), R.color.bg_weather_clear);
+        if (status.forecastDescResId == R.string.weather_desc_61_65 || status.forecastDescResId == R.string.weather_desc_95_99) {
+            cardBg = ContextCompat.getColor(requireContext(), R.color.bg_weather_rain);
+        } else if (status.forecastDescResId == R.string.weather_desc_45_48 || status.forecastDescResId == R.string.weather_desc_1_3) {
+            cardBg = ContextCompat.getColor(requireContext(), R.color.bg_weather_cloudy);
+        }
+        cardMain.setCardBackgroundColor(cardBg);
 
-        valWind120.setText(String.format(Locale.getDefault(), "%.1f km/h", status.wind120));
-        valWindSustained.setText(String.format(Locale.getDefault(), "%.1f km/h", status.windSustained));
-        valWindDirection.setText(getCardinalDirection(status.windDirection));
-        valGusts.setText(String.format(Locale.getDefault(), "%.1f km/h", status.gusts));
-        
-        valRainProb.setText(status.rainProbability + "%");
-        valRain.setText(String.format(Locale.getDefault(), "%.1f mm", status.rain));
-        valKp.setText(status.kp >= 0 ? String.format(Locale.getDefault(), "Kp %.2f", status.kp) : "N/A");
+        // Semáforo Avanzado (Borde)
+        int strokeColor = ContextCompat.getColor(requireContext(), R.color.flight_green);
+        switch(status.safetyAnalysis.nivel) {
+            case AMARILLO: strokeColor = ContextCompat.getColor(requireContext(), R.color.flight_yellow); break;
+            case NARANJA: strokeColor = ContextCompat.getColor(requireContext(), R.color.flight_orange); break;
+            case ROJO: strokeColor = ContextCompat.getColor(requireContext(), R.color.flight_red); break;
+        }
+        cardMain.setStrokeColor(strokeColor);
+        cardMain.setStrokeWidth(8); 
 
-        if (status.messageArg != null) {
-            txtTitle.setText(getString(status.messageResId, status.messageArg));
+        // GPS Warning (Advanced message)
+        if (status.safetyAnalysis.nivel != FlightSafetyLevel.VERDE) {
+            layoutGpsWarning.setVisibility(View.VISIBLE);
+            txtGpsWarning.setText(status.safetyAnalysis.mensajeBreve);
         } else {
-            txtTitle.setText(getString(status.messageResId));
+            layoutGpsWarning.setVisibility(View.GONE);
         }
-        
-        // Semáforo visual
-        int color = ContextCompat.getColor(requireContext(), R.color.state_success);
-        int icon = R.drawable.ic_success_toast;
 
-        switch (status.level) {
-            case RED:
-                color = ContextCompat.getColor(requireContext(), R.color.state_error);
-                icon = R.drawable.ic_toast_error;
-                break;
-            case YELLOW:
-                color = ContextCompat.getColor(requireContext(), R.color.state_warning);
-                icon = R.drawable.ic_toast_warning;
-                break;
+        // Assistant
+        txtFlightRec.setText(status.safetyAnalysis.ventanaOptima);
+        txtAssistantTitle.setTextColor(strokeColor);
+        imgAssistantIcon.setColorFilter(strokeColor);
+
+        // Technical Details
+        setDetailValue(detApparent, String.format(Locale.getDefault(), "%.1f°C", status.apparentTemperature));
+        setDetailValue(detCloud, status.cloudCover + "%");
+        setDetailValue(detVis, String.format(Locale.getDefault(), "%.1f km", status.visibility));
+
+        setDetailValue(detWind120, String.format(Locale.getDefault(), "%.1f km/h", status.wind120));
+        setDetailValue(detWindSust, String.format(Locale.getDefault(), "%.1f km/h", status.windSustained));
+        setDetailValue(detWindDir, getCardinalDirection(status.windDirection));
+        setDetailValue(detGusts, String.format(Locale.getDefault(), "%.1f km/h", status.gusts));
+        setDetailValue(detRainProb, status.rainProbability + "%");
+        setDetailValue(detRainAct, String.format(Locale.getDefault(), "%.1f mm", status.rain));
+
+        // Kp Index with color
+        String kpText = status.kp >= 0 ? String.format(Locale.getDefault(), "%.1f", status.kp) : "N/A";
+        int kpColor = ContextCompat.getColor(requireContext(), R.color.weather_text_primary);
+        if (status.kp >= 0 && status.kp < 4) {
+            kpText += " (Bajo)";
+            kpColor = ContextCompat.getColor(requireContext(), R.color.weather_green_safe);
+        } else if (status.kp >= 5) {
+            kpText += " (Alto)";
+            kpColor = ContextCompat.getColor(requireContext(), R.color.weather_orange);
         }
-        
-        cardStatus.setCardBackgroundColor(color);
-        imgStatus.setImageResource(icon);
-        
-        // Actualizar lista de horas
+        setDetailValue(detKp, kpText, kpColor);
+
+        // Lists
         hourlyList.clear();
         hourlyList.addAll(status.hourlyList);
         hourlyAdapter.notifyDataSetChanged();
+
+        weeklyList.clear();
+        weeklyList.addAll(status.dailyList);
+        weeklyAdapter.notifyDataSetChanged();
+    }
+
+    private int obtenerIconoClima(int descResId, boolean isDay) {
+        if (descResId == R.string.weather_desc_0) return isDay ? R.drawable.ic_weather_clear : R.drawable.ic_weather_night;
+        if (descResId == R.string.weather_desc_1_3) return R.drawable.ic_weather_partly_cloudy;
+        if (descResId == R.string.weather_desc_45_48) return R.drawable.ic_weather_fog;
+        if (descResId == R.string.weather_desc_51_55) return R.drawable.ic_weather_rain;
+        if (descResId == R.string.weather_desc_61_65) return R.drawable.ic_weather_heavy_rain;
+        if (descResId == R.string.weather_desc_95_99) return R.drawable.ic_weather_storm;
+        if (descResId == R.string.weather_desc_71_75) return R.drawable.ic_weather_snow;
+        return R.drawable.ic_weather_cloudy;
     }
 
     private String getCardinalDirection(int degrees) {
@@ -201,76 +330,133 @@ public class WeatherFragment extends Fragment {
         return directions[(int) Math.round((degrees % 360) / 45.0)];
     }
 
-    private void toggleInfoPopup(View anchor) {
-        if (infoPopup != null && infoPopup.isShowing()) {
-            infoPopup.dismiss();
-            infoPopup = null;
-        } else {
-            showInfoPopup(anchor);
+    private void showSafetyDetailsDialog(WeatherManager.SafetyStatus status) {
+        View dv = getLayoutInflater().inflate(R.layout.layout_dialog_safety_details, null);
+        androidx.appcompat.app.AlertDialog.Builder b = new androidx.appcompat.app.AlertDialog.Builder(requireContext());
+        androidx.appcompat.app.AlertDialog d = b.create();
+        if (d.getWindow() != null) d.getWindow().setBackgroundDrawableResource(android.R.color.transparent);
+        d.setView(dv);
+
+        ImageView imgIcon = dv.findViewById(R.id.img_dialog_icon);
+        TextView txtTitle = dv.findViewById(R.id.txt_dialog_title);
+        TextView txtDesc = dv.findViewById(R.id.txt_dialog_desc);
+        TextView txtRec = dv.findViewById(R.id.txt_dialog_rec);
+
+        txtTitle.setText(getString(R.string.safety_report_title));
+        txtRec.setText(status.safetyAnalysis.recomendacion);
+
+        // Construir descripción con causas y disclaimer
+        StringBuilder sb = new StringBuilder();
+        sb.append(status.safetyAnalysis.detalle).append("\n\n");
+        
+        if (!status.safetyAnalysis.causas.isEmpty()) {
+            sb.append(getString(R.string.label_detected_causes)).append("\n");
+            for (String causa : status.safetyAnalysis.causas) {
+                sb.append("• ").append(causa).append("\n");
+            }
+            sb.append("\n");
         }
+        
+        sb.append(getString(R.string.msg_safety_disclaimer));
+        txtDesc.setText(sb.toString());
+
+        // Icono dinámico según el riesgo principal determinado por el analizador
+        imgIcon.setImageResource(status.safetyAnalysis.mainIconRes);
+        
+        // Ajustar color del icono según nivel
+        int tint = ContextCompat.getColor(requireContext(), R.color.flight_green);
+        switch(status.safetyAnalysis.nivel) {
+            case AMARILLO: tint = ContextCompat.getColor(requireContext(), R.color.flight_yellow); break;
+            case NARANJA: tint = ContextCompat.getColor(requireContext(), R.color.flight_orange); break;
+            case ROJO: tint = ContextCompat.getColor(requireContext(), R.color.flight_red); break;
+        }
+        imgIcon.setColorFilter(tint);
+
+        dv.findViewById(R.id.btn_dialog_close).setOnClickListener(v -> d.dismiss());
+        d.show();
     }
 
-    private void showInfoPopup(View anchor) {
-        View popupView = LayoutInflater.from(requireContext()).inflate(R.layout.layout_custom_toast_pro, null);
-        infoPopup = new PopupWindow(popupView, ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT, true);
-        
-        TextView label = popupView.findViewById(R.id.toast_label);
-        TextView message = popupView.findViewById(R.id.toast_message);
-        
-        label.setText(R.string.label_info);
-        message.setText(R.string.msg_weather_accuracy_tip);
-        
-        infoPopup.setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
-        infoPopup.setOutsideTouchable(true);
-        infoPopup.showAsDropDown(anchor, -250, 0); 
-    }
-
-    // --- Adaptador para el pronóstico por horas ---
+    // Adaptadores
     private class HourlyAdapter extends RecyclerView.Adapter<HourlyAdapter.ViewHolder> {
         private final List<WeatherManager.HourlyStatus> list;
         HourlyAdapter(List<WeatherManager.HourlyStatus> list) { this.list = list; }
-        
         @NonNull @Override public ViewHolder onCreateViewHolder(@NonNull ViewGroup p, int vt) {
             return new ViewHolder(LayoutInflater.from(p.getContext()).inflate(R.layout.item_hourly_weather, p, false));
         }
-        
         @Override public void onBindViewHolder(@NonNull ViewHolder h, int pos) {
             WeatherManager.HourlyStatus hs = list.get(pos);
             h.txtTime.setText(hs.time);
+            h.txtTemp.setText(String.format(Locale.getDefault(), "%.0f°", hs.wind)); 
             h.txtWind.setText(String.format(Locale.getDefault(), "%.0f km/h", hs.wind));
             h.txtRain.setText(hs.rainProb + "%");
-            h.imgIcon.setImageResource(getWeatherDescRes(hs.weatherCode));
-            
-            int color;
-            switch (hs.level) {
-                case RED: color = ContextCompat.getColor(requireContext(), R.color.state_error); break;
-                case YELLOW: color = ContextCompat.getColor(requireContext(), R.color.state_warning); break;
-                default: color = ContextCompat.getColor(requireContext(), R.color.state_success); break;
-            }
-            h.card.setCardBackgroundColor(color);
+            h.imgIcon.setImageResource(obtenerIconoClimaFromCode(hs.weatherCode, hs.time));
+            if (hs.level == WeatherManager.SafetyLevel.YELLOW) h.card.setStrokeColor(Color.YELLOW);
+            else if (hs.level == WeatherManager.SafetyLevel.RED) h.card.setStrokeColor(Color.RED);
+            else h.card.setStrokeColor(Color.TRANSPARENT);
         }
-        
         @Override public int getItemCount() { return list.size(); }
-        
-        private int getWeatherDescRes(int code) {
-            switch (code) {
-                case 0: return R.drawable.ic_info; // Sustituir por iconos de sol/nube si existen
-                case 1: case 2: case 3: return R.drawable.ic_info;
-                case 61: case 63: case 65: return R.drawable.ic_toast_error; // Lluvia
-                default: return R.drawable.ic_info;
-            }
-        }
-
         class ViewHolder extends RecyclerView.ViewHolder {
-            TextView txtTime, txtWind, txtRain; ImageView imgIcon; CardView card;
+            TextView txtTime, txtTemp, txtWind, txtRain; ImageView imgIcon; MaterialCardView card;
             ViewHolder(View v) {
                 super(v);
                 txtTime = v.findViewById(R.id.txt_hourly_time);
+                txtTemp = v.findViewById(R.id.txt_hourly_temp);
                 txtWind = v.findViewById(R.id.txt_hourly_wind);
                 txtRain = v.findViewById(R.id.txt_hourly_rain);
                 imgIcon = v.findViewById(R.id.img_hourly_icon);
-                card = v.findViewById(R.id.card_hourly);
+                card = (MaterialCardView) v;
             }
         }
+    }
+
+    private class WeeklyAdapter extends RecyclerView.Adapter<WeeklyAdapter.ViewHolder> {
+        private final List<WeatherManager.DailyForecast> list;
+        WeeklyAdapter(List<WeatherManager.DailyForecast> list) { this.list = list; }
+        @NonNull @Override public ViewHolder onCreateViewHolder(@NonNull ViewGroup p, int vt) {
+            return new ViewHolder(LayoutInflater.from(p.getContext()).inflate(R.layout.item_daily_weather, p, false));
+        }
+        @Override public void onBindViewHolder(@NonNull ViewHolder h, int pos) {
+            WeatherManager.DailyForecast df = list.get(pos);
+            h.txtDay.setText(formatDate(df.date));
+            h.txtTempRange.setText(String.format(Locale.getDefault(), "%.0f° / %.0f°", df.tempMax, df.tempMin));
+            h.txtRain.setText(df.rainProb + "%");
+            h.imgIcon.setImageResource(obtenerIconoClimaFromCode(df.weatherCode, "12:00")); 
+        }
+        @Override public int getItemCount() { return list.size(); }
+        private String formatDate(String dateStr) {
+            try {
+                SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd", Locale.US);
+                Date date = sdf.parse(dateStr);
+                return new SimpleDateFormat("EEE", Locale.getDefault()).format(date);
+            } catch (Exception e) { return dateStr; }
+        }
+        class ViewHolder extends RecyclerView.ViewHolder {
+            TextView txtDay, txtTempRange, txtRain; ImageView imgIcon;
+            ViewHolder(View v) {
+                super(v);
+                txtDay = v.findViewById(R.id.txt_daily_day);
+                txtTempRange = v.findViewById(R.id.txt_daily_temp_range);
+                txtRain = v.findViewById(R.id.txt_daily_rain);
+                imgIcon = v.findViewById(R.id.img_daily_icon);
+            }
+        }
+    }
+
+    private int obtenerIconoClimaFromCode(int code, String time) {
+        boolean isNight = false;
+        if (time != null && time.length() >= 2) {
+            try {
+                int hour = Integer.parseInt(time.substring(0, 2));
+                if (hour >= 19 || hour <= 6) isNight = true;
+            } catch (Exception ignored) {}
+        }
+
+        if (code == 0) return isNight ? R.drawable.ic_weather_night : R.drawable.ic_weather_clear;
+        if (code <= 3) return R.drawable.ic_weather_partly_cloudy;
+        if (code <= 48) return R.drawable.ic_weather_fog;
+        if (code <= 55) return R.drawable.ic_weather_rain;
+        if (code <= 65) return R.drawable.ic_weather_heavy_rain;
+        if (code <= 99) return R.drawable.ic_weather_storm;
+        return R.drawable.ic_weather_cloudy;
     }
 }

@@ -1,0 +1,3 @@
+- [x] Restore GPS Activation Toast
+    - [x] Update `checkGpsState` logic in `AutomaticFragment.kt`
+- [x] Build and verify

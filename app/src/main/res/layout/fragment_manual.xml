@@ -52,94 +52,26 @@
                     android:layout_height="wrap_content"
                     android:textColor="@color/text_secondary"
                     android:text="@string/label_latitude"/>
-                <LinearLayout
-                    android:orientation="horizontal"
+                <EditText
+                    android:id="@+id/et_lat_dec"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content">
-                    <EditText
-                        android:id="@+id/et_lat_gra"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_margin="5dp"
-                        android:layout_weight="1"
-                        android:inputType="numberSigned"/>
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:textColor="@color/text_primary"
-                        android:text="º  "/>
-                    <EditText
-                        android:id="@+id/et_lat_min"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_margin="5dp"
-                        android:layout_weight="1"
-                        android:inputType="numberSigned"/>
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:textColor="@color/text_primary"
-                        android:text="&apos;  "/>
-                    <EditText
-                        android:id="@+id/et_lat_seg"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_margin="5dp"
-                        android:layout_weight="1.5"
-                        android:inputType="numberDecimal"/>
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:textColor="@color/text_primary"
-                        android:text="&apos;&apos;  "/>
-                </LinearLayout>
+                    android:layout_height="wrap_content"
+                    android:layout_margin="5dp"
+                    android:hint="Ej: -16.504260"
+                    android:inputType="numberDecimal|numberSigned"/>
 
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:textColor="@color/text_secondary"
                     android:text="@string/label_longitude"/>
-                <LinearLayout
-                    android:orientation="horizontal"
+                <EditText
+                    android:id="@+id/et_lon_dec"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content">
-                    <EditText
-                        android:id="@+id/et_lon_gra"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_margin="5dp"
-                        android:layout_weight="1"
-                        android:inputType="numberSigned"/>
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:textColor="@color/text_primary"
-                        android:text="º  "/>
-                    <EditText
-                        android:id="@+id/et_lon_min"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_margin="5dp"
-                        android:layout_weight="1"
-                        android:inputType="numberSigned"/>
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:textColor="@color/text_primary"
-                        android:text="&apos;  "/>
-                    <EditText
-                        android:id="@+id/et_lon_seg"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_margin="5dp"
-                        android:layout_weight="1.5"
-                        android:inputType="numberDecimal"/>
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:textColor="@color/text_primary"
-                        android:text="&apos;&apos;  "/>
-                </LinearLayout>
+                    android:layout_height="wrap_content"
+                    android:layout_margin="5dp"
+                    android:hint="Ej: -68.090811"
+                    android:inputType="numberDecimal|numberSigned"/>
 
                 <TextView
                     android:layout_width="match_parent"
@@ -186,7 +118,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:textColor="@color/text_primary"
-                        android:text="m"
+                        android:text="@string/unit_meter"
                         android:layout_row="0"
                         android:layout_column="2"
                         android:layout_gravity="center_vertical"/>
@@ -212,7 +144,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:textColor="@color/text_primary"
-                        android:text="m"
+                        android:text="@string/unit_meter"
                         android:layout_row="1"
                         android:layout_column="2"
                         android:layout_gravity="center_vertical"/>
@@ -238,7 +170,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:textColor="@color/text_primary"
-                        android:text="m"
+                        android:text="@string/unit_meter"
                         android:layout_row="2"
                         android:layout_column="2"
                         android:layout_gravity="center_vertical"/>
@@ -315,118 +247,97 @@
                 android:layout_height="wrap_content"
                 android:textStyle="bold"
                 android:textColor="@color/text_secondary"
-                android:layout_marginTop="8dp"
+                android:layout_marginTop="12dp"
                 android:text="@string/title_geometric_factors"/>
 
-            <!-- Factor de Escala -->
-            <LinearLayout
+            <!-- GRID COMPACTO DE DATOS TÉCNICOS -->
+            <GridLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:columnCount="2"
                 android:layout_marginTop="8dp"
-                android:background="@color/bg_surface_secondary"
-                android:orientation="horizontal"
-                android:padding="4dp">
+                android:alignmentMode="alignMargins">
 
-                <TextView
+                <!-- 1. Factor de Escala -->
+                <LinearLayout
+                    android:orientation="vertical"
+                    android:layout_columnWeight="1"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:layout_weight="1.2"
-                    android:padding="3dp"
-                    android:text="@string/label_scale_factor"
-                    android:textColor="@color/text_primary" />
+                    android:background="@color/bg_surface_secondary"
+                    android:padding="8dp"
+                    android:layout_margin="2dp">
+                    <TextView android:text="@string/label_scale_factor" android:textSize="10sp" android:textColor="@color/text_secondary" android:textStyle="bold" android:layout_width="wrap_content" android:layout_height="wrap_content"/>
+                    <TextView android:id="@+id/txt_man_fe" android:text="0.00000000" android:textColor="@color/accent_orange" android:textSize="13sp" android:textStyle="bold" android:layout_width="wrap_content" android:layout_height="wrap_content"/>
+                    <TextView android:id="@+id/txt_man_fe_ppm" android:text="0 PPM" android:textColor="@color/text_secondary" android:textSize="10sp" android:layout_width="wrap_content" android:layout_height="wrap_content"/>
+                </LinearLayout>
 
-                <TextView
-                    android:id="@+id/txt_man_fe"
+                <!-- 2. Factor de Altura -->
+                <LinearLayout
+                    android:orientation="vertical"
+                    android:layout_columnWeight="1"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:layout_weight="1.2"
-                    android:padding="3dp"
-                    android:text="0"
-                    android:textColor="@color/accent_orange"
-                    android:textStyle="bold" />
+                    android:background="@color/bg_surface_secondary"
+                    android:padding="8dp"
+                    android:layout_margin="2dp">
+                    <TextView android:text="@string/label_elevation_factor" android:textSize="10sp" android:textColor="@color/text_secondary" android:textStyle="bold" android:layout_width="wrap_content" android:layout_height="wrap_content"/>
+                    <TextView android:id="@+id/txt_man_fa" android:text="0.00000000" android:textColor="@color/accent_orange" android:textSize="13sp" android:textStyle="bold" android:layout_width="wrap_content" android:layout_height="wrap_content"/>
+                    <TextView android:id="@+id/txt_man_fa_ppm" android:text="0 PPM" android:textColor="@color/text_secondary" android:textSize="10sp" android:layout_width="wrap_content" android:layout_height="wrap_content"/>
+                </LinearLayout>
 
-                <TextView
-                    android:id="@+id/txt_man_fe_ppm"
+                <!-- 3. Altura Ortométrica -->
+                <LinearLayout
+                    android:orientation="vertical"
+                    android:layout_columnWeight="1"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:layout_weight="0.8"
-                    android:padding="3dp"
-                    android:text="0"
-                    android:textColor="@color/text_secondary" />
-            </LinearLayout>
+                    android:background="@color/bg_surface_secondary"
+                    android:padding="8dp"
+                    android:layout_margin="2dp">
+                    <TextView android:text="@string/label_orthometric_altitude" android:textSize="10sp" android:textColor="@color/text_secondary" android:textStyle="bold" android:layout_width="wrap_content" android:layout_height="wrap_content"/>
+                    <TextView android:id="@+id/txt_man_alt_orto" android:text="0.000 m" android:textColor="@color/accent_orange" android:textSize="13sp" android:textStyle="bold" android:layout_width="wrap_content" android:layout_height="wrap_content"/>
+                </LinearLayout>
 
-            <!-- Factor de Altura -->
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="4dp"
-                android:background="@color/bg_surface_secondary"
-                android:orientation="horizontal"
-                android:padding="4dp">
-
-                <TextView
+                <!-- 4. Ondulación Geoidal -->
+                <LinearLayout
+                    android:orientation="vertical"
+                    android:layout_columnWeight="1"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:layout_weight="1.2"
-                    android:padding="3dp"
-                    android:text="@string/label_elevation_factor"
-                    android:textColor="@color/text_primary" />
+                    android:background="@color/bg_surface_secondary"
+                    android:padding="8dp"
+                    android:layout_margin="2dp">
+                    <TextView android:text="@string/label_geoid_undulation" android:textSize="10sp" android:textColor="@color/text_secondary" android:textStyle="bold" android:layout_width="wrap_content" android:layout_height="wrap_content"/>
+                    <TextView android:id="@+id/txt_man_geoid_undulation" android:text="0.000 m" android:textColor="@color/accent_orange" android:textSize="13sp" android:textStyle="bold" android:layout_width="wrap_content" android:layout_height="wrap_content"/>
+                </LinearLayout>
 
-                <TextView
-                    android:id="@+id/txt_man_fa"
+                <!-- 5. Temperatura Ambiente (Movido aquí) -->
+                <LinearLayout
+                    android:orientation="vertical"
+                    android:layout_columnWeight="1"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:layout_weight="1.2"
-                    android:padding="3dp"
-                    android:text="0"
-                    android:textColor="@color/accent_orange"
-                    android:textStyle="bold" />
+                    android:background="@color/bg_surface_secondary"
+                    android:padding="8dp"
+                    android:layout_margin="2dp">
+                    <TextView android:text="@string/label_temp_ambient" android:textSize="10sp" android:textColor="@color/text_secondary" android:textStyle="bold" android:layout_width="wrap_content" android:layout_height="wrap_content"/>
+                    <TextView android:id="@+id/txt_man_temp" android:text="-- °C" android:textColor="@color/accent_orange" android:textSize="13sp" android:textStyle="bold" android:layout_width="wrap_content" android:layout_height="wrap_content"/>
+                </LinearLayout>
 
-                <TextView
-                    android:id="@+id/txt_man_fa_ppm"
+                <!-- 6. Modelo Geoidal -->
+                <LinearLayout
+                    android:orientation="vertical"
+                    android:layout_columnWeight="1"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:layout_weight="0.8"
-                    android:padding="3dp"
-                    android:text="0"
-                    android:textColor="@color/text_secondary" />
-            </LinearLayout>
-
-            <!-- Altura Ortométrica -->
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="4dp"
-                android:background="@color/bg_surface_secondary"
-                android:orientation="horizontal"
-                android:padding="4dp">
-
-                <TextView
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1.2"
-                    android:padding="3dp"
-                    android:text="@string/label_orthometric_altitude"
-                    android:textColor="@color/text_primary" />
-
-                <TextView
-                    android:id="@+id/txt_man_alt_orto"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1.2"
-                    android:padding="3dp"
-                    android:text="0"
-                    android:textColor="@color/accent_orange"
-                    android:textStyle="bold" />
-
-                <TextView
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="0.8"
-                    android:padding="3dp"
-                    android:text="m"
-                    android:textColor="@color/text_secondary" />
-            </LinearLayout>
+                    android:background="@color/bg_surface_secondary"
+                    android:padding="8dp"
+                    android:layout_margin="2dp">
+                    <TextView android:text="@string/label_geoid_model" android:textSize="10sp" android:textColor="@color/text_secondary" android:textStyle="bold" android:layout_width="wrap_content" android:layout_height="wrap_content"/>
+                    <TextView android:id="@+id/txt_man_geoid_model" android:text="EGM96 (Global)" android:textColor="@color/accent_orange" android:textSize="11sp" android:textStyle="bold" android:layout_width="wrap_content" android:layout_height="wrap_content"/>
+                </LinearLayout>
+            </GridLayout>
 
             <!-- RECUADRO DESTACADO: RESULTADOS CLAVE -->
             <LinearLayout
@@ -530,7 +441,7 @@
                             android:id="@+id/txt_man_presion_hpa"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="-- hPa"
+                            android:text="-- HPa"
                             android:textColor="@color/text_primary"
                             android:textSize="11sp"
                             android:textStyle="bold"

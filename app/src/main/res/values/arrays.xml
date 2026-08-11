@@ -70,6 +70,11 @@
         <item>59</item>
         <item>60</item>
     </string-array>
+    <string-array name="zonas_bolivia">
+        <item>19</item>
+        <item>20</item>
+        <item>21</item>
+    </string-array>
     <string-array name="tipos_registro">
         <item>Cambio de Estación</item>
         <item>Radiación</item>

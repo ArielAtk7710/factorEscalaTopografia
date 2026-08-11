@@ -16,9 +16,11 @@ public interface ApiService {
             @Query("longitude") double lon,
             @Query("current") String currentParams,
             @Query("hourly") String hourlyParams,
+            @Query("daily") String dailyParams,
+            @Query("timezone") String timezone,
             @Query("models") String model
     );
 
     @GET
-    Call<List<List<String>>> getKpIndex(@Url String url);
+    Call<java.util.List<bo.com.factorcombinadotopo.models.KpIndex>> getKpIndex(@Url String url);
 }

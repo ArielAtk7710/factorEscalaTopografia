@@ -99,8 +99,18 @@ public class UIUtils {
 
         TextView txtTitle = view.findViewById(R.id.txt_dialog_title);
         TextView txtMsg = view.findViewById(R.id.txt_dialog_message);
+        TextView txtWarn = view.findViewById(R.id.txt_dialog_warning);
+        
         txtTitle.setText(titleRes);
         txtMsg.setText(msgRes);
+        
+        // Lógica específica para advertencia de caché
+        if (titleRes == R.string.title_confirm_cache_clear) {
+            txtWarn.setVisibility(View.VISIBLE);
+            txtWarn.setText(R.string.warn_cache_clear);
+        } else {
+            txtWarn.setVisibility(View.GONE);
+        }
 
         view.findViewById(R.id.btn_dialog_yes).setOnClickListener(v -> {
             onConfirm.run();
@@ -111,15 +121,23 @@ public class UIUtils {
         dialog.show();
     }
 
+    private static Toast currentToast;
+
     private static void showCustomToast(Context context, String type, String label, String message, int duration) {
-        Toast toast = prepareCustomToast(context, type, label, message, duration);
-        if (toast != null) toast.show();
+        new Handler(Looper.getMainLooper()).post(() -> {
+            if (currentToast != null) currentToast.cancel();
+            
+            Toast toast = prepareCustomToast(context, type, label, message, duration);
+            if (toast != null) {
+                currentToast = toast;
+                toast.show();
+            }
+        });
     }
 
     private static Toast prepareCustomToast(Context context, String type, String labelStr, String message, int duration) {
         try {
             LayoutInflater inflater = LayoutInflater.from(context);
-            // Se usa null porque el Toast no tiene un contenedor raíz disponible en el momento de inflar
             View layout = inflater.inflate(R.layout.layout_custom_toast_pro, null);
 
             View root = layout.findViewById(R.id.toast_root);
@@ -155,7 +173,6 @@ public class UIUtils {
             toast.setGravity(Gravity.CENTER, 0, 0);
             return toast;
         } catch (Exception e) {
-            // Fallback al Toast estándar si algo falla con el layout custom
             return Toast.makeText(context, message, duration);
         }
     }

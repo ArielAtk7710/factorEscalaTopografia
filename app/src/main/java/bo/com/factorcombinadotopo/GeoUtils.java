@@ -80,10 +80,20 @@ public class GeoUtils {
     }
 
     /**
-     * Formatea un factor topográfico (9 decimales).
+     * Formatea un factor topográfico (9 decimales EXACTOS).
      */
     public static String formatFactor(double value) {
         return String.format(java.util.Locale.US, "%.9f", value);
+    }
+
+    /**
+     * Convierte una coordenada decimal a formato GMS (Grados, Minutos, Segundos).
+     * Delegando el cálculo a la clase estandarizada de la IGM.
+     */
+    public static String toDMS(double decimal, boolean isLatitude) {
+        IGMCoordinate.DmsCoordinate dms = IGMCoordinateFormatter.toDms(decimal, isLatitude);
+        // Formato visual profesional: XXº XX' XX.XXX''
+        return (decimal < 0 ? "-" : "") + dms.degrees + "º " + dms.minutes + "' " + formatCoord(dms.seconds) + "''";
     }
 
     /**

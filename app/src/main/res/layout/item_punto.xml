@@ -127,6 +127,18 @@
                     android:contentDescription="Expandir" />
             </LinearLayout>
 
+            <TextView
+                android:id="@+id/txt_item_tipo_registro"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Registro Automático"
+                android:textColor="@color/text_secondary"
+                android:textSize="11sp"
+                android:textStyle="italic"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="@id/btn_expand_details"
+                app:layout_constraintBottom_toBottomOf="@id/btn_expand_details" />
+
         </androidx.constraintlayout.widget.ConstraintLayout>
 
         <!-- SECCIÓN DETALLADA: OCULTA POR DEFECTO -->
@@ -158,7 +170,7 @@
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_marginBottom="12dp">
-                    <TextView android:text="LATITUD" android:textSize="10sp" android:textColor="@color/text_secondary" android:textStyle="bold" android:layout_width="wrap_content" android:layout_height="wrap_content"/>
+                    <TextView android:text="@string/label_latitude" android:textSize="10sp" android:textColor="@color/text_secondary" android:textStyle="bold" android:layout_width="wrap_content" android:layout_height="wrap_content"/>
                     <TextView android:id="@+id/txt_det_lat" android:text="-16.52620695" android:textColor="@color/text_primary" android:textSize="13sp" android:layout_width="wrap_content" android:layout_height="wrap_content"/>
                 </LinearLayout>
 
@@ -168,7 +180,7 @@
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_marginBottom="12dp">
-                    <TextView android:text="LONGITUD" android:textSize="10sp" android:textColor="@color/text_secondary" android:textStyle="bold" android:layout_width="wrap_content" android:layout_height="wrap_content"/>
+                    <TextView android:text="@string/label_longitude" android:textSize="10sp" android:textColor="@color/text_secondary" android:textStyle="bold" android:layout_width="wrap_content" android:layout_height="wrap_content"/>
                     <TextView android:id="@+id/txt_det_lon" android:text="-68.09631038" android:textColor="@color/text_primary" android:textSize="13sp" android:layout_width="wrap_content" android:layout_height="wrap_content"/>
                 </LinearLayout>
 
@@ -178,7 +190,7 @@
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_marginBottom="12dp">
-                    <TextView android:text="ALTURA ELIPSOIDAL" android:textSize="10sp" android:textColor="@color/text_secondary" android:textStyle="bold" android:layout_width="wrap_content" android:layout_height="wrap_content"/>
+                    <TextView android:text="@string/label_ellipsoidal_altitude" android:textSize="10sp" android:textColor="@color/text_secondary" android:textStyle="bold" android:layout_width="wrap_content" android:layout_height="wrap_content"/>
                     <TextView android:id="@+id/txt_det_alt" android:text="3600.00 m" android:textColor="@color/text_primary" android:textSize="13sp" android:layout_width="wrap_content" android:layout_height="wrap_content"/>
                 </LinearLayout>
 
@@ -188,7 +200,7 @@
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_marginBottom="12dp">
-                    <TextView android:text="ALTURA ORTOMÉTRICA" android:textSize="10sp" android:textColor="@color/text_secondary" android:textStyle="bold" android:layout_width="wrap_content" android:layout_height="wrap_content"/>
+                    <TextView android:text="@string/label_orthometric_altitude" android:textSize="10sp" android:textColor="@color/text_secondary" android:textStyle="bold" android:layout_width="wrap_content" android:layout_height="wrap_content"/>
                     <TextView android:id="@+id/txt_det_alt_orto" android:text="3560.00 m" android:textColor="@color/text_primary" android:textSize="13sp" android:layout_width="wrap_content" android:layout_height="wrap_content"/>
                 </LinearLayout>
 
@@ -198,7 +210,7 @@
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_marginBottom="12dp">
-                    <TextView android:text="SISTEMA DE REF." android:textSize="10sp" android:textColor="@color/text_secondary" android:textStyle="bold" android:layout_width="wrap_content" android:layout_height="wrap_content"/>
+                    <TextView android:text="@string/label_ref_system" android:textSize="10sp" android:textColor="@color/text_secondary" android:textStyle="bold" android:layout_width="wrap_content" android:layout_height="wrap_content"/>
                     <TextView android:id="@+id/txt_det_sis" android:text="WGS-84 19 S" android:textColor="@color/text_primary" android:textSize="13sp" android:layout_width="wrap_content" android:layout_height="wrap_content"/>
                 </LinearLayout>
 
@@ -208,9 +220,51 @@
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_marginBottom="12dp">
-                    <TextView android:text="PRESIÓN" android:textSize="10sp" android:textColor="@color/text_secondary" android:textStyle="bold" android:layout_width="wrap_content" android:layout_height="wrap_content"/>
+                    <TextView android:text="@string/label_geoid_model" android:textSize="10sp" android:textColor="@color/text_secondary" android:textStyle="bold" android:layout_width="wrap_content" android:layout_height="wrap_content"/>
+                    <TextView android:id="@+id/txt_det_geoid_model" android:text="EGM96 (Global)" android:textColor="@color/text_primary" android:textSize="13sp" android:layout_width="wrap_content" android:layout_height="wrap_content"/>
+                </LinearLayout>
+
+                <LinearLayout
+                    android:orientation="vertical"
+                    android:layout_columnWeight="1"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="12dp">
+                    <TextView android:text="@string/label_pressure" android:textSize="10sp" android:textColor="@color/text_secondary" android:textStyle="bold" android:layout_width="wrap_content" android:layout_height="wrap_content"/>
                     <TextView android:id="@+id/txt_det_presion" android:text="--- hPa" android:textColor="@color/text_primary" android:textSize="13sp" android:layout_width="wrap_content" android:layout_height="wrap_content"/>
                 </LinearLayout>
+
+                <!-- v7: Nuevos campos técnicos -->
+                <LinearLayout
+                    android:orientation="vertical"
+                    android:layout_columnWeight="1"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="12dp">
+                    <TextView android:text="@string/label_precision" android:textSize="10sp" android:textColor="@color/text_secondary" android:textStyle="bold" android:layout_width="wrap_content" android:layout_height="wrap_content"/>
+                    <TextView android:id="@+id/txt_det_precision" android:text="±0m" android:textColor="@color/text_primary" android:textSize="13sp" android:layout_width="wrap_content" android:layout_height="wrap_content"/>
+                </LinearLayout>
+
+                <LinearLayout
+                    android:orientation="vertical"
+                    android:layout_columnWeight="1"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="12dp">
+                    <TextView android:text="@string/label_satellites" android:textSize="10sp" android:textColor="@color/text_secondary" android:textStyle="bold" android:layout_width="wrap_content" android:layout_height="wrap_content"/>
+                    <TextView android:id="@+id/txt_det_sat" android:text="0" android:textColor="@color/text_primary" android:textSize="13sp" android:layout_width="wrap_content" android:layout_height="wrap_content"/>
+                </LinearLayout>
+
+                <LinearLayout
+                    android:orientation="vertical"
+                    android:layout_columnWeight="1"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="12dp">
+                    <TextView android:text="@string/label_temp_ambient" android:textSize="10sp" android:textColor="@color/text_secondary" android:textStyle="bold" android:layout_width="wrap_content" android:layout_height="wrap_content"/>
+                    <TextView android:id="@+id/txt_det_temp" android:text="-- °C" android:textColor="@color/text_primary" android:textSize="13sp" android:layout_width="wrap_content" android:layout_height="wrap_content"/>
+                </LinearLayout>
+
             </GridLayout>
 
             <!-- FACTORES -->
@@ -229,7 +283,7 @@
                     android:background="@color/bg_surface_secondary"
                     android:padding="8dp"
                     android:layout_marginEnd="4dp">
-                    <TextView android:text="FACTOR ESCALA" android:textSize="10sp" android:textColor="@color/text_secondary" android:textStyle="bold" android:layout_width="wrap_content" android:layout_height="wrap_content"/>
+                    <TextView android:text="@string/label_scale_factor" android:textSize="10sp" android:textColor="@color/text_secondary" android:textStyle="bold" android:layout_width="wrap_content" android:layout_height="wrap_content"/>
                     <TextView android:id="@+id/txt_det_fe" android:text="0.99971499" android:textColor="@color/text_primary" android:textSize="12sp" android:textStyle="bold" android:layout_width="wrap_content" android:layout_height="wrap_content"/>
                 </LinearLayout>
 
@@ -241,7 +295,7 @@
                     android:background="@color/bg_surface_secondary"
                     android:padding="8dp"
                     android:layout_marginStart="4dp">
-                    <TextView android:text="FACTOR ALTURA" android:textSize="10sp" android:textColor="@color/text_secondary" android:textStyle="bold" android:layout_width="wrap_content" android:layout_height="wrap_content"/>
+                    <TextView android:text="@string/label_elevation_factor" android:textSize="10sp" android:textColor="@color/text_secondary" android:textStyle="bold" android:layout_width="wrap_content" android:layout_height="wrap_content"/>
                     <TextView android:id="@+id/txt_det_fa" android:text="0.99945678" android:textColor="@color/text_primary" android:textSize="12sp" android:textStyle="bold" android:layout_width="wrap_content" android:layout_height="wrap_content"/>
                 </LinearLayout>
             </LinearLayout>
@@ -253,7 +307,7 @@
                 android:layout_marginTop="8dp"
                 android:background="@color/accent_primary"
                 android:padding="8dp">
-                <TextView android:text="FACTOR COMBINADO K" android:textSize="10sp" android:textColor="@color/text_primary" android:textStyle="bold" android:layout_width="wrap_content" android:layout_height="wrap_content"/>
+                <TextView android:text="@string/label_comb_factor_k" android:textSize="10sp" android:textColor="@color/text_primary" android:textStyle="bold" android:layout_width="wrap_content" android:layout_height="wrap_content"/>
                 <TextView android:id="@+id/txt_det_fc" android:text="0.99912345" android:textColor="@color/accent_orange" android:textSize="16sp" android:textStyle="bold" android:layout_width="wrap_content" android:layout_height="wrap_content"/>
             </LinearLayout>
 
@@ -267,7 +321,7 @@
                 android:background="@color/bg_surface_secondary"
                 android:padding="8dp">
                 <TextView
-                    android:text="OBSERVACIONES"
+                    android:text="@string/label_observations"
                     android:textSize="10sp"
                     android:textColor="@color/text_secondary"
                     android:textStyle="bold"

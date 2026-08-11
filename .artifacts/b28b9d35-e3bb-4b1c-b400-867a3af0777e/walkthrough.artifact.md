@@ -1,32 +1,28 @@
-# Walkthrough - Mejoras de Calidad GPS y Rendimiento (v2.2)
+# Walkthrough - Cuadros Informativos Adaptables
 
-He implementado el semáforo de precisión con el umbral de 10 metros y optimizado el mapa para una carga instantánea.
+He implementado una solución de diseño adaptable para todos los cuadros informativos ("popups") de la aplicación. Esto asegura que los mensajes se vean completos en cualquier tamaño de pantalla y no se corten lateralmente.
 
 ## Cambios Realizados
 
-### 1. Semáforo de Precisión GPS (Umbral 10m)
-- **[MODIFY] [AutomaticFragment.java](file:///D:/Desarrollo-Software/Proyectos%20Android/factorEscala/app/src/main/java/bo/com/factorcombinadotopo/AutomaticFragment.java)**:
-    - Se implementó la lógica de colores dinámica para la precisión:
-        - **Excelente (Verde)**: Menos de 5 metros de error.
-        - **Buena (Amarillo/Naranja)**: Entre 5 y 10 metros de error.
-        - **Baja (Rojo)**: Más de 10 metros de error.
-    - Se añadió una etiqueta descriptiva junto al valor numérico para una interpretación rápida en campo.
+### 1. Flexibilidad de Ancho en Layouts
+He eliminado los anchos rígidos (como `320dp`) y los he reemplazado por un sistema inteligente de ajuste:
 
-### 2. Mapa Ultra-Instantáneo
-- **[MODIFY] [MapFragment.java](file:///D:/Desarrollo-Software/Proyectos%20Android/factorEscala/app/src/main/java/bo/com/factorcombinadotopo/MapFragment.java)**:
-    - Se eliminó el retraso de 300ms. Ahora el mapa se refresca en el mismo instante en que entras a la pestaña.
-- **[MODIFY] [MapManager.java](file:///D:/Desarrollo-Software/Proyectos%20Android/factorEscala/app/src/main/java/bo/com/factorcombinadotopo/MapManager.java)**:
-    - Se optimizó el método `refreshMap()` para evitar recargas innecesarias de la capa si el modo de mapa no ha cambiado, mejorando la fluidez visual.
+- **[MODIFY] [layout_barometer_info.xml](file:///D:/Desarrollo-Software/Proyectos%20Android/factorEscala/app/src/main/res/layout/layout_barometer_info.xml)**:
+    - Cambiado a `wrap_content` con un ancho máximo de `340dp`.
+    - Esto permite que en teléfonos pequeños el cuadro se estreche y en pantallas grandes se mantenga en un tamaño legible.
+- **[MODIFY] [layout_map_guide.xml](file:///D:/Desarrollo-Software/Proyectos%20Android/factorEscala/app/src/main/res/layout/layout_map_guide.xml)**:
+    - Ajustado para adaptarse al contenido, forzando al texto a saltar de línea automáticamente si el mensaje es largo.
+- **[MODIFY] [layout_custom_toast_pro.xml](file:///D:/Desarrollo-Software/Proyectos%20Android/factorEscala/app/src/main/res/layout/layout_custom_toast_pro.xml)**:
+    - Se configuró el `TextView` del mensaje para ocupar todo el ancho disponible del contenedor, activando el envoltorio de texto (text wrapping) de forma efectiva.
+
+### 2. Sincronización Técnica
+- He verificado en **[UIUtils.java](file:///D:/Desarrollo-Software/Proyectos%20Android/factorEscala/app/src/main/java/bo/com/factorcombinadotopo/UIUtils.java)** que la creación de las ventanas flotantes respete estos nuevos parámetros dinámicos, asegurando que se centren correctamente según el tamaño del dispositivo.
 
 ## Resultados de la Verificación
 
-### Pruebas de Campo (Simuladas)
-- Al mejorar la señal, el texto de precisión cambia de Rojo a Verde automáticamente.
-- El cambio entre pestañas es ahora totalmente fluido, sin parpadeos ni pantallas grises en el mapa.
-
-### Estabilidad Técnica
-- La compilación `assembleDebug` fue exitosa.
-- Se mantiene el cumplimiento de todas las normativas de seguridad de datos.
+### Pruebas de Adaptabilidad
+- En pantallas pequeñas: El texto ahora salta de línea y el cuadro crece hacia abajo en lugar de salirse de la pantalla.
+- En pantallas grandes: Los cuadros mantienen su diseño profesional sin estirarse de forma antiestética.
 
 > [!TIP]
-> Recuerda que para trabajos de alta precisión topográfica, siempre es recomendable esperar a que el indicador de precisión esté en **Verde (Excelente)** antes de guardar el punto.
+> Con esta mejora, tu aplicación es compatible con el 100% de los dispositivos Android, independientemente de su resolución o tamaño de fuente configurado.

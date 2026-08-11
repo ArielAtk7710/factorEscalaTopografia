@@ -1,4 +1,5 @@
-- [x] Implement GPS precision traffic light logic in `AutomaticFragment.java` (10m threshold)
-- [x] Remove delay and optimize `onResume` in `MapFragment.java`
-- [x] Minor optimization in `MapManager.java#refreshMap`
-- [ ] Final verification and push to Git
+- [x] Make `layout_barometer_info.xml` adaptable (wrap_content + maxWidth)
+- [x] Make `layout_map_guide.xml` adaptable (wrap_content)
+- [x] Fix text wrapping in `layout_custom_toast_pro.xml`
+- [x] Verify dynamic resizing in `UIUtils.java`
+- [x] Final verification of UI layout

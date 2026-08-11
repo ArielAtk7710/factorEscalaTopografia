@@ -9,6 +9,9 @@ public class WeatherResponse {
     @SerializedName("hourly")
     public Hourly hourly;
 
+    @SerializedName("daily")
+    public Daily daily;
+
     public static class CurrentWeather {
         @SerializedName("temperature_2m")
         public double temperature2m;
@@ -18,6 +21,9 @@ public class WeatherResponse {
 
         @SerializedName("weather_code")
         public int weatherCode;
+
+        @SerializedName("is_day")
+        public int isDay;
 
         @SerializedName("wind_speed_10m")
         public double windSpeed10m;
@@ -65,5 +71,22 @@ public class WeatherResponse {
 
         @SerializedName("cloud_cover")
         public java.util.List<Integer> cloudCover;
+    }
+
+    public static class Daily {
+        @SerializedName("time")
+        public java.util.List<String> time;
+
+        @SerializedName("weather_code")
+        public java.util.List<Integer> weatherCode;
+
+        @SerializedName("temperature_2m_max")
+        public java.util.List<Double> tempMax;
+
+        @SerializedName("temperature_2m_min")
+        public java.util.List<Double> tempMin;
+
+        @SerializedName("precipitation_probability_max")
+        public java.util.List<Integer> rainProbMax;
     }
 }

@@ -74,6 +74,19 @@
                         android:layout_height="match_parent" />
 
                     <com.google.android.material.floatingactionbutton.FloatingActionButton
+                        android:id="@+id/fab_mini_toggle_map_type"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="bottom|end"
+                        android:layout_marginEnd="12dp"
+                        android:layout_marginBottom="68dp"
+                        android:src="@drawable/ic_map"
+                        app:backgroundTint="@color/accent_light"
+                        app:fabSize="mini"
+                        app:tint="@android:color/white"
+                        android:contentDescription="Cambiar Capa" />
+
+                    <com.google.android.material.floatingactionbutton.FloatingActionButton
                         android:id="@+id/fab_mini_center_location"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
@@ -137,19 +150,19 @@
                     <TextView android:id="@+id/txt_lon" android:text="0" android:textColor="@color/accent_orange" android:textSize="14sp" android:textStyle="bold" android:layout_width="wrap_content" android:layout_height="wrap_content"/>
                 </LinearLayout>
                 <LinearLayout android:orientation="vertical" android:layout_columnWeight="1" android:layout_marginBottom="12dp">
-                    <TextView android:text="@string/label_ellipsoidal_altitude" android:textSize="10sp" android:textColor="@color/text_secondary" android:textStyle="bold" android:layout_width="wrap_content" android:layout_height="wrap_content"/>
-                    <TextView android:id="@+id/txt_alt" android:text="-- m" android:textColor="@color/accent_orange" android:textSize="14sp" android:textStyle="bold" android:layout_width="wrap_content" android:layout_height="wrap_content"/>
+                    <TextView android:text="@string/label_orthometric_altitude" android:textSize="10sp" android:textColor="@color/text_secondary" android:textStyle="bold" android:layout_width="wrap_content" android:layout_height="wrap_content"/>
+                    <TextView android:id="@+id/txt_alt_orto" android:text="-- m" android:textColor="@color/accent_orange" android:textSize="15sp" android:textStyle="bold" android:layout_width="wrap_content" android:layout_height="wrap_content"/>
                 </LinearLayout>
                 <LinearLayout android:orientation="vertical" android:layout_columnWeight="1" android:layout_marginBottom="12dp">
-                    <TextView android:text="@string/label_orthometric_altitude" android:textSize="10sp" android:textColor="@color/text_secondary" android:textStyle="bold" android:layout_width="wrap_content" android:layout_height="wrap_content"/>
-                    <TextView android:id="@+id/txt_alt_orto" android:text="-- m" android:textColor="@color/accent_orange" android:textSize="14sp" android:textStyle="bold" android:layout_width="wrap_content" android:layout_height="wrap_content"/>
+                    <TextView android:text="@string/label_ellipsoidal_altitude" android:textSize="10sp" android:textColor="@color/text_secondary" android:textStyle="bold" android:layout_width="wrap_content" android:layout_height="wrap_content"/>
+                    <TextView android:id="@+id/txt_alt" android:text="-- m" android:textColor="@color/accent_orange" android:textSize="13sp" android:textStyle="bold" android:layout_width="wrap_content" android:layout_height="wrap_content" android:alpha="0.8"/>
                 </LinearLayout>
                 <LinearLayout android:orientation="vertical" android:layout_columnWeight="1">
-                    <TextView android:text="Modelo Geoidal" android:textSize="10sp" android:textColor="@color/text_secondary" android:textStyle="bold" android:layout_width="wrap_content" android:layout_height="wrap_content"/>
+                    <TextView android:text="@string/label_geoid_model" android:textSize="10sp" android:textColor="@color/text_secondary" android:textStyle="bold" android:layout_width="wrap_content" android:layout_height="wrap_content"/>
                     <TextView android:id="@+id/txt_geoid_model" android:text="EGM96 (Global)" android:textColor="@color/accent_orange" android:textSize="14sp" android:textStyle="bold" android:layout_width="wrap_content" android:layout_height="wrap_content"/>
                 </LinearLayout>
                 <LinearLayout android:orientation="vertical" android:layout_columnWeight="1">
-                    <TextView android:text="Ondulación Geoidal" android:textSize="10sp" android:textColor="@color/text_secondary" android:textStyle="bold" android:layout_width="wrap_content" android:layout_height="wrap_content"/>
+                    <TextView android:text="@string/label_geoid_undulation" android:textSize="10sp" android:textColor="@color/text_secondary" android:textStyle="bold" android:layout_width="wrap_content" android:layout_height="wrap_content"/>
                     <TextView android:id="@+id/txt_geoid_undulation" android:text="-- m" android:textColor="@color/accent_orange" android:textSize="14sp" android:textStyle="bold" android:layout_width="wrap_content" android:layout_height="wrap_content"/>
                 </LinearLayout>
             </GridLayout>
@@ -171,7 +184,7 @@
                     <TextView android:id="@+id/txt_ref_system" android:text="--" android:textColor="@color/accent_orange" android:textSize="14sp" android:textStyle="bold" android:layout_width="wrap_content" android:layout_height="wrap_content"/>
                 </LinearLayout>
                 <LinearLayout android:orientation="vertical" android:layout_columnWeight="1">
-                    <TextView android:text="Temperatura Ambiente" android:textSize="10sp" android:textColor="@color/text_secondary" android:textStyle="bold" android:layout_width="wrap_content" android:layout_height="wrap_content"/>
+                    <TextView android:text="@string/label_temp_ambient" android:textSize="10sp" android:textColor="@color/text_secondary" android:textStyle="bold" android:layout_width="wrap_content" android:layout_height="wrap_content"/>
                     <TextView android:id="@+id/txt_temp" android:text="-- °C" android:textColor="@color/accent_orange" android:textSize="14sp" android:textStyle="bold" android:layout_width="wrap_content" android:layout_height="wrap_content"/>
                 </LinearLayout>
             </GridLayout>
@@ -293,7 +306,7 @@
                             android:id="@+id/txt_presion_hpa"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="-- hPa"
+                            android:text="-- HPa"
                             android:textColor="@color/text_primary"
                             android:textSize="11sp"
                             android:textStyle="bold"

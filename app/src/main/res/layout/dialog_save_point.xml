@@ -25,7 +25,7 @@
             <ImageView
                 android:layout_width="32dp"
                 android:layout_height="32dp"
-                android:src="@drawable/ic_map_pin"
+                android:src="@drawable/ic_register"
                 android:padding="4dp"
                 android:background="@drawable/bg_spinner_with_arrow"
                 android:backgroundTint="@color/bg_surface_secondary"/>
@@ -69,7 +69,7 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="OBSERVACIONES"
+            android:text="@string/label_observations"
             android:textColor="@color/text_secondary"
             android:textSize="10sp"
             android:textStyle="bold"
@@ -83,7 +83,7 @@
             android:layout_height="wrap_content"
             android:background="@drawable/bg_spinner_with_arrow"
             android:backgroundTint="@color/bg_surface_secondary"
-            android:hint="Detalles técnicos, descripción del terreno..."
+            android:hint="@string/label_observations_hint"
             android:padding="12dp"
             android:textColor="@color/text_primary"
             android:textColorHint="@color/text_secondary"

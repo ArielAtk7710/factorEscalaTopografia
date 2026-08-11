@@ -46,6 +46,68 @@
                 android:padding="12dp"
                 android:layout_marginBottom="6dp" />
 
+            <!-- Geoidal Model Section -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/title_geoid_adjustment"
+                android:textColor="@color/text_secondary"
+                android:textSize="12sp"
+                android:textStyle="bold"
+                android:layout_marginBottom="4dp" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="6dp"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
+
+                <com.google.android.material.button.MaterialButtonToggleGroup
+                    android:id="@+id/toggle_geoid_model"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    app:singleSelection="true"
+                    app:selectionRequired="true">
+                    <Button
+                        android:id="@+id/btn_geoid_mgb"
+                        style="?attr/materialButtonOutlinedStyle"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="@string/opt_mgb"
+                        android:textSize="12sp"
+                        android:textStyle="bold"
+                        app:backgroundTint="@color/toggle_button_background_selector"
+                        android:textColor="@color/toggle_button_text_selector"
+                        app:strokeColor="@color/accent_orange" />
+                    <Button
+                        android:id="@+id/btn_geoid_egm96"
+                        style="?attr/materialButtonOutlinedStyle"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="@string/opt_egm96"
+                        android:textSize="12sp"
+                        android:textStyle="bold"
+                        app:backgroundTint="@color/toggle_button_background_selector"
+                        android:textColor="@color/toggle_button_text_selector"
+                        app:strokeColor="@color/accent_orange" />
+                </com.google.android.material.button.MaterialButtonToggleGroup>
+
+                <ImageButton
+                    android:id="@+id/btn_geoid_info"
+                    android:layout_width="48dp"
+                    android:layout_height="48dp"
+                    android:layout_marginStart="8dp"
+                    android:background="@drawable/bg_spinner_with_arrow"
+                    android:backgroundTint="@color/bg_surface_secondary"
+                    android:contentDescription="@string/desc_geoid_info"
+                    android:src="@drawable/ic_info"
+                    app:tint="@color/accent_light" />
+            </LinearLayout>
+
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -87,222 +149,138 @@
             </LinearLayout>
 
             <!-- SECCIÓN MAPAS -->
-            <LinearLayout
-                android:layout_width="match_parent"
+            <TextView
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:gravity="center_vertical"
-                android:layout_marginBottom="4dp">
-                <TextView
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:text="@string/label_maps"
-                    android:textColor="@color/text_primary"
-                    android:textSize="16sp"
-                    android:textStyle="bold" />
-                <ImageButton
-                    android:id="@+id/btn_map_download_info"
-                    android:layout_width="40dp"
-                    android:layout_height="40dp"
-                    android:background="?attr/selectableItemBackgroundBorderless"
-                    android:src="@drawable/ic_info"
-                    app:tint="@color/accent_light"
-                    android:contentDescription="Guía de descarga de mapas" />
-            </LinearLayout>
+                android:layout_marginBottom="4dp"
+                android:text="@string/label_maps"
+                android:textColor="@color/text_primary"
+                android:textSize="16sp"
+                android:textStyle="bold" />
 
             <!-- Modo del mapa -->
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_marginBottom="4dp"
                 android:text="@string/label_map_mode"
                 android:textColor="@color/text_secondary"
                 android:textSize="12sp"
-                android:textStyle="bold"
-                android:layout_marginBottom="4dp" />
-
-            <com.google.android.material.button.MaterialButtonToggleGroup
-                android:id="@+id/toggle_map_mode"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                app:singleSelection="true"
-                app:selectionRequired="true"
-                android:layout_marginBottom="6dp">
-                <Button
-                    android:id="@+id/btn_mode_online"
-                    style="?attr/materialButtonOutlinedStyle"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:text="@string/opt_online"
-                    android:textSize="12sp"
-                    app:backgroundTint="@color/toggle_button_background_selector"
-                    android:textColor="@color/toggle_button_text_selector"
-                    app:strokeColor="@color/accent_orange" />
-                <Button
-                    android:id="@+id/btn_mode_offline"
-                    style="?attr/materialButtonOutlinedStyle"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:text="@string/opt_offline"
-                    android:textSize="12sp"
-                    app:backgroundTint="@color/toggle_button_background_selector"
-                    android:textColor="@color/toggle_button_text_selector"
-                    app:strokeColor="@color/accent_orange" />
-                <Button
-                    android:id="@+id/btn_mode_hybrid"
-                    style="?attr/materialButtonOutlinedStyle"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:text="@string/opt_hybrid"
-                    android:textSize="12sp"
-                    app:backgroundTint="@color/toggle_button_background_selector"
-                    android:textColor="@color/toggle_button_text_selector"
-                    app:strokeColor="@color/accent_orange" />
-            </com.google.android.material.button.MaterialButtonToggleGroup>
-
-            <!-- Carpeta de mapas (Recuadro Azul Compacto) -->
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/label_map_folder"
-                android:textColor="@color/text_secondary"
-                android:textSize="11sp"
-                android:textStyle="bold"
-                android:layout_marginBottom="4dp" />
+                android:textStyle="bold" />
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:padding="12dp"
-                android:orientation="vertical"
                 android:layout_marginBottom="6dp"
-                android:background="@color/bg_surface">
-
-                <TextView
-                    android:id="@+id/txt_maps_folder_path"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="Android > data > bo.com.factorcombinadotopo > files > osmdroid"
-                    android:textColor="@color/text_primary"
-                    android:textSize="10sp"
-                    android:textStyle="bold" />
-            </LinearLayout>
-
-            <!-- Export Path Section -->
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/label_export_directory"
-                android:textColor="@color/text_secondary"
-                android:textSize="12sp"
-                android:textStyle="bold"
-                android:layout_marginBottom="4dp" />
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:background="@color/bg_surface"
-                android:padding="16dp"
-                android:orientation="vertical"
-                android:layout_marginBottom="6dp">
-                <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="@string/text_export_path"
-                    android:textColor="@color/accent_light"
-                    android:textSize="13sp"
-                    android:textStyle="bold" />
-            </LinearLayout>
-
-            <!-- Mapa instalado -->
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
                 android:gravity="center_vertical"
-                android:layout_marginBottom="2dp">
-                <TextView
+                android:orientation="horizontal">
+
+                <com.google.android.material.button.MaterialButtonToggleGroup
+                    android:id="@+id/toggle_map_mode"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:text="@string/label_installed_map"
-                    android:textColor="@color/text_secondary"
-                    android:textSize="12sp"
-                    android:textStyle="bold" />
+                    app:selectionRequired="true"
+                    app:singleSelection="true">
+
+                    <Button
+                        android:id="@+id/btn_mode_online"
+                        style="?attr/materialButtonOutlinedStyle"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:clickable="false"
+                        android:focusable="false"
+                        android:text="@string/opt_online"
+                        android:textColor="@android:color/white"
+                        android:textSize="12sp"
+                        android:textStyle="bold"
+                        app:backgroundTint="@color/accent_orange"
+                        app:strokeColor="@color/accent_orange" />
+
+                    <Button
+                        android:id="@+id/btn_mode_offline_aesthetic"
+                        style="?attr/materialButtonOutlinedStyle"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:enabled="false"
+                        android:text="@string/opt_offline"
+                        android:textColor="@color/accent_orange"
+                        android:textSize="12sp"
+                        android:textStyle="bold"
+                        app:strokeColor="@color/accent_orange" />
+                </com.google.android.material.button.MaterialButtonToggleGroup>
+
                 <ImageButton
-                    android:id="@+id/btn_map_import_info"
-                    android:layout_width="40dp"
-                    android:layout_height="40dp"
-                    android:background="?attr/selectableItemBackgroundBorderless"
+                    android:id="@+id/btn_map_info"
+                    android:layout_width="48dp"
+                    android:layout_height="48dp"
+                    android:layout_marginStart="8dp"
+                    android:background="@drawable/bg_spinner_with_arrow"
+                    android:backgroundTint="@color/bg_surface_secondary"
+                    android:contentDescription="@string/desc_map_info"
                     android:src="@drawable/ic_info"
-                    app:tint="@color/accent_light"
-                    android:contentDescription="Guía de importación de mapas" />
-            </LinearLayout>
-
-            <LinearLayout
-                android:id="@+id/layout_map_info"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:background="@color/bg_surface"
-                android:padding="12dp"
-                android:orientation="vertical"
-                android:layout_marginBottom="6dp">
-                <TextView
-                    android:id="@+id/txt_installed_map_name"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="@string/msg_no_map_installed"
-                    android:textColor="@color/text_primary"
-                    android:textSize="14sp"
-                    android:textStyle="bold" />
-                <TextView
-                    android:id="@+id/txt_installed_map_details"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text=""
-                    android:textColor="@color/text_secondary"
-                    android:textSize="12sp"
-                    android:layout_marginTop="4dp" />
-            </LinearLayout>
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:layout_marginBottom="6dp">
-                <Button
-                    android:id="@+id/btn_import_map"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:text="@string/btn_import_map"
-                    android:textSize="11sp"
-                    app:backgroundTint="@color/accent_orange"
-                    android:layout_marginEnd="4dp" />
-                <Button
-                    android:id="@+id/btn_delete_map"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:text="@string/btn_delete_map"
-                    android:textSize="11sp"
-                    app:backgroundTint="@color/state_error"
-                    android:layout_marginStart="4dp" />
+                    app:tint="@color/accent_light" />
             </LinearLayout>
 
             <!-- Caché (Fila Horizontal) -->
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_marginBottom="4dp"
                 android:text="@string/label_cache"
                 android:textColor="@color/text_secondary"
                 android:textSize="12sp"
-                android:textStyle="bold"
-                android:layout_marginBottom="4dp" />
+                android:textStyle="bold" />
 
+            <!-- Caché Callejera -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:layout_marginBottom="4dp">
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:background="@color/bg_surface"
+                    android:padding="10dp"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical">
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="@string/label_cache_street"
+                        android:textColor="@color/text_secondary"
+                        android:textSize="10sp" />
+                    <TextView
+                        android:id="@+id/txt_cache_size_street"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="0 MB"
+                        android:textColor="@color/accent_orange"
+                        android:textStyle="bold"
+                        android:textSize="12sp" />
+                </LinearLayout>
+
+                <Button
+                    android:id="@+id/btn_clear_cache_street"
+                    style="?attr/materialButtonOutlinedStyle"
+                    android:layout_width="wrap_content"
+                    android:layout_height="36dp"
+                    android:layout_marginStart="6dp"
+                    android:text="@string/btn_clean"
+                    android:textSize="9sp"
+                    android:paddingHorizontal="8dp"
+                    app:strokeColor="@color/accent_light"
+                    android:textColor="@color/accent_light" />
+            </LinearLayout>
+
+            <!-- Caché Satelital -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -315,34 +293,35 @@
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:background="@color/bg_surface"
-                    android:padding="12dp"
+                    android:padding="10dp"
                     android:orientation="horizontal"
                     android:gravity="center_vertical">
                     <TextView
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
-                        android:text="@string/label_space_used"
+                        android:text="@string/label_cache_sat"
                         android:textColor="@color/text_secondary"
-                        android:textSize="11sp" />
+                        android:textSize="10sp" />
                     <TextView
-                        android:id="@+id/txt_cache_size"
+                        android:id="@+id/txt_cache_size_sat"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="0 MB"
                         android:textColor="@color/accent_orange"
                         android:textStyle="bold"
-                        android:textSize="13sp" />
+                        android:textSize="12sp" />
                 </LinearLayout>
 
                 <Button
-                    android:id="@+id/btn_clear_cache"
+                    android:id="@+id/btn_clear_cache_sat"
                     style="?attr/materialButtonOutlinedStyle"
                     android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="8dp"
-                    android:text="@string/btn_clear_cache"
-                    android:textSize="10sp"
+                    android:layout_height="36dp"
+                    android:layout_marginStart="6dp"
+                    android:text="@string/btn_clean"
+                    android:textSize="9sp"
+                    android:paddingHorizontal="8dp"
                     app:strokeColor="@color/accent_light"
                     android:textColor="@color/accent_light" />
             </LinearLayout>

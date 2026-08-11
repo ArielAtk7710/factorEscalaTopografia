@@ -114,7 +114,7 @@
                     android:id="@+id/txt_lib_expand_label"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Ver Detalles"
+                    android:text="@string/label_show_details"
                     android:textColor="@color/accent_light"
                     android:textSize="12sp"
                     android:textStyle="bold" />
@@ -159,7 +159,7 @@
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_marginBottom="12dp">
-                    <TextView android:text="TIPO REGISTRO" android:textSize="10sp" android:textColor="@color/text_secondary" android:textStyle="bold" android:layout_width="wrap_content" android:layout_height="wrap_content"/>
+                    <TextView android:text="@string/label_reg_type" android:textSize="10sp" android:textColor="@color/text_secondary" android:textStyle="bold" android:layout_width="wrap_content" android:layout_height="wrap_content"/>
                     <TextView android:id="@+id/txt_lib_det_tipo" android:text="Radiación" android:textColor="@color/text_primary" android:textSize="13sp" android:layout_width="wrap_content" android:layout_height="wrap_content"/>
                 </LinearLayout>
 
@@ -169,7 +169,7 @@
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_marginBottom="12dp">
-                    <TextView android:text="ALT. INSTRUMENTO" android:textSize="10sp" android:textColor="@color/text_secondary" android:textStyle="bold" android:layout_width="wrap_content" android:layout_height="wrap_content"/>
+                    <TextView android:text="@string/label_alt_ins_m" android:textSize="10sp" android:textColor="@color/text_secondary" android:textStyle="bold" android:layout_width="wrap_content" android:layout_height="wrap_content"/>
                     <TextView android:id="@+id/txt_lib_det_alt_ins" android:text="1.545 m" android:textColor="@color/text_primary" android:textSize="13sp" android:layout_width="wrap_content" android:layout_height="wrap_content"/>
                 </LinearLayout>
 
@@ -179,7 +179,7 @@
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_marginBottom="12dp">
-                    <TextView android:text="ESTE (E)" android:textSize="10sp" android:textColor="@color/text_secondary" android:textStyle="bold" android:layout_width="wrap_content" android:layout_height="wrap_content"/>
+                    <TextView android:text="@string/label_east_e" android:textSize="10sp" android:textColor="@color/text_secondary" android:textStyle="bold" android:layout_width="wrap_content" android:layout_height="wrap_content"/>
                     <TextView android:id="@+id/txt_lib_det_este" android:text="590745.00" android:textColor="@color/text_primary" android:textSize="13sp" android:layout_width="wrap_content" android:layout_height="wrap_content"/>
                 </LinearLayout>
 
@@ -189,7 +189,7 @@
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_marginBottom="12dp">
-                    <TextView android:text="NORTE (N)" android:textSize="10sp" android:textColor="@color/text_secondary" android:textStyle="bold" android:layout_width="wrap_content" android:layout_height="wrap_content"/>
+                    <TextView android:text="@string/label_north_n" android:textSize="10sp" android:textColor="@color/text_secondary" android:textStyle="bold" android:layout_width="wrap_content" android:layout_height="wrap_content"/>
                     <TextView android:id="@+id/txt_lib_det_norte" android:text="8175432.00" android:textColor="@color/text_primary" android:textSize="13sp" android:layout_width="wrap_content" android:layout_height="wrap_content"/>
                 </LinearLayout>
 
@@ -198,7 +198,7 @@
                     android:layout_columnWeight="1"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content">
-                    <TextView android:text="COTA (Z)" android:textSize="10sp" android:textColor="@color/text_secondary" android:textStyle="bold" android:layout_width="wrap_content" android:layout_height="wrap_content"/>
+                    <TextView android:text="@string/label_alt_z" android:textSize="10sp" android:textColor="@color/text_secondary" android:textStyle="bold" android:layout_width="wrap_content" android:layout_height="wrap_content"/>
                     <TextView android:id="@+id/txt_lib_det_cota" android:text="3600.00" android:textColor="@color/text_primary" android:textSize="13sp" android:layout_width="wrap_content" android:layout_height="wrap_content"/>
                 </LinearLayout>
 
@@ -207,7 +207,7 @@
                     android:layout_columnWeight="1"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content">
-                    <TextView android:text="FECHA" android:textSize="10sp" android:textColor="@color/text_secondary" android:textStyle="bold" android:layout_width="wrap_content" android:layout_height="wrap_content"/>
+                    <TextView android:text="@string/label_reg_date" android:textSize="10sp" android:textColor="@color/text_secondary" android:textStyle="bold" android:layout_width="wrap_content" android:layout_height="wrap_content"/>
                     <TextView android:id="@+id/txt_lib_det_fecha" android:text="2026-08-01" android:textColor="@color/text_primary" android:textSize="13sp" android:layout_width="wrap_content" android:layout_height="wrap_content"/>
                 </LinearLayout>
             </GridLayout>
@@ -220,7 +220,7 @@
                 android:layout_marginTop="12dp"
                 android:background="@color/bg_surface_secondary"
                 android:padding="8dp">
-                <TextView android:text="OBSERVACIONES DE CAMPO" android:textSize="10sp" android:textColor="@color/text_secondary" android:textStyle="bold" android:layout_width="wrap_content" android:layout_height="wrap_content"/>
+                <TextView android:text="@string/label_field_obs" android:textSize="10sp" android:textColor="@color/text_secondary" android:textStyle="bold" android:layout_width="wrap_content" android:layout_height="wrap_content"/>
                 <TextView android:id="@+id/txt_lib_det_obs" android:text="Sin observaciones." android:textColor="@color/text_primary" android:textSize="12sp" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="2dp"/>
             </LinearLayout>
 

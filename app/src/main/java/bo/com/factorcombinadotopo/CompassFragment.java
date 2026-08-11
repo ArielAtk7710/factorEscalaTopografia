@@ -21,22 +21,20 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.ViewModelProvider;
 
-import com.google.android.gms.location.FusedLocationProviderClient;
-import com.google.android.gms.location.LocationCallback;
-import com.google.android.gms.location.LocationRequest;
-import com.google.android.gms.location.LocationResult;
-import com.google.android.gms.location.LocationServices;
-import com.google.android.gms.location.Priority;
-
-import java.text.DecimalFormat;
 import java.util.List;
 import java.util.Locale;
 
+/**
+ * Fragmento de Brújula Profesional.
+ * Utiliza el ViewModel compartido para recibir actualizaciones de GPS sin duplicar sensores.
+ */
 public class CompassFragment extends Fragment implements SensorEventListener {
 
     private ImageView imgDial, imgBubble, imgNeedle;
     private TextView txtAzimut, txtAzimutDms, txtEste, txtNorte, txtAlt, txtRef, txtLocation;
+    private TextView txtGeoidModel, txtGeoidUndulation;
     private SensorManager sensorManager;
     private Sensor accelerometer, magnetometer;
     
@@ -46,8 +44,7 @@ public class CompassFragment extends Fragment implements SensorEventListener {
     private float currentPitch = 0f;
     private float currentRoll = 0f;
 
-    private FusedLocationProviderClient fusedLocationClient;
-    private LocationCallback locationCallback;
+    private SurveyViewModel viewModel;
     private long lastLocationRequestTime = 0;
 
     @Nullable
@@ -60,6 +57,7 @@ public class CompassFragment extends Fragment implements SensorEventListener {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         
+        // Bindings
         imgDial = view.findViewById(R.id.img_compass_dial);
         imgBubble = view.findViewById(R.id.img_level_bubble);
         imgNeedle = view.findViewById(R.id.img_compass_needle);
@@ -71,6 +69,8 @@ public class CompassFragment extends Fragment implements SensorEventListener {
         txtNorte = view.findViewById(R.id.txt_comp_norte);
         txtAlt = view.findViewById(R.id.txt_comp_alt);
         txtRef = view.findViewById(R.id.txt_comp_ref);
+        txtGeoidModel = view.findViewById(R.id.txt_comp_geoid_model);
+        txtGeoidUndulation = view.findViewById(R.id.txt_comp_geoid_undulation);
 
         sensorManager = (SensorManager) requireActivity().getSystemService(Context.SENSOR_SERVICE);
         if (sensorManager != null) {
@@ -78,39 +78,35 @@ public class CompassFragment extends Fragment implements SensorEventListener {
             magnetometer = sensorManager.getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD);
         }
 
-        fusedLocationClient = LocationServices.getFusedLocationProviderClient(requireActivity());
-        setupLocationUpdates();
+        // ViewModel compartido con la Actividad
+        viewModel = new ViewModelProvider(requireActivity()).get(SurveyViewModel.class);
+        setupViewModelObservers();
     }
 
-    private void setupLocationUpdates() {
-        locationCallback = new LocationCallback() {
-            @Override
-            public void onLocationResult(@NonNull LocationResult locationResult) {
-                if (!isAdded() || getView() == null) return;
-                for (Location location : locationResult.getLocations()) {
-                    if (location != null) updateGpsUI(location);
-                }
+    private void setupViewModelObservers() {
+        // Observar coordenadas UTM y cálculos en tiempo real
+        viewModel.getCalculationResult().observe(getViewLifecycleOwner(), res -> {
+            if (res == null) return;
+            
+            txtAlt.setText(GeoUtils.formatCoord(res.altOrto) + " m");
+            txtEste.setText(GeoUtils.formatCoord(res.este) + " m");
+            txtNorte.setText(GeoUtils.formatCoord(res.norte) + " m");
+            txtRef.setText(String.format(Locale.US, "%d%c (WGS84)", res.zona, res.hemisferio));
+            
+            if (txtGeoidUndulation != null) {
+                txtGeoidUndulation.setText(GeoUtils.formatCoord(res.geoidN) + " m");
             }
-        };
-    }
 
-    private void updateGpsUI(Location loc) {
-        if (!isAdded() || getView() == null) return;
-        
-        double geoidN = GeoidManager.getGeoidUndulation(loc.getLatitude(), loc.getLongitude());
-        SharedPreferences prefs = requireActivity().getSharedPreferences("AppPrefs", Context.MODE_PRIVATE);
-        float offset = prefs.getFloat("PressureOffset", 0f);
-        
-        TopoCalculoManager.TopoResult res = TopoCalculoManager.calculateAll(
-                loc.getLatitude(), loc.getLongitude(), loc.getAltitude(), geoidN, offset);
-        
-        txtAlt.setText(GeoUtils.formatCoord(res.altOrto) + " m");
-        txtEste.setText(GeoUtils.formatCoord(res.este) + " m");
-        txtNorte.setText(GeoUtils.formatCoord(res.norte) + " m");
-        
-        txtRef.setText(String.format(Locale.US, "%d%c (WGS84)", res.zona, res.hemisferio));
+            // Actualizar nombre de ubicación cada minuto
+            updateLocationName(res.lat, res.lon);
+        });
 
-        updateLocationName(loc.getLatitude(), loc.getLongitude());
+        // Observar modelo geoidal activo
+        viewModel.getUsesMgb().observe(getViewLifecycleOwner(), uses -> {
+            if (txtGeoidModel != null) {
+                txtGeoidModel.setText(uses ? getString(R.string.opt_mgb) : getString(R.string.opt_egm96));
+            }
+        });
     }
 
     private void updateLocationName(double lat, double lon) {
@@ -128,10 +124,6 @@ public class CompassFragment extends Fragment implements SensorEventListener {
                     new Handler(Looper.getMainLooper()).post(() -> {
                         if (isAdded() && txtLocation != null) txtLocation.setText(locationName);
                     });
-                } else {
-                    new Handler(Looper.getMainLooper()).post(() -> {
-                        if (isAdded() && txtLocation != null) txtLocation.setText(R.string.label_unknown_location);
-                    });
                 }
             } catch (Exception ignored) {}
         }).start();
@@ -142,22 +134,12 @@ public class CompassFragment extends Fragment implements SensorEventListener {
         super.onResume();
         if (accelerometer != null) sensorManager.registerListener(this, accelerometer, SensorManager.SENSOR_DELAY_GAME);
         if (magnetometer != null) sensorManager.registerListener(this, magnetometer, SensorManager.SENSOR_DELAY_GAME);
-        
-        startLocationUpdates();
-    }
-
-    private void startLocationUpdates() {
-        try {
-            LocationRequest request = new LocationRequest.Builder(Priority.PRIORITY_HIGH_ACCURACY, 2000).build();
-            fusedLocationClient.requestLocationUpdates(request, locationCallback, Looper.getMainLooper());
-        } catch (SecurityException ignored) {}
     }
 
     @Override
     public void onPause() {
         super.onPause();
         if (sensorManager != null) sensorManager.unregisterListener(this);
-        fusedLocationClient.removeLocationUpdates(locationCallback);
     }
 
     @Override
@@ -188,16 +170,13 @@ public class CompassFragment extends Fragment implements SensorEventListener {
     }
 
     private void updateCompassAndLevel(float azimut, float pitch, float roll) {
-        // Suavizado
         currentAzimut = currentAzimut + 0.2f * (azimut - currentAzimut);
         currentPitch = currentPitch + 0.2f * (pitch - currentPitch);
         currentRoll = currentRoll + 0.2f * (roll - currentRoll);
 
-        // Rotación del Dial y la Aguja (Inversa al giro del móvil)
         if (imgDial != null) imgDial.setRotation(-currentAzimut);
         if (imgNeedle != null) imgNeedle.setRotation(-currentAzimut);
 
-        // Movimiento de la Burbuja (Ajustado para dial mediano)
         float maxOffset = 40f; 
         float xOffset = Math.max(-maxOffset, Math.min(maxOffset, currentRoll * 1.2f));
         float yOffset = Math.max(-maxOffset, Math.min(maxOffset, currentPitch * 1.2f));
@@ -221,11 +200,9 @@ public class CompassFragment extends Fragment implements SensorEventListener {
         double mDouble = (val - d) * 60.0;
         int m = (int) mDouble;
         int s = (int) Math.round((mDouble - m) * 60.0);
-        
         if (s == 60) { s = 0; m++; }
         if (m == 60) { m = 0; d++; }
         d %= 360;
-        
         return getString(R.string.label_azimut_dms, d, m, s);
     }
 
@@ -242,7 +219,5 @@ public class CompassFragment extends Fragment implements SensorEventListener {
     }
 
     @Override
-    public void onAccuracyChanged(Sensor sensor, int accuracy) {
-        // En el nuevo diseño minimalista, ocultamos o usamos un indicador discreto si fuera necesario
-    }
+    public void onAccuracyChanged(Sensor sensor, int accuracy) {}
 }

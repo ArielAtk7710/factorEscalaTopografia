@@ -21,6 +21,10 @@ public class FileUtils {
      * Compatible con Android 11+ (Scoped Storage) y versiones anteriores.
      */
     public static void savePublicTxtFile(Context context, String fileName, String content) {
+        savePublicTxtFile(context, fileName, content, null);
+    }
+
+    public static void savePublicTxtFile(Context context, String fileName, String content, String successMessage) {
         String relativePath = Environment.DIRECTORY_DOCUMENTS + "/FactorEscalaTop";
         
         try {
@@ -37,7 +41,7 @@ public class FileUtils {
                     try (OutputStream outputStream = context.getContentResolver().openOutputStream(fileUri)) {
                         if (outputStream != null) {
                             outputStream.write(content.getBytes());
-                            showPathToast(context, fileName);
+                            showPathToast(context, fileName, successMessage);
                         }
                     }
                 }
@@ -49,7 +53,7 @@ public class FileUtils {
                 java.io.File file = new java.io.File(directory, fileName);
                 try (java.io.FileOutputStream fos = new java.io.FileOutputStream(file)) {
                     fos.write(content.getBytes());
-                    showPathToast(context, fileName);
+                    showPathToast(context, fileName, successMessage);
                 }
             }
         } catch (Exception e) {
@@ -57,9 +61,10 @@ public class FileUtils {
         }
     }
 
-    private static void showPathToast(Context context, String fileName) {
+    private static void showPathToast(Context context, String fileName, String successMessage) {
         String amigablePath = "Almacenamiento Interno > Documents > FactorEscalaTop > " + fileName;
-        UIUtils.showInfoToastLong(context, amigablePath);
+        String finalMessage = (successMessage != null ? successMessage + "\n\n" : "") + amigablePath;
+        UIUtils.showInfoToastLong(context, finalMessage);
     }
 
     /**

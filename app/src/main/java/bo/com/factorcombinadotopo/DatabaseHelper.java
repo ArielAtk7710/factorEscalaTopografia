@@ -13,7 +13,7 @@ import java.util.Locale;
 public class DatabaseHelper extends SQLiteOpenHelper {
 
     private static final String DATABASE_NAME = "puntos.db";
-    private static final int DATABASE_VERSION = 4;
+    private static final int DATABASE_VERSION = 7;
 
     public static final String TABLE_PUNTOS = "puntos";
     public static final String TABLE_LIBRETA = "libreta_campo";
@@ -33,6 +33,11 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public static final String COLUMN_FACTOR_ESCALA = "factor_escala";
     public static final String COLUMN_FACTOR_ALTURA = "factor_altura";
     public static final String COLUMN_FACTOR_COMBINADO = "factor_combinado";
+    public static final String COLUMN_MODELO_GEOIDAL = "modelo_geoidal";
+    public static final String COLUMN_TIPO_REGISTRO = "tipo_registro";
+    public static final String COLUMN_PRECISION = "precision";
+    public static final String COLUMN_SATELITES = "satelites";
+    public static final String COLUMN_TEMPERATURA = "temperatura";
     public static final String COLUMN_FECHA = "fecha";
     public static final String COLUMN_NOTAS = "notas";
 
@@ -67,6 +72,11 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                     COLUMN_FACTOR_ESCALA + " TEXT, " +
                     COLUMN_FACTOR_ALTURA + " TEXT, " +
                     COLUMN_FACTOR_COMBINADO + " TEXT, " +
+                    COLUMN_MODELO_GEOIDAL + " TEXT, " +
+                    COLUMN_TIPO_REGISTRO + " TEXT, " +
+                    COLUMN_PRECISION + " TEXT, " +
+                    COLUMN_SATELITES + " TEXT, " +
+                    COLUMN_TEMPERATURA + " TEXT, " +
                     COLUMN_FECHA + " TEXT, " +
                     COLUMN_NOTAS + " TEXT" +
                     ");";
@@ -114,6 +124,17 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         if (oldVersion < 4) {
             db.execSQL(TABLE_LIBRETA_CREATE);
         }
+        if (oldVersion < 5) {
+            db.execSQL("ALTER TABLE " + TABLE_PUNTOS + " ADD COLUMN " + COLUMN_MODELO_GEOIDAL + " TEXT DEFAULT 'EGM96 (Global)'");
+        }
+        if (oldVersion < 6) {
+            db.execSQL("ALTER TABLE " + TABLE_PUNTOS + " ADD COLUMN " + COLUMN_TIPO_REGISTRO + " TEXT DEFAULT 'Registro Automático'");
+        }
+        if (oldVersion < 7) {
+            db.execSQL("ALTER TABLE " + TABLE_PUNTOS + " ADD COLUMN " + COLUMN_PRECISION + " TEXT DEFAULT 'N/A'");
+            db.execSQL("ALTER TABLE " + TABLE_PUNTOS + " ADD COLUMN " + COLUMN_SATELITES + " TEXT DEFAULT 'N/A'");
+            db.execSQL("ALTER TABLE " + TABLE_PUNTOS + " ADD COLUMN " + COLUMN_TEMPERATURA + " TEXT DEFAULT 'N/A'");
+        }
     }
 
     public long insertarPunto(ContentValues values) {
@@ -157,16 +178,16 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             String timeStampLocal = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault()).format(new Date());
 
             // Ejemplo 1: Punto de Referencia La Paz (Imagen)
-            insertPuntoHelper(db, "GPS_LP_CONTROL", "-16º 29' 45.120''", "-68º 08' 22.450''", "3962.670", "3928.15", "458.2", "595393.080", "8177115.220", "19", "S", "0.99965432", "0.99943210", "0.99909005", timeStampLocal);
+            insertPuntoHelper(db, "GPS_LP_CONTROL", "-16º 29' 45.120''", "-68º 08' 22.450''", "3962.670", "3928.15", "458.2", "595393.080", "8177115.220", "19", "S", "0.99965432", "0.99943210", "0.99909005", "MGBol08", "Registro Automático", "±2m", "12", "15.0°C", timeStampLocal);
 
             // Ejemplo 2: Estación CBBA
-            insertPuntoHelper(db, "BASE_AIRPORT_CBBA", "-17º 26' 10.300''", "-66º 10' 15.200''", "2550.000", "2532.15", "562.8", "802145.450", "8076543.220", "19", "S", "0.99971234", "0.99965432", "0.99936666", timeStampLocal);
+            insertPuntoHelper(db, "BASE_AIRPORT_CBBA", "-17º 26' 10.300''", "-66º 10' 15.200''", "2550.000", "2532.15", "562.8", "802145.450", "8076543.220", "19", "S", "0.99971234", "0.99965432", "0.99936666", "EGM96 (Global)", "Registro Automático", "±5m", "8", "22.5°C", timeStampLocal);
 
             // Ejemplo 3: Punto Topográfico SCZ
-            insertPuntoHelper(db, "PUNTO_MIRA_SCZ", "-17º 48' 02.100''", "-63º 10' 45.300''", "420.000", "435.80", "720.5", "481023.120", "8031456.780", "20", "S", "0.99960234", "0.99993412", "0.99953648", timeStampLocal);
+            insertPuntoHelper(db, "PUNTO_MIRA_SCZ", "-17º 48' 02.100''", "-63º 10' 45.300''", "420.000", "435.80", "720.5", "481023.120", "8031456.780", "20", "S", "0.99960234", "0.99993412", "0.99953648", "EGM96 (Global)", "Registro Automático", "±10m", "5", "28.0°C", timeStampLocal);
 
             // Ejemplo 4: Control Minero Potosí
-            insertPuntoHelper(db, "MINA_CONTROL_POT", "-19º 35' 12.400''", "-65º 45' 20.100''", "4060.000", "4020.15", "465.3", "211456.900", "7832145.600", "20", "S", "0.99984321", "0.99936123", "0.99920444", timeStampLocal);
+            insertPuntoHelper(db, "MINA_CONTROL_POT", "-19º 35' 12.400''", "-65º 45' 20.100''", "4060.000", "4020.15", "465.3", "211456.900", "7832145.600", "20", "S", "0.99984321", "0.99936123", "0.99920444", "EGM96 (Global)", "Registro Automático", "±3m", "10", "12.0°C", timeStampLocal);
 
             // 2 Entradas de Libreta de Apuntes
             ContentValues l1 = new ContentValues();
@@ -199,7 +220,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         }
     }
 
-    private void insertPuntoHelper(SQLiteDatabase db, String nom, String lat, String lon, String alt, String altO, String pres, String este, String norte, String zona, String hem, String fe, String fa, String fc, String fecha) {
+    private void insertPuntoHelper(SQLiteDatabase db, String nom, String lat, String lon, String alt, String altO, String pres, String este, String norte, String zona, String hem, String fe, String fa, String fc, String model, String tipoReg, String precision, String sats, String temp, String fecha) {
         ContentValues v = new ContentValues();
         v.put(COLUMN_NOMBRE, nom);
         v.put(COLUMN_LATITUD, lat);
@@ -214,6 +235,11 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         v.put(COLUMN_FACTOR_ESCALA, fe);
         v.put(COLUMN_FACTOR_ALTURA, fa);
         v.put(COLUMN_FACTOR_COMBINADO, fc);
+        v.put(COLUMN_MODELO_GEOIDAL, model);
+        v.put(COLUMN_TIPO_REGISTRO, tipoReg);
+        v.put(COLUMN_PRECISION, precision);
+        v.put(COLUMN_SATELITES, sats);
+        v.put(COLUMN_TEMPERATURA, temp);
         v.put(COLUMN_FECHA, fecha);
         db.insert(TABLE_PUNTOS, null, v);
     }

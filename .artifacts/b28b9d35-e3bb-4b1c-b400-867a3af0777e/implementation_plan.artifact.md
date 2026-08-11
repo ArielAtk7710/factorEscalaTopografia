@@ -1,33 +1,33 @@
-# Plan de Implementación - Mejoras de Precisión y Rendimiento Visual (v2.2)
+# Plan de Implementación - Cuadros Informativos Adaptables
 
-Este plan detalla dos mejoras específicas para elevar la calidad técnica y la experiencia de usuario (UX) en el trabajo de campo, ajustando el umbral de precisión a 10 metros.
+Este plan asegura que todas las ventanas informativas (popups) de la aplicación se adapten automáticamente al tamaño de la pantalla de cualquier teléfono, evitando que el texto se corte y mejorando la legibilidad.
 
 ## Cambios Propuestos
 
-### 1. Semáforo de Precisión GPS
+### 1. Flexibilidad de Ancho en Layouts
 
-#### [MODIFY] [AutomaticFragment.java](file:///D:/Desarrollo-Software/Proyectos%20Android/factorEscala/app/src/main/java/bo/com/factorcombinadotopo/AutomaticFragment.java)
-Implementaremos una lógica visual en el campo de precisión para alertar al topógrafo sobre la calidad de la señal:
-- **Excelente (< 5m)**: Texto en color Verde (`state_success`).
-- **Buena (5m - 10m)**: Texto en color Amarillo/Naranja (`state_warning`).
-- **Baja (> 10m)**: Texto en color Rojo (`state_error`).
-- Se añadirá una etiqueta descriptiva junto al valor (ej: "± 3m - Excelente").
+#### [MODIFY] [layout_barometer_info.xml](file:///D:/Desarrollo-Software/Proyectos%20Android/factorEscala/app/src/main/res/layout/layout_barometer_info.xml)
+- Cambiar el ancho fijo de `320dp` a `wrap_content`.
+- Añadir un ancho máximo (`app:cardMaxWidth="340dp"`) para que en tablets o pantallas muy anchas no se estire demasiado, pero en teléfonos pequeños se reduzca lo necesario.
 
-### 2. Optimización de Carga Instantánea del Mapa
+#### [MODIFY] [layout_map_guide.xml](file:///D:/Desarrollo-Software/Proyectos%20Android/factorEscala/app/src/main/res/layout/layout_map_guide.xml)
+- Cambiar el ancho fijo de `320dp` a `wrap_content`.
+- Asegurar que el contenedor interno permita que el texto largo salte de línea automáticamente.
 
-#### [MODIFY] [MapFragment.java](file:///D:/Desarrollo-Software/Proyectos%20Android/factorEscala/app/src/main/java/bo/com/factorcombinadotopo/MapFragment.java)
-- **Eliminación del Delay**: Quitaremos el retraso de 300ms en `onResume`.
-- **Sincronización Directa**: Llamaremos a `refreshMap()` de forma directa al entrar en la pestaña.
+#### [MODIFY] [layout_custom_toast_pro.xml](file:///D:/Desarrollo-Software/Proyectos%20Android/factorEscala/app/src/main/res/layout/layout_custom_toast_pro.xml)
+- Ajustar el `TextView` del mensaje para que use todo el ancho disponible del contenedor (`match_parent` dentro del layout con peso), obligando al texto a envolverse (wrap) en lugar de cortarse.
 
-#### [MODIFY] [MapManager.java](file:///D:/Desarrollo-Software/Proyectos%20Android/factorEscala/app/src/main/java/bo/com/factorcombinadotopo/MapManager.java)
-- Ajustar `refreshMap()` para una respuesta inmediata.
+### 2. Lógica de Centrado y Seguridad
+
+#### [MODIFY] [UIUtils.java](file:///D:/Desarrollo-Software/Proyectos%20Android/factorEscala/app/src/main/java/bo/com/factorcombinadotopo/UIUtils.java)
+- Verificar que la creación de los `PopupWindow` permita el redimensionamiento dinámico basado en el contenido inflado.
 
 ## Plan de Verificación
 
-### Verificación de Precisión
-1. Simular diferentes niveles de precisión GPS.
-2. Confirmar que el color y la etiqueta cambian correctamente al cruzar los umbrales de 5m y 10m.
+### Verificación de Adaptabilidad
+1. Abrir el cuadro de **Barómetro**.
+2. Abrir el cuadro de **Mapas**.
+3. **Resultado esperado**: Los cuadros deben verse centrados. Si el texto es largo, el cuadro debe crecer hacia abajo (salto de línea) y no hacia los lados fuera de la pantalla.
 
-### Verificación de Rendimiento
-1. Cambiar rápidamente entre pestañas.
-2. Confirmar que el mapa carga sin retrasos perceptibles.
+### Verificación Visual
+- Comprobar que no hay espacios en blanco excesivos y que el diseño se mantiene profesional y compacto.

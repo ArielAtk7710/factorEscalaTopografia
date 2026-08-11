@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:layout_width="320dp"
+    android:layout_width="340dp"
     android:layout_height="wrap_content"
     android:layout_gravity="center"
     app:cardBackgroundColor="@color/bg_surface"
@@ -27,7 +27,7 @@
             android:id="@+id/txt_dialog_title"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Confirmar"
+            android:text="@string/btn_confirm"
             android:textColor="@color/text_primary"
             android:textSize="18sp"
             android:textStyle="bold"
@@ -41,8 +41,20 @@
             android:text="¿Está seguro de realizar esta acción?"
             android:textColor="@color/text_secondary"
             android:textSize="14sp"
-            android:layout_marginBottom="24dp"
+            android:layout_marginBottom="12dp"
             android:textAlignment="center" />
+
+        <TextView
+            android:id="@+id/txt_dialog_warning"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/label_tech_warning"
+            android:textColor="@color/state_warning"
+            android:textSize="12sp"
+            android:textStyle="bold"
+            android:layout_marginBottom="24dp"
+            android:textAlignment="center"
+            android:visibility="gone" />
 
         <LinearLayout
             android:layout_width="match_parent"

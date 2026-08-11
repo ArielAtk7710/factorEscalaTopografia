@@ -21,6 +21,7 @@
     </queries>
 
     <application
+        android:name=".SurveyApplication"
         android:allowBackup="true"
         android:requestLegacyExternalStorage="true"
         android:icon="@mipmap/ic_launcher"

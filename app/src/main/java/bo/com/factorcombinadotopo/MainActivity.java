@@ -1,5 +1,6 @@
 package bo.com.factorcombinadotopo;
 
+import android.content.Context;
 import android.graphics.Typeface;
 import android.os.Bundle;
 import androidx.appcompat.app.AppCompatActivity;
@@ -16,6 +17,9 @@ import android.widget.EditText;
 import android.widget.TextView;
 import com.google.android.material.bottomsheet.BottomSheetDialog;
 import android.app.DatePickerDialog;
+import android.location.LocationManager;
+import android.content.BroadcastReceiver;
+import android.content.IntentFilter;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Locale;
@@ -28,6 +32,8 @@ import android.os.Environment;
 import android.os.Handler;
 import android.os.Looper;
 import java.io.File;
+import java.util.concurrent.Executors;
+
 import android.widget.PopupWindow;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
@@ -44,8 +50,25 @@ import com.google.android.material.navigation.NavigationView;
 import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.core.view.GravityCompat;
 import androidx.core.content.FileProvider;
+import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationCallback;
+import com.google.android.gms.location.LocationRequest;
+import com.google.android.gms.location.LocationResult;
+import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.location.Priority;
+import androidx.lifecycle.ViewModelProvider;
 
 import androidx.annotation.NonNull;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import java.io.InputStream;
+import android.widget.ImageView;
+import android.widget.Toast;
+import android.hardware.Sensor;
+import android.hardware.SensorEvent;
+import android.hardware.SensorEventListener;
+import android.hardware.SensorManager;
+import android.graphics.Color;
 
 public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
     private SectionsPagerAdapter mSectionsPagerAdapter;
@@ -56,43 +79,52 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private static final String KEY_LANG = "Language";
     private static final String KEY_THEME = "Theme";
     public static final String KEY_PRESSURE_OFFSET = "PressureOffset";
+    public static final String KEY_GEOID_MODEL = "GeoidModel"; // 0: EGM96, 1: MGB
 
     // Nuevas llaves para ajustes de Mapas
-    public static final String KEY_MAP_MODE = "MapMode"; // 0: Online, 1: Offline, 2: Hybrid
+    public static final String KEY_MAP_MODE = "MapMode"; // 0: Online, 2: Satélite
     public static final String KEY_SHOW_LOCATION = "ShowLocation";
     public static final String KEY_REAL_TIME_UPDATE = "RealTimeUpdate";
+    private static final String KEY_TERMS_ACCEPTED = "TermsAccepted";
 
-    private ActivityResultLauncher<String[]> mapImportLauncher;
-    private TextView txtInstalledMapName, txtInstalledMapDetails, txtCacheSize;
-    private Button btnModeHybrid; // Referencia para habilitar/deshabilitar dinámicamente
-    private PopupWindow barometerInfoPopup, mapDownloadInfoPopup, mapImportInfoPopup;
+    private TextView txtCacheSizeStreet, txtCacheSizeSat;
+    private PopupWindow barometerInfoPopup, mapInfoPopup, geoidInfoPopup;
+
+    private FusedLocationProviderClient fusedLocationClient;
+    private LocationCallback locationCallback;
+    private SurveyViewModel viewModel;
+
+    private boolean isGpsEnabledGlobal = true;
+    private final BroadcastReceiver gpsStateReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            if (LocationManager.PROVIDERS_CHANGED_ACTION.equals(intent.getAction())) {
+                checkGlobalGpsState(false);
+            }
+        }
+    };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        // 1. Inicialización Crítica de osmdroid (DEBE ir antes de inflate layouts)
-        org.osmdroid.config.IConfigurationProvider osmConfig = org.osmdroid.config.Configuration.getInstance();
-        
-        // Primero cargamos la configuración base
-        osmConfig.load(this, getSharedPreferences("osmdroid", MODE_PRIVATE));
-        
-        // LUEGO aplicamos nuestras credenciales y rutas para asegurar que no se sobreescriban
-        osmConfig.setUserAgentValue(getPackageName());
-        File osmdroidDir = new File(getExternalFilesDir(null), "osmdroid");
-        if (!osmdroidDir.exists()) osmdroidDir.mkdirs();
-        osmConfig.setOsmdroidBasePath(osmdroidDir);
-        osmConfig.setOsmdroidTileCache(new File(osmdroidDir, "tiles"));
-
-        // 2. Cargar preferencias de la App
+        // 1. Cargar preferencias de la App
         SharedPreferences prefs = getSharedPreferences(PREFS_NAME, MODE_PRIVATE);
         
         // Asegurar modo Online por defecto en el primer inicio absoluto
         if (!prefs.contains(KEY_MAP_MODE)) {
             prefs.edit().putInt(KEY_MAP_MODE, 0).apply();
         }
+        if (!prefs.contains(KEY_GEOID_MODEL)) {
+            prefs.edit().putInt(KEY_GEOID_MODEL, 1).apply();
+        }
         String lang = prefs.getString(KEY_LANG, "es");
         updateLocale(lang);
         boolean isDark = prefs.getBoolean(KEY_THEME, true);
         AppCompatDelegate.setDefaultNightMode(isDark ? AppCompatDelegate.MODE_NIGHT_YES : AppCompatDelegate.MODE_NIGHT_NO);
+
+        // 2.1 Verificar aceptación de Términos y Condiciones
+        if (!prefs.getBoolean(KEY_TERMS_ACCEPTED, false)) {
+            showTermsDialog();
+        }
 
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
@@ -111,6 +143,15 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
         NavigationView navigationView = findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
+
+        this.viewModel = new ViewModelProvider(this).get(SurveyViewModel.class);
+        this.fusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
+        this.locationCallback = new LocationCallback() {
+            @Override
+            public void onLocationResult(@NonNull LocationResult result) {
+                if (viewModel != null) viewModel.processNewLocation(result.getLastLocation());
+            }
+        };
 
         this.mSectionsPagerAdapter = new SectionsPagerAdapter(this);
         this.mViewPager = findViewById(R.id.container);
@@ -155,17 +196,31 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 }
             }
         });
+    }
 
-        // Inicializar el importador de mapas
-        mapImportLauncher = registerForActivityResult(new ActivityResultContracts.OpenDocument(), uri -> {
-            if (uri != null) {
-                importMapFile(uri);
-            }
+    private void showTermsDialog() {
+        View view = getLayoutInflater().inflate(R.layout.layout_dialog_terms, null);
+        androidx.appcompat.app.AlertDialog.Builder builder = new androidx.appcompat.app.AlertDialog.Builder(this);
+        builder.setView(view);
+        builder.setCancelable(false); // Obligatorio aceptar o salir
+        
+        final androidx.appcompat.app.AlertDialog dialog = builder.create();
+        if (dialog.getWindow() != null) {
+            dialog.getWindow().setBackgroundDrawableResource(android.R.color.transparent);
+        }
+
+        view.findViewById(R.id.btn_terms_exit).setOnClickListener(v -> {
+            dialog.dismiss();
+            finish(); // Cerrar app si no acepta
         });
 
-        // Insertar datos de ejemplo si el registro está vacío
-        DatabaseHelper dbHelper = DatabaseHelper.getInstance(this);
-        dbHelper.seedExampleData();
+        view.findViewById(R.id.btn_terms_accept).setOnClickListener(v -> {
+            SharedPreferences prefs = getSharedPreferences(PREFS_NAME, MODE_PRIVATE);
+            prefs.edit().putBoolean(KEY_TERMS_ACCEPTED, true).apply();
+            dialog.dismiss();
+        });
+
+        dialog.show();
     }
 
     @Override
@@ -245,10 +300,24 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     }
 
     @Override
+    public boolean onMenuOpened(int featureId, android.view.Menu menu) {
+        if (menu != null && menu.getClass().getSimpleName().equals("MenuBuilder")) {
+            try {
+                java.lang.reflect.Method m = menu.getClass().getDeclaredMethod("setOptionalIconsVisible", Boolean.TYPE);
+                m.setAccessible(true);
+                m.invoke(menu, true);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+        return super.onMenuOpened(featureId, menu);
+    }
+
+    @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
         if (id == R.id.action_about) {
-            UIUtils.showInfoToast(this, getString(R.string.menu_about));
+            showAboutDialog();
             return true;
         } else if (id == R.id.action_tutorial) {
             UIUtils.showInfoToast(this, getString(R.string.menu_tutorial));
@@ -261,6 +330,45 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             return true;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    private void showAboutDialog() {
+        BottomSheetDialog dialog = new BottomSheetDialog(this);
+        View view = getLayoutInflater().inflate(R.layout.layout_dialog_about, null);
+        dialog.setContentView(view);
+        
+        final int[] _x_val = {0};
+        View _v_trig = view.findViewById(R.id.txt_about_collaborators_title);
+        if (_v_trig != null) {
+            _v_trig.setOnClickListener(v -> {
+                _x_val[0]++;
+                if (_x_val[0] >= 5) {
+                    _x_val[0] = 0;
+                    _show_ext_ms();
+                }
+            });
+        }
+        
+        view.findViewById(R.id.btn_about_close).setOnClickListener(v -> dialog.dismiss());
+        dialog.show();
+    }
+
+    private void _show_ext_ms() {
+        try {
+            View layout = getLayoutInflater().inflate(R.layout.layout_ms_ext, null);
+            ImageView img = layout.findViewById(R.id.ext_img);
+            
+            InputStream is = getAssets().open("images/pandapache.png");
+            Bitmap bitmap = BitmapFactory.decodeStream(is);
+            img.setImageBitmap(bitmap);
+            
+            Toast toast = new Toast(getApplicationContext());
+            toast.setDuration(Toast.LENGTH_LONG);
+            toast.setView(layout);
+            toast.show();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     private void showSettingsDialog() {
@@ -298,6 +406,35 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             public void onNothingSelected(AdapterView<?> parent) {}
         });
 
+        // 1.1 Configurar Modelo Geoidal
+        com.google.android.material.button.MaterialButtonToggleGroup toggleGeoid = view.findViewById(R.id.toggle_geoid_model);
+        int savedGeoid = prefs.getInt(KEY_GEOID_MODEL, 1); // 1 es MGBol08 por defecto
+        if (savedGeoid == 1) toggleGeoid.check(R.id.btn_geoid_mgb);
+        else toggleGeoid.check(R.id.btn_geoid_egm96);
+
+        toggleGeoid.addOnButtonCheckedListener((group, checkedId, isChecked) -> {
+            if (isChecked) {
+                int model = (checkedId == R.id.btn_geoid_mgb) ? 1 : 0;
+                prefs.edit().putInt(KEY_GEOID_MODEL, model).apply();
+                
+                // Mostrar Toast Informativo
+                String msg = (model == 1) ? getString(R.string.msg_using_mgbol) : getString(R.string.msg_using_egm96);
+                UIUtils.showInfoToast(this, msg);
+            }
+        });
+
+        View btnGeoidInfo = view.findViewById(R.id.btn_geoid_info);
+        btnGeoidInfo.setOnClickListener(v -> {
+            if (geoidInfoPopup != null && geoidInfoPopup.isShowing()) {
+                geoidInfoPopup.dismiss();
+                geoidInfoPopup = null;
+            } else {
+                geoidInfoPopup = UIUtils.showPopupInfo(this, view, 
+                        getString(R.string.title_geoid_adjustment), 
+                        getString(R.string.msg_geoid_mgb_info));
+            }
+        });
+
         // 2. Configurar Offset de Presión (0.0 por defecto)
         EditText etOffset = view.findViewById(R.id.et_pressure_offset);
         float currentOffset = prefs.getFloat(KEY_PRESSURE_OFFSET, 0.0f);
@@ -320,81 +457,41 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             }
         });
 
-        // 3. SECCIÓN MAPAS (Online por defecto)
-        View btnMapDownloadInfo = view.findViewById(R.id.btn_map_download_info);
-        btnMapDownloadInfo.setOnClickListener(v -> {
-            if (mapDownloadInfoPopup != null && mapDownloadInfoPopup.isShowing()) {
-                mapDownloadInfoPopup.dismiss();
-                mapDownloadInfoPopup = null;
+        // 3. SECCIÓN MAPAS (Solo ONLINE disponible en Ajustes)
+        View btnMapInfo = view.findViewById(R.id.btn_map_info);
+        btnMapInfo.setOnClickListener(v -> {
+            if (mapInfoPopup != null && mapInfoPopup.isShowing()) {
+                mapInfoPopup.dismiss();
+                mapInfoPopup = null;
             } else {
-                mapDownloadInfoPopup = UIUtils.showPopupInfo(this, view, 
-                        getString(R.string.title_map_download_guide), 
-                        getString(R.string.msg_map_download_instr));
+                mapInfoPopup = UIUtils.showPopupInfo(this, view, 
+                        getString(R.string.label_maps), 
+                        getString(R.string.msg_map_offline_auto));
             }
         });
 
         com.google.android.material.button.MaterialButtonToggleGroup toggleMapMode = view.findViewById(R.id.toggle_map_mode);
-        btnModeHybrid = view.findViewById(R.id.btn_mode_hybrid);
+        toggleMapMode.check(R.id.btn_mode_online);
         
-        // Verificar si hay mapas importados para habilitar/deshabilitar opción Híbrido
-        boolean hasMaps = hasImportedMaps();
-        btnModeHybrid.setEnabled(hasMaps);
-
-        int savedMode = prefs.getInt(KEY_MAP_MODE, 0); // 0 es Online
-        
-        // Si el modo guardado es Híbrido pero no hay mapas, forzar a Online
-        if (savedMode == 2 && !hasMaps) {
-            savedMode = 0;
-            prefs.edit().putInt(KEY_MAP_MODE, 0).apply();
-        }
-
-        switch (savedMode) {
-            case 0: toggleMapMode.check(R.id.btn_mode_online); break;
-            case 1: toggleMapMode.check(R.id.btn_mode_offline); break;
-            case 2: toggleMapMode.check(R.id.btn_mode_hybrid); break;
-        }
-
-        toggleMapMode.addOnButtonCheckedListener((group, checkedId, isChecked) -> {
-            if (isChecked) {
-                int mode = 0;
-                if (checkedId == R.id.btn_mode_offline) mode = 1;
-                else if (checkedId == R.id.btn_mode_hybrid) mode = 2;
-                prefs.edit().putInt(KEY_MAP_MODE, mode).apply();
-            }
-        });
-
-        // Mapa Instalado
-        txtInstalledMapName = view.findViewById(R.id.txt_installed_map_name);
-        txtInstalledMapDetails = view.findViewById(R.id.txt_installed_map_details);
-        updateInstalledMapUI();
-
-        View btnMapImportInfo = view.findViewById(R.id.btn_map_import_info);
-        btnMapImportInfo.setOnClickListener(v -> {
-            if (mapImportInfoPopup != null && mapImportInfoPopup.isShowing()) {
-                mapImportInfoPopup.dismiss();
-                mapImportInfoPopup = null;
-            } else {
-                mapImportInfoPopup = UIUtils.showPopupInfo(this, view, 
-                        getString(R.string.title_map_import_guide), 
-                        getString(R.string.msg_map_import_instr));
-            }
-        });
-
-        view.findViewById(R.id.btn_import_map).setOnClickListener(v -> {
-            mapImportLauncher.launch(new String[]{"*/*"});
-        });
-
-        view.findViewById(R.id.btn_delete_map).setOnClickListener(v -> {
-            UIUtils.showConfirmDialog(this, R.string.dialog_delete_title, R.string.msg_map_delete_confirm, () -> {
-                deleteInstalledMap();
-            });
-        });
+        // Forzamos el modo Online en las preferencias si no estaba ya
+        prefs.edit().putInt(KEY_MAP_MODE, 0).apply();
 
         // Caché
-        txtCacheSize = view.findViewById(R.id.txt_cache_size);
+        txtCacheSizeStreet = view.findViewById(R.id.txt_cache_size_street);
+        txtCacheSizeSat = view.findViewById(R.id.txt_cache_size_sat);
         updateCacheSizeUI();
-        view.findViewById(R.id.btn_clear_cache).setOnClickListener(v -> {
-            clearMapCache();
+        
+        view.findViewById(R.id.btn_clear_cache_street).setOnClickListener(v -> {
+            UIUtils.showConfirmDialog(this, 
+                R.string.title_confirm_cache_clear, 
+                R.string.msg_confirm_cache_clear, 
+                () -> clearMapCache(0));
+        });
+        view.findViewById(R.id.btn_clear_cache_sat).setOnClickListener(v -> {
+            UIUtils.showConfirmDialog(this, 
+                R.string.title_confirm_cache_clear, 
+                R.string.msg_confirm_cache_clear, 
+                () -> clearMapCache(1));
         });
 
         // GPS
@@ -430,99 +527,35 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         });
 
         dialog.setOnDismissListener(d -> {
-            btnModeHybrid = null;
-            txtInstalledMapName = null;
-            txtInstalledMapDetails = null;
-            txtCacheSize = null;
+            txtCacheSizeStreet = null;
+            txtCacheSizeSat = null;
             if (barometerInfoPopup != null) barometerInfoPopup.dismiss();
-            if (mapDownloadInfoPopup != null) mapDownloadInfoPopup.dismiss();
-            if (mapImportInfoPopup != null) mapImportInfoPopup.dismiss();
+            if (mapInfoPopup != null) mapInfoPopup.dismiss();
+            if (geoidInfoPopup != null) geoidInfoPopup.dismiss();
         });
 
         dialog.show();
     }
 
-    private File getMapsDirectory() {
-        File mapsDir = new File(getExternalFilesDir(null), "osmdroid");
-        if (!mapsDir.exists()) mapsDir.mkdirs();
-        return mapsDir;
-    }
-
-    private void updateInstalledMapUI() {
-        if (txtInstalledMapName == null) return;
-        File mapsDir = getMapsDirectory();
-        if (mapsDir == null) return;
-        
-        File[] files = mapsDir.listFiles();
-        boolean hasMaps = files != null && files.length > 0;
-
-        // Actualizar estado del botón Híbrido si el diálogo está abierto
-        if (btnModeHybrid != null) {
-            btnModeHybrid.setEnabled(hasMaps);
-            if (!hasMaps) {
-                View parent = (View) btnModeHybrid.getParent();
-                if (parent instanceof com.google.android.material.button.MaterialButtonToggleGroup) {
-                    com.google.android.material.button.MaterialButtonToggleGroup group = (com.google.android.material.button.MaterialButtonToggleGroup) parent;
-                    if (group.getCheckedButtonId() == R.id.btn_mode_hybrid || group.getCheckedButtonId() == R.id.btn_mode_offline) {
-                        group.check(R.id.btn_mode_online);
-                        getSharedPreferences(PREFS_NAME, MODE_PRIVATE).edit().putInt(KEY_MAP_MODE, 0).apply();
-                    }
-                }
-            }
-        }
-
-        if (hasMaps) {
-            File mapFile = files[0]; // Tomamos el primer archivo encontrado
-            txtInstalledMapName.setText(mapFile.getName());
-            String details = FileUtils.formatSize(mapFile.length()) + " | " + 
-                             new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()).format(new java.util.Date(mapFile.lastModified())) + " | " + 
-                             getString(R.string.label_success).replace(":", "");
-            txtInstalledMapDetails.setText(details);
-        } else {
-            txtInstalledMapName.setText(R.string.msg_no_map_installed);
-            txtInstalledMapDetails.setText("");
-        }
-    }
-
-    private void importMapFile(Uri uri) {
-        String name = FileUtils.getFileName(this, uri);
-        File mapsDir = getMapsDirectory();
-        if (mapsDir == null) {
-            UIUtils.showErrorToast(this, getString(R.string.err_no_storage));
-            return;
-        }
-        
-        File dest = new File(mapsDir, name);
-        if (FileUtils.copyUriToFile(this, uri, dest)) {
-            UIUtils.showSuccessToast(this, getString(R.string.msg_map_imported_success, name));
-            updateInstalledMapUI();
-        } else {
-            UIUtils.showErrorToast(this, getString(R.string.err_copy_file));
-        }
-    }
-
-    private void deleteInstalledMap() {
-        File mapsDir = getMapsDirectory();
-        FileUtils.clearDirectory(mapsDir);
-        updateInstalledMapUI();
-    }
-
-    private boolean hasImportedMaps() {
-        File mapsDir = getMapsDirectory();
-        if (mapsDir == null) return false;
-        File[] files = mapsDir.listFiles();
-        return files != null && files.length > 0;
-    }
-
     private void updateCacheSizeUI() {
-        if (txtCacheSize == null) return;
-        File cacheDir = new File(new File(getExternalFilesDir(null), "osmdroid"), "tiles");
-        long size = FileUtils.getFolderSize(cacheDir);
-        txtCacheSize.setText(FileUtils.formatSize(size));
+        File osmdroidDir = new File(getExternalFilesDir(null), "osmdroid");
+        
+        if (txtCacheSizeStreet != null) {
+            File streetCache = new File(osmdroidDir, "tiles_street");
+            txtCacheSizeStreet.setText(FileUtils.formatSize(FileUtils.getFolderSize(streetCache)));
+        }
+        
+        if (txtCacheSizeSat != null) {
+            File satCache = new File(osmdroidDir, "tiles_sat");
+            txtCacheSizeSat.setText(FileUtils.formatSize(FileUtils.getFolderSize(satCache)));
+        }
     }
 
-    private void clearMapCache() {
-        File cacheDir = new File(new File(getExternalFilesDir(null), "osmdroid"), "tiles");
+    private void clearMapCache(int type) {
+        File osmdroidDir = new File(getExternalFilesDir(null), "osmdroid");
+        String folderName = (type == 1) ? "tiles_sat" : "tiles_street";
+        File cacheDir = new File(osmdroidDir, folderName);
+        
         FileUtils.clearDirectory(cacheDir);
         updateCacheSizeUI();
         UIUtils.showSuccessToast(this, getString(R.string.msg_cache_cleared));
@@ -532,7 +565,47 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         BottomSheetDialog dialog = new BottomSheetDialog(this);
         View view = getLayoutInflater().inflate(R.layout.dialog_calibrate_compass, null);
         dialog.setContentView(view);
+
+        TextView txtStatus = view.findViewById(R.id.txt_sensor_status);
+        SensorManager sensorManager = (SensorManager) getSystemService(SENSOR_SERVICE);
+        Sensor magnetometer = sensorManager.getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD);
+
+        SensorEventListener calibrationListener = new SensorEventListener() {
+            @Override
+            public void onSensorChanged(SensorEvent event) {}
+
+            @Override
+            public void onAccuracyChanged(Sensor sensor, int accuracy) {
+                if (txtStatus == null) return;
+                switch (accuracy) {
+                    case SensorManager.SENSOR_STATUS_ACCURACY_HIGH:
+                        txtStatus.setText("Alta Precisión");
+                        txtStatus.setTextColor(Color.GREEN);
+                        break;
+                    case SensorManager.SENSOR_STATUS_ACCURACY_MEDIUM:
+                        txtStatus.setText("Media (Mover dispositivo)");
+                        txtStatus.setTextColor(Color.YELLOW);
+                        break;
+                    default:
+                        txtStatus.setText("Baja (Calibración necesaria)");
+                        txtStatus.setTextColor(Color.RED);
+                        break;
+                }
+            }
+        };
+
+        if (magnetometer != null) {
+            sensorManager.registerListener(calibrationListener, magnetometer, SensorManager.SENSOR_DELAY_NORMAL);
+        } else {
+            txtStatus.setText("Sensor no disponible");
+        }
+
         view.findViewById(R.id.btn_close_calibrate).setOnClickListener(v -> dialog.dismiss());
+        
+        dialog.setOnDismissListener(d -> {
+            if (magnetometer != null) sensorManager.unregisterListener(calibrationListener);
+        });
+
         dialog.show();
     }
 
@@ -599,7 +672,25 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         txtWeek.setText(String.valueOf(weeks));
         txtWeekNum.setText(String.format(Locale.getDefault(), "%d%d", weeks, dayOfWeekGps));
     }
+    /**
+     * Obtiene la ondulación geoidal (N) respetando la preferencia del usuario (EGM96 o MGB)
+     * seleccionada en el menú de Ajustes.
+     */
+    public double getGeoidUndulationForCurrentSetting(double lat, double lon) {
+        SharedPreferences prefs = getSharedPreferences(PREFS_NAME, MODE_PRIVATE);
+        int geoidModel = prefs.getInt(KEY_GEOID_MODEL, 1); // 1: MGB por defecto
 
+        if (geoidModel == 1 && MGBEngine.getInstance().estaLista()) {
+            double nMgb = MGBEngine.getInstance().getGeoidUndulation(lat, lon);
+            // Si las coordenadas están dentro del área de cobertura MGB (no retorna 0.0)
+            if (nMgb != 0.0) {
+                return nMgb;
+            }
+        }
+
+        // Modelo por defecto o Respaldo (Fallback) a EGM96
+        return EGM96Engine.getEGM96Undulation(lat, lon);
+    }
     public class SectionsPagerAdapter extends FragmentStateAdapter {
         public SectionsPagerAdapter(AppCompatActivity activity) {
             super(activity);
@@ -625,6 +716,58 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         @Override
         public int getItemCount() {
             return 4;
+        }
+    }
+
+    private void checkGlobalGpsState(boolean isInitialCheck) {
+        LocationManager lm = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+        if (lm == null) return;
+
+        boolean isEnabled = lm.isProviderEnabled(LocationManager.GPS_PROVIDER);
+        
+        if (isInitialCheck) {
+            isGpsEnabledGlobal = isEnabled;
+            if (!isEnabled) {
+                UIUtils.showWarningToast(this, getString(R.string.msg_gps_required));
+            }
+            return;
+        }
+
+        if (isEnabled && !isGpsEnabledGlobal) {
+            UIUtils.showSuccessToast(this, getString(R.string.msg_gps_activated));
+        } else if (!isEnabled && isGpsEnabledGlobal) {
+            UIUtils.showWarningToast(this, getString(R.string.msg_gps_deactivated));
+        }
+        
+        isGpsEnabledGlobal = isEnabled;
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        registerReceiver(gpsStateReceiver, new IntentFilter(LocationManager.PROVIDERS_CHANGED_ACTION));
+        checkGlobalGpsState(true);
+        startLocationUpdates();
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        unregisterReceiver(gpsStateReceiver);
+        stopLocationUpdates();
+    }
+
+    @android.annotation.SuppressLint("MissingPermission")
+    private void startLocationUpdates() {
+        if (androidx.core.content.ContextCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) == android.content.pm.PackageManager.PERMISSION_GRANTED) {
+            LocationRequest req = new LocationRequest.Builder(Priority.PRIORITY_HIGH_ACCURACY, 2000).build();
+            fusedLocationClient.requestLocationUpdates(req, locationCallback, Looper.getMainLooper());
+        }
+    }
+
+    private void stopLocationUpdates() {
+        if (fusedLocationClient != null) {
+            fusedLocationClient.removeLocationUpdates(locationCallback);
         }
     }
 }

@@ -6,10 +6,8 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.content.SharedPreferences;
 import android.location.GnssStatus;
 import android.location.Location;
-import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
 import android.os.Handler;
@@ -20,86 +18,49 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
-
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.cardview.widget.CardView;
-import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.Fragment;
-
-import com.google.android.gms.location.FusedLocationProviderClient;
-import com.google.android.gms.location.LocationCallback;
-import com.google.android.gms.location.LocationRequest;
-import com.google.android.gms.location.LocationResult;
-import com.google.android.gms.location.LocationServices;
-import com.google.android.gms.location.Priority;
+import androidx.lifecycle.ViewModelProvider;
 import com.google.android.material.switchmaterial.SwitchMaterial;
-
-import org.json.JSONObject;
 import org.osmdroid.views.MapView;
-
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
-import java.net.HttpURLConnection;
-import java.net.URL;
-import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
-import java.util.TimeZone;
 
+/**
+ * Fragmento para cálculos automáticos en tiempo real.
+ * Observa el ViewModel compartido para obtener actualizaciones de ubicación.
+ */
 public class AutomaticFragment extends Fragment {
-    private TextView txt_lat, txt_lon, txt_alt, txt_alt_orto, txt_presion, txt_presion_hpa;
-    private TextView txt_este, txt_norte, txt_ref_system;
-    private TextView txt_fa, txt_fa_ppm, txt_fe, txt_fe_ppm, txt_fc, txt_fc_ppm;
-    private TextView txt_presicion, txt_sat, txt_temp;
-    private TextView txt_geoid_undulation, txt_geoid_model;
+
+    private TextView txtLat, txtLon, txtAlt, txtAltOrto, txtPresion, txtPresionHpa;
+    private TextView txtEste, txtNorte, txtRefSystem;
+    private TextView txtFa, txtFe, txtFc, txtPresicion, txtSat, txtTemp;
+    private TextView txtGeoidUndulation, txtGeoidModel;
+
     private SwitchMaterial switchMapa;
     private CardView cardMapa;
     private MapView miniMapView;
-    private Button btn_guardar_punto;
+    private Button btnGuardarPunto;
 
-    private LocationManager mlocManager;
     private MapManager miniMapManager;
-    private LocationHelper miniMapLocationHelper;
-    private FusedLocationProviderClient fusedLocationClient;
-    private LocationCallback locationCallback;
-    private TopoCalculoManager.TopoResult lastTopoResult;
+    private SurveyViewModel viewModel;
+    private TopoCalculoManager.TopoResult lastResult;
 
-    private long lastTempRequestTime = 0;
-    private double currentAmbientTemp = 15.0; // Valor estándar inicial
+    private boolean isGpsCurrentlyEnabled = true;
 
     private final GnssStatus.Callback gnssCallback = new GnssStatus.Callback() {
         @Override
         public void onSatelliteStatusChanged(@NonNull GnssStatus status) {
-            if (!isAdded() || getView() == null) return;
+            if (!isAdded()) return;
             int satellitesInUse = 0;
             for (int i = 0; i < status.getSatelliteCount(); i++) {
                 if (status.usedInFix(i)) satellitesInUse++;
             }
-            if (txt_sat != null) txt_sat.setText(String.valueOf(satellitesInUse));
-        }
-    };
-
-    private boolean isGpsCurrentlyEnabled = true;
-
-    private final Runnable manualInfoRunnable = () -> {
-        if (isAdded() && !isGpsCurrentlyEnabled) {
-            UIUtils.showInfoToast(requireContext(), getString(R.string.msg_manual_entry_hint));
-        }
-    };
-
-    private final Runnable periodicAlertRunnable = new Runnable() {
-        @Override
-        public void run() {
-            if (isAdded() && !isGpsCurrentlyEnabled) {
-                UIUtils.showWarningToast(requireContext(), getString(R.string.msg_activate_gps));
-                resetUIData();
-                gpsCheckHandler.removeCallbacks(manualInfoRunnable);
-                gpsCheckHandler.postDelayed(manualInfoRunnable, 5000);
-                gpsCheckHandler.postDelayed(this, 20000);
-            }
+            if (txtSat != null) txtSat.setText(String.valueOf(satellitesInUse));
         }
     };
 
@@ -107,43 +68,10 @@ public class AutomaticFragment extends Fragment {
         @Override
         public void onReceive(Context context, Intent intent) {
             if (LocationManager.PROVIDERS_CHANGED_ACTION.equals(intent.getAction())) {
-                checkGpsState(false);
+                checkGpsState();
             }
         }
     };
-
-    private void checkGpsState(boolean forceNotification) {
-        if (!isAdded() || getActivity() == null) return;
-        mlocManager = (LocationManager) getActivity().getSystemService(Context.LOCATION_SERVICE);
-        if (mlocManager == null) return;
-
-        boolean isEnabled = mlocManager.isProviderEnabled(LocationManager.GPS_PROVIDER);
-        if (!isEnabled && (isGpsCurrentlyEnabled || forceNotification)) {
-            isGpsCurrentlyEnabled = false;
-            stopAlertCycles();
-            gpsCheckHandler.post(periodicAlertRunnable);
-        } else if (isEnabled && (!isGpsCurrentlyEnabled || forceNotification)) {
-            isGpsCurrentlyEnabled = true;
-            stopAlertCycles();
-            UIUtils.showSuccessToast(requireContext(), getString(R.string.msg_gps_activated));
-            restartLocationUpdates();
-        }
-    }
-
-    @SuppressLint("MissingPermission")
-    private void restartLocationUpdates() {
-        if (isAdded() && mlocManager != null) {
-            try {
-                mlocManager.unregisterGnssStatusCallback(gnssCallback);
-                mlocManager.registerGnssStatusCallback(gnssCallback, new Handler(Looper.getMainLooper()));
-            } catch (Exception ignored) {}
-        }
-    }
-
-    private void stopAlertCycles() {
-        gpsCheckHandler.removeCallbacks(periodicAlertRunnable);
-        gpsCheckHandler.removeCallbacks(manualInfoRunnable);
-    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -154,363 +82,224 @@ public class AutomaticFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
+        // Usar ViewModel compartido de la Actividad
+        viewModel = new ViewModelProvider(requireActivity()).get(SurveyViewModel.class);
+
         // Bindings
-        txt_lat = view.findViewById(R.id.txt_lat);
-        txt_lon = view.findViewById(R.id.txt_lon);
-        txt_alt = view.findViewById(R.id.txt_alt);
-        txt_alt_orto = view.findViewById(R.id.txt_alt_orto);
-        txt_presion = view.findViewById(R.id.txt_presion);
-        txt_presion_hpa = view.findViewById(R.id.txt_presion_hpa);
-        txt_este = view.findViewById(R.id.txt_este);
-        txt_norte = view.findViewById(R.id.txt_norte);
-        txt_ref_system = view.findViewById(R.id.txt_ref_system);
-        txt_fa = view.findViewById(R.id.txt_fa);
-        txt_fa_ppm = view.findViewById(R.id.txt_fa_ppm);
-        txt_fe = view.findViewById(R.id.txt_fe);
-        txt_fe_ppm = view.findViewById(R.id.txt_fe_ppm);
-        txt_fc = view.findViewById(R.id.txt_fc); // Azul box
-        txt_fc_ppm = view.findViewById(R.id.txt_fc_ppm);
-        txt_presicion = view.findViewById(R.id.txt_presicion);
-        txt_sat = view.findViewById(R.id.txt_sat);
-        txt_temp = view.findViewById(R.id.txt_temp);
-        txt_geoid_undulation = view.findViewById(R.id.txt_geoid_undulation);
-        txt_geoid_model = view.findViewById(R.id.txt_geoid_model);
+        txtLat = view.findViewById(R.id.txt_lat);
+        txtLon = view.findViewById(R.id.txt_lon);
+        txtAlt = view.findViewById(R.id.txt_alt);
+        txtAltOrto = view.findViewById(R.id.txt_alt_orto);
+        txtPresion = view.findViewById(R.id.txt_presion);
+        txtPresionHpa = view.findViewById(R.id.txt_presion_hpa);
+        txtEste = view.findViewById(R.id.txt_este);
+        txtNorte = view.findViewById(R.id.txt_norte);
+        txtRefSystem = view.findViewById(R.id.txt_ref_system);
+        txtFa = view.findViewById(R.id.txt_fa);
+        txtFe = view.findViewById(R.id.txt_fe);
+        txtFc = view.findViewById(R.id.txt_fc);
+        txtPresicion = view.findViewById(R.id.txt_presicion);
+        txtSat = view.findViewById(R.id.txt_sat);
+        txtTemp = view.findViewById(R.id.txt_temp);
+        txtGeoidUndulation = view.findViewById(R.id.txt_geoid_undulation);
+        txtGeoidModel = view.findViewById(R.id.txt_geoid_model);
+        
         switchMapa = view.findViewById(R.id.switch_mapa);
         cardMapa = view.findViewById(R.id.card_mapa);
         miniMapView = view.findViewById(R.id.mini_map_view);
-        btn_guardar_punto = view.findViewById(R.id.btn_guardar_punto_auto);
+        btnGuardarPunto = view.findViewById(R.id.btn_guardar_punto_auto);
+
+        view.findViewById(R.id.fab_mini_toggle_map_type).setOnClickListener(v -> {
+            if (miniMapManager != null) {
+                miniMapManager.toggleMapType();
+                UIUtils.showInfoToast(requireContext(), "Mapa: " + miniMapManager.getCurrentMapModeName());
+            }
+        });
 
         view.findViewById(R.id.fab_mini_center_location).setOnClickListener(v -> {
             if (miniMapManager != null) miniMapManager.centerOnCurrentLocation();
         });
 
-        fusedLocationClient = LocationServices.getFusedLocationProviderClient(requireActivity());
-        setupLocationCallback();
-
         setupMiniMap();
+        setupViewModelObservers();
 
-        btn_guardar_punto.setOnClickListener(v -> showSavePointDialog());
-        switchMapa.setOnCheckedChangeListener((bv, isChecked) -> {
-            try {
-                cardMapa.setVisibility(isChecked ? View.VISIBLE : View.GONE);
-                handleMapState(isChecked);
-                if (isChecked && miniMapView != null && isAdded()) {
-                    miniMapView.invalidate();
-                }
-            } catch (Exception e) {
-                // Prevenir cierre de app por error de renderizado del mapa
-                e.printStackTrace();
-            }
-        });
-
-        if (ActivityCompat.checkSelfPermission(requireContext(), android.Manifest.permission.ACCESS_FINE_LOCATION) != 0) {
-            ActivityCompat.requestPermissions(requireActivity(), new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION}, 1000);
-        } else {
-            locationStart();
-        }
+        btnGuardarPunto.setOnClickListener(v -> showSavePointDialog());
+        switchMapa.setOnCheckedChangeListener((bv, isChecked) -> handleMapState(isChecked));
     }
 
     private void setupMiniMap() {
         miniMapManager = new MapManager(requireContext(), miniMapView);
-        // El minimapa sí puede centrar automáticamente la primera vez
-        miniMapManager.setAutoCenterEnabled(true); 
-        // Capa predeterminada de calles y seguimiento permanente
-        miniMapManager.enableFollowLocation(true);
-        
-        miniMapLocationHelper = new LocationHelper(requireContext(), location -> {
-            if (isAdded() && miniMapManager != null) {
-                miniMapManager.updateMyLocation(location);
-            }
+        miniMapManager.setAutoCenterEnabled(true);
+    }
+
+    private void setupViewModelObservers() {
+        // Observar Ubicación Raw para el mapa y la precisión
+        viewModel.getRawLocation().observe(getViewLifecycleOwner(), loc -> {
+            if (loc == null) return;
+            if (switchMapa.isChecked()) miniMapManager.updateMyLocation(loc);
+            
+            String level = getPrecisionLevel(loc.getAccuracy());
+            txtPresicion.setText(String.format(Locale.US, "± %.0f m - %s", loc.getAccuracy(), level));
+        });
+
+        // Observar Resultados de Cálculo
+        viewModel.getCalculationResult().observe(getViewLifecycleOwner(), res -> {
+            if (res != null) updateUI(res);
+        });
+
+        viewModel.getUsesMgb().observe(getViewLifecycleOwner(), uses -> {
+            txtGeoidModel.setText(uses ? "MGBol" : "EGM96 (Global)");
+        });
+
+        viewModel.getAmbientTemperature().observe(getViewLifecycleOwner(), temp -> {
+            txtTemp.setText(String.format(Locale.getDefault(), "%.1f°C", temp));
+        });
+
+        viewModel.getErrorResult().observe(getViewLifecycleOwner(), err -> {
+            if (err != null) UIUtils.showErrorToast(requireContext(), err);
         });
     }
 
-    private void handleMapState(boolean active) {
-        if (!isAdded() || miniMapManager == null) return;
+    private void updateUI(TopoCalculoManager.TopoResult res) {
+        lastResult = res;
+        txtLat.setText(GeoUtils.formatLatLon(res.lat));
+        txtLon.setText(GeoUtils.formatLatLon(res.lon));
+        txtAlt.setText(String.format(Locale.getDefault(), "%.3f m", res.altEllipsoidal));
+        txtAltOrto.setText(String.format(Locale.getDefault(), "%.3f m", res.altOrto));
+        txtEste.setText(String.format(Locale.getDefault(), "%.3f", res.este));
+        txtNorte.setText(String.format(Locale.getDefault(), "%.3f", res.norte));
+        txtRefSystem.setText(GeoUtils.getUtmZoneFormatted(res.lat, res.lon));
+        
+        txtFa.setText(GeoUtils.formatFactor(res.elevationFactor));
+        txtFe.setText(GeoUtils.formatFactor(res.scaleFactor));
+        txtFc.setText(GeoUtils.formatFactor(res.combinedFactor));
+        
+        txtGeoidUndulation.setText(String.format(Locale.getDefault(), "%.2f m", res.geoidN));
+        txtPresion.setText(String.format(Locale.getDefault(), "%.3f", res.pressureMmHg));
+        txtPresionHpa.setText(String.format(Locale.US, "%.3f %s", res.pressureHpa, getString(R.string.unit_hpa)));
+    }
+
+    private String getPrecisionLevel(float accuracy) {
+        if (accuracy < 2.0f) return "Excelente";
+        if (accuracy < 5.0f) return "Buena";
+        if (accuracy < 10.0f) return "Media";
+        return "Baja";
+    }
+
+    private void checkGpsState() {
+        LocationManager lm = (LocationManager) requireContext().getSystemService(Context.LOCATION_SERVICE);
+        boolean isEnabled = lm.isProviderEnabled(LocationManager.GPS_PROVIDER);
+        if (!isEnabled) resetUIData();
+        isGpsCurrentlyEnabled = isEnabled;
+    }
+
+    @SuppressLint("MissingPermission")
+    private void restartGnssCallback() {
+        LocationManager lm = (LocationManager) requireContext().getSystemService(Context.LOCATION_SERVICE);
         try {
-            if (active) {
-                miniMapManager.onResume();
-                if (miniMapLocationHelper != null) miniMapLocationHelper.startLocationUpdates();
-            } else {
-                miniMapManager.onPause();
-                if (miniMapLocationHelper != null) miniMapLocationHelper.stopLocationUpdates();
-            }
+            lm.unregisterGnssStatusCallback(gnssCallback);
+            lm.registerGnssStatusCallback(gnssCallback, new Handler(Looper.getMainLooper()));
         } catch (Exception ignored) {}
     }
 
-    private void setupLocationCallback() {
-        locationCallback = new LocationCallback() {
-            @Override
-            public void onLocationResult(@NonNull LocationResult locationResult) {
-                if (!isAdded() || getView() == null) return;
-                for (Location location : locationResult.getLocations()) {
-                    if (location != null) processNewLocation(location);
-                }
-            }
-        };
+    private void resetUIData() {
+        txtLat.setText("0"); txtLon.setText("0"); txtAlt.setText("-- m");
+        txtAltOrto.setText("-- m"); txtEste.setText("0.00"); txtNorte.setText("0.00");
+        txtPresicion.setText("± -- m"); txtSat.setText("0");
     }
 
-    private void processNewLocation(Location loc) {
-        if (!isAdded() || getView() == null) return;
-        showGPSData(loc);
-
-        // 1. Obtener Ondulación Geoidal N (EGM96) desde GeoidManager
-
-        double geoidN = GeoidManager.getGeoidUndulation(loc.getLatitude(), loc.getLongitude());
-        SharedPreferences prefs = requireActivity().getSharedPreferences("AppPrefs", Context.MODE_PRIVATE);
-        float offset = prefs.getFloat("PressureOffset", 0f);
-
-        // 2. Ejecutar cálculo topográfico pasando 'geoidN' y 'offset' de presión
-        lastTopoResult = TopoCalculoManager.calculateAll(
-                loc.getLatitude(),
-                loc.getLongitude(),
-                loc.getAltitude(),
-                geoidN,
-                offset
-        );
-
-        // 3. Renderizado de Altura Ortométrica y Modelo Geoidal
-        if (txt_alt_orto != null) txt_alt_orto.setText(GeoUtils.formatCoord(lastTopoResult.altOrto) + " m");
-        if (txt_geoid_undulation != null) txt_geoid_undulation.setText(GeoUtils.formatCoord(geoidN) + " m");
-        if (txt_geoid_model != null) txt_geoid_model.setText(R.string.geoid_model_egm96);
-
-        if (txt_presion != null) {
-            txt_presion.setText(GeoUtils.formatCoord(lastTopoResult.pressureMmHg));
+    private void handleMapState(boolean visible) {
+        cardMapa.setVisibility(visible ? View.VISIBLE : View.GONE);
+        if (visible) {
+            miniMapManager.onResume();
+            miniMapView.invalidate();
+        } else {
+            miniMapManager.onPause();
         }
-        if (txt_presion_hpa != null) {
-            txt_presion_hpa.setText(String.format(Locale.US, "%.3f %s", 
-                lastTopoResult.pressureHpa, getString(R.string.unit_hpa)));
-        }
-        
-        if (txt_presicion != null) {
-            float accuracy = loc.getAccuracy();
-            int color;
-            String status;
-            
-            if (accuracy < 5) {
-                color = androidx.core.content.ContextCompat.getColor(requireContext(), R.color.state_success);
-                status = "Excelente";
-            } else if (accuracy <= 10) {
-                color = androidx.core.content.ContextCompat.getColor(requireContext(), R.color.state_warning);
-                status = "Buena";
-            } else {
-                color = androidx.core.content.ContextCompat.getColor(requireContext(), R.color.state_error);
-                status = "Baja";
-            }
-            
-            txt_presicion.setTextColor(color);
-            txt_presicion.setText(String.format(Locale.getDefault(), "%s %.0fm - %s", 
-                getString(R.string.label_precision_sign), accuracy, status));
-        }
-        
-        // Detección automática de Zona UTM y Región
-        if (txt_ref_system != null) {
-            txt_ref_system.setText(GeoUtils.getUtmZoneFormatted(loc.getLatitude(), loc.getLongitude()));
-        }
-
-        // Renderizado en tiempo real de coordenadas UTM
-        if (txt_este != null) txt_este.setText(GeoUtils.formatCoord(lastTopoResult.este) + " m");
-        if (txt_norte != null) txt_norte.setText(GeoUtils.formatCoord(lastTopoResult.norte) + " m");
-
-        txt_fa.setText(GeoUtils.formatFactor(lastTopoResult.elevationFactor));
-        txt_fa_ppm.setText(Math.round((lastTopoResult.elevationFactor - 1.0) * 1000000.0) + " PPM");
-        txt_fe.setText(GeoUtils.formatFactor(lastTopoResult.scaleFactor));
-        txt_fe_ppm.setText(Math.round((lastTopoResult.scaleFactor - 1.0) * 1000000.0) + " PPM");
-        txt_fc.setText(GeoUtils.formatFactor(lastTopoResult.combinedFactor));
-        if (txt_fc_ppm != null) txt_fc_ppm.setText(Math.round((lastTopoResult.combinedFactor - 1.0) * 1000000.0) + " PPM");
-
-        updateTemperature(loc.getLatitude(), loc.getLongitude());
-    }
-
-    private void updateTemperature(double lat, double lon) {
-        if (System.currentTimeMillis() - lastTempRequestTime < 600000) return;
-        lastTempRequestTime = System.currentTimeMillis();
-
-        new Thread(() -> {
-            HttpURLConnection conn = null;
-            try {
-                String urlStr = String.format(Locale.US,
-                        "https://api.open-meteo.com/v1/forecast?latitude=%.6f&longitude=%.6f&current=temperature_2m",
-                        lat, lon);
-
-                URL url = new URL(urlStr);
-                conn = (HttpURLConnection) url.openConnection();
-                conn.setRequestMethod("GET");
-                conn.setConnectTimeout(8000);
-                conn.setReadTimeout(8000);
-
-                if (conn.getResponseCode() == HttpURLConnection.HTTP_OK) {
-                    BufferedReader rd = new BufferedReader(new InputStreamReader(conn.getInputStream()));
-                    StringBuilder res = new StringBuilder();
-                    String line;
-                    while ((line = rd.readLine()) != null) res.append(line);
-                    rd.close();
-
-                    JSONObject json = new JSONObject(res.toString());
-                    double temp = json.getJSONObject("current").getDouble("temperature_2m");
-                    currentAmbientTemp = temp; // Guardar para el próximo ciclo de cálculo
-
-                    new Handler(Looper.getMainLooper()).post(() -> {
-                        if (isAdded() && getView() != null && txt_temp != null) {
-                            txt_temp.setText(String.format(Locale.getDefault(), "%.1f °C", temp));
-                        }
-                    });
-                } else {
-                    lastTempRequestTime = 0;
-                }
-            } catch (Exception e) {
-                lastTempRequestTime = 0;
-            } finally {
-                if (conn != null) conn.disconnect();
-            }
-        }).start();
     }
 
     private void showSavePointDialog() {
+        if (lastResult == null) {
+            UIUtils.showWarningToast(requireContext(), getString(R.string.msg_gps_no_signal));
+            return;
+        }
+
         View dv = getLayoutInflater().inflate(R.layout.dialog_save_point, null);
         AlertDialog.Builder b = new AlertDialog.Builder(requireContext());
         AlertDialog d = b.create();
         if (d.getWindow() != null) d.getWindow().setBackgroundDrawableResource(android.R.color.transparent);
         d.setView(dv);
+
         EditText etN = dv.findViewById(R.id.et_point_name);
         EditText etObs = dv.findViewById(R.id.et_point_notes);
+
         dv.findViewById(R.id.btn_dialog_save).setOnClickListener(v -> {
             String name = etN.getText().toString().trim();
-            if (name.isEmpty()) { etN.setError(getString(R.string.hint_point_name)); return; }
-            guardarPuntoEnRegistro(name, etObs.getText().toString());
+            if (name.isEmpty()) {
+                etN.setError(getString(R.string.hint_point_name));
+                return;
+            }
+            ejecutarGuardado(name, etObs.getText().toString());
             d.dismiss();
         });
+
         dv.findViewById(R.id.btn_dialog_cancel).setOnClickListener(v -> d.dismiss());
         d.show();
     }
 
-    private void guardarPuntoEnRegistro(String name, String notes) {
-        if (!isAdded()) return;
+    private void ejecutarGuardado(String name, String notes) {
         DatabaseHelper db = DatabaseHelper.getInstance(requireContext());
         ContentValues v = new ContentValues();
+        String time = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault()).format(new Date());
 
-        // 1. Obtener Hora Local Exacta
-        String fechaHoraLocal = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault()).format(new Date());
-
-        // 2. Mapear datos técnicos completos
-        v.put(DatabaseHelper.COLUMN_FECHA, fechaHoraLocal);
+        v.put(DatabaseHelper.COLUMN_FECHA, time);
         v.put(DatabaseHelper.COLUMN_NOMBRE, name);
-        v.put(DatabaseHelper.COLUMN_LATITUD, txt_lat.getText().toString());
-        v.put(DatabaseHelper.COLUMN_LONGITUD, txt_lon.getText().toString());
+        v.put(DatabaseHelper.COLUMN_LATITUD, GeoUtils.formatLatLon(lastResult.lat));
+        v.put(DatabaseHelper.COLUMN_LONGITUD, GeoUtils.formatLatLon(lastResult.lon));
+        v.put(DatabaseHelper.COLUMN_ESTE, GeoUtils.formatCoord(lastResult.este));
+        v.put(DatabaseHelper.COLUMN_NORTE, GeoUtils.formatCoord(lastResult.norte));
+        v.put(DatabaseHelper.COLUMN_ZONA, String.valueOf(lastResult.zona));
+        v.put(DatabaseHelper.COLUMN_HEMISFERIO, String.valueOf(lastResult.hemisferio));
+        v.put(DatabaseHelper.COLUMN_ALTURA, GeoUtils.formatCoord(lastResult.altEllipsoidal));
+        v.put(DatabaseHelper.COLUMN_ALTURA_ORTO, GeoUtils.formatCoord(lastResult.altOrto));
+        v.put(DatabaseHelper.COLUMN_PRESION, GeoUtils.formatCoord(lastResult.pressureMmHg));
+        v.put(DatabaseHelper.COLUMN_FACTOR_ESCALA, GeoUtils.formatFactor(lastResult.scaleFactor));
+        v.put(DatabaseHelper.COLUMN_FACTOR_ALTURA, GeoUtils.formatFactor(lastResult.elevationFactor));
+        v.put(DatabaseHelper.COLUMN_FACTOR_COMBINADO, GeoUtils.formatFactor(lastResult.combinedFactor));
+        v.put(DatabaseHelper.COLUMN_MODELO_GEOIDAL, txtGeoidModel.getText().toString());
+        v.put(DatabaseHelper.COLUMN_TIPO_REGISTRO, getString(R.string.label_reg_auto));
         
-        if (lastTopoResult != null) {
-            v.put(DatabaseHelper.COLUMN_ESTE, GeoUtils.formatCoord(lastTopoResult.este));
-            v.put(DatabaseHelper.COLUMN_NORTE, GeoUtils.formatCoord(lastTopoResult.norte));
-            v.put(DatabaseHelper.COLUMN_ZONA, String.valueOf(lastTopoResult.zona));
-            v.put(DatabaseHelper.COLUMN_HEMISFERIO, String.valueOf(lastTopoResult.hemisferio));
-            v.put(DatabaseHelper.COLUMN_ALTURA, GeoUtils.formatCoord(lastTopoResult.altOrto + lastTopoResult.geoidN));
-            v.put(DatabaseHelper.COLUMN_ALTURA_ORTO, GeoUtils.formatCoord(lastTopoResult.altOrto));
-            
-            // Guardar solo valor numérico (mmHg) para integridad de datos
-            v.put(DatabaseHelper.COLUMN_PRESION, GeoUtils.formatCoord(lastTopoResult.pressureMmHg));
-            
-            v.put(DatabaseHelper.COLUMN_FACTOR_ESCALA, GeoUtils.formatFactor(lastTopoResult.scaleFactor));
-            v.put(DatabaseHelper.COLUMN_FACTOR_ALTURA, GeoUtils.formatFactor(lastTopoResult.elevationFactor));
-            
-            // Guardar Factor Combinado ATÓMICO (solo el número)
-            v.put(DatabaseHelper.COLUMN_FACTOR_COMBINADO, GeoUtils.formatFactor(lastTopoResult.combinedFactor));
-        } else {
-            v.put(DatabaseHelper.COLUMN_ESTE, "");
-            v.put(DatabaseHelper.COLUMN_NORTE, "");
-            v.put(DatabaseHelper.COLUMN_ZONA, "");
-            v.put(DatabaseHelper.COLUMN_HEMISFERIO, "");
-            v.put(DatabaseHelper.COLUMN_ALTURA, "");
-            v.put(DatabaseHelper.COLUMN_ALTURA_ORTO, "");
-            v.put(DatabaseHelper.COLUMN_PRESION, "");
-            v.put(DatabaseHelper.COLUMN_FACTOR_ESCALA, "");
-            v.put(DatabaseHelper.COLUMN_FACTOR_ALTURA, "");
-            v.put(DatabaseHelper.COLUMN_FACTOR_COMBINADO, "");
-        }
+        String precision = txtPresicion.getText().toString();
+        v.put(DatabaseHelper.COLUMN_PRECISION, precision.contains("--") ? "Ninguno" : precision);
         
-        // 3. Manejo de Notas Vacías
-        String finalNotes = (notes == null || notes.trim().isEmpty()) ? getString(R.string.label_no_observations) : notes.trim();
-        v.put(DatabaseHelper.COLUMN_NOTAS, finalNotes);
+        String satellites = txtSat.getText().toString();
+        v.put(DatabaseHelper.COLUMN_SATELITES, (satellites.contains("--") || satellites.isEmpty()) ? "Ninguno" : satellites);
+        
+        String temp = txtTemp.getText().toString();
+        v.put(DatabaseHelper.COLUMN_TEMPERATURA, temp.contains("--") ? "Ninguno" : temp);
+        
+        v.put(DatabaseHelper.COLUMN_NOTAS, notes.isEmpty() ? getString(R.string.label_no_observations) : notes);
 
-        // 4. Guardar
         db.insertarPunto(v);
         UIUtils.showSuccessToast(requireContext(), getString(R.string.msg_point_saved_format, name));
-    }
-
-    private void resetUIData() {
-        txt_lat.setText("0"); txt_lon.setText("0"); txt_alt.setText("-- m");
-        txt_alt_orto.setText("-- m"); txt_presion.setText("---");
-        if (txt_presion_hpa != null) txt_presion_hpa.setText("-- hPa");
-        txt_fc.setText("0.00000000");
-        if (txt_fc_ppm != null) txt_fc_ppm.setText("-- PPM");
-        txt_sat.setText("0"); txt_temp.setText("-- °C");
     }
 
     @Override
     public void onResume() {
         super.onResume();
-        requireActivity().registerReceiver(gpsReceiver, new IntentFilter(LocationManager.PROVIDERS_CHANGED_ACTION));
-        checkGpsState(true);
-        startFusedLocationUpdates();
-        if (switchMapa != null && switchMapa.isChecked()) {
-            handleMapState(true);
-            if (miniMapManager != null) {
-                new Handler(Looper.getMainLooper()).postDelayed(() -> {
-                    if (isAdded() && miniMapManager != null) {
-                        miniMapManager.refreshMap();
-                    }
-                }, 300);
-            }
-        }
-    }
-
-    private void startFusedLocationUpdates() {
-        if (ActivityCompat.checkSelfPermission(requireContext(), android.Manifest.permission.ACCESS_FINE_LOCATION) == 0) {
-            LocationRequest req = new LocationRequest.Builder(Priority.PRIORITY_HIGH_ACCURACY, 1000).build();
-            fusedLocationClient.requestLocationUpdates(req, locationCallback, Looper.getMainLooper());
-        }
+        checkGpsState();
+        requireContext().registerReceiver(gpsReceiver, new IntentFilter(LocationManager.PROVIDERS_CHANGED_ACTION));
+        restartGnssCallback();
     }
 
     @Override
     public void onPause() {
         super.onPause();
+        requireContext().unregisterReceiver(gpsReceiver);
+        
+        LocationManager lm = (LocationManager) requireContext().getSystemService(Context.LOCATION_SERVICE);
         try {
-            requireActivity().unregisterReceiver(gpsReceiver);
+            lm.unregisterGnssStatusCallback(gnssCallback);
         } catch (Exception ignored) {}
-        
-        if (fusedLocationClient != null) fusedLocationClient.removeLocationUpdates(locationCallback);
-        
-        if (mlocManager != null) {
-            mlocManager.unregisterGnssStatusCallback(gnssCallback);
-        }
-        
-        stopAlertCycles();
-        handleMapState(false);
     }
-
-    @Override
-    public void onDestroyView() {
-        super.onDestroyView();
-        // Evitamos onDetach() para persistencia en ViewPager2
-    }
-
-    private void locationStart() {
-        mlocManager = (LocationManager) requireActivity().getSystemService(Context.LOCATION_SERVICE);
-        if (mlocManager != null && mlocManager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
-            restartLocationUpdates();
-        }
-    }
-
-    public void showGPSData(Location loc) {
-        double lat = Math.abs(loc.getLatitude());
-        double lon = Math.abs(loc.getLongitude());
-        
-        // Formato DMS para lectura humana (se mantiene igual pero asegurando Locale)
-        String latStr = (loc.getLatitude() < 0 ? "-" : "") + (int)lat + "º " + (int)((lat-(int)lat)*60) + "' " + GeoUtils.formatCoord(((lat-(int)lat)*60 - (int)((lat-(int)lat)*60))*60) + "''";
-        String lonStr = (loc.getLongitude() < 0 ? "-" : "") + (int)lon + "º " + (int)((lon-(int)lon)*60) + "' " + GeoUtils.formatCoord(((lon-(int)lon)*60 - (int)((lon-(int)lon)*60))*60) + "''";
-        
-        txt_lat.setText(latStr);
-        txt_lon.setText(lonStr);
-        txt_alt.setText(GeoUtils.formatCoord(loc.getAltitude()) + " m");
-    }
-
-    private final Handler gpsCheckHandler = new Handler(Looper.getMainLooper());
 }
