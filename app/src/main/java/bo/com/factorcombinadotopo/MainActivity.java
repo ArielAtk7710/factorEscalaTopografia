@@ -94,6 +94,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private LocationCallback locationCallback;
     private SurveyViewModel viewModel;
 
+    private ActivityResultLauncher<String[]> requestPermissionLauncher;
+
     private boolean isGpsEnabledGlobal = true;
     private final BroadcastReceiver gpsStateReceiver = new BroadcastReceiver() {
         @Override
@@ -125,6 +127,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         if (!prefs.getBoolean(KEY_TERMS_ACCEPTED, false)) {
             showTermsDialog();
         }
+
+        setupPermissionLauncher();
 
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
@@ -218,9 +222,51 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             SharedPreferences prefs = getSharedPreferences(PREFS_NAME, MODE_PRIVATE);
             prefs.edit().putBoolean(KEY_TERMS_ACCEPTED, true).apply();
             dialog.dismiss();
+            
+            // Disparar solicitud de permisos inmediatamente después de aceptar términos
+            solicitarPermisosIniciales();
         });
 
         dialog.show();
+    }
+
+    private void setupPermissionLauncher() {
+        requestPermissionLauncher = registerForActivityResult(
+                new ActivityResultContracts.RequestMultiplePermissions(),
+                result -> {
+                    Boolean fineLocationGranted = result.getOrDefault(android.Manifest.permission.ACCESS_FINE_LOCATION, false);
+                    Boolean coarseLocationGranted = result.getOrDefault(android.Manifest.permission.ACCESS_COARSE_LOCATION, false);
+                    
+                    if (fineLocationGranted != null && fineLocationGranted) {
+                        UIUtils.showSuccessToast(this, "Permiso de ubicación concedido");
+                        startLocationUpdates();
+                    } else if (coarseLocationGranted != null && coarseLocationGranted) {
+                        UIUtils.showInfoToast(this, "Ubicación aproximada concedida. Se recomienda alta precisión.");
+                        startLocationUpdates();
+                    } else {
+                        UIUtils.showWarningToast(this, "La app requiere GPS para funcionar correctamente.");
+                    }
+                }
+        );
+    }
+
+    private void solicitarPermisosIniciales() {
+        String[] permissions;
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.TIRAMISU) {
+            // Android 13+ no usa READ_EXTERNAL_STORAGE para archivos generales
+            permissions = new String[]{
+                    android.Manifest.permission.ACCESS_FINE_LOCATION,
+                    android.Manifest.permission.ACCESS_COARSE_LOCATION
+            };
+        } else {
+            permissions = new String[]{
+                    android.Manifest.permission.ACCESS_FINE_LOCATION,
+                    android.Manifest.permission.ACCESS_COARSE_LOCATION,
+                    android.Manifest.permission.READ_EXTERNAL_STORAGE,
+                    android.Manifest.permission.WRITE_EXTERNAL_STORAGE
+            };
+        }
+        requestPermissionLauncher.launch(permissions);
     }
 
     @Override

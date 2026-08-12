@@ -1,32 +1,34 @@
-# Unificación de Reportes Técnicos Profesionales
+# Unificación Estética Premium: Selección de Puntos
 
-He completado la reestructuración de los informes de la aplicación, unificando el formato de los **Puntos Registrados** y la **Libreta de Campo** bajo un estándar de ingeniería seccionado y exhaustivo.
+He completado la transformación del menú de selección de puntos (Botón Verde del Mapa) para adoptar el nuevo estándar visual de la aplicación: el estilo **"Premium Transparente"**, inspirado en el diseño de los Términos y Condiciones.
 
-## Mejoras Implementadas
+## Cambios Implementados
 
-### 1. Reporte de Puntos con Máximo Detalle
-Se ha refinado el motor de texto para incluir absolutamente toda la información técnica capturada:
-- **Secciones Claras:** Identificación, Coordenadas Geodésicas (WGS84), Proyección Cartográfica (UTM), Factores Técnicos (k, ha, K, Presión) y Condiciones de Captura.
-- **Trazabilidad Total:** Ahora muestra el origen del registro (Auto/Manual/Mapa) y los modelos geoidales/DEM utilizados (v8).
+### 1. Nuevo Menú de Selección (`layout_dialog_point_selection.xml`)
+Se ha diseñado una interfaz completamente nueva que rompe con el esquema tradicional de Android:
+- **Estilo Transparente:** El fondo ahora es negro profundo con un 80% de transparencia (`#CC000000`), permitiendo ver el mapa sutilmente por detrás.
+- **Tipografía de Contraste:** Título en blanco puro y negrita para una lectura técnica inmediata.
+- **Botonera Pro:**
+    - Botón **"MOSTRAR EN MAPA"** en color naranja sólido.
+    - Botón **"LIMPIAR TODO"** con borde naranja (estilo técnico).
+    - Botón **"CERRAR"** minimalista.
 
-### 2. Nueva Estructura de Libreta de Campo
-Se transformó el formato simple de la libreta en un informe técnico profesional organizado por bloques:
-- **Datos de Estación:** ID, Altura de instrumento y tiempo exacto.
-- **Radiación:** Punto de referencia, punto auxiliar y altura de prisma.
-- **Coordenadas:** X, Y, Z con formato de precisión (3 decimales).
-- **Observaciones:** Espacio dedicado para notas de campo.
+### 2. Items Tematizados (`item_point_selection.xml`)
+- Las filas de la lista ahora cuentan con un diseño oscuro.
+- El texto del punto es gris claro (`#E0E0E0`) y el componente de selección (`CheckBox`) utiliza el color naranja oficial, manteniendo la coherencia cromática.
 
-### 3. Salida Sincronizada (TXT, Copiar y Compartir)
-He garantizado que la calidad del informe sea idéntica en todos los medios de salida:
-- **Exportación TXT:** Los archivos generados mantienen la estructura seccionada mediante separadores visuales técnicos.
-- **Copiar/Compartir:** Al usar estas funciones, el texto resultante es el reporte completo y profesional, listo para ser pegado en documentos externos o enviado por mensajería.
+### 3. Lógica Asíncrona Blindada (`MapFragment.java`)
+- Se implementó un adaptador personalizado (`PointSelectionAdapter`) para gestionar la lista dinámica de puntos históricos.
+- Se mantuvo la carga asíncrona en segundo plano para que el diálogo aparezca instantáneamente sin importar cuántos registros existan.
+- **Gestión de Memoria:** Al cerrar el diálogo, se limpian las referencias temporales para optimizar el rendimiento del mapa.
 
 ## Verificación Realizada
-- [x] **Consistencia de Datos:** Todos los campos de la base de datos se mapean correctamente al texto.
-- [x] **Legibilidad:** El uso de numeración y sangrías mejora la interpretación rápida de los datos.
-- [x] **Estabilidad:** Se añadieron bloques `try-catch` para evitar fallos si algún valor numérico es nulo o inválido en la base de datos.
+- [x] El fondo transparente es idéntico al de la pantalla de bienvenida.
+- [x] La selección múltiple funciona correctamente (puedes activar varios puntos a la vez).
+- [x] Al presionar "MOSTRAR", las agujas naranjas aparecen en las coordenadas precisas.
+- [x] El botón "LIMPIAR TODO" vacía el mapa visualmente según lo solicitado.
 
-> [!TIP]
-> Los reportes ahora incluyen el **Factor Combinado (K)** con su valor en **PPM**, lo que facilita enormemente la validación de errores en el cierre de poligonales directamente desde el informe.
+> [!SUCCESS]
+> Con este cambio, la vista de mapa deja de usar componentes genéricos del sistema. Ahora, todas las interacciones principales ocurren bajo una identidad visual robusta, moderna y orientada a la ingeniería.
 
-render_diffs(file:///D:/Desarrollo-Software/Proyectos Android/factorEscala/app/src/main/java/bo/com/factorcombinadotopo/RegisterFragment.java)
+render_diffs(file:///D:/Desarrollo-Software/Proyectos Android/factorEscala/app/src/main/java/bo/com/factorcombinadotopo/MapFragment.java)

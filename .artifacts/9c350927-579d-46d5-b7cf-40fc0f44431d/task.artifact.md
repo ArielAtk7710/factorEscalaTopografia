@@ -1,11 +1,11 @@
-# Lista de Tareas - Creación de Guía Rápida Pro
+# Lista de Tareas - Unificación Estética de Selección de Puntos
 
-- `[/]` **Paso 1: Redacción de Contenidos**
-    - `[ ]` Añadir textos de la guía en `strings.xml` (Español e Inglés)
-- `[ ]` **Paso 2: Diseño de Interfaz**
-    - `[ ]` Crear `layout_dialog_guide.xml` con estética premium
-- `[ ]` **Paso 3: Lógica de Aplicación**
-    - `[ ]` Implementar `showQuickGuideDialog()` en `MainActivity.java`
-- `[ ]` **Paso 4: Verificación**
-    - `[ ]` Validar apertura desde el menú de la barra superior
-    - `[ ]` Confirmar legibilidad de todos los apartados
+- `[x]` **Paso 1: Diseño de Interfaz**
+    - `[x]` Crear `layout_dialog_point_selection.xml` (Fondo transparente, estilo premium).
+    - `[x]` Crear `item_point_selection.xml` para las filas de la lista.
+- `[x]` **Paso 2: Lógica de Fragmento**
+    - `[x]` Implementar adaptador interno `SelectionAdapter` en `MapFragment`.
+    - `[x]` Refactorizar `showPointSelectionDialog()` para usar el nuevo diseño.
+- `[/]` **Paso 3: Verificación**
+    - `[x]` Validar consistencia visual con Términos y Condiciones.
+    - `[ ]` Comprobar funcionalidad de selección múltiple y proyección en mapa.

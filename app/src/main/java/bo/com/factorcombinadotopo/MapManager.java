@@ -3,9 +3,6 @@ package bo.com.factorcombinadotopo;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.location.Location;
-import android.graphics.Bitmap;
-import android.graphics.Canvas;
-import android.graphics.drawable.BitmapDrawable;
 import android.widget.TextView;
 
 import org.osmdroid.api.IMapController;
@@ -116,18 +113,9 @@ public class MapManager {
         CopyrightOverlay copyrightOverlay = new CopyrightOverlay(context);
         mapView.getOverlays().add(copyrightOverlay);
 
-        // 3. Capa de Ubicación (Chincheta Blanca sobre Círculo Azul)
         locationOverlay = new MyLocationNewOverlay(new GpsMyLocationProvider(context), mapView);
         if (showLocation) {
             locationOverlay.enableMyLocation();
-        }
-
-        // Personalización del Icono de Ubicación (Reemplazo del Punto Azul)
-        Drawable personDrawable = ContextCompat.getDrawable(context, R.drawable.ic_user_location_pin);
-        if (personDrawable != null) {
-            Bitmap personBitmap = drawableToBitmap(personDrawable);
-            locationOverlay.setPersonIcon(personBitmap);
-            locationOverlay.setPersonAnchor(0.5f, 0.5f); // Centro del círculo azul
         }
 
         locationOverlay.disableFollowLocation(); 
@@ -313,18 +301,6 @@ public class MapManager {
             locationOverlay.disableMyLocation();
             locationOverlay.disableFollowLocation();
         }
-    }
-
-    /**
-     * Helper interno para convertir vectores a bitmaps (usado para la Chincheta de Ubicación).
-     */
-    private Bitmap drawableToBitmap(Drawable drawable) {
-        if (drawable instanceof BitmapDrawable) return ((BitmapDrawable) drawable).getBitmap();
-        Bitmap bitmap = Bitmap.createBitmap(drawable.getIntrinsicWidth(), drawable.getIntrinsicHeight(), Bitmap.Config.ARGB_8888);
-        Canvas canvas = new Canvas(bitmap);
-        drawable.setBounds(0, 0, canvas.getWidth(), canvas.getHeight());
-        drawable.draw(canvas);
-        return bitmap;
     }
 
     /**

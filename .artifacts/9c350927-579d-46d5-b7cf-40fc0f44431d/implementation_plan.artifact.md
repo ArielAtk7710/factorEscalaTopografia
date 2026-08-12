@@ -1,43 +1,35 @@
-# Plan de Implementación: Guía Rápida Pro
+# Plan de Estilo Unificado: Diálogos de Selección y Mensajes
 
-Este plan detalla la creación de la sección "Guía Rápida", proporcionando al usuario un manual breve, concreto y profesional sobre el uso de todas las herramientas de FactorEscalaTop, manteniendo la estética de la app.
+Este plan detalla la reestructuración estética de los diálogos de la aplicación para adoptar el estándar "Premium Transparente" (basado en el diseño de Términos y Condiciones), unificando todos los mensajes y menús bajo una misma identidad visual.
 
 ## Proposed Changes
 
-### 1. Recursos de Texto (`strings.xml`)
-- **[MODIFY] [strings.xml](file:///D:/Desarrollo-Software/Proyectos Android/factorEscala/app/src/main/res/values/strings.xml)**:
-    - Añadir `title_quick_guide`: "📖 Guía Rápida de Uso"
-    - Añadir los bloques de contenido para cada función:
-        - **General:** Resumen de la app.
-        - **Cálculos:** Automático vs Manual.
-        - **Mapa:** Agujas, Lupa y Altura Online.
-        - **Dron:** Semáforo y Ventanas de Vuelo.
-        - **Herramientas:** Brújula, Calendario y Libreta.
-        - **Datos:** Exportación TXT/JSON.
+### 1. Interfaz de Diálogo de Selección (`layout_dialog_point_selection.xml`)
+- **[NEW] [layout_dialog_point_selection.xml](file:///D:/Desarrollo-Software/Proyectos Android/factorEscala/app/src/main/res/layout/layout_dialog_point_selection.xml)**:
+    - **Fondo:** Negro transparente (`#CC000000`).
+    - **Título:** Blanco puro, 20sp, negrita, centrado ("Seleccionar Puntos").
+    - **Lista:** Uso de `RecyclerView` o `ListView` con items tematizados (texto blanco/gris).
+    - **Botonera:**
+        - Botón "MOSTRAR": Naranja sólido con texto blanco.
+        - Botón "LIMPIAR TODO": Borde naranja (Outlined), texto blanco.
+        - Botón "CERRAR": Estilo minimalista.
 
-### 2. Diseño de la Interfaz (`layout_dialog_guide.xml`)
-- **[NEW] [layout_dialog_guide.xml](file:///D:/Desarrollo-Software/Proyectos Android/factorEscala/app/src/main/res/layout/layout_dialog_guide.xml)**:
-    - Siguiendo el formato de `layout_dialog_about.xml`.
-    - **Cabecera:** Título en color **Naranja** (`@color/accent_orange`).
-    - **Contenido:** Lista seccionada con títulos en **Azul** (`@color/accent_primary`) y cuerpo en color de texto estándar.
-    - **Interactividad:** Uso de `NestedScrollView` para una navegación fluida.
-    - **Botón de Cierre:** Estilo naranja con texto "ENTENDIDO".
+### 2. Lógica del Fragmento de Mapa (`MapFragment.java`)
+- **[MODIFY] [MapFragment.java](file:///D:/Desarrollo-Software/Proyectos Android/factorEscala/app/src/main/java/bo/com/factorcombinadotopo/MapFragment.java)**:
+    - Reemplazar `showPointSelectionDialog()` por una implementación que infle el nuevo layout transparente.
+    - Asegurar que el diálogo ocupe el tamaño adecuado y permita la interacción con la lista de puntos históricos.
 
-### 3. Lógica de Activación (`MainActivity.java`)
-- **[MODIFY] [MainActivity.java](file:///D:/Desarrollo-Software/Proyectos Android/factorEscala/app/src/main/java/bo/com/factorcombinadotopo/MainActivity.java)**:
-    - Implementar el método `showQuickGuideDialog()`.
-    - Vincular este método al item `action_tutorial` del menú (que ahora se llama Guía Rápida).
-    - Utilizar `BottomSheetDialog` para una apertura moderna y táctil.
+### 3. Estandarización de Estilo (Futuros Mensajes)
+- Se establece como norma de diseño para el proyecto el uso del fondo `#CC000000` y tipografía blanca para cualquier ventana emergente (Popups, Diálogos de Alerta, etc.), eliminando definitivamente los estilos por defecto de Android.
 
 ## Beneficios
-- **Onboarding Eficiente:** El usuario nuevo comprende el potencial de la app en menos de 1 minuto.
-- **Soporte Técnico Integrado:** Reduce dudas sobre términos complejos (DEM, Kp, etc.).
-- **Coherencia Visual:** Refuerza la identidad premium del software.
+- **Uniformidad Total:** El usuario percibirá la app como una suite de alta gama, sin cambios bruscos de estilo entre funciones.
+- **Identidad Técnica:** El contraste de blanco sobre negro transparente resalta el carácter de "herramienta de precisión".
 
 ## Plan de Verificación
 
 ### Manual Verification
-1.  **Acceso:** Abrir el menú lateral o de opciones y seleccionar "Guía Rápida".
-2.  **Visualización:** Confirmar que los colores naranja y azul se aplican correctamente a los títulos.
-3.  **Lectura:** Verificar que el texto no esté cortado y el scroll funcione bien.
-4.  **Cierre:** Presionar "ENTENDIDO" y confirmar que regresa a la pantalla anterior.
+1.  **Activación:** Presionar el botón verde (Listado) en el Mapa.
+2.  **Visualización:** Confirmar que el fondo es negro transparente y los títulos son blancos, idénticos a los Términos y Condiciones.
+3.  **Funcionalidad:** Seleccionar varios puntos, presionar "MOSTRAR" y verificar que se proyecten las agujas naranjas en el mapa.
+4.  **Limpieza:** Usar "LIMPIAR TODO" en el nuevo diálogo y confirmar que las marcas desaparecen del mapa.

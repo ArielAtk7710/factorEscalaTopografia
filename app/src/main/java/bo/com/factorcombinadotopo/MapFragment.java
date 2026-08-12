@@ -357,36 +357,85 @@ public class MapFragment extends Fragment {
             cursor.close();
 
             new Handler(Looper.getMainLooper()).post(() -> {
-                if (!isAdded() || allPoints.isEmpty()) {
-                    if (isAdded()) UIUtils.showInfoToast(requireContext(), "No hay puntos registrados");
+                if (!isAdded()) return;
+                if (allPoints.isEmpty()) {
+                    UIUtils.showInfoToast(requireContext(), "No hay puntos registrados");
                     return;
                 }
 
-                String[] names = new String[allPoints.size()];
-                boolean[] checked = new boolean[allPoints.size()];
-                for (int i = 0; i < allPoints.size(); i++) names[i] = allPoints.get(i).nombre;
+                // 🎨 NUEVO DISEÑO PREMIUM TRANSPARENTE
+                View dv = getLayoutInflater().inflate(R.layout.layout_dialog_point_selection, null);
+                AlertDialog.Builder b = new AlertDialog.Builder(requireContext());
+                AlertDialog d = b.create();
+                if (d.getWindow() != null) d.getWindow().setBackgroundDrawableResource(android.R.color.transparent);
+                d.setView(dv);
 
-                new AlertDialog.Builder(requireContext())
-                    .setTitle("Seleccionar puntos para ver")
-                    .setMultiChoiceItems(names, checked, (dialog, which, isChecked) -> checked[which] = isChecked)
-                    .setPositiveButton("Mostrar", (dialog, which) -> {
-                        if (mapManager != null) {
-                            mapManager.clearManualMarkers();
-                            for (int j = 0; j < checked.length; j++) {
-                                if (checked[j]) {
-                                    PointRef p = allPoints.get(j);
-                                    mapManager.addManualMarker(new GeoPoint(p.lat, p.lon), p.nombre);
-                                }
+                androidx.recyclerview.widget.RecyclerView rv = dv.findViewById(R.id.rv_point_selection);
+                rv.setLayoutManager(new androidx.recyclerview.widget.LinearLayoutManager(requireContext()));
+                
+                boolean[] selected = new boolean[allPoints.size()];
+                PointSelectionAdapter adapter = new PointSelectionAdapter(allPoints, selected);
+                rv.setAdapter(adapter);
+
+                dv.findViewById(R.id.btn_selection_show).setOnClickListener(v -> {
+                    if (mapManager != null) {
+                        mapManager.clearManualMarkers();
+                        for (int i = 0; i < selected.length; i++) {
+                            if (selected[i]) {
+                                PointRef p = allPoints.get(i);
+                                mapManager.addManualMarker(new GeoPoint(p.lat, p.lon), p.nombre);
                             }
                         }
-                    })
-                    .setNegativeButton("Cerrar", null)
-                    .setNeutralButton("Limpiar Todo", (dialog, which) -> {
-                        if (mapManager != null) mapManager.clearManualMarkers();
-                    })
-                    .show();
+                    }
+                    d.dismiss();
+                });
+
+                dv.findViewById(R.id.btn_selection_clear_all).setOnClickListener(v -> {
+                    if (mapManager != null) mapManager.clearManualMarkers();
+                    d.dismiss();
+                });
+
+                dv.findViewById(R.id.btn_selection_close).setOnClickListener(v -> d.dismiss());
+                
+                d.show();
             });
         }).start();
+    }
+
+    /**
+     * Adaptador interno para la selección de puntos con estilo Premium.
+     */
+    private static class PointSelectionAdapter extends androidx.recyclerview.widget.RecyclerView.Adapter<PointSelectionAdapter.ViewHolder> {
+        private final List<PointRef> points;
+        private final boolean[] selected;
+
+        PointSelectionAdapter(List<PointRef> points, boolean[] selected) {
+            this.points = points;
+            this.selected = selected;
+        }
+
+        @NonNull
+        @Override
+        public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+            View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_point_selection, parent, false);
+            return new ViewHolder(v);
+        }
+
+        @Override
+        public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
+            PointRef p = points.get(position);
+            holder.cb.setText(p.nombre);
+            holder.cb.setChecked(selected[position]);
+            holder.cb.setOnCheckedChangeListener((bv, isChecked) -> selected[position] = isChecked);
+        }
+
+        @Override
+        public int getItemCount() { return points.size(); }
+
+        static class ViewHolder extends androidx.recyclerview.widget.RecyclerView.ViewHolder {
+            android.widget.CheckBox cb;
+            ViewHolder(View v) { super(v); cb = (android.widget.CheckBox) v; }
+        }
     }
 
     private void showGoToCoordsDialog() {
