@@ -332,24 +332,21 @@
 
     <!-- Terms and Conditions -->
     <string name="title_terms_conditions">📜 Terms and Conditions of Use</string>
-    <string name="terms_body">By using FactorEscalaTop 2.3, you formally accept the following terms and conditions:\n\n
+    <string name="terms_body">By using FactorEscalaTop 2.4, you formally accept the following terms and conditions:\n\n
         <b>Geographic Scope:</b> The application is designed and calibrated exclusively for the reference systems and cartographic grid of Bolivia.\n\n
         <b>Technical Support Tool:</b> The data provided is for guidance only and does not replace the procedures, technical controls, or professional equipment required for official or legal surveys.\n\n
-        <b>Variable Precision:</b> The accuracy of the results is subject to the quality of the device\'s GNSS hardware, the entered coordinates, environmental conditions, and external information sources.\n\n
+        <b>Reference Systems:</b> The app utilizes official <b>MGBol08</b> models and the global <b>EGM2008</b> standard for geodetic precision.\n\n
+        <b>Connectivity and APIs:</b> "Online Height" and "Weather" functions depend on third-party services (Open-Meteo, Esri). The availability of these external services depends on their own providers.\n\n
         <b>User Responsibility:</b> It is the professional\'s exclusive obligation to verify, validate, and certify all calculations before their application in formal projects.\n\n
-        <b>Limit of Liability:</b> To the maximum extent permitted by law, the developer assumes no responsibility for direct or indirect damages, loss of profits, or financial losses derived from the use or reliance on the application\'s calculations.\n\n
-        <b>Intellectual Property:</b> Reverse engineering, modification, or unauthorized distribution of the software and its content is strictly prohibited.\n\n
-        <b>Third-Party Services:</b> The app uses standard infrastructure services (including Google Play Services for maps and location, and free weather APIs). The operation of these external services depends on their own providers and availability.\n\n
-        <b>Subscriptions (PRO Version):</b> Purchases and updates of the PRO version are managed through the Google Play Store, subject to Google\'s payment and refund policies.\n\n
-        <b>Regulatory Compliance:</b> The user agrees to use the tool in accordance with current regulations in the Plurinational State of Bolivia.</string>
+        <b>Limit of Liability:</b> The developer assumes no responsibility for damages derived from the use or reliance on the application\'s calculations.\n\n
+        <b>Regulatory Compliance:</b> The user agrees to use the tool in accordance with Law 164 and current regulations in the Plurinational State of Bolivia.</string>
 
     <string name="title_privacy_policy">🔒 Privacy Policy</string>
     <string name="privacy_body">In compliance with Google Play guidelines for data protection, this policy details how information is managed:\n\n
-        <b>Use of Location (GPS):</b> The application collects and processes real-time geolocation data solely to execute the geodetic and topographic calculations requested by the user on the screen.\n\n
-        <b>Local Storage:</b> User points, records, and settings are stored locally in the device\'s internal memory. Personal project databases are not uploaded to the developer\'s external servers.\n\n
-        <b>Google Play Services Tools:</b> The application uses standard Google Play Services components (necessary for the operation of maps and native operating system geolocation).\n\n
-        <b>Advertising and Monetization:</b> If the application shows ads through compatible advertising networks (such as Google AdMob), these platforms may use device advertising identifiers to show contextual or generic ads in accordance with Google policies.\n\n
-        <b>No Sale of Data:</b> The developer does not sell, transfer, or cede personal or location data to third parties for commercial purposes.</string>
+        <b>Location Usage (GPS):</b> The application processes real-time geolocation data to execute geodetic calculations and project maps. Data is processed locally and may be used in the background to maintain session pin persistence.\n\n
+        <b>Local Storage and Export:</b> Points and records are stored exclusively in the device\'s internal memory. Exported files (TXT/JSON) are the user\'s responsibility.\n\n
+        <b>Third-Party Services:</b> We use Google Play Services for maps, Open-Meteo API for weather and elevation data, and ArcGIS (Esri) for satellite layers.\n\n
+        <b>Security:</b> No personal data is collected or sold to external developer servers.</string>
 
     <string name="btn_accept_continue">ACCEPT AND CONTINUE</string>
     <string name="btn_exit">EXIT</string>
@@ -389,5 +386,26 @@
     <string name="label_lat_short">LAT: %1$.6f</string>
     <string name="label_lon_short">LON: %1$.6f</string>
     <string name="msg_touch_outside_close">Touch outside to close</string>
+    <!-- Quick Guide Content -->
+    <string name="title_quick_guide">📖 Quick User Guide</string>
+
+    <string name="guide_section_gen_title">1. General Concepts</string>
+    <string name="guide_section_gen_body">FactorEscalaTop is a topographic suite for calculating correction factors (k, ha, K) and GNSS data management, specifically calibrated for Bolivia.</string>
+
+    <string name="guide_section_calc_title">2. Calculation Modes</string>
+    <string name="guide_section_calc_body"><b>Automatic:</b> Obtains real-time data from GPS.\n<b>Manual:</b> Allows simulating scenarios by entering coordinates from blueprints or projects.</string>
+
+    <string name="guide_section_map_title">3. Navigation and Map</string>
+    <string name="guide_section_map_body"><b>Orange Crosshair:</b> Your central target.\n<b>Search (Magnifier):</b> Tap the top panel to navigate to exact coordinates.\n<b>Orange Needles:</b> Temporary session marks that follow you throughout the app.</string>
+
+    <string name="guide_section_alt_title">4. Altitude and DEM Models</string>
+    <string name="guide_section_alt_body"><b>Device GPS:</b> Ellipsoidal height from the mobile.\n<b>Online Height:</b> Obtains the elevation (MSL) via Open-Meteo API (Copernicus DEM) with EGM2008 correction.</string>
+
+    <string name="guide_section_drone_title">5. Flight Assistant</string>
+    <string name="guide_section_drone_body">Analyzes drone safety using a traffic light (Green to Red) based on winds, rain, and the Solar Kp Index to protect your GPS signal.</string>
+
+    <string name="guide_section_data_title">6. Data Management</string>
+    <string name="guide_section_data_body">Export your surveys in <b>TXT</b> for human reports or <b>JSON</b> for direct integration with GIS/CAD software from the RECORDS tab.</string>
+
     <string name="desc_high_precision">High Precision Topography</string>
 </resources>

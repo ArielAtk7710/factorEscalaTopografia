@@ -331,24 +331,21 @@
 
     <!-- Terms and Conditions -->
     <string name="title_terms_conditions">📜 Conditions Générales d\'Utilisation</string>
-    <string name="terms_body">En utilisant FactorEscalaTop 2.3, vous acceptez formellement les conditions générales suivantes :\n\n
+    <string name="terms_body">En utilisant FactorEscalaTop 2.4, vous acceptez formellement les conditions générales suivantes :\n\n
         <b>Portée Géographique :</b> L\'application est conçue et calibrée exclusivement pour les systèmes de référence et la grille cartographique de Bolivie.\n\n
         <b>Outil de Support Técnico :</b> Les données fournies sont à titre indicatif uniquement et ne remplacent pas les procédures, contrôles techniques ou équipements professionnels requis pour les levés officiels ou légaux.\n\n
-        <b>Précision Variable :</b> L\'exactitude des résultats est soumise à la qualité du matériel GNSS de l\'appareil, aux coordonnées saisies, aux conditions environnementales et aux sources d\'informations externes.\n\n
-        <b>Responsabilité de l\'Utilisateur :</b> Il appartient exclusivement au professionnel de vérifier, valider et certifier tous les calculs avant leur application dans des projets formels.\n\n
-        <b>Limite de Responsabilité :</b> Dans la mesure maximale permise par la loi, le développeur n\'assume aucune responsabilité pour les dommages directs, indirects, la perte de profits ou les pertes financières découlant de l\'utilisation ou de la confiance accordée aux calculs de l\'application.\n\n
-        <b>Propriété Intellectuelle :</b> L\'ingénierie inverse, la modification ou la distribution non autorisée du logiciel et de son contenu sont strictement interdites.\n\n
-        <b>Services Tiers :</b> L\'application utilise des services d\'infrastructure standard (y compris Google Play Services pour les cartes et la localisation, et des API météo gratuites). Le fonctionnement de ces services externes dépend de leurs propres fournisseurs et disponibilité.\n\n
-        <b>Abonnements (Version PRO) :</b> Les achats et les mises à jour de la version PRO sont gérés via le Google Play Store, soumis aux politiques de paiement et de remboursement de Google.\n\n
-        <b>Conformité Réglementaire :</b> L\'utilisateur accepte d\'utiliser l\'outil conformément aux réglementations en vigueur dans l\'État plurinational de Bolivie.</string>
+        <b>Systèmes de Référence :</b> L\'application utilise les modèles officiels <b>MGBol08</b> et la norme mondiale <b>EGM2008</b>.\n\n
+        <b>Connectivité et API :</b> Les fonctions de hauteur en ligne et météo dépendent de services tiers (Open-Meteo, Esri).\n\n
+        <b>Responsabilité de l\'Utilisateur :</b> Il appartient exclusivement au professionnel de vérifier tous les calculs.\n\n
+        <b>Limite de Responsabilité :</b> Le développeur n\'assume aucune responsabilité pour les dommages découlant de l\'utilisation de l\'application.\n\n
+        <b>Conformité Réglementaire :</b> L\'utilisateur s\'engage à utiliser l\'outil conformément à la loi 164 et aux réglementations en vigueur en Bolivie.</string>
 
     <string name="title_privacy_policy">🔒 Politique de Confidentialité</string>
     <string name="privacy_body">Conformément aux directives de Google Play pour la protection des données, cette politique détaille la gestion des informations :\n\n
-        <b>Utilisation de la Localisation (GPS) :</b> L\'application collecte et traite les données de géolocalisation en temps réel uniquement pour exécuter les calculs géodésiques et topographiques demandés par l\'utilisateur à l\'écran.\n\n
-        <b>Stockage Local :</b> Les points, enregistrements et paramètres de l\'utilisateur sont stockés localement dans la mémoire interne de l\'appareil. Les bases de données des projets personnels ne sont pas téléchargées sur les serveurs externes du développeur.\n\n
-        <b>Outils Google Play Services :</b> L\'application utilise des composants standard de Google Play Services (nécessaires au fonctionnement des cartes et de la géolocalisation native du système d\'exploitation).\n\n
-        <b>Publicité et Monétisation :</b> Si l\'application affiche des annonces via des réseaux publicitaires compatibles (tels que Google AdMob), ces plateformes peuvent utiliser des identifiants publicitaires de l\'appareil pour afficher des annonces contextuelles ou génériques conformément aux politiques de Google.\n\n
-        <b>Pas de Vente de Données :</b> Le développeur ne vend, ne transfère ni ne cède de données personnelles ou de localisation à des tiers à des fins commerciales.</string>
+        <b>Localisation (GPS) :</b> L\'application traite les données de géolocalisation en temps réel localement pour les calculs géodésiques et les cartes.\n\n
+        <b>Stockage et Exportation :</b> Les données sont stockées exclusivement sur l\'appareil. Les fichiers exportés (TXT/JSON) sont la responsabilité de l\'utilisateur.\n\n
+        <b>Services Tiers :</b> Google Play Services, Open-Meteo API et ArcGIS (Esri).\n\n
+        <b>Sécurité :</b> Aucune donnée n\'est vendue à des tiers.</string>
 
     <string name="btn_accept_continue">ACCEPTER ET CONTINUER</string>
     <string name="btn_exit">QUITTER</string>
@@ -388,5 +385,26 @@
     <string name="label_lat_short">LAT : %1$.6f</string>
     <string name="label_lon_short">LON : %1$.6f</string>
     <string name="msg_touch_outside_close">Touchez l\'extérieur pour fermer</string>
+    <!-- Quick Guide Content -->
+    <string name="title_quick_guide">📖 Guide Rapide d\'Utilisation</string>
+
+    <string name="guide_section_gen_title">1. Concepts Généraux</string>
+    <string name="guide_section_gen_body">FactorEscalaTop est une suite topographique pour le calcul des facteurs de correction (k, ha, K) et la gestion des données GNSS, calibrée spécifiquement pour la Bolivie.</string>
+
+    <string name="guide_section_calc_title">2. Modes de Calcul</string>
+    <string name="guide_section_calc_body"><b>Automatique :</b> Obtient des données en temps réel du GPS.\n<b>Manuel :</b> Permet de simuler des scénarios en saisissant des coordonnées de plans ou de projets.</string>
+
+    <string name="guide_section_map_title">3. Navigation et Carte</string>
+    <string name="guide_section_map_body"><b>Viseur Orange :</b> Votre objectif central.\n<b>Recherche (Loupe) :</b> Appuyez sur le panneau supérieur pour naviguer vers des coordonnées exactes.\n<b>Aiguilles Orange :</b> Marques temporaires de session qui vous suivent dans toute l\'application.</string>
+
+    <string name="guide_section_alt_title">4. Altitude et Modèles DEM</string>
+    <string name="guide_section_alt_body"><b>GPS Appareil :</b> Altitude ellipsoïdale du mobile.\n<b>Hauteur en Ligne :</b> Obtient l\'élévation (MSL) via l\'API Open-Meteo (Copernicus DEM) avec correction EGM2008.</string>
+
+    <string name="guide_section_drone_title">5. Assistant de Vol</string>
+    <string name="guide_section_drone_body">Analyse la sécurité des drones via un feu tricolore (Vert à Rouge) basé sur les vents, la pluie et l\'indice Kp solaire pour protéger votre signal GPS.</string>
+
+    <string name="guide_section_data_title">6. Gestion des Données</string>
+    <string name="guide_section_data_body">Exportez vos relevés en <b>TXT</b> pour les rapports humains ou en <b>JSON</b> pour une intégration directe avec les logiciels SIG/CAO depuis l\'onglet REGISTRES.</string>
+
     <string name="desc_high_precision">Topographie de Haute Précision</string>
 </resources>

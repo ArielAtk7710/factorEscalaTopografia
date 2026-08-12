@@ -1,53 +1,43 @@
-# Plan de Auditoría y Corrección Integral (Senior Android Architecture)
+# Plan de Implementación: Guía Rápida Pro
 
-Este plan detalla la reestructuración técnica de la aplicación para garantizar estabilidad absoluta, conectividad resiliente y una experiencia de usuario (UX) de grado industrial.
-
-## User Review Required
-
-> [!IMPORTANT]
-> Se implementará un **Monitor de Conectividad Global**. La aplicación dejará de intentar realizar peticiones de red si el dispositivo está en modo avión o sin datos, informando proactivamente al usuario.
-> Se aplicará una política de **"Cero requireContext()"** en procesos asíncronos para eliminar el riesgo de cierres inesperados al navegar entre pestañas.
+Este plan detalla la creación de la sección "Guía Rápida", proporcionando al usuario un manual breve, concreto y profesional sobre el uso de todas las herramientas de FactorEscalaTop, manteniendo la estética de la app.
 
 ## Proposed Changes
 
-### 1. Gestión de Conectividad (Network Resilience)
-- **[NEW] NetworkUtils.java**: Clase de utilidad para verificar el estado del hardware de red (`ConnectivityManager`).
-- **[MODIFY] [WeatherManager.java](file:///D:/Desarrollo-Software/Proyectos Android/factorEscala/app/src/main/java/bo/com/factorcombinadotopo/WeatherManager.java)**: Integrar validación previa a la descarga del clima y Kp solar.
-- **[MODIFY] [TopographyRepository.java](file:///D:/Desarrollo-Software/Proyectos Android/factorEscala/app/src/main/java/bo/com/factorcombinadotopo/TopographyRepository.java)**: Validar internet antes de la consulta a la API de Elevación (Open-Meteo).
-
-### 2. Estabilidad y Prevención de ANR/Crashes
-- **[MODIFY] [MapFragment.java](file:///D:/Desarrollo-Software/Proyectos Android/factorEscala/app/src/main/java/bo/com/factorcombinadotopo/MapFragment.java)**:
-    - Implementar "Debounce" en los botones de guardado para evitar registros duplicados por clics rápidos.
-    - Reemplazar todas las llamadas directas a recursos (`getString`) por un acceso seguro que verifique si el fragmento está adjunto (`isAdded()`).
-- **Audit de Hilos**: Revisar que ninguna operación de `DatabaseHelper` (SQLite) se ejecute en el hilo UI.
-
-### 3. Base de Datos y Exportación Expandida
-- **[MODIFY] [RegisterFragment.java](file:///D:/Desarrollo-Software/Proyectos Android/factorEscala/app/src/main/java/bo/com/factorcombinadotopo/RegisterFragment.java)**:
-    - Añadir soporte para exportación en formato **JSON** para permitir la interoperabilidad con software de escritorio (CAD/GIS).
-    - Validar la integridad de los datos recuperados del cursor (manejo de nulos preventivo).
-
-### 4. Ciclo de Vida del Mapa (osmdroid)
-- **[MODIFY] [MapManager.java](file:///D:/Desarrollo-Software/Proyectos Android/factorEscala/app/src/main/java/bo/com/factorcombinadotopo/MapManager.java)**:
-    - Asegurar que la liberación de recursos (`onDetach`) sea total para evitar fugas de memoria (Memory Leaks) al cerrar la vista de mapa.
-    - Manejar el error de descarga de mosaicos (tiles) de forma silenciosa sin interrumpir la renderización de marcadores.
-
-### 5. Ortografía y Textos (QA)
+### 1. Recursos de Texto (`strings.xml`)
 - **[MODIFY] [strings.xml](file:///D:/Desarrollo-Software/Proyectos Android/factorEscala/app/src/main/res/values/strings.xml)**:
-    - Corregir abreviaturas no estandarizadas.
-    - Revisar gramática en los mensajes de advertencia técnica.
-    - Asegurar que las traducciones EN, FR y PT sigan el mismo rigor terminológico.
+    - Añadir `title_quick_guide`: "📖 Guía Rápida de Uso"
+    - Añadir los bloques de contenido para cada función:
+        - **General:** Resumen de la app.
+        - **Cálculos:** Automático vs Manual.
+        - **Mapa:** Agujas, Lupa y Altura Online.
+        - **Dron:** Semáforo y Ventanas de Vuelo.
+        - **Herramientas:** Brújula, Calendario y Libreta.
+        - **Datos:** Exportación TXT/JSON.
+
+### 2. Diseño de la Interfaz (`layout_dialog_guide.xml`)
+- **[NEW] [layout_dialog_guide.xml](file:///D:/Desarrollo-Software/Proyectos Android/factorEscala/app/src/main/res/layout/layout_dialog_guide.xml)**:
+    - Siguiendo el formato de `layout_dialog_about.xml`.
+    - **Cabecera:** Título en color **Naranja** (`@color/accent_orange`).
+    - **Contenido:** Lista seccionada con títulos en **Azul** (`@color/accent_primary`) y cuerpo en color de texto estándar.
+    - **Interactividad:** Uso de `NestedScrollView` para una navegación fluida.
+    - **Botón de Cierre:** Estilo naranja con texto "ENTENDIDO".
+
+### 3. Lógica de Activación (`MainActivity.java`)
+- **[MODIFY] [MainActivity.java](file:///D:/Desarrollo-Software/Proyectos Android/factorEscala/app/src/main/java/bo/com/factorcombinadotopo/MainActivity.java)**:
+    - Implementar el método `showQuickGuideDialog()`.
+    - Vincular este método al item `action_tutorial` del menú (que ahora se llama Guía Rápida).
+    - Utilizar `BottomSheetDialog` para una apertura moderna y táctil.
 
 ## Beneficios
-- **App Inmortal:** Reducción del 99% en cierres inesperados bajo condiciones de uso intenso o baja señal.
-- **Transparencia:** El usuario recibe feedback claro sobre por qué una función no está disponible (ej. sin internet).
-- **Interoperabilidad:** Los datos exportados ahora son compatibles con estándares modernos de datos (JSON).
+- **Onboarding Eficiente:** El usuario nuevo comprende el potencial de la app en menos de 1 minuto.
+- **Soporte Técnico Integrado:** Reduce dudas sobre términos complejos (DEM, Kp, etc.).
+- **Coherencia Visual:** Refuerza la identidad premium del software.
 
 ## Plan de Verificación
 
-### Automated Verification
-- Ejecutar `gradle_build` para asegurar que las nuevas validaciones no rompan la lógica de las 18 clases maestras.
-
 ### Manual Verification
-1. **Modo Avión:** Abrir la app sin internet e intentar cargar el clima. Debe salir un mensaje de "Sin conexión" en lugar de un error técnico o congelamiento.
-2. **Navegación Frenética:** Cambiar entre pestañas mientras se guarda un punto. La app debe mantenerse estable.
-3. **Exportación:** Verificar que el archivo JSON generado sea válido y contenga toda la información de la DB v8.
+1.  **Acceso:** Abrir el menú lateral o de opciones y seleccionar "Guía Rápida".
+2.  **Visualización:** Confirmar que los colores naranja y azul se aplican correctamente a los títulos.
+3.  **Lectura:** Verificar que el texto no esté cortado y el scroll funcione bien.
+4.  **Cierre:** Presionar "ENTENDIDO" y confirmar que regresa a la pantalla anterior.

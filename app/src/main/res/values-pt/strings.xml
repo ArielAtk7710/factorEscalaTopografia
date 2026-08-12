@@ -77,8 +77,8 @@
     <string name="lang_es">Espanhol (Español)</string>
     <string name="lang_en">Inglês (English)</string>
     <string name="lang_pt">Português</string>
-    <string name="lang_fr">Francês (Français)</string>
-    <string name="label_export_directory">Diretório de Exportação</string>
+    <string name="lang_fr">Francés (Français)</string>
+    <string name="label_export_directory">Diretório de Exportación</string>
     <string name="label_map_export_path">Caminho dos dados exportados</string>
     <string name="text_export_path">Armazenamento Interno > Documents > FactorEscalaTop</string>
     <string name="label_pressure_adjustment">Ajuste do Barômetro (mmHg)</string>
@@ -159,7 +159,7 @@
     <string name="safety_solar_rec">Recomendação: Aumente o tempo de leitura de seus pontos ou adie levantamentos de alta precisão.</string>
 
     <string name="safety_geometry_title">Má Geometria Satelital</string>
-    <string name="safety_geometry_desc">Os satélites visíveis estão agrupados em uma única zona do céu ou há muito poucos disponíveis, aumentando a margem de erro métrico.</string>
+    <string name="safety_geometry_desc">Os satélites visíveis estão agrupados em uma única zona do céu ou há muito poucos disponibles, aumentando a margem de erro métrico.</string>
     <string name="safety_geometry_rec">Recomendação: Evite tomar pontos de controle críticos. Afaste-se de edifícios altos, desfiladeiros ou árvores densas que bloqueiem o horizonte.</string>
 
     <string name="safety_wind_title">Alerta de Ventos Fortes</string>
@@ -185,7 +185,7 @@
     <string name="label_visibility">Visibilidade:</string>
     <string name="label_gusts_max">Rajadas Máx:</string>
     <string name="label_rain_prob_v">Prob. Chuva:</string>
-    <string name="label_rain_actual">Chuva Atual:</string>
+    <string name="label_rain_actual">Chuva Actual:</string>
     <string name="label_kp_solar">Índice Kp Solar:</string>
     <string name="msg_gps_no_signal">GPS sem sinal</string>
     <string name="msg_weather_danger">Perigo detectado. Decolagem não recomendada.</string>
@@ -256,7 +256,7 @@
     <string name="label_este_utm">ESTE (E) - UTM</string>
     <string name="label_norte_utm">NORTE (N) - UTM</string>
     <string name="label_alt_cota">ALTURA (Z / COTA)</string>
-    <string name="label_comb_factor">FATOR COMBINADO</string>
+    <string name="label_comb_factor">FACTOR COMBINADO</string>
     <string name="label_press_atm">PRESSÃO ATMOSFÉRICA</string>
     <string name="label_zone_hem">ZONA / HEMISFERIO</string>
     <string name="label_unknown_location">Localização Desconhecida</string>
@@ -279,7 +279,7 @@
     <string name="label_flight_assistant">ASSISTENTE DE VOO</string>
     <string name="msg_analyzing_window">Analisando janela de voo segura...</string>
     <string name="title_station_base">1. ESTAÇÃO BASE (OCUPAÇÃO)</string>
-    <string name="title_orientation">2. ORIENTAÇÃO (VISÃO RÉ)</string>
+    <string name="title_orientation">2. ORIENTACIÓN (VISÃO RÉ)</string>
     <string name="title_point_aux">3. PONTO AUXILIAR / DETALHE</string>
     <string name="label_station_id">ID Estação</string>
     <string name="label_alt_ins_m">Alt. Inst. (m)</string>
@@ -329,24 +329,20 @@
 
     <!-- Terms and Conditions -->
     <string name="title_terms_conditions">📜 Termos e Condições de Uso</string>
-    <string name="terms_body">Ao utilizar o FactorEscalaTop 2.3, você aceita formalmente os seguintes termos e condições:\n\n
-        <b>Alcance Geográfico:</b> O aplicativo foi projetado e calibrado exclusivamente para os sistemas de referência e a grade cartográfica da Bolívia.\n\n
-        <b>Ferramenta de Suporte Técnico:</b> Os dados fornecidos são apenas para orientação e não substituem os procedimentos, controles técnicos ou equipamentos profissionais exigidos para levantamentos oficiais ou legais.\n\n
-        <b>Precisão Variável:</b> A precisão dos resultados está sujeita à qualidade do hardware GNSS do dispositivo, às coordenadas inseridas, às condições ambientais e às fontes de informação externas.\n\n
-        <b>Responsabilidade do Usuário:</b> É obrigação exclusiva do profissional verificar, validar e certificar todos os cálculos antes de sua aplicação em projetos formais.\n\n
-        <b>Limite de Responsabilidade:</b> Na máxima extensão permitida por lei, o desenvolvedor não assume qualquer responsabilidade por danos diretos, indiretos, lucros cessantes ou perdas financeiras decorrentes do uso ou da confiança nos cálculos do aplicativo.\n\n
-        <b>Propriedade Intelectual:</b> Fica estritamente proibida a engenharia reversa, modificação ou distribuição não autorizada do software e de seu conteúdo.\n\n
-        <b>Serviços de Terceiros:</b> O aplicativo utiliza serviços de infraestrutura padrão (incluindo Google Play Services para mapas e localização, e APIs meteorológicas gratuitas). O funcionamento desses serviços externos depende de seus próprios provedores e disponibilidade.\n\n
-        <b>Assinaturas (Versão PRO):</b> As compras e atualizações da versão PRO são gerenciadas através da Google Play Store, sujeitas às políticas de pagamento e reembolso do Google.\n\n
-        <b>Conformidade Regulatória:</b> O usuário concorda em utilizar a ferramenta de acordo com a normativa vigente no Estado Plurinacional da Bolívia.</string>
+    <string name="terms_body">Ao utilizar o FactorEscalaTop 2.4, você aceita formalmente os seguintes termos e condições:\n\n
+        <b>Alcance Geográfico:</b> O aplicativo foi projetado exclusivamente para a grade cartográfica da Bolívia.\n\n
+        <b>Suporte Técnico:</b> Os dados são apenas para orientação e não substituem equipamentos profissionais certificados.\n\n
+        <b>Sistemas de Referência:</b> O app utiliza os modelos <b>MGBol08</b> e o padrão global <b>EGM2008</b>.\n\n
+        <b>Conectividade e APIs:</b> As funções de altura online e clima dependem de serviços de terceiros (Open-Meteo, Esri).\n\n
+        <b>Responsabilidade:</b> É obrigação do profissional verificar todos os cálculos.\n\n
+        <b>Conformidade Regulatória:</b> O usuário concorda em utilizar a ferramenta de acordo com a Lei 164 e a normativa vigente na Bolívia.</string>
 
     <string name="title_privacy_policy">🔒 Política de Privacidade</string>
-    <string name="privacy_body">Em conformidade com as diretrizes do Google Play para proteção de dados, esta política detalha como as informações são gerenciadas:\n\n
-        <b>Uso da Localização (GPS):</b> O aplicativo coleta e processa dados de geolocalização em tempo real apenas para executar os cálculos geodésicos e topográficos solicitados pelo usuário na tela.\n\n
-        <b>Armazenamento Local:</b> Os pontos, registros e configurações do usuário são armazenados localmente na memória interna do dispositivo. As bases de dados de projetos pessoais não são carregadas nos servidores externos do desenvolvedor.\n\n
-        <b>Ferramentas do Google Play Services:</b> O aplicativo utiliza componentes padrão do Google Play Services (necessários para o funcionamento de mapas e geolocalização nativa do sistema operacional).\n\n
-        <b>Publicidade e Monetização:</b> Se o aplicativo exibir anúncios através de redes publicitárias compatíveis (como o Google AdMob), essas plataformas poderão utilizar identificadores de publicidade do dispositivo para exibir anúncios contextuais ou genéricos de acordo com as políticas do Google.\n\n
-        <b>Não Venda de Dados:</b> O desenvolvedor não vende, transfere ou cede dados pessoais ou de localização a terceiros para fins comerciais.</string>
+    <string name="privacy_body">Em conformidade com as diretrizes do Google Play, esta política detalha a gestão de informações:\n\n
+        <b>Uso de Localização (GPS):</b> O aplicativo processa dados de geolocalização em tempo real localmente para cálculos geodésicos e mapas.\n\n
+        <b>Armazenamento Local:</b> Os registros são armazenados apenas no dispositivo. Os arquivos exportados (TXT/JSON) são responsabilidade do usuário.\n\n
+        <b>Serviços de Terceiros:</b> Google Play Services, Open-Meteo API e ArcGIS (Esri).\n\n
+        <b>Seguridade:</b> Nenhum dado pessoal é vendido a terceiros.</string>
 
     <string name="btn_accept_continue">ACEITAR E CONTINUAR</string>
     <string name="btn_exit">SAIR</string>
@@ -383,4 +379,24 @@
     <string name="label_lon_short">LON: %1$.6f</string>
     <string name="msg_touch_outside_close">Toque fora para fechar</string>
     <string name="desc_high_precision">Topografia de Alta Precisão</string>
+    <!-- Quick Guide Content -->
+    <string name="title_quick_guide">📖 Guia Rápida</string>
+
+    <string name="guide_section_gen_title">1. Conceitos Gerais</string>
+    <string name="guide_section_gen_body">FactorEscalaTop é uma suite topográfica para o cálculo de fatores de correção (k, ha, K) e gestão de dados GNSS, calibrada especificamente para a Bolívia.</string>
+
+    <string name="guide_section_calc_title">2. Modos de Cálculo</string>
+    <string name="guide_section_calc_body"><b>Automático:</b> Obtém dados em tempo real do GPS.\n<b>Manual:</b> Permite simular cenários inserindo coordenadas de plantas ou projetos.</string>
+
+    <string name="guide_section_map_title">3. Navegação e Mapa</string>
+    <string name="guide_section_map_body"><b>Mira Laranja:</b> Seu objetivo central.\n<b>Buscador (Lupa):</b> Toque no painel superior para navegar para coordenadas exatas.\n<b>Agulhas Laranja:</b> Marcas temporais de sessão que te seguem em todo o app.</string>
+
+    <string name="guide_section_alt_title">4. Altitude e Modelos DEM</string>
+    <string name="guide_section_alt_body"><b>GPS Dispositivo:</b> Altitude elipsoidal do celular.\n<b>Altitude Online:</b> Obtém a cota (MSL) via API do Open-Meteo (Copernicus DEM) com correção EGM2008.</string>
+
+    <string name="guide_section_drone_title">5. Assistente de Voo</string>
+    <string name="guide_section_drone_body">Analisa a segurança para drones através de um semáforo (Verde a Vermelho) baseado em ventos, chuva e no índice Kp Solar para proteger seu sinal GPS.</string>
+
+    <string name="guide_section_data_title">6. Gestão de Dados</string>
+    <string name="guide_section_data_body">Exporte seus levantamentos em <b>TXT</b> para relatórios humanos ou <b>JSON</b> para integração direta com software GIS/CAD na aba REGISTROS.</string>
 </resources>

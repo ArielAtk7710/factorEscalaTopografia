@@ -26,7 +26,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Set;
-import java.util.TreeMap;
+import androidx.appcompat.app.AlertDialog;
 
 public class RegisterFragment extends Fragment {
 
@@ -78,18 +78,7 @@ public class RegisterFragment extends Fragment {
         libretaAdapter = new LibretaAdapter(libretaList);
         recyclerView.setAdapter(puntosAdapter);
 
-        btnExportAll.setOnClickListener(v -> {
-            new AlertDialog.Builder(requireContext())
-                .setTitle("Exportar Datos")
-                .setItems(new String[]{"Formato Texto (TXT)", "Formato Digital (JSON)"}, (dialog, which) -> {
-                    if (which == 0) {
-                        if (activeTab == 0) exportarHistorialTxt(puntosList, "Completo");
-                        else exportarLibretaTxt(libretaList, "Completo_Libreta");
-                    } else {
-                        exportarDatosJson();
-                    }
-                }).show();
-        });
+        btnExportAll.setOnClickListener(v -> showExportOptionsDialog());
 
         btnExportSelected.setOnClickListener(v -> {
             if (!isSelectionMode) {
@@ -196,6 +185,30 @@ public class RegisterFragment extends Fragment {
             exportarLibretaTxt(seleccionados, "Seleccion_Libreta");
         }
         toggleSelectionMode();
+    }
+
+    private void showExportOptionsDialog() {
+        if (!isAdded()) return;
+        
+        View dv = getLayoutInflater().inflate(R.layout.dialog_export_options, null);
+        AlertDialog.Builder b = new AlertDialog.Builder(requireContext());
+        AlertDialog d = b.create();
+        if (d.getWindow() != null) d.getWindow().setBackgroundDrawableResource(android.R.color.transparent);
+        d.setView(dv);
+
+        dv.findViewById(R.id.btn_export_txt).setOnClickListener(v -> {
+            if (activeTab == 0) exportarHistorialTxt(puntosList, "Completo");
+            else exportarLibretaTxt(libretaList, "Completo_Libreta");
+            d.dismiss();
+        });
+
+        dv.findViewById(R.id.btn_export_json).setOnClickListener(v -> {
+            exportarDatosJson();
+            d.dismiss();
+        });
+
+        dv.findViewById(R.id.btn_export_cancel).setOnClickListener(v -> d.dismiss());
+        d.show();
     }
 
     private void exportarDatosJson() {
@@ -363,28 +376,35 @@ public class RegisterFragment extends Fragment {
         if (!isAdded()) return "";
         StringBuilder sb = new StringBuilder();
         
-        // Re-formatear datos numéricos para el reporte (usando Locale US para punto decimal)
-        double fcVal = Double.parseDouble(p.fc.replace(",", "."));
-        String formattedFc = GeoUtils.formatFactorWithPpm(fcVal);
+        // Re-formatear datos numéricos para el reporte
+        String formattedFc = "N/A";
+        try {
+            double fcVal = Double.parseDouble(p.fc.replace(",", "."));
+            formattedFc = GeoUtils.formatFactorWithPpm(fcVal);
+        } catch (Exception ignored) {}
         
-        sb.append("IDENTIFICACIÓN DEL PUNTO:\n");
-        sb.append("  Nombre: ").append(p.nombre).append("\n");
-        sb.append("  Origen: ").append(p.tipoRegistro).append("\n");
-        sb.append("  Fecha:  ").append(p.fecha).append("\n");
-        sb.append("  Notas:  ").append(p.notas).append("\n\n");
+        sb.append("====================================================\n");
+        sb.append("       REPORTE TÉCNICO DE PUNTO REGISTRADO          \n");
+        sb.append("====================================================\n\n");
 
-        sb.append("COORDENADAS GEODÉSICAS (WGS84):\n");
-        sb.append("  Latitud:   ").append(p.latitud).append("\n");
-        sb.append("  Longitud:  ").append(p.longitud).append("\n");
+        sb.append("1. IDENTIFICACIÓN DEL PUNTO:\n");
+        sb.append("  Nombre:     ").append(p.nombre).append("\n");
+        sb.append("  Origen:     ").append(p.tipoRegistro).append("\n");
+        sb.append("  Fecha/Hora: ").append(p.fecha).append("\n");
+        sb.append("  Notas:      ").append(p.notas).append("\n\n");
+
+        sb.append("2. COORDENADAS GEODÉSICAS (WGS84):\n");
+        sb.append("  Latitud:    ").append(p.latitud).append("\n");
+        sb.append("  Longitud:   ").append(p.longitud).append("\n");
         sb.append("  Alt. Elipsoidal: ").append(p.altura).append(" m\n");
         sb.append("  Alt. Ortométrica: ").append(p.altOrto).append(" m\n\n");
 
-        sb.append("PROYECCIÓN CARTOGRÁFICA (UTM):\n");
-        sb.append("  Este (X):  ").append(p.este).append(" m\n");
-        sb.append("  Norte (Y): ").append(p.norte).append(" m\n");
-        sb.append("  Zona/Hem:  ").append(p.zona).append(p.hemisferio).append("\n\n");
+        sb.append("3. PROYECCIÓN CARTOGRÁFICA (UTM):\n");
+        sb.append("  Este (X):   ").append(p.este).append(" m\n");
+        sb.append("  Norte (Y):  ").append(p.norte).append(" m\n");
+        sb.append("  Zona/Hem:   ").append(p.zona).append(p.hemisferio).append("\n\n");
 
-        sb.append("FACTORES Y DATOS TÉCNICOS:\n");
+        sb.append("4. FACTORES Y DATOS TÉCNICOS:\n");
         sb.append("  Modelo Geoidal:    ").append(p.geoidModel).append("\n");
         sb.append("  Modelo DEM:        ").append(p.modeloDem).append("\n");
         sb.append("  Factor de Escala:  ").append(p.fe).append("\n");
@@ -392,7 +412,7 @@ public class RegisterFragment extends Fragment {
         sb.append("  Factor Combinado:  ").append(formattedFc).append("\n");
         sb.append("  Presión Atmo.:     ").append(p.presion).append("\n\n");
 
-        sb.append("CONDICIONES DE CAPTURA:\n");
+        sb.append("5. CONDICIONES DE CAPTURA:\n");
         sb.append("  Precisión GPS: ").append(p.precision).append("\n");
         sb.append("  Satélites:     ").append(p.satelites).append("\n");
         sb.append("  Temperatura:   ").append(p.temperatura).append("\n");
@@ -402,22 +422,38 @@ public class RegisterFragment extends Fragment {
 
     private String buildLibretaInfoString(LibretaEntry e) {
         StringBuilder sb = new StringBuilder();
-        sb.append(getString(R.string.label_libreta_title)).append(":\n");
-        sb.append("  ").append(getString(R.string.label_reg_date)).append(": ").append(e.fecha).append("\n");
-        sb.append("  ").append(getString(R.string.label_station)).append(": ").append(e.estacion).append(" (").append(getString(R.string.label_instrument)).append(": ").append(e.altIns).append(getString(R.string.unit_meter)).append(") -> AUX: ").append(e.puntoAux).append("\n");
-        sb.append("  ").append(getString(R.string.label_ref_format, e.puntoRef)).append(" (").append(getString(R.string.label_prisma)).append(": ").append(e.altPri).append(getString(R.string.unit_meter)).append(") | ").append(e.tipoReg).append("\n");
-        
-        // Coordenadas con formato profesional US
+        sb.append("==========================================\n");
+        sb.append("       REPORTE DE LIBRETA DE CAMPO        \n");
+        sb.append("==========================================\n\n");
+
+        sb.append("1. DATOS DE LA ESTACIÓN:\n");
+        sb.append("  ID Estación: ").append(e.estacion).append("\n");
+        sb.append("  Alt. Instrumento: ").append(e.altIns).append(" m\n");
+        sb.append("  Fecha/Hora:  ").append(e.fecha).append("\n\n");
+
+        sb.append("2. PUNTO VISADO (RADIACIÓN):\n");
+        sb.append("  Punto de Ref: ").append(e.puntoRef).append("\n");
+        sb.append("  ID Punto Aux: ").append(e.puntoAux).append("\n");
+        sb.append("  Alt. Prisma:  ").append(e.altPri).append(" m\n");
+        sb.append("  Tipo Registro: ").append(e.tipoReg).append("\n\n");
+
+        sb.append("3. COORDENADAS CALCULADAS:\n");
         try {
             double este = Double.parseDouble(e.este.replace(",", "."));
             double norte = Double.parseDouble(e.norte.replace(",", "."));
             double cota = Double.parseDouble(e.cota.replace(",", "."));
-            sb.append("  COORD: E=").append(GeoUtils.formatCoord(este)).append(" | N=").append(GeoUtils.formatCoord(norte)).append(" | Z=").append(GeoUtils.formatCoord(cota)).append("\n");
+            sb.append("  Este (X):  ").append(GeoUtils.formatCoord(este)).append(" m\n");
+            sb.append("  Norte (Y): ").append(GeoUtils.formatCoord(norte)).append(" m\n");
+            sb.append("  Elevación (Z): ").append(GeoUtils.formatCoord(cota)).append(" m\n\n");
         } catch (Exception ex) {
-            sb.append("  COORD: E=").append(e.este).append(" | N=").append(e.norte).append(" | Z=").append(e.cota).append("\n");
+            sb.append("  Este (X):  ").append(e.este).append(" m\n");
+            sb.append("  Norte (Y): ").append(e.norte).append(" m\n");
+            sb.append("  Elevación (Z): ").append(e.cota).append(" m\n\n");
         }
 
-        sb.append("  ").append(getString(R.string.label_observations)).append(": ").append((e.obs == null || e.obs.isEmpty()) ? getString(R.string.label_no_observations) : e.obs);
+        sb.append("4. OBSERVACIONES:\n");
+        sb.append("  ").append((e.obs == null || e.obs.isEmpty()) ? getString(R.string.label_no_observations) : e.obs).append("\n");
+
         return sb.toString();
     }
 

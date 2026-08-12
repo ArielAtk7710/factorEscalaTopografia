@@ -148,8 +148,11 @@ public class WeatherFragment extends Fragment {
 
     private void updateCurrentDateUI() {
         if (txtCurrentDate == null) return;
-        SimpleDateFormat sdf = new SimpleDateFormat("EEEE, d 'de' MMMM", new Locale("es", "ES"));
+        // Usar el Locale actual del sistema para soporte multiidioma
+        Locale currentLocale = getResources().getConfiguration().getLocales().get(0);
+        SimpleDateFormat sdf = new SimpleDateFormat("EEEE, d 'de' MMMM", currentLocale);
         String dateStr = sdf.format(new Date());
+        // Capitalizar y mostrar
         txtCurrentDate.setText(dateStr.substring(0, 1).toUpperCase() + dateStr.substring(1));
     }
 

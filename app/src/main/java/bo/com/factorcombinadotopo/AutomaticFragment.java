@@ -293,13 +293,13 @@ public class AutomaticFragment extends Fragment {
     }
 
     @Override
-    public void onPause() {
-        super.onPause();
-        requireContext().unregisterReceiver(gpsReceiver);
-        
-        LocationManager lm = (LocationManager) requireContext().getSystemService(Context.LOCATION_SERVICE);
-        try {
-            lm.unregisterGnssStatusCallback(gnssCallback);
-        } catch (Exception ignored) {}
+    public void onDestroyView() {
+        super.onDestroyView();
+        if (miniMapManager != null) {
+            miniMapManager.onDestroy();
+        }
+        if (miniMapView != null) {
+            miniMapView.onDetach();
+        }
     }
 }
