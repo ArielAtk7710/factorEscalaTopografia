@@ -5,13 +5,7 @@
     <item
         android:id="@+id/action_calibrate"
         android:title="Calibrar Brújula"
-        android:icon="@drawable/ic_compass_calibrate"
-        app:showAsAction="never" />
-
-    <item
-        android:id="@+id/action_settings"
-        android:title="@string/action_settings"
-        android:icon="@drawable/ic_settings"
+        android:icon="@drawable/ic_compass_needle_white"
         app:showAsAction="never" />
 
     <item
@@ -21,8 +15,14 @@
         app:showAsAction="never" />
 
     <item
+        android:id="@+id/action_settings"
+        android:title="@string/action_settings"
+        android:icon="@drawable/ic_settings"
+        app:showAsAction="never" />
+
+    <item
         android:id="@+id/action_about"
         android:title="@string/menu_about"
-        android:icon="@drawable/ic_toast_info"
+        android:icon="@drawable/ic_info_white"
         app:showAsAction="never" />
 </menu>

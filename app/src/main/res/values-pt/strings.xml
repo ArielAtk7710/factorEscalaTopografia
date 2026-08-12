@@ -43,6 +43,9 @@
     <string name="btn_confirm">Confirmar</string>
     <string name="btn_export">EXPORTAR</string>
     <string name="btn_delete">Apagar</string>
+    <string name="btn_accept">ACEITAR</string>
+    <string name="title_exit_app">Confirmar Saída</string>
+    <string name="msg_exit_app">Tem certeza de que deseja sair do aplicativo?</string>
 
     <!-- History / Register -->
     <string name="title_register">REGISTROS</string>
@@ -76,6 +79,7 @@
     <string name="lang_pt">Português</string>
     <string name="lang_fr">Francês (Français)</string>
     <string name="label_export_directory">Diretório de Exportação</string>
+    <string name="label_map_export_path">Caminho dos dados exportados</string>
     <string name="text_export_path">Armazenamento Interno > Documents > FactorEscalaTop</string>
     <string name="label_pressure_adjustment">Ajuste do Barômetro (mmHg)</string>
     <string name="hint_pressure_adjustment">Ex: -1.5 ou 0.8</string>
@@ -231,7 +235,9 @@
 
     <!-- Menu items -->
     <string name="menu_about">Sobre</string>
-    <string name="menu_tutorial">Tutorial</string>
+    <string name="menu_tutorial">Guia Rápida</string>
+    <string name="label_view_details">ver detalhes...</string>
+    <string name="msg_loading_weather_long">Carregando dados... A análise do clima pode levar entre 15 a 30 segundos</string>
 
     <string name="splash_title">App Fator de Escala Topográfica</string>
     <string name="developer_name">Desenvolvido por Attack7710</string>

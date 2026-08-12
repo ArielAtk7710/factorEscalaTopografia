@@ -4,19 +4,19 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="vertical"
-    android:padding="20dp"
-    android:background="@color/bg_surface">
+    android:padding="24dp"
+    android:background="#CC000000">
 
     <TextView
         android:id="@+id/txt_dialog_terms_title"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="@string/title_terms_conditions"
-        android:textColor="@color/text_primary"
+        android:textColor="#FFFFFF"
         android:textSize="20sp"
         android:textStyle="bold"
         android:gravity="center"
-        android:layout_marginBottom="16dp" />
+        android:layout_marginBottom="20dp" />
 
     <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"
@@ -33,27 +33,27 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="@string/terms_body"
-                android:textColor="@color/text_secondary"
+                android:textColor="#E0E0E0"
                 android:textSize="14sp"
-                android:lineSpacingExtra="4dp" />
+                android:lineSpacingExtra="5dp" />
 
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="@string/title_privacy_policy"
-                android:textColor="@color/text_primary"
+                android:textColor="#FFFFFF"
                 android:textSize="18sp"
                 android:textStyle="bold"
-                android:layout_marginTop="24dp"
-                android:layout_marginBottom="8dp" />
+                android:layout_marginTop="28dp"
+                android:layout_marginBottom="10dp" />
 
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="@string/privacy_body"
-                android:textColor="@color/text_secondary"
+                android:textColor="#E0E0E0"
                 android:textSize="14sp"
-                android:lineSpacingExtra="4dp" />
+                android:lineSpacingExtra="5dp" />
 
         </LinearLayout>
     </androidx.core.widget.NestedScrollView>
@@ -62,24 +62,30 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        android:layout_marginTop="24dp"
+        android:layout_marginTop="28dp"
         android:gravity="end">
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/btn_terms_exit"
-            style="@style/Widget.MaterialComponents.Button.TextButton"
+            style="@style/Widget.MaterialComponents.Button.OutlinedButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/btn_exit"
-            android:textColor="@color/state_error" />
+            android:textColor="#FFFFFF"
+            app:strokeColor="@color/accent_orange"
+            app:strokeWidth="1.2dp"
+            app:cornerRadius="8dp" />
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/btn_terms_accept"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/btn_accept_continue"
+            app:backgroundTint="@color/accent_orange"
+            android:textColor="@android:color/white"
+            android:textStyle="bold"
             app:cornerRadius="8dp"
-            android:layout_marginStart="8dp" />
+            android:layout_marginStart="12dp" />
 
     </LinearLayout>
 

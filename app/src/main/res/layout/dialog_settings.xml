@@ -148,17 +148,29 @@
                     android:contentDescription="@string/btn_info_barometer" />
             </LinearLayout>
 
-            <!-- SECCIÓN MAPAS -->
+            <!-- Sección Ruta de Mapas Exportados -->
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="4dp"
-                android:text="@string/label_maps"
-                android:textColor="@color/text_primary"
-                android:textSize="16sp"
+                android:text="@string/label_map_export_path"
+                android:textColor="@color/text_secondary"
+                android:textSize="12sp"
                 android:textStyle="bold" />
 
-            <!-- Modo del mapa -->
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="12dp"
+                android:background="@color/bg_surface"
+                android:padding="12dp"
+                android:text="@string/text_export_path"
+                android:textColor="@color/accent_light"
+                android:textSize="12sp"
+                android:textStyle="bold" />
+
+            <!-- SECCIÓN MAPAS -->
+                        <!-- Modo del mapa -->
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"

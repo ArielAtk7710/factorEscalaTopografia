@@ -55,6 +55,12 @@ public class TopographyRepository {
      * Obtiene la elevación ortométrica desde la API de Open-Meteo.
      */
     public void fetchElevationAsync(double lat, double lon, ElevationCallback callback) {
+        // 🛡️ Validación de Red antes de peticionar
+        if (!NetworkUtils.isNetworkAvailable(context)) {
+            callback.onError("Sin conexión. No se puede obtener la altura online.");
+            return;
+        }
+
         WeatherManager.getApiService().getElevation(lat, lon).enqueue(new Callback<ElevationResponse>() {
             @Override
             public void onResponse(Call<ElevationResponse> call, Response<ElevationResponse> response) {

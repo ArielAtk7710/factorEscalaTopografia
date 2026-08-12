@@ -21,6 +21,7 @@
             android:layout_height="?attr/actionBarSize"
             android:background="@color/nav_background"
             app:navigationIcon="@drawable/ic_menu"
+            app:navigationIconTint="@android:color/white"
             app:layout_constraintTop_toTopOf="parent"
             app:popupTheme="@style/AppTheme.PopupOverlay">
 

@@ -69,8 +69,8 @@ public class CompassFragment extends Fragment implements SensorEventListener {
         txtNorte = view.findViewById(R.id.txt_comp_norte);
         txtAlt = view.findViewById(R.id.txt_comp_alt);
         txtRef = view.findViewById(R.id.txt_comp_ref);
-        txtGeoidModel = view.findViewById(R.id.txt_comp_geoid_model);
-        txtGeoidUndulation = view.findViewById(R.id.txt_comp_geoid_undulation);
+
+
 
         sensorManager = (SensorManager) requireActivity().getSystemService(Context.SENSOR_SERVICE);
         if (sensorManager != null) {

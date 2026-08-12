@@ -43,6 +43,9 @@
     <string name="btn_confirm">Confirmar</string>
     <string name="btn_export">EXPORTAR</string>
     <string name="btn_delete">Borrar</string>
+    <string name="btn_accept">ACEPTAR</string>
+    <string name="title_exit_app">Confirmar Salida</string>
+    <string name="msg_exit_app">¿Está seguro de que desea salir de la aplicación?</string>
 
     <!-- History / Register -->
     <string name="title_register">REGISTROS</string>
@@ -76,6 +79,7 @@
     <string name="lang_pt">Portugués (Português)</string>
     <string name="lang_fr">Francés (Français)</string>
     <string name="label_export_directory">Directorio de Exportación</string>
+    <string name="label_map_export_path">Ruta de datos exportados</string>
     <string name="text_export_path">Almacenamiento Interno > Documents > FactorEscalaTop</string>
     <string name="label_pressure_adjustment">Ajuste de Barómetro (mmHg)</string>
     <string name="hint_pressure_adjustment">Ej: -1.5 o 0.8</string>
@@ -231,6 +235,8 @@
     <string name="label_temp_ambient">Temperatura Ambiente</string>
     <string name="label_analysis_cond">ANÁLISIS DE CONDICIONES</string>
     <string name="btn_refresh_data">ACTUALIZAR DATOS</string>
+    <string name="label_view_details">ver detalles...</string>
+    <string name="msg_loading_weather_long">Cargando datos... El análisis del clima puede tardar entre 15 a 30 segundos</string>
     <string name="label_registered_format">Registrado: %1$s</string>
     <string name="label_ref_format">Ref: %1$s</string>
     <string name="label_no_observations">Ninguna Observación</string>
@@ -269,7 +275,7 @@
 
     <!-- Menu items -->
     <string name="menu_about">Acerca de</string>
-    <string name="menu_tutorial">Tutorial</string>
+    <string name="menu_tutorial">Guía Rápida</string>
 
     <string name="splash_title">App Factor Escala Topográfica</string>
     <string name="developer_name">Desarrollado por Attack7710</string>
@@ -278,8 +284,8 @@
     <string name="msg_gps_required">Por favor, encienda su GPS para operar correctamente.</string>
     <string name="msg_manual_entry_hint">Ingrese los datos de forma manual</string>
     <string name="msg_activate_gps">Active el GPS de su dispositivo</string>
-    <string name="msg_point_saved_format">Punto \'%1$s\' guardado en Registro</string>
-    <string name="msg_select_points_export">Seleccione puntos para exportar</string>
+    <string name="msg_point_saved_format">Punto \'%1$s\' guardado exitosamente</string>
+    <string name="msg_select_points_export">Seleccione los puntos que desea exportar</string>
     <string name="msg_select_points_delete">Seleccione puntos para borrar</string>
     <string name="msg_no_points_selected">No hay puntos seleccionados</string>
 

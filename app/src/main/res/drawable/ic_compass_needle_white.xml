@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="24dp"
+    android:height="24dp"
+    android:viewportWidth="100"
+    android:viewportHeight="100">
+
+    <!-- Aguja Norte (Blanco) -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M50,15 L62,50 L50,56 L38,50 Z"/>
+
+    <!-- Aguja Sur (Blanco) -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M50,85 L38,50 L50,44 L62,50 Z"/>
+
+    <!-- Punto central (Blanco) -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M50,47a3,3 0,1 1,0 6a3,3 0,1 1,0 -6"/>
+</vector>

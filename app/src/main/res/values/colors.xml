@@ -35,6 +35,8 @@
     <color name="bg_weather_cloudy">#546E7A</color>
     <color name="bg_weather_rain">#37474F</color>
 
+    <color name="color_magenta">#E91E63</color>
+
     <!-- Weather UI / Pro Icons -->
     <color name="weather_blue_active">#5D98DB</color>
     <color name="weather_text_primary">#111827</color> <!-- O el color de texto claro que prefieras -->

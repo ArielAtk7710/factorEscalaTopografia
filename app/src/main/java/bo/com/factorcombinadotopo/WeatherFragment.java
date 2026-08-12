@@ -27,6 +27,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.material.card.MaterialCardView;
+import androidx.lifecycle.ViewModelProvider;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -39,14 +40,19 @@ public class WeatherFragment extends Fragment {
     // Main Card
     private MaterialCardView cardMain;
     private ImageView imgMainIcon;
-    private TextView txtMainTemp, txtMainCondition, txtLocationName;
+    private TextView txtMainTemp, txtMainCondition, txtLocationName, txtCurrentDate;
     private LinearLayout layoutGpsWarning;
     private TextView txtGpsWarning;
 
     // Recommendation
     private MaterialCardView cardAssistant;
     private ImageView imgAssistantIcon;
-    private TextView txtAssistantTitle, txtFlightRec;
+    private TextView txtAssistantTitle, txtFlightRec, txtViewDetails;
+
+    // Loading
+    private View layoutLoading;
+
+    private SurveyViewModel viewModel;
 
     // Lists
     private RecyclerView rvHourly, rvWeekly;
@@ -80,6 +86,7 @@ public class WeatherFragment extends Fragment {
         imgMainIcon = view.findViewById(R.id.img_main_weather_icon);
         txtMainTemp = view.findViewById(R.id.txt_main_temp);
         txtLocationName = view.findViewById(R.id.txt_location_name);
+        txtCurrentDate = view.findViewById(R.id.txt_current_date);
         txtMainCondition = view.findViewById(R.id.txt_main_condition);
         layoutGpsWarning = view.findViewById(R.id.layout_gps_warning);
         txtGpsWarning = view.findViewById(R.id.txt_gps_warning);
@@ -89,6 +96,10 @@ public class WeatherFragment extends Fragment {
         imgAssistantIcon = view.findViewById(R.id.img_assistant_icon);
         txtAssistantTitle = view.findViewById(R.id.txt_assistant_title);
         txtFlightRec = view.findViewById(R.id.txt_flight_rec);
+        txtViewDetails = view.findViewById(R.id.txt_view_details);
+
+        // Bind Loading
+        layoutLoading = view.findViewById(R.id.layout_weather_loading);
 
         // Bind Lists
         rvHourly = view.findViewById(R.id.rv_hourly_weather);
@@ -109,7 +120,17 @@ public class WeatherFragment extends Fragment {
         setupTechnicalLabels();
         setupRecyclerViews();
 
-        view.findViewById(R.id.btn_refresh_weather).setOnClickListener(v -> loadWeatherData());
+        // ViewModel compartido con la Actividad
+        viewModel = new ViewModelProvider(requireActivity()).get(SurveyViewModel.class);
+        setupViewModelObservers();
+
+        view.findViewById(R.id.btn_refresh_weather).setOnClickListener(v -> {
+            if (viewModel.getRawLocation().getValue() != null) {
+                viewModel.refreshWeather(viewModel.getRawLocation().getValue());
+            } else {
+                UIUtils.showWarningToast(requireContext(), getString(R.string.msg_gps_no_signal));
+            }
+        });
         
         cardMain.setOnClickListener(v -> {
             if (lastStatus != null) showSafetyDetailsDialog(lastStatus);
@@ -120,7 +141,45 @@ public class WeatherFragment extends Fragment {
         });
 
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(requireActivity());
-        loadWeatherData();
+        
+        // Mostrar fecha actual del sistema
+        updateCurrentDateUI();
+    }
+
+    private void updateCurrentDateUI() {
+        if (txtCurrentDate == null) return;
+        SimpleDateFormat sdf = new SimpleDateFormat("EEEE, d 'de' MMMM", new Locale("es", "ES"));
+        String dateStr = sdf.format(new Date());
+        txtCurrentDate.setText(dateStr.substring(0, 1).toUpperCase() + dateStr.substring(1));
+    }
+
+    private void setupViewModelObservers() {
+        // Observar estado de carga del clima
+        viewModel.isWeatherLoading().observe(getViewLifecycleOwner(), isLoading -> {
+            if (layoutLoading != null) {
+                layoutLoading.setVisibility(isLoading ? View.VISIBLE : View.GONE);
+            }
+        });
+
+        // Observar resultados del clima (Background Pre-load)
+        viewModel.getWeatherStatus().observe(getViewLifecycleOwner(), status -> {
+            if (status != null) {
+                lastStatus = status;
+                updateUI(status);
+                // Actualizar nombre de ubicación según el GPS del ViewModel
+                Location loc = viewModel.getRawLocation().getValue();
+                if (loc != null) {
+                    updateLocationName(loc.getLatitude(), loc.getLongitude());
+                }
+            }
+        });
+
+        // Observar errores
+        viewModel.getErrorResult().observe(getViewLifecycleOwner(), error -> {
+            if (error != null && !error.isEmpty() && isAdded()) {
+                UIUtils.showErrorToast(requireContext(), error);
+            }
+        });
     }
 
     private void setupTechnicalLabels() {
@@ -172,42 +231,8 @@ public class WeatherFragment extends Fragment {
     }
 
     private void loadWeatherData() {
-        isDataLoaded = false;
-        timeoutHandler.postDelayed(() -> {
-            if (!isDataLoaded && isAdded()) {
-                UIUtils.showInfoToast(requireContext(), "Actualizando información meteorológica...");
-            }
-        }, 3000);
-
-        try {
-            fusedLocationClient.getLastLocation().addOnSuccessListener(requireActivity(), location -> {
-                if (location != null) {
-                    updateLocationName(location.getLatitude(), location.getLongitude());
-                    // Simular captura de PDOP (en una app real vendría de GnssStatus o extras)
-                    double currentPdop = 1.8; 
-
-                    WeatherManager.checkFlightSafety(requireContext(), location.getLatitude(), location.getLongitude(), currentPdop, new WeatherManager.WeatherCallback() {
-                        @Override
-                        public void onSuccess(WeatherManager.SafetyStatus status) {
-                            isDataLoaded = true;
-                            lastStatus = status;
-                            if (isAdded()) updateUI(status);
-                        }
-
-                        @Override
-                        public void onError(String error) {
-                            isDataLoaded = true;
-                            if (isAdded()) UIUtils.showErrorToast(requireContext(), error);
-                        }
-                    });
-                } else {
-                    isDataLoaded = true;
-                    UIUtils.showWarningToast(requireContext(), getString(R.string.msg_gps_no_signal));
-                }
-            });
-        } catch (SecurityException ignored) {
-            isDataLoaded = true;
-        }
+        // Método deprecado en favor del ViewModel compartido.
+        // Se mantiene vacío para evitar errores de compilación si hay referencias antiguas.
     }
 
     private void updateLocationName(double lat, double lon) {
@@ -279,6 +304,9 @@ public class WeatherFragment extends Fragment {
         txtFlightRec.setText(status.safetyAnalysis.ventanaOptima);
         txtAssistantTitle.setTextColor(strokeColor);
         imgAssistantIcon.setColorFilter(strokeColor);
+        if (txtViewDetails != null) {
+            txtViewDetails.setTextColor(strokeColor);
+        }
 
         // Technical Details
         setDetailValue(detApparent, String.format(Locale.getDefault(), "%.1f°C", status.apparentTemperature));

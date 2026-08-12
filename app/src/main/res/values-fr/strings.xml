@@ -43,6 +43,9 @@
     <string name="btn_confirm">Confirmer</string>
     <string name="btn_export">EXPORTER</string>
     <string name="btn_delete">Supprimer</string>
+    <string name="btn_accept">ACCEPTER</string>
+    <string name="title_exit_app">Confirmer la sortie</string>
+    <string name="msg_exit_app">Êtes-vous sûr de vouloir quitter l\'application ?</string>
 
     <!-- History / Register -->
     <string name="title_register">REGISTRES</string>
@@ -76,6 +79,7 @@
     <string name="lang_pt">Portugais (Português)</string>
     <string name="lang_fr">Français</string>
     <string name="label_export_directory">Répertoire d\'Exportation</string>
+    <string name="label_map_export_path">Ruta de datos exportados</string>
     <string name="text_export_path">Stockage Interne > Documents > FactorEscalaTop</string>
     <string name="label_pressure_adjustment">Ajustement du Baromètre (mmHg)</string>
     <string name="hint_pressure_adjustment">Ex: -1.5 ou 0.8</string>
@@ -233,7 +237,9 @@
 
     <!-- Menu items -->
     <string name="menu_about">À propos</string>
-    <string name="menu_tutorial">Tutoriel</string>
+    <string name="menu_tutorial">Guide Rapide</string>
+    <string name="label_view_details">voir les détails...</string>
+    <string name="msg_loading_weather_long">Chargement des données... L\'analyse météo peut prendre entre 15 et 30 secondes</string>
 
     <string name="splash_title">App Facteur d\'Échelle Topographique</string>
     <string name="developer_name">Développé par Attack7710</string>

@@ -17,6 +17,8 @@ public class SurveyViewModel extends AndroidViewModel {
     private final MutableLiveData<TopoCalculoManager.TopoResult> calculationResult = new MutableLiveData<>();
     private final MutableLiveData<Boolean> usesMgb = new MutableLiveData<>();
     private final MutableLiveData<Double> ambientTemperature = new MutableLiveData<>();
+    private final MutableLiveData<WeatherManager.SafetyStatus> weatherStatus = new MutableLiveData<>();
+    private final MutableLiveData<Boolean> isWeatherLoading = new MutableLiveData<>(false);
     private final MutableLiveData<String> errorResult = new MutableLiveData<>();
 
     public SurveyViewModel(@NonNull Application application) {
@@ -38,6 +40,14 @@ public class SurveyViewModel extends AndroidViewModel {
 
     public LiveData<Double> getAmbientTemperature() {
         return ambientTemperature;
+    }
+
+    public LiveData<WeatherManager.SafetyStatus> getWeatherStatus() {
+        return weatherStatus;
+    }
+
+    public LiveData<Boolean> isWeatherLoading() {
+        return isWeatherLoading;
     }
 
     public LiveData<String> getErrorResult() {
@@ -65,6 +75,28 @@ public class SurveyViewModel extends AndroidViewModel {
             @Override
             public void onError(Exception e) {
                 errorResult.postValue(e.getMessage());
+            }
+        });
+
+        // Disparar actualización de clima en segundo plano
+        refreshWeather(loc);
+    }
+
+    public void refreshWeather(Location loc) {
+        if (loc == null) return;
+        isWeatherLoading.postValue(true);
+        // Simular captura de PDOP (1.8 constante por ahora como en el fragmento)
+        WeatherManager.checkFlightSafety(getApplication(), loc.getLatitude(), loc.getLongitude(), 1.8, new WeatherManager.WeatherCallback() {
+            @Override
+            public void onSuccess(WeatherManager.SafetyStatus status) {
+                weatherStatus.postValue(status);
+                isWeatherLoading.postValue(false);
+            }
+
+            @Override
+            public void onError(String error) {
+                errorResult.postValue(error);
+                isWeatherLoading.postValue(false);
             }
         });
     }

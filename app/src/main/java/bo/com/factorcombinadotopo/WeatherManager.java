@@ -104,6 +104,12 @@ public class WeatherManager {
     }
 
     public static void checkFlightSafety(Context context, double lat, double lon, double pdop, WeatherCallback callback) {
+        // 🛡️ Validación Senior de Conectividad Proactiva
+        if (!NetworkUtils.isNetworkAvailable(context)) {
+            callback.onError("Sin conexión a Internet. Verifique su señal en el campo.");
+            return;
+        }
+
         AtomicReference<WeatherResponse> weatherRef = new AtomicReference<>(null);
         AtomicReference<Double> kpRef = new AtomicReference<>(null);
         AtomicBoolean weatherFailed = new AtomicBoolean(false);

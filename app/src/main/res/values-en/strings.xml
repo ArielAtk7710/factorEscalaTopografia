@@ -43,6 +43,9 @@
     <string name="btn_confirm">Confirm</string>
     <string name="btn_export">EXPORT</string>
     <string name="btn_delete">Delete</string>
+    <string name="btn_accept">ACCEPT</string>
+    <string name="title_exit_app">Confirm Exit</string>
+    <string name="msg_exit_app">Are you sure you want to exit the application?</string>
 
     <!-- History / Register -->
     <string name="title_register">RECORDS</string>
@@ -76,6 +79,7 @@
     <string name="lang_pt">Portuguese (Português)</string>
     <string name="lang_fr">French (Français)</string>
     <string name="label_export_directory">Export Directory</string>
+    <string name="label_map_export_path">Exported data path</string>
     <string name="text_export_path">Internal Storage > Documents > FactorEscalaTop</string>
     <string name="label_pressure_adjustment">Barometer Adjustment (mmHg)</string>
     <string name="hint_pressure_adjustment">Ex: -1.5 or 0.8</string>
@@ -234,7 +238,9 @@
 
     <!-- Menu items -->
     <string name="menu_about">About</string>
-    <string name="menu_tutorial">Tutorial</string>
+    <string name="menu_tutorial">Quick Guide</string>
+    <string name="label_view_details">view details...</string>
+    <string name="msg_loading_weather_long">Loading data... Weather analysis can take between 15 to 30 seconds</string>
 
     <string name="splash_title">Topographic Scale Factor App</string>
     <string name="developer_name">Developed by Attack7710</string>

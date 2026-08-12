@@ -228,7 +228,15 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         if (drawer.isDrawerOpen(GravityCompat.START)) {
             drawer.closeDrawer(GravityCompat.START);
         } else {
-            super.onBackPressed();
+            new androidx.appcompat.app.AlertDialog.Builder(this)
+                .setTitle(R.string.title_exit_app)
+                .setMessage(R.string.msg_exit_app)
+                .setPositiveButton(R.string.btn_accept, (dialog, which) -> {
+                    MapManager.clearSession(); // Limpiar pines al salir
+                    finishAffinity();
+                })
+                .setNegativeButton(R.string.btn_cancel, null)
+                .show();
         }
     }
 
@@ -364,6 +372,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             
             Toast toast = new Toast(getApplicationContext());
             toast.setDuration(Toast.LENGTH_LONG);
+            toast.setGravity(android.view.Gravity.CENTER, 0, 0); // Centrar en pantalla
             toast.setView(layout);
             toast.show();
         } catch (Exception e) {

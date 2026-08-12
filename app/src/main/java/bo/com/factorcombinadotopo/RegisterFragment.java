@@ -79,8 +79,16 @@ public class RegisterFragment extends Fragment {
         recyclerView.setAdapter(puntosAdapter);
 
         btnExportAll.setOnClickListener(v -> {
-            if (activeTab == 0) exportarHistorialTxt(puntosList, "Completo");
-            else exportarLibretaTxt(libretaList, "Completo_Libreta");
+            new AlertDialog.Builder(requireContext())
+                .setTitle("Exportar Datos")
+                .setItems(new String[]{"Formato Texto (TXT)", "Formato Digital (JSON)"}, (dialog, which) -> {
+                    if (which == 0) {
+                        if (activeTab == 0) exportarHistorialTxt(puntosList, "Completo");
+                        else exportarLibretaTxt(libretaList, "Completo_Libreta");
+                    } else {
+                        exportarDatosJson();
+                    }
+                }).show();
         });
 
         btnExportSelected.setOnClickListener(v -> {
@@ -190,64 +198,113 @@ public class RegisterFragment extends Fragment {
         toggleSelectionMode();
     }
 
-    private void cargarPuntos() {
-        puntosList.clear();
-        Cursor cursor = dbHelper.obtenerPuntos();
-        if (cursor != null && cursor.moveToFirst()) {
-            do {
-                Punto p = new Punto();
-                p.id = cursor.getInt(cursor.getColumnIndexOrThrow(DatabaseHelper.COLUMN_ID));
-                p.nombre = cursor.getString(cursor.getColumnIndexOrThrow(DatabaseHelper.COLUMN_NOMBRE));
-                p.latitud = cursor.getString(cursor.getColumnIndexOrThrow(DatabaseHelper.COLUMN_LATITUD));
-                p.longitud = cursor.getString(cursor.getColumnIndexOrThrow(DatabaseHelper.COLUMN_LONGITUD));
-                p.altura = cursor.getString(cursor.getColumnIndexOrThrow(DatabaseHelper.COLUMN_ALTURA));
-                p.altOrto = cursor.getString(cursor.getColumnIndexOrThrow(DatabaseHelper.COLUMN_ALTURA_ORTO));
-                p.presion = cursor.getString(cursor.getColumnIndexOrThrow(DatabaseHelper.COLUMN_PRESION));
-                p.este = cursor.getString(cursor.getColumnIndexOrThrow(DatabaseHelper.COLUMN_ESTE));
-                p.norte = cursor.getString(cursor.getColumnIndexOrThrow(DatabaseHelper.COLUMN_NORTE));
-                p.zona = cursor.getString(cursor.getColumnIndexOrThrow(DatabaseHelper.COLUMN_ZONA));
-                p.hemisferio = cursor.getString(cursor.getColumnIndexOrThrow(DatabaseHelper.COLUMN_HEMISFERIO));
-                p.fe = cursor.getString(cursor.getColumnIndexOrThrow(DatabaseHelper.COLUMN_FACTOR_ESCALA));
-                p.fa = cursor.getString(cursor.getColumnIndexOrThrow(DatabaseHelper.COLUMN_FACTOR_ALTURA));
-                p.fc = cursor.getString(cursor.getColumnIndexOrThrow(DatabaseHelper.COLUMN_FACTOR_COMBINADO));
-                p.geoidModel = cursor.getString(cursor.getColumnIndexOrThrow(DatabaseHelper.COLUMN_MODELO_GEOIDAL));
-                p.tipoRegistro = cursor.getString(cursor.getColumnIndexOrThrow(DatabaseHelper.COLUMN_TIPO_REGISTRO));
-                p.precision = cursor.getString(cursor.getColumnIndexOrThrow(DatabaseHelper.COLUMN_PRECISION));
-                p.satelites = cursor.getString(cursor.getColumnIndexOrThrow(DatabaseHelper.COLUMN_SATELITES));
-                p.temperatura = cursor.getString(cursor.getColumnIndexOrThrow(DatabaseHelper.COLUMN_TEMPERATURA));
-                p.modeloDem = cursor.getString(cursor.getColumnIndexOrThrow(DatabaseHelper.COLUMN_MODELO_DEM));
-                p.fecha = cursor.getString(cursor.getColumnIndexOrThrow(DatabaseHelper.COLUMN_FECHA));
-                p.notas = cursor.getString(cursor.getColumnIndexOrThrow(DatabaseHelper.COLUMN_NOTAS));
-                puntosList.add(p);
-            } while (cursor.moveToNext());
-            cursor.close();
+    private void exportarDatosJson() {
+        if (!isAdded()) return;
+        List<Object> combinedData = new ArrayList<>();
+        combinedData.addAll(puntosList);
+        combinedData.addAll(libretaList);
+        
+        if (combinedData.isEmpty()) {
+            UIUtils.showWarningToast(requireContext(), getString(R.string.warn_no_export_data));
+            return;
         }
-        actualizarVistaVacia(puntosList.isEmpty());
+
+        try {
+            com.google.gson.Gson gson = new com.google.gson.GsonBuilder().setPrettyPrinting().create();
+            String json = gson.toJson(combinedData);
+            String timeTag = new SimpleDateFormat("yyyyMMdd_HHmm", Locale.getDefault()).format(new Date());
+            String fileName = "Exportacion_Completa_" + timeTag + ".json";
+            
+            FileUtils.savePublicTxtFile(requireContext(), fileName, json, "Datos exportados en formato JSON");
+        } catch (Exception e) {
+            UIUtils.showErrorToast(requireContext(), "Error al generar JSON: " + e.getMessage());
+        }
+    }
+
+    private void cargarPuntos() {
+        if (!isAdded() || getContext() == null) return;
+        
+        new Thread(() -> {
+            final List<Punto> tempPuntos = new ArrayList<>();
+            Cursor cursor = dbHelper.obtenerPuntos();
+            if (cursor != null && cursor.moveToFirst()) {
+                do {
+                    Punto p = new Punto();
+                    p.id = cursor.getInt(cursor.getColumnIndexOrThrow(DatabaseHelper.COLUMN_ID));
+                    p.nombre = cursor.getString(cursor.getColumnIndexOrThrow(DatabaseHelper.COLUMN_NOMBRE));
+                    p.latitud = cursor.getString(cursor.getColumnIndexOrThrow(DatabaseHelper.COLUMN_LATITUD));
+                    p.longitud = cursor.getString(cursor.getColumnIndexOrThrow(DatabaseHelper.COLUMN_LONGITUD));
+                    p.altura = cursor.getString(cursor.getColumnIndexOrThrow(DatabaseHelper.COLUMN_ALTURA));
+                    p.altOrto = cursor.getString(cursor.getColumnIndexOrThrow(DatabaseHelper.COLUMN_ALTURA_ORTO));
+                    p.presion = cursor.getString(cursor.getColumnIndexOrThrow(DatabaseHelper.COLUMN_PRESION));
+                    p.este = cursor.getString(cursor.getColumnIndexOrThrow(DatabaseHelper.COLUMN_ESTE));
+                    p.norte = cursor.getString(cursor.getColumnIndexOrThrow(DatabaseHelper.COLUMN_NORTE));
+                    p.zona = cursor.getString(cursor.getColumnIndexOrThrow(DatabaseHelper.COLUMN_ZONA));
+                    p.hemisferio = cursor.getString(cursor.getColumnIndexOrThrow(DatabaseHelper.COLUMN_HEMISFERIO));
+                    p.fe = cursor.getString(cursor.getColumnIndexOrThrow(DatabaseHelper.COLUMN_FACTOR_ESCALA));
+                    p.fa = cursor.getString(cursor.getColumnIndexOrThrow(DatabaseHelper.COLUMN_FACTOR_ALTURA));
+                    p.fc = cursor.getString(cursor.getColumnIndexOrThrow(DatabaseHelper.COLUMN_FACTOR_COMBINADO));
+                    p.geoidModel = cursor.getString(cursor.getColumnIndexOrThrow(DatabaseHelper.COLUMN_MODELO_GEOIDAL));
+                    p.tipoRegistro = cursor.getString(cursor.getColumnIndexOrThrow(DatabaseHelper.COLUMN_TIPO_REGISTRO));
+                    p.precision = cursor.getString(cursor.getColumnIndexOrThrow(DatabaseHelper.COLUMN_PRECISION));
+                    p.satelites = cursor.getString(cursor.getColumnIndexOrThrow(DatabaseHelper.COLUMN_SATELITES));
+                    p.temperatura = cursor.getString(cursor.getColumnIndexOrThrow(DatabaseHelper.COLUMN_TEMPERATURA));
+                    p.modeloDem = cursor.getString(cursor.getColumnIndexOrThrow(DatabaseHelper.COLUMN_MODELO_DEM));
+                    p.fecha = cursor.getString(cursor.getColumnIndexOrThrow(DatabaseHelper.COLUMN_FECHA));
+                    p.notas = cursor.getString(cursor.getColumnIndexOrThrow(DatabaseHelper.COLUMN_NOTAS));
+                    tempPuntos.add(p);
+                } while (cursor.moveToNext());
+                cursor.close();
+            }
+
+            if (getActivity() != null) {
+                getActivity().runOnUiThread(() -> {
+                    if (isAdded()) {
+                        puntosList.clear();
+                        puntosList.addAll(tempPuntos);
+                        actualizarVistaVacia(puntosList.isEmpty());
+                    }
+                });
+            }
+        }).start();
     }
 
     private void cargarLibreta() {
-        libretaList.clear();
-        Cursor cursor = dbHelper.obtenerLibreta();
-        if (cursor != null && cursor.moveToFirst()) {
-            do {
-                LibretaEntry e = new LibretaEntry();
-                e.id = cursor.getInt(cursor.getColumnIndexOrThrow(DatabaseHelper.COL_LIB_ID));
-                e.estacion = cursor.getString(cursor.getColumnIndexOrThrow(DatabaseHelper.COL_LIB_ESTACION));
-                e.altIns = cursor.getString(cursor.getColumnIndexOrThrow(DatabaseHelper.COL_LIB_ALT_INS));
-                e.puntoRef = cursor.getString(cursor.getColumnIndexOrThrow(DatabaseHelper.COL_LIB_PUNTO_REF));
-                e.altPri = cursor.getString(cursor.getColumnIndexOrThrow(DatabaseHelper.COL_LIB_ALT_PRI));
-                e.puntoAux = cursor.getString(cursor.getColumnIndexOrThrow(DatabaseHelper.COL_LIB_PUNTO_AUX));
-                e.tipoReg = cursor.getString(cursor.getColumnIndexOrThrow(DatabaseHelper.COL_LIB_TIPO_REG));
-                e.este = cursor.getString(cursor.getColumnIndexOrThrow(DatabaseHelper.COL_LIB_ESTE));
-                e.norte = cursor.getString(cursor.getColumnIndexOrThrow(DatabaseHelper.COL_LIB_NORTE));
-                e.cota = cursor.getString(cursor.getColumnIndexOrThrow(DatabaseHelper.COL_LIB_COTA));
-                e.obs = cursor.getString(cursor.getColumnIndexOrThrow(DatabaseHelper.COL_LIB_OBS));
-                e.fecha = cursor.getString(cursor.getColumnIndexOrThrow(DatabaseHelper.COL_LIB_FECHA));
-                libretaList.add(e);
-            } while (cursor.moveToNext());
-            cursor.close();
-        }
-        actualizarVistaVacia(libretaList.isEmpty());
+        if (!isAdded() || getContext() == null) return;
+        
+        new Thread(() -> {
+            final List<LibretaEntry> tempLibreta = new ArrayList<>();
+            Cursor cursor = dbHelper.obtenerLibreta();
+            if (cursor != null && cursor.moveToFirst()) {
+                do {
+                    LibretaEntry e = new LibretaEntry();
+                    e.id = cursor.getInt(cursor.getColumnIndexOrThrow(DatabaseHelper.COL_LIB_ID));
+                    e.estacion = cursor.getString(cursor.getColumnIndexOrThrow(DatabaseHelper.COL_LIB_ESTACION));
+                    e.altIns = cursor.getString(cursor.getColumnIndexOrThrow(DatabaseHelper.COL_LIB_ALT_INS));
+                    e.puntoRef = cursor.getString(cursor.getColumnIndexOrThrow(DatabaseHelper.COL_LIB_PUNTO_REF));
+                    e.altPri = cursor.getString(cursor.getColumnIndexOrThrow(DatabaseHelper.COL_LIB_ALT_PRI));
+                    e.puntoAux = cursor.getString(cursor.getColumnIndexOrThrow(DatabaseHelper.COL_LIB_PUNTO_AUX));
+                    e.tipoReg = cursor.getString(cursor.getColumnIndexOrThrow(DatabaseHelper.COL_LIB_TIPO_REG));
+                    e.este = cursor.getString(cursor.getColumnIndexOrThrow(DatabaseHelper.COL_LIB_ESTE));
+                    e.norte = cursor.getString(cursor.getColumnIndexOrThrow(DatabaseHelper.COL_LIB_NORTE));
+                    e.cota = cursor.getString(cursor.getColumnIndexOrThrow(DatabaseHelper.COL_LIB_COTA));
+                    e.obs = cursor.getString(cursor.getColumnIndexOrThrow(DatabaseHelper.COL_LIB_OBS));
+                    e.fecha = cursor.getString(cursor.getColumnIndexOrThrow(DatabaseHelper.COL_LIB_FECHA));
+                    tempLibreta.add(e);
+                } while (cursor.moveToNext());
+                cursor.close();
+            }
+
+            if (getActivity() != null) {
+                getActivity().runOnUiThread(() -> {
+                    if (isAdded()) {
+                        libretaList.clear();
+                        libretaList.addAll(tempLibreta);
+                        actualizarVistaVacia(libretaList.isEmpty());
+                    }
+                });
+            }
+        }).start();
     }
 
     private void actualizarVistaVacia(boolean isEmpty) {
