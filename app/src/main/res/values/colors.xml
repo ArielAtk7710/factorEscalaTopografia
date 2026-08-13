@@ -44,6 +44,7 @@
     <color name="weather_orange">#F97316</color>
 
     <!-- Navigation & UI Mappings -->
+    <color name="accent_blue_dark">#1E3A8A</color>
     <color name="nav_background">@color/bg_surface</color>
     <color name="nav_selected">@color/accent_primary</color>
     <color name="nav_unselected">@color/text_secondary</color>

@@ -1,35 +1,23 @@
-# Walkthrough: Optimización Técnica de Rendimiento y Estabilidad
+# Walkthrough: Mejora de Uniformidad en Botones del Mapa
 
-Se ha realizado una reestructuración profunda de la gestión de hilos y el ciclo de vida de la aplicación para garantizar una experiencia de usuario fluida, libre de bloqueos (ANRs) y cierres inesperados.
+Se ha rediseñado el botón del "Pin Azul" para que sea visualmente coherente con el resto de los botones de acción en la vista del mapa, siguiendo el patrón de **Fondo de Color Sólido + Icono Blanco**.
 
 ## Cambios Realizados
 
-### 1. Procesamiento en Segundo Plano (Background Threads)
+### Recursos de Estilo
+- **[NEW] [ic_pushpin.xml](file:///D:/Desarrollo-Software/Proyectos%20Android/factorEscala/app/src/main/res/drawable/ic_pushpin.xml)**: Se creó un nuevo icono vectorial de chincheta (pushpin) en color blanco. Esto reemplaza la imagen PNG circular y garantiza que el icono sea nítido en cualquier resolución.
+- **[MODIFY] [colors.xml](file:///D:/Desarrollo-Software/Proyectos%20Android/factorEscala/app/src/main/res/values/colors.xml)**: Se añadió el color `accent_blue_dark` (#1E3A8A) para ser utilizado como el fondo oficial de este nuevo botón.
 
-- **[MODIFY] [TopographyRepository.java](file:///D:/Desarrollo-Software/Proyectos%20Android/factorEscala/app/src/main/java/bo/com/factorcombinadotopo/TopographyRepository.java)**:
-    - Se expuso el método `runOnBackground()` para permitir que cualquier componente de la app delegue tareas pesadas al pool de hilos optimizado del repositorio.
-- **[MODIFY] [MainActivity.java](file:///D:/Desarrollo-Software/Proyectos%20Android/factorEscala/app/src/main/java/bo/com/factorcombinadotopo/MainActivity.java)**:
-    - El cálculo del tamaño del caché de mapas ahora ocurre en segundo plano. Los Ajustes abren instantáneamente mientras los valores se cargan con un indicador "...".
-    - La limpieza física de archivos también se movió a hilos secundarios.
-- **[MODIFY] [AutomaticFragment, MapFragment, RegisterFragment]**:
-    - Todas las operaciones de inserción y eliminación en la base de datos local se extrajeron del hilo principal, eliminando por completo el riesgo de ANRs durante el guardado de puntos.
-
-### 2. Robustez de Mapas y Sincronización
-
-- **[MODIFY] [MapManager.java](file:///D:/Desarrollo-Software/Proyectos%20Android/factorEscala/app/src/main/java/bo/com/factorcombinadotopo/MapManager.java)**:
-    - Se implementó un objeto de bloqueo (`overlayLock`) para sincronizar el acceso a la lista de capas del mapa. Esto evita el crash `ConcurrentModificationException` si el GPS intenta dibujar mientras el usuario limpia el mapa.
-    - Se añadió la bandera `isInitialized` para proteger el motor de mapas de interacciones prematuras antes de completar su configuración.
-
-### 3. Seguridad de Ciclo de Vida
-
-- **[MODIFY] [MapFragment.java](file:///D:/Desarrollo-Software/Proyectos%20Android/factorEscala/app/src/main/java/bo/com/factorcombinadotopo/MapFragment.java)**:
-    - Se implementó una gestión estricta de `activeProgressDialog`. El diálogo de progreso ahora se cierra automáticamente en `onDestroyView`, evitando crashes al rotar la pantalla o salir de la app durante un guardado.
+### Layout del Mapa
+- **[MODIFY] [fragment_map.xml](file:///D:/Desarrollo-Software/Proyectos%20Android/factorEscala/app/src/main/res/layout/fragment_map.xml)**:
+    - Se actualizó el `FloatingActionButton` con ID `fab_blue_pin`.
+    - Se cambió el color de fondo de blanco a azul oscuro (`@color/accent_blue_dark`).
+    - Se asignó el nuevo icono vectorial blanco (`@drawable/ic_pushpin`).
+    - Se estableció el tinte del icono explícitamente a blanco para mantener la uniformidad con los botones magenta, azul primario y verde.
 
 ## Verificación
+- El botón ahora presenta una superficie de color sólido sin bordes blancos extraños.
+- El icono de la chincheta resalta claramente en blanco, igualando el estilo de la escoba, el marcador de posición y el registro.
 
-- Se ha comprobado que la interfaz permanece receptiva (60 FPS) incluso durante operaciones intensivas de disco o base de datos.
-- Se verificó la estabilidad del mapa bajo condiciones de actualización rápida de ubicación.
-- Los diálogos de progreso ya no dejan referencias huérfanas en el sistema.
-
-> [!IMPORTANT]
-> Estas optimizaciones aseguran que **FactorEscalaTop** funcione correctamente en dispositivos de gama media/baja y mantenga la integridad de los datos técnicos en condiciones de uso intensivo.
+> [!TIP]
+> Al usar iconos vectoriales en lugar de imágenes PNG para los botones FAB, la aplicación ahorra memoria y mejora el rendimiento visual del mapa.
