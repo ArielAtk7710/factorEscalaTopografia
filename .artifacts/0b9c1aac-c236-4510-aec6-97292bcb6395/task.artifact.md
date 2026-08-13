@@ -1,6 +1,8 @@
-# Tareas: Corrección de Traducción al Francés y Ortografía Técnica
+# Tareas: Optimización Técnica (Rendimiento y Estabilidad)
 
-- `[/]` Corregir términos en español en `values-fr/strings.xml`
-- `[ ]` Revisar consistencia de "ó" en `values/strings.xml`
-- `[ ]` Verificar compilación
-- `[ ]` Crear walkthrough
+- `[x]` Exponer ejecutor de hilos en `TopographyRepository.java`
+- `[x]` Mover guardado de base de datos a hilos de fondo en `AutomaticFragment` y `MapFragment`
+- `[x]` Optimizar cálculo de caché y limpieza en `MainActivity` (hilos secundarios)
+- `[x]` Implementar sincronización de Overlays en `MapManager`
+- `[x]` Asegurar cierre de diálogos en el ciclo de vida de `MapFragment`
+- `[x]` Verificar estabilidad general y ausencia de ANRs

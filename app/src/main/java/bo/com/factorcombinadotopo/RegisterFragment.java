@@ -159,13 +159,21 @@ public class RegisterFragment extends Fragment {
         }
 
         UIUtils.showConfirmDialog(requireContext(), R.string.dialog_delete_title, R.string.dialog_delete_msg, () -> {
-            for (int id : selectedIds) {
-                if (activeTab == 0) dbHelper.eliminarPunto(id);
-                else dbHelper.eliminarLibreta(id);
-            }
-            UIUtils.showSuccessToast(requireContext(), getString(R.string.msg_point_deleted));
-            toggleSelectionMode();
-            cargarDatos();
+            TopographyRepository.getInstance(requireContext()).runOnBackground(() -> {
+                for (int id : selectedIds) {
+                    if (activeTab == 0) dbHelper.eliminarPunto(id);
+                    else dbHelper.eliminarLibreta(id);
+                }
+                if (getActivity() != null) {
+                    getActivity().runOnUiThread(() -> {
+                        if (isAdded()) {
+                            UIUtils.showSuccessToast(requireContext(), getString(R.string.msg_point_deleted));
+                            toggleSelectionMode();
+                            cargarDatos();
+                        }
+                    });
+                }
+            });
         });
     }
 
@@ -515,9 +523,17 @@ public class RegisterFragment extends Fragment {
             h.btnDelete.setVisibility(isSelectionMode ? View.GONE : View.VISIBLE);
             h.btnDelete.setOnClickListener(v -> {
                 UIUtils.showConfirmDialog(requireContext(), R.string.dialog_delete_title, R.string.dialog_delete_msg_single, () -> {
-                    dbHelper.eliminarPunto(p.id);
-                    cargarPuntos();
-                    UIUtils.showSuccessToast(requireContext(), getString(R.string.msg_point_deleted));
+                    TopographyRepository.getInstance(requireContext()).runOnBackground(() -> {
+                        dbHelper.eliminarPunto(p.id);
+                        if (getActivity() != null) {
+                            getActivity().runOnUiThread(() -> {
+                                if (isAdded()) {
+                                    cargarPuntos();
+                                    UIUtils.showSuccessToast(requireContext(), getString(R.string.msg_point_deleted));
+                                }
+                            });
+                        }
+                    });
                 });
             });
         }
@@ -582,9 +598,17 @@ public class RegisterFragment extends Fragment {
             h.btnDelete.setVisibility(isSelectionMode ? View.GONE : View.VISIBLE);
             h.btnDelete.setOnClickListener(v -> {
                 UIUtils.showConfirmDialog(requireContext(), R.string.dialog_delete_title, R.string.dialog_delete_msg_single, () -> {
-                    dbHelper.eliminarLibreta(e.id);
-                    cargarLibreta();
-                    UIUtils.showSuccessToast(requireContext(), getString(R.string.msg_point_deleted));
+                    TopographyRepository.getInstance(requireContext()).runOnBackground(() -> {
+                        dbHelper.eliminarLibreta(e.id);
+                        if (getActivity() != null) {
+                            getActivity().runOnUiThread(() -> {
+                                if (isAdded()) {
+                                    cargarLibreta();
+                                    UIUtils.showSuccessToast(requireContext(), getString(R.string.msg_point_deleted));
+                                }
+                            });
+                        }
+                    });
                 });
             });
         }

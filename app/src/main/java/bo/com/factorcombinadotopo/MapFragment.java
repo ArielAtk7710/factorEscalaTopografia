@@ -61,6 +61,7 @@ public class MapFragment extends Fragment {
     private long lastClickTime = 0; // Para lógica Debounce
     private static final int PERMISSION_REQUEST_CODE = 200;
     private static boolean hasCenteredOnce = false; // Memoria de centrado inicial único
+    private AlertDialog activeProgressDialog;
 
     private final BroadcastReceiver gpsStatusReceiver = new BroadcastReceiver() {
         @Override
@@ -205,12 +206,12 @@ public class MapFragment extends Fragment {
         TextView txtProgress = progressView.findViewById(R.id.txt_progress_label);
         if (txtProgress != null) txtProgress.setText(getString(R.string.msg_saving_data));
 
-        AlertDialog progressDialog = new AlertDialog.Builder(context)
+        activeProgressDialog = new AlertDialog.Builder(context)
                 .setView(progressView)
                 .setCancelable(false)
                 .create();
-        if (progressDialog.getWindow() != null) progressDialog.getWindow().setBackgroundDrawableResource(android.R.color.transparent);
-        progressDialog.show();
+        if (activeProgressDialog.getWindow() != null) activeProgressDialog.getWindow().setBackgroundDrawableResource(android.R.color.transparent);
+        activeProgressDialog.show();
 
         // 2. Obtener Coordenada del Centro (Cruz Naranja)
         IGeoPoint center = mapView.getMapCenter();
@@ -228,12 +229,12 @@ public class MapFragment extends Fragment {
                 @Override
                 public void onResult(TopoCalculoManager.TopoResult res, boolean isMgb) {
                     if (!isAdded()) {
-                        if (progressDialog.isShowing()) progressDialog.dismiss();
+                        if (activeProgressDialog != null && activeProgressDialog.isShowing()) activeProgressDialog.dismiss();
                         return;
                     }
-                    persistirPuntoMapa(res, name, notes, isMgb, "Altura GPS dispositivo", "Métrica (Mapa)", progressDialog);
+                    persistirPuntoMapa(res, name, notes, isMgb, "Altura GPS dispositivo", "Métrica (Mapa)", activeProgressDialog);
                 }
-                @Override public void onError(Exception e) { handleGuardadoError(e, progressDialog); }
+                @Override public void onError(Exception e) { handleGuardadoError(e, activeProgressDialog); }
             });
 
         } else {
@@ -243,7 +244,7 @@ public class MapFragment extends Fragment {
                 @Override
                 public void onResult(double elevationOrto) {
                     if (!isAdded()) {
-                        if (progressDialog.isShowing()) progressDialog.dismiss();
+                        if (activeProgressDialog != null && activeProgressDialog.isShowing()) activeProgressDialog.dismiss();
                         return;
                     }
                     // La API devolvió la cota. Reconstruir elipsoidal y calcular forzando MGBol08
@@ -251,19 +252,19 @@ public class MapFragment extends Fragment {
                         @Override
                         public void onResult(TopoCalculoManager.TopoResult res, boolean isMgb) {
                             if (!isAdded()) {
-                                if (progressDialog.isShowing()) progressDialog.dismiss();
+                                if (activeProgressDialog != null && activeProgressDialog.isShowing()) activeProgressDialog.dismiss();
                                 return;
                             }
-                            persistirPuntoMapa(res, name, notes, true, "GLO-90, Copernicus", "Digital (DEM)", progressDialog);
+                            persistirPuntoMapa(res, name, notes, true, "GLO-90, Copernicus", "Digital (DEM)", activeProgressDialog);
                         }
-                        @Override public void onError(Exception e) { handleGuardadoError(e, progressDialog); }
+                        @Override public void onError(Exception e) { handleGuardadoError(e, activeProgressDialog); }
                     });
                 }
 
                 @Override
                 public void onError(String error) {
                     if (!isAdded()) {
-                        if (progressDialog.isShowing()) progressDialog.dismiss();
+                        if (activeProgressDialog != null && activeProgressDialog.isShowing()) activeProgressDialog.dismiss();
                         return;
                     }
                     // Fallback Local por error de red
@@ -278,12 +279,12 @@ public class MapFragment extends Fragment {
                         @Override
                         public void onResult(TopoCalculoManager.TopoResult res, boolean isMgb) {
                             if (!isAdded()) {
-                                if (progressDialog.isShowing()) progressDialog.dismiss();
+                                if (activeProgressDialog != null && activeProgressDialog.isShowing()) activeProgressDialog.dismiss();
                                 return;
                             }
-                            persistirPuntoMapa(res, name, fallbackNotes, isMgb, "Altura GPS dispositivo (Sin Red)", "Métrica (Offline)", progressDialog);
+                            persistirPuntoMapa(res, name, fallbackNotes, isMgb, "Altura GPS dispositivo (Sin Red)", "Métrica (Offline)", activeProgressDialog);
                         }
-                        @Override public void onError(Exception e) { handleGuardadoError(e, progressDialog); }
+                        @Override public void onError(Exception e) { handleGuardadoError(e, activeProgressDialog); }
                     });
                 }
             });
@@ -324,18 +325,21 @@ public class MapFragment extends Fragment {
         v.put(DatabaseHelper.COLUMN_TEMPERATURA, String.format(Locale.getDefault(), "%.1f°C", TopographyRepository.getInstance(context).getCurrentAmbientTemp()));
         v.put(DatabaseHelper.COLUMN_NOTAS, notes.isEmpty() ? getString(R.string.label_no_observations) : notes);
 
-        db.insertarPunto(v);
-
-        new Handler(Looper.getMainLooper()).postDelayed(() -> {
-            if (isAdded() && dialog != null && dialog.isShowing()) {
-                dialog.dismiss();
-                UIUtils.showSuccessToast(requireContext(), getString(R.string.msg_point_saved_format, name));
-                // Pilar 2: Acumulación libre en pantalla tras guardado garantizado
-                if (mapManager != null) {
-                    mapManager.addManualMarker(new GeoPoint(res.lat, res.lon), name);
+        TopographyRepository.getInstance(context).runOnBackground(() -> {
+            db.insertarPunto(v);
+            new Handler(Looper.getMainLooper()).postDelayed(() -> {
+                if (isAdded()) {
+                    if (activeProgressDialog != null && activeProgressDialog.isShowing()) {
+                        activeProgressDialog.dismiss();
+                    }
+                    UIUtils.showSuccessToast(requireContext(), getString(R.string.msg_point_saved_format, name));
+                    if (mapManager != null) {
+                        mapManager.addManualMarker(new GeoPoint(res.lat, res.lon), name);
+                    }
                 }
-            }
-        }, 500);
+                activeProgressDialog = null;
+            }, 500);
+        });
     }
 
     private void handleGuardadoError(Exception e, AlertDialog dialog) {
@@ -637,6 +641,10 @@ public class MapFragment extends Fragment {
 
     @Override
     public void onDestroyView() {
+        if (activeProgressDialog != null && activeProgressDialog.isShowing()) {
+            activeProgressDialog.dismiss();
+        }
+        activeProgressDialog = null;
         super.onDestroyView();
         if (mapManager != null) mapManager.onDestroy();
         if (mapView != null) mapView.onDetach();

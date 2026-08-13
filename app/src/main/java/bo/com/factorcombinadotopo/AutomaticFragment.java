@@ -285,8 +285,14 @@ public class AutomaticFragment extends Fragment {
         
         v.put(DatabaseHelper.COLUMN_NOTAS, notes.isEmpty() ? getString(R.string.label_no_observations) : notes);
 
-        db.insertarPunto(v);
-        UIUtils.showSuccessToast(requireContext(), getString(R.string.msg_point_saved_format, name));
+        TopographyRepository.getInstance(requireContext()).runOnBackground(() -> {
+            db.insertarPunto(v);
+            new Handler(Looper.getMainLooper()).post(() -> {
+                if (isAdded()) {
+                    UIUtils.showSuccessToast(requireContext(), getString(R.string.msg_point_saved_format, name));
+                }
+            });
+        });
     }
 
     @Override

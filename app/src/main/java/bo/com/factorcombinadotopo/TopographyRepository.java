@@ -41,6 +41,13 @@ public class TopographyRepository {
         this.context = context;
     }
 
+    /**
+     * Permite ejecutar tareas en segundo plano usando el pool de hilos del repositorio.
+     */
+    public void runOnBackground(Runnable task) {
+        executor.execute(task);
+    }
+
     public interface CalculationCallback {
         void onResult(TopoCalculoManager.TopoResult result, boolean usesMgb);
         void onError(Exception e);

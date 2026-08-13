@@ -37,7 +37,9 @@ public class MapManager {
     private MyLocationNewOverlay locationOverlay;
     private boolean isFirstFix = true; // No estático para que cada instancia maneje su centrado inicial
     private boolean autoCenterEnabled = true;
+    private boolean isInitialized = false;
     private int currentMapMode = 0; // 0: Predeterminado (OSM), 1: Satélite (ArcGIS)
+    private final Object overlayLock = new Object();
     private OnMarkerClickListener markerClickListener;
 
     public interface OnMarkerClickListener {
@@ -142,6 +144,7 @@ public class MapManager {
         locationOverlay.disableFollowLocation(); 
         mapView.getOverlays().add(locationOverlay);
 
+        isInitialized = true;
         mapView.onResume(); 
         mapView.invalidate();
     }
@@ -235,7 +238,7 @@ public class MapManager {
     }
 
     public void updateMyLocation(Location location) {
-        if (location == null) return;
+        if (location == null || !isInitialized) return;
         GeoPoint point = new GeoPoint(location.getLatitude(), location.getLongitude());
         if (isFirstFix && autoCenterEnabled) {
             mapView.getController().animateTo(point);
@@ -269,10 +272,12 @@ public class MapManager {
      */
     public void restoreMarkers() {
         if (mapView == null) return;
-        // Limpiar cualquier marcador visual residual pero conservar la lista técnica
-        removeVisualMarkers();
-        for (MarkerData data : sessionMarkers) {
-            addMarkerToView(data.lat, data.lon, data.name);
+        synchronized (overlayLock) {
+            // Limpiar cualquier marcador visual residual pero conservar la lista técnica
+            removeVisualMarkers();
+            for (MarkerData data : sessionMarkers) {
+                addMarkerToView(data.lat, data.lon, data.name);
+            }
         }
         mapView.invalidate();
     }
@@ -281,8 +286,10 @@ public class MapManager {
      * Limpia visualmente el mapa y VACÍA la sesión (Escoba).
      */
     public void clearManualMarkers() {
-        removeVisualMarkers();
-        clearSession();
+        synchronized (overlayLock) {
+            removeVisualMarkers();
+            clearSession();
+        }
         mapView.invalidate();
     }
 
@@ -296,12 +303,14 @@ public class MapManager {
     private void removeVisualMarkers() {
         // Eliminar de forma segura buscando marcadores de tipo Pin Naranja
         List<org.osmdroid.views.overlay.Overlay> overlays = mapView.getOverlays();
-        for (int i = overlays.size() - 1; i >= 0; i--) {
-            if (overlays.get(i) instanceof Marker) {
-                Marker m = (Marker) overlays.get(i);
-                if (m.getTitle() != null && !m.getTitle().isEmpty()) {
-                    m.closeInfoWindow(); // Cerrar la etiqueta/nombre antes de borrar el pin
-                    mapView.getOverlays().remove(i);
+        synchronized (overlayLock) {
+            for (int i = overlays.size() - 1; i >= 0; i--) {
+                if (overlays.get(i) instanceof Marker) {
+                    Marker m = (Marker) overlays.get(i);
+                    if (m.getTitle() != null && !m.getTitle().isEmpty()) {
+                        m.closeInfoWindow(); // Cerrar la etiqueta/nombre antes de borrar el pin
+                        overlays.remove(i);
+                    }
                 }
             }
         }
@@ -311,9 +320,11 @@ public class MapManager {
      * Añade un marcador a la sesión y lo dibuja.
      */
     public void addManualMarker(IGeoPoint point, String name) {
-        if (point == null) return;
-        sessionMarkers.add(new MarkerData(point.getLatitude(), point.getLongitude(), name));
-        addMarkerToView(point.getLatitude(), point.getLongitude(), name);
+        if (point == null || !isInitialized) return;
+        synchronized (overlayLock) {
+            sessionMarkers.add(new MarkerData(point.getLatitude(), point.getLongitude(), name));
+            addMarkerToView(point.getLatitude(), point.getLongitude(), name);
+        }
         mapView.invalidate();
     }
 

@@ -607,29 +607,38 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private void updateCacheSizeUI() {
         if (txtCacheSizeStreet == null && txtCacheSizeSat == null) return;
         
-        File osmdroidDir = new File(getExternalFilesDir(null), "osmdroid");
-        
-        if (txtCacheSizeStreet != null) {
-            File streetCache = new File(osmdroidDir, "tiles_street");
-            long size = FileUtils.getFolderSize(streetCache);
-            txtCacheSizeStreet.setText(FileUtils.formatSize(size));
-        }
-        
-        if (txtCacheSizeSat != null) {
-            File satCache = new File(osmdroidDir, "tiles_sat");
-            long size = FileUtils.getFolderSize(satCache);
-            txtCacheSizeSat.setText(FileUtils.formatSize(size));
-        }
+        if (txtCacheSizeStreet != null) txtCacheSizeStreet.setText("...");
+        if (txtCacheSizeSat != null) txtCacheSizeSat.setText("...");
+
+        TopographyRepository.getInstance(this).runOnBackground(() -> {
+            File osmdroidDir = new File(getExternalFilesDir(null), "osmdroid");
+            
+            final long streetSize = FileUtils.getFolderSize(new File(osmdroidDir, "tiles_street"));
+            final long satSize = FileUtils.getFolderSize(new File(osmdroidDir, "tiles_sat"));
+
+            new Handler(Looper.getMainLooper()).post(() -> {
+                if (txtCacheSizeStreet != null) txtCacheSizeStreet.setText(FileUtils.formatSize(streetSize));
+                if (txtCacheSizeSat != null) txtCacheSizeSat.setText(FileUtils.formatSize(satSize));
+            });
+        });
     }
 
     private void clearMapCache(int type) {
-        File osmdroidDir = new File(getExternalFilesDir(null), "osmdroid");
-        String folderName = (type == 1) ? "tiles_sat" : "tiles_street";
-        File cacheDir = new File(osmdroidDir, folderName);
-        
-        FileUtils.clearDirectory(cacheDir);
-        updateCacheSizeUI();
-        UIUtils.showSuccessToast(this, getString(R.string.msg_cache_cleared));
+        if (txtCacheSizeStreet != null) txtCacheSizeStreet.setText("...");
+        if (txtCacheSizeSat != null) txtCacheSizeSat.setText("...");
+
+        TopographyRepository.getInstance(this).runOnBackground(() -> {
+            File osmdroidDir = new File(getExternalFilesDir(null), "osmdroid");
+            String folderName = (type == 1) ? "tiles_sat" : "tiles_street";
+            File cacheDir = new File(osmdroidDir, folderName);
+            
+            FileUtils.clearDirectory(cacheDir);
+            
+            new Handler(Looper.getMainLooper()).post(() -> {
+                updateCacheSizeUI();
+                UIUtils.showSuccessToast(this, getString(R.string.msg_cache_cleared));
+            });
+        });
     }
 
     private void showCompassCalibrateDialog() {

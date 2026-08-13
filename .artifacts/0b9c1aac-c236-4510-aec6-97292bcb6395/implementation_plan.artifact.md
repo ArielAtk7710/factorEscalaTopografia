@@ -1,30 +1,41 @@
-# Plan de Corrección de Traducción al Francés y Ortografía Técnica
+# Plan de Optimización Técnica: Rendimiento y Estabilidad Senior
 
-Este plan aborda los errores detectados en el idioma **Francés** (`values-fr`) y asegura la consistencia ortográfica en la ayuda técnica del idioma **Español** (`values`).
+Este plan aborda las vulnerabilidades críticas detectadas en la auditoría de rendimiento y estabilidad, enfocándose en la descarga del hilo principal (UI Thread), la robustez de los mapas y el manejo seguro del ciclo de vida.
 
-## Cambios Propuestos
+## 1. Optimización de Hilos (Background Processing)
 
-### 1. Correcciones en Francés (`values-fr/strings.xml`)
+### [TopographyRepository](file:///D:/Desarrollo-Software/Proyectos%20Android/factorEscala/app/src/main/java/bo/com/factorcombinadotopo/TopographyRepository.java)
+- Exponer el `ExecutorService` o crear un método `runOnBackground(Runnable)` para centralizar las tareas asíncronas de la app.
 
-Se eliminarán los restos de texto en español y se ajustarán los términos técnicos al francés correcto:
+### [AutomaticFragment](file:///D:/Desarrollo-Software/Proyectos%20Android/factorEscala/app/src/main/java/bo/com/factorcombinadotopo/AutomaticFragment.java) & [MapFragment](file:///D:/Desarrollo-Software/Proyectos%20Android/factorEscala/app/src/main/java/bo/com/factorcombinadotopo/MapFragment.java)
+- Envolver las llamadas a `db.insertarPunto(v)` en hilos secundarios para evitar bloqueos durante el guardado.
 
-- **`label_map_export_path`**: Cambiar "Ruta de datos exportados" por "**Chemin des données exportées**".
-- **`val_high_input` / `val_low_input`**: Cambiar el conector "o" por "**ou**" (ej: "1.5 ou 2.3").
-- **`label_no_obs_list`**: Cambiar "Sem observaciones" por "**Aucune observation.**".
-- **`msg_gps_toggle_info`**: Corregir la descripción técnica para usar "**basées**" en lugar de "basadas".
+### [MainActivity](file:///D:/Desarrollo-Software/Proyectos%20Android/factorEscala/app/src/main/java/bo/com/factorcombinadotopo/MainActivity.java)
+- Refactorizar `updateCacheSizeUI()`: El cálculo de tamaño de carpetas se moverá a un hilo de fondo. Se usará un estado de "Calculando..." en la UI mientras termina.
+- Refactorizar `clearMapCache()`: La eliminación física de archivos se realizará en segundo plano.
 
-### 2. Ortografía Técnica en Español (`values/strings.xml`)
+---
 
-- Se verificará que en todas las tablas de ayuda barométrica se utilice "**ó**" (con tilde) cuando se encuentre entre números, para garantizar la máxima legibilidad y evitar confusiones con el número cero (0).
-    - Ya aplicado en `val_high_input` y `val_low_input`. Se revisará si existen otros casos similares en el archivo.
+## 2. Robustez en Mapas
+
+### [MapManager](file:///D:/Desarrollo-Software/Proyectos%20Android/factorEscala/app/src/main/java/bo/com/factorcombinadotopo/MapManager.java)
+- **Sincronización**: Envolver el acceso a `mapView.getOverlays()` en bloques sincronizados o usar iteradores seguros en `removeVisualMarkers` y `restoreMarkers` para evitar `ConcurrentModificationException`.
+- **Estado de Carga**: Añadir una bandera `isMapInitialized` para ignorar clics o actualizaciones antes de que la configuración base termine.
+
+---
+
+## 3. Manejo del Ciclo de Vida (Lifecycle Safety)
+
+### [MapFragment](file:///D:/Desarrollo-Software/Proyectos%20Android/factorEscala/app/src/main/java/bo/com/factorcombinadotopo/MapFragment.java)
+- **Gestión de Diálogos**: Mantener una referencia a `progressDialog` y asegurar su cierre en `onDestroyView()` o `onPause()`. Esto evita que la app intente cerrar un diálogo de una actividad que ya no existe (BadTokenException).
+
+---
 
 ## Plan de Verificación
 
-### Pruebas de Sistema
-- Cambiar el idioma de la aplicación a **Francés** en los ajustes.
-- Navegar a la sección de **Ajustes** y verificar la ruta de exportación.
-- Abrir el mapa, marcar un punto y revisar la información de ayuda de altura (icono info).
-- Verificar que en el historial no aparezcan términos en otros idiomas cuando no hay observaciones.
+### Pruebas de Estrés
+- Abrir Ajustes y presionar "Limpiar" repetidamente mientras se navega el mapa.
+- Rotar la pantalla 10 veces seguidas durante una operación de guardado.
 
-### Compilación
-- Ejecutar un build de prueba para asegurar que los archivos XML mantienen la estructura correcta.
+### Monitoreo de Logs
+- Verificar en Logcat que no aparezcan mensajes de "Skipped frames" relacionados con I/O de archivos o base de datos.
