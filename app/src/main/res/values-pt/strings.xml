@@ -78,7 +78,7 @@
     <string name="lang_en">Inglês (English)</string>
     <string name="lang_pt">Português</string>
     <string name="lang_fr">Francés (Français)</string>
-    <string name="label_export_directory">Diretório de Exportación</string>
+    <string name="label_export_directory">Diretório de Exportação</string>
     <string name="label_map_export_path">Caminho dos dados exportados</string>
     <string name="text_export_path">Armazenamento Interno > Documents > FactorEscalaTop</string>
     <string name="label_pressure_adjustment">Ajuste do Barômetro (mmHg)</string>
@@ -96,6 +96,7 @@
     <string name="val_high_input">1.5 ou 2.3</string>
     <string name="val_low_input">-1.5 ou -0.8</string>
     <string name="val_offset_input">Calibrar</string>
+    <string name="val_err_offset">±0.5 to ±2.0</string>
     <string name="msg_restart_required">O aplicativo será reiniciado para aplicar as alterações.</string>
 
     <!-- Maps Settings Section -->
@@ -378,6 +379,41 @@
     <string name="label_lat_short">LAT: %1$.6f</string>
     <string name="label_lon_short">LON: %1$.6f</string>
     <string name="msg_touch_outside_close">Toque fora para fechar</string>
+    <string name="title_confirm_cache_street">Confirmar Limpeza de Rua</string>
+    <string name="msg_confirm_cache_street">Deseja excluir o cache do mapa de ruas?</string>
+    <string name="title_confirm_cache_sat">Confirmar Limpeza de Satélite</string>
+    <string name="msg_confirm_cache_sat">Deseja excluir o cache do mapa de satélite?</string>
+    <string name="label_height_gps_disp">Alt. GPS Disp.</string>
+    <string name="label_height_online_dem">Alt. online DEM</string>
+    <string name="msg_navigating_to">Navegando para a posição...</string>
+    <string name="label_height_info">Informações de Altitude</string>
+    <string name="msg_map_clean_success">Mapa visualmente limpo. Os registros permanecem seguros.</string>
+    <string name="msg_no_points_found">Nenhum ponto registrado</string>
+    <string name="err_invalid_coords">Insira coordenadas válidas</string>
+    <string name="err_numeric_format">Formato numérico inválido</string>
+    <string name="precision_excellent">Excelente</string>
+    <string name="precision_good">Boa</string>
+    <string name="precision_medium">Média</string>
+    <string name="precision_low">Baixa</string>
+    <string name="label_lat_label">Latitude:</string>
+    <string name="label_lon_label">Longitude:</string>
+    <string name="label_alt_ellip_label">Alt. Elipsoidal:</string>
+    <string name="label_alt_orto_label">Alt. Ortométrica:</string>
+    <string name="label_este_label">Este (X):</string>
+    <string name="label_norte_label">Norte (Y):</string>
+    <string name="label_zona_label">Zona / Hemisfério:</string>
+    <string name="label_fe_label">Fator de Escala (k):</string>
+    <string name="label_fa_label">Fator de Altura (ha):</string>
+    <string name="label_fc_label">Fator Combinado (K):</string>
+    <string name="label_geoid_label">Modelo Geoidal:</string>
+    <string name="label_type_label">Tipo de Registro:</string>
+    <string name="label_date_label">Data:</string>
+
+    <string name="msg_saving_data">Salvando dados...</string>
+    <string name="err_technical_prefix">Erro técnico: </string>
+    <string name="label_high_precision_status">Alta Precisão</string>
+    <string name="precision_medium_move">Média (Mover dispositivo)</string>
+    <string name="precision_low_calibrate">Baixa (Calibração necessária)</string>
     <string name="desc_high_precision">Topografia de Alta Precisão</string>
     <!-- Quick Guide Content -->
     <string name="title_quick_guide">📖 Guia Rápida</string>
@@ -399,4 +435,7 @@
 
     <string name="guide_section_data_title">6. Gestão de Dados</string>
     <string name="guide_section_data_body">Exporte seus levantamentos em <b>TXT</b> para relatórios humanos ou <b>JSON</b> para integração direta com software GIS/CAD na aba REGISTROS.</string>
+    <string name="val_normal_offset">0.0</string>
+    <string name="val_high_offset">+1.0 to +3.0</string>
+    <string name="val_low_offset">-1.0 to -3.0</string>
 </resources>

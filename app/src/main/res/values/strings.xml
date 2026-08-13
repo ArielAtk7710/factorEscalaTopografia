@@ -53,7 +53,7 @@
     <string name="msg_no_registered_points">No hay puntos registrados aún.</string>
     <string name="dialog_register_point">Registrar Nuevo Punto</string>
     <string name="label_point_name">NOMBRE DEL PUNTO</string>
-    <string name="hint_point_name">PC_...</string>
+    <string name="hint_point_name">PC_</string>
     <string name="msg_point_saved">Punto guardado en Registro</string>
     <string name="msg_point_deleted">Registro eliminado</string>
     <string name="msg_copied_clipboard">Copiado al portapapeles</string>
@@ -93,8 +93,8 @@
     <string name="cond_low">Baja presión (frente frío)</string>
     <string name="cond_offset">Barómetro desfasado</string>
     <string name="val_normal_input">0 o vacío</string>
-    <string name="val_high_input">1.5 o 2.3</string>
-    <string name="val_low_input">-1.5 o -0.8</string>
+    <string name="val_high_input">1.5 ó 2.3</string>
+    <string name="val_low_input">-1.5 ó -0.8</string>
     <string name="val_offset_input">Calibrar</string>
     <string name="val_normal_offset">0.0</string>
     <string name="val_high_offset">+1.0 a +3.0</string>
@@ -406,6 +406,10 @@
     <!-- Cache Management -->
     <string name="title_confirm_cache_clear">Confirmar Limpieza de Caché</string>
     <string name="msg_confirm_cache_clear">¿Desea eliminar los mapas guardados en la memoria temporal?</string>
+    <string name="title_confirm_cache_street">Confirmar Limpieza Callejera</string>
+    <string name="msg_confirm_cache_street">¿Desea eliminar la caché del mapa callejero?</string>
+    <string name="title_confirm_cache_sat">Confirmar Limpieza Satelital</string>
+    <string name="msg_confirm_cache_sat">¿Desea eliminar la caché del mapa satelital?</string>
     <string name="warn_cache_clear">⚠️ ADVERTENCIA: Si borra la caché, no podrá visualizar estas zonas del mapa sin conexión a Internet (Modo Offline).</string>
 
     <!-- Export Success Messages -->
@@ -441,5 +445,36 @@
     <string name="guide_section_data_title">6. Gestión de Datos</string>
     <string name="guide_section_data_body">Exporta tus levantamientos en <b>TXT</b> para reportes humanos o <b>JSON</b> para integración directa con software GIS/CAD desde la pestaña REGISTROS.</string>
 
+    <string name="label_height_gps_disp">Altura GPS Disp.</string>
+    <string name="label_height_online_dem">Altura online DEM</string>
+    <string name="msg_navigating_to">Navegando a posición...</string>
+    <string name="label_height_info">Información de Altura</string>
+    <string name="msg_map_clean_success">Mapa visualmente limpio. Los registros permanecen seguros.</string>
+    <string name="msg_no_points_found">No hay puntos registrados</string>
+    <string name="err_invalid_coords">Ingrese coordenadas válidas</string>
+    <string name="err_numeric_format">Formato numérico inválido</string>
+    <string name="precision_excellent">Excelente</string>
+    <string name="precision_good">Buena</string>
+    <string name="precision_medium">Media</string>
+    <string name="precision_low">Baja</string>
+    <string name="label_lat_label">Latitud:</string>
+    <string name="label_lon_label">Longitud:</string>
+    <string name="label_alt_ellip_label">Alt. Elipsoidal:</string>
+    <string name="label_alt_orto_label">Alt. Ortométrica:</string>
+    <string name="label_este_label">Este (X):</string>
+    <string name="label_norte_label">Norte (Y):</string>
+    <string name="label_zona_label">Zona / Hemisferio:</string>
+    <string name="label_fe_label">Factor Escala (k):</string>
+    <string name="label_fa_label">Factor Altura (ha):</string>
+    <string name="label_fc_label">Factor Combinado (K):</string>
+    <string name="label_geoid_label">Modelo Geoidal:</string>
+    <string name="label_type_label">Tipo Registro:</string>
+    <string name="label_date_label">Fecha:</string>
+
+    <string name="msg_saving_data">Guardando datos...</string>
+    <string name="err_technical_prefix">Error técnico: </string>
+    <string name="label_high_precision_status">Alta Precisión</string>
+    <string name="precision_medium_move">Media (Mover dispositivo)</string>
+    <string name="precision_low_calibrate">Baja (Calibración necesaria)</string>
     <string name="desc_high_precision">Topografía de Alta Precisión</string>
 </resources>

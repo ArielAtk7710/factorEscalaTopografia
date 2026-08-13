@@ -13,7 +13,7 @@ import java.nio.MappedByteBuffer;
 import java.nio.channels.FileChannel;
 
 /**
- * Motor de alto rendimiento para el Modelo Geoidal Bolivia (MGBol).
+ * Motor de alto rendimiento para el Modelo Geoidal Bolivia (MGBol08).
  * Implementación pura en Java para máxima compatibilidad.
  */
 public class MGBEngine {
@@ -81,7 +81,7 @@ public class MGBEngine {
             }
             
             this.dataN = localData;
-            Log.d(TAG, "MGBol Engine [NIO]: Cargado exitosamente (" + numRecords + " puntos)");
+            Log.d(TAG, "MGBol08 Engine [NIO]: Cargado exitosamente (" + numRecords + " puntos)");
             return true;
         }
     }
@@ -101,7 +101,7 @@ public class MGBEngine {
             
             this.dataN = localData;
             this.estaCargada = true;
-            Log.d(TAG, "MGBol Engine [Stream]: Cargado exitosamente via Fallback (" + numRecords + " puntos)");
+            Log.d(TAG, "MGBol08 Engine [Stream]: Cargado exitosamente via Fallback (" + numRecords + " puntos)");
         } catch (Exception e) {
             Log.e(TAG, "Error fatal: No se pudo cargar la grilla por ningún método.", e);
             estaCargada = false;

@@ -148,7 +148,7 @@ public class AutomaticFragment extends Fragment {
         });
 
         viewModel.getUsesMgb().observe(getViewLifecycleOwner(), uses -> {
-            txtGeoidModel.setText(uses ? "MGBol" : "EGM96 (Global)");
+            txtGeoidModel.setText(uses ? getString(R.string.opt_mgb) : getString(R.string.opt_egm96));
         });
 
         viewModel.getAmbientTemperature().observe(getViewLifecycleOwner(), temp -> {
@@ -180,10 +180,10 @@ public class AutomaticFragment extends Fragment {
     }
 
     private String getPrecisionLevel(float accuracy) {
-        if (accuracy < 2.0f) return "Excelente";
-        if (accuracy < 5.0f) return "Buena";
-        if (accuracy < 10.0f) return "Media";
-        return "Baja";
+        if (accuracy < 2.0f) return getString(R.string.precision_excellent);
+        if (accuracy < 5.0f) return getString(R.string.precision_good);
+        if (accuracy < 10.0f) return getString(R.string.precision_medium);
+        return getString(R.string.precision_low);
     }
 
     private void checkGpsState() {
@@ -212,6 +212,11 @@ public class AutomaticFragment extends Fragment {
         cardMapa.setVisibility(visible ? View.VISIBLE : View.GONE);
         if (visible) {
             miniMapManager.onResume();
+            // Centrado inmediato si ya tenemos ubicación previa
+            Location loc = viewModel.getRawLocation().getValue();
+            if (loc != null) {
+                miniMapManager.updateMyLocation(loc);
+            }
             miniMapView.invalidate();
         } else {
             miniMapManager.onPause();

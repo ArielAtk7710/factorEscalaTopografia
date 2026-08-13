@@ -1,84 +1,81 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:layout_width="340dp"
+    android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_gravity="center"
-    app:cardBackgroundColor="@color/bg_surface"
-    app:cardCornerRadius="16dp"
-    app:cardElevation="8dp">
+    android:orientation="vertical"
+    android:padding="24dp"
+    android:background="@drawable/bg_dialog_confirm_border"
+    android:gravity="center_horizontal">
 
-    <LinearLayout
+    <ImageView
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:src="@drawable/ic_export"
+        app:tint="@color/accent_orange"
+        android:layout_marginBottom="16dp"
+        android:contentDescription="Exportar" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Exportar Datos"
+        android:textColor="#FFFFFF"
+        android:textSize="20sp"
+        android:textStyle="bold"
+        android:layout_marginBottom="12dp"
+        android:textAlignment="center" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Seleccione el formato de salida para sus registros"
+        android:textColor="#E0E0E0"
+        android:textSize="14sp"
+        android:layout_marginBottom="24dp"
+        android:textAlignment="center"
+        android:lineSpacingExtra="4dp" />
+
+    <!-- Opción TXT -->
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/btn_export_txt"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:padding="24dp"
-        android:gravity="center_horizontal">
+        android:text="FORMATO TEXTO (TXT)"
+        android:textAllCaps="false"
+        app:icon="@drawable/ic_manual"
+        app:iconGravity="textStart"
+        app:backgroundTint="@color/accent_orange"
+        android:textColor="@android:color/white"
+        android:textStyle="bold"
+        app:cornerRadius="8dp" />
 
-        <ImageView
-            android:layout_width="48dp"
-            android:layout_height="48dp"
-            android:src="@drawable/ic_export"
-            app:tint="@color/accent_orange"
-            android:layout_marginBottom="16dp"
-            android:contentDescription="Exportar" />
+    <!-- Opción JSON -->
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/btn_export_json"
+        style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="12dp"
+        android:text="FORMATO DIGITAL (JSON)"
+        android:textAllCaps="false"
+        app:icon="@drawable/ic_auto"
+        app:iconGravity="textStart"
+        android:textColor="#FFFFFF"
+        app:strokeColor="@color/accent_orange"
+        app:strokeWidth="1.2dp"
+        app:cornerRadius="8dp" />
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Exportar Datos"
-            android:textColor="@color/text_primary"
-            android:textSize="18sp"
-            android:textStyle="bold"
-            android:layout_marginBottom="8dp"
-            android:textAlignment="center" />
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/btn_export_cancel"
+        style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:text="@string/btn_cancel"
+        android:textColor="#FFFFFF"
+        app:strokeColor="@color/accent_orange"
+        app:strokeWidth="1.2dp"
+        app:cornerRadius="8dp" />
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Seleccione el formato de salida para sus registros"
-            android:textColor="@color/text_secondary"
-            android:textSize="13sp"
-            android:layout_marginBottom="24dp"
-            android:textAlignment="center" />
-
-        <!-- Opción TXT -->
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/btn_export_txt"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="FORMATO TEXTO (TXT)"
-            android:textAllCaps="false"
-            app:icon="@drawable/ic_manual"
-            app:iconGravity="textStart"
-            app:backgroundTint="@color/accent_orange"
-            android:textColor="@android:color/white"
-            android:textStyle="bold"
-            app:cornerRadius="8dp" />
-
-        <!-- Opción JSON -->
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/btn_export_json"
-            style="@style/Widget.MaterialComponents.Button.OutlinedButton"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="12dp"
-            android:text="FORMATO DIGITAL (JSON)"
-            android:textAllCaps="false"
-            app:icon="@drawable/ic_auto"
-            app:iconGravity="textStart"
-            android:textColor="@color/text_primary"
-            app:strokeColor="@color/accent_orange"
-            app:cornerRadius="8dp" />
-
-        <Button
-            android:id="@+id/btn_export_cancel"
-            style="@style/Widget.MaterialComponents.Button.TextButton"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
-            android:text="@string/btn_cancel"
-            android:textColor="@color/text_secondary" />
-
-    </LinearLayout>
-</androidx.cardview.widget.CardView>
+</LinearLayout>

@@ -58,7 +58,7 @@
             android:layout_height="wrap_content"
             android:background="@drawable/bg_spinner_with_arrow"
             android:backgroundTint="@color/bg_surface_secondary"
-            android:hint="@string/hint_point_name"
+            android:text="@string/hint_point_name"
             android:padding="12dp"
             android:textColor="@color/text_primary"
             android:textColorHint="@color/text_secondary"

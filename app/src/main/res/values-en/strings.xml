@@ -407,5 +407,40 @@
     <string name="guide_section_data_title">6. Data Management</string>
     <string name="guide_section_data_body">Export your surveys in <b>TXT</b> for human reports or <b>JSON</b> for direct integration with GIS/CAD software from the RECORDS tab.</string>
 
+    <string name="title_confirm_cache_street">Confirm Street Cache Clear</string>
+    <string name="msg_confirm_cache_street">Do you want to delete the street map cache?</string>
+    <string name="title_confirm_cache_sat">Confirm Satellite Cache Clear</string>
+    <string name="msg_confirm_cache_sat">Do you want to delete the satellite map cache?</string>
+    <string name="label_height_gps_disp">GPS Height Device</string>
+    <string name="label_height_online_dem">Online Height DEM</string>
+    <string name="msg_navigating_to">Navigating to position...</string>
+    <string name="label_height_info">Altitude Information</string>
+    <string name="msg_map_clean_success">Map visually cleaned. Records remain safe.</string>
+    <string name="msg_no_points_found">No points registered</string>
+    <string name="err_invalid_coords">Enter valid coordinates</string>
+    <string name="err_numeric_format">Invalid numeric format</string>
+    <string name="precision_excellent">Excellent</string>
+    <string name="precision_good">Good</string>
+    <string name="precision_medium">Medium</string>
+    <string name="precision_low">Low</string>
+    <string name="label_lat_label">Latitude:</string>
+    <string name="label_lon_label">Longitude:</string>
+    <string name="label_alt_ellip_label">Ellip. Altitude:</string>
+    <string name="label_alt_orto_label">Ortho. Altitude:</string>
+    <string name="label_este_label">East (X):</string>
+    <string name="label_norte_label">North (Y):</string>
+    <string name="label_zona_label">Zone / Hemisphere:</string>
+    <string name="label_fe_label">Scale Factor (k):</string>
+    <string name="label_fa_label">Elevation Factor (ha):</string>
+    <string name="label_fc_label">Combined Factor (K):</string>
+    <string name="label_geoid_label">Geoid Model:</string>
+    <string name="label_type_label">Record Type:</string>
+    <string name="label_date_label">Date:</string>
+
+    <string name="msg_saving_data">Saving data...</string>
+    <string name="err_technical_prefix">Technical error: </string>
+    <string name="label_high_precision_status">High Precision</string>
+    <string name="precision_medium_move">Medium (Move device)</string>
+    <string name="precision_low_calibrate">Low (Calibration needed)</string>
     <string name="desc_high_precision">High Precision Topography</string>
 </resources>

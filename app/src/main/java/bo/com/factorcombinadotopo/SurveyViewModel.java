@@ -21,6 +21,11 @@ public class SurveyViewModel extends AndroidViewModel {
     private final MutableLiveData<Boolean> isWeatherLoading = new MutableLiveData<>(false);
     private final MutableLiveData<String> errorResult = new MutableLiveData<>();
 
+    private Location lastWeatherLocation;
+    private long lastWeatherTimestamp = 0;
+    private static final float WEATHER_UPDATE_DISTANCE_THRESHOLD = 1000f; // 1 km
+    private static final long WEATHER_UPDATE_TIME_THRESHOLD = 30 * 60 * 1000; // 30 min
+
     public SurveyViewModel(@NonNull Application application) {
         super(application);
         this.repository = TopographyRepository.getInstance(application);
@@ -78,8 +83,31 @@ public class SurveyViewModel extends AndroidViewModel {
             }
         });
 
-        // Disparar actualización de clima en segundo plano
-        refreshWeather(loc);
+        // Disparar actualización de clima en segundo plano con control de umbral
+        shouldRefreshWeatherAuto(loc);
+    }
+
+    private void shouldRefreshWeatherAuto(Location loc) {
+        long currentTime = System.currentTimeMillis();
+        
+        // 1. Si es la primera vez
+        if (lastWeatherLocation == null || lastWeatherTimestamp == 0) {
+            refreshWeather(loc);
+            return;
+        }
+
+        // 2. Si ya hay una carga en curso, no hacer nada
+        if (Boolean.TRUE.equals(isWeatherLoading.getValue())) return;
+
+        // 3. Verificar distancia
+        float distance = loc.distanceTo(lastWeatherLocation);
+        
+        // 4. Verificar tiempo
+        long timeDiff = currentTime - lastWeatherTimestamp;
+
+        if (distance > WEATHER_UPDATE_DISTANCE_THRESHOLD || timeDiff > WEATHER_UPDATE_TIME_THRESHOLD) {
+            refreshWeather(loc);
+        }
     }
 
     public void refreshWeather(Location loc) {
@@ -89,6 +117,8 @@ public class SurveyViewModel extends AndroidViewModel {
         WeatherManager.checkFlightSafety(getApplication(), loc.getLatitude(), loc.getLongitude(), 1.8, new WeatherManager.WeatherCallback() {
             @Override
             public void onSuccess(WeatherManager.SafetyStatus status) {
+                lastWeatherLocation = loc;
+                lastWeatherTimestamp = System.currentTimeMillis();
                 weatherStatus.postValue(status);
                 isWeatherLoading.postValue(false);
             }

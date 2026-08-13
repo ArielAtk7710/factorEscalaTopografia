@@ -25,6 +25,9 @@ import java.util.List;
 import java.util.ArrayList;
 import java.text.SimpleDateFormat;
 import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
+import android.widget.ImageView;
+import com.google.android.material.bottomsheet.BottomSheetDialog;
 import org.osmdroid.util.GeoPoint;
 import org.osmdroid.api.IMapController;
 
@@ -57,6 +60,7 @@ public class MapFragment extends Fragment {
     private android.location.Location lastGpsLocation;
     private long lastClickTime = 0; // Para lógica Debounce
     private static final int PERMISSION_REQUEST_CODE = 200;
+    private static boolean hasCenteredOnce = false; // Memoria de centrado inicial único
 
     private final BroadcastReceiver gpsStatusReceiver = new BroadcastReceiver() {
         @Override
@@ -87,6 +91,7 @@ public class MapFragment extends Fragment {
 
             mapManager = new MapManager(requireContext(), mapView);
             mapManager.setAutoCenterEnabled(true); 
+            mapManager.setOnMarkerClickListener(this::onMarkerClickInternal);
 
             view.findViewById(R.id.fab_center_location).setOnClickListener(v -> {
                 if (mapManager != null) mapManager.centerOnCurrentLocation();
@@ -137,6 +142,13 @@ public class MapFragment extends Fragment {
         viewModel.getRawLocation().observe(getViewLifecycleOwner(), location -> {
             if (isAdded() && mapManager != null && location != null) {
                 this.lastGpsLocation = location;
+                
+                // Centrado automático solo la primera vez por sesión
+                if (!hasCenteredOnce) {
+                    mapManager.centerToLocation(location);
+                    hasCenteredOnce = true;
+                }
+                
                 mapManager.updateMyLocation(location);
                 if (txtAlt != null) {
                     txtAlt.setText(String.format(Locale.getDefault(), "ALT: %.1fm", location.getAltitude()));
@@ -162,7 +174,7 @@ public class MapFragment extends Fragment {
         if (btnInfo != null) {
             btnInfo.setOnClickListener(v -> {
                 UIUtils.showPopupInfo(requireContext(), dv, 
-                        "Información de Altura", 
+                        getString(R.string.label_height_info), 
                         getString(R.string.msg_gps_toggle_info));
             });
         }
@@ -191,7 +203,7 @@ public class MapFragment extends Fragment {
         // 1. Mostrar Spin de Carga
         View progressView = getLayoutInflater().inflate(R.layout.layout_dialog_progress, null);
         TextView txtProgress = progressView.findViewById(R.id.txt_progress_label);
-        if (txtProgress != null) txtProgress.setText("Guardando datos...");
+        if (txtProgress != null) txtProgress.setText(getString(R.string.msg_saving_data));
 
         AlertDialog progressDialog = new AlertDialog.Builder(context)
                 .setView(progressView)
@@ -219,7 +231,7 @@ public class MapFragment extends Fragment {
                         if (progressDialog.isShowing()) progressDialog.dismiss();
                         return;
                     }
-                    persistirPuntoMapa(res, name, notes, isMgb, "Copernicus DEM GLO-90", "Métrica (Mapa)", progressDialog);
+                    persistirPuntoMapa(res, name, notes, isMgb, "Altura GPS dispositivo", "Métrica (Mapa)", progressDialog);
                 }
                 @Override public void onError(Exception e) { handleGuardadoError(e, progressDialog); }
             });
@@ -242,7 +254,7 @@ public class MapFragment extends Fragment {
                                 if (progressDialog.isShowing()) progressDialog.dismiss();
                                 return;
                             }
-                            persistirPuntoMapa(res, name, notes, true, "Open-Meteo API", "Digital (DEM)", progressDialog);
+                            persistirPuntoMapa(res, name, notes, true, "GLO-90, Copernicus", "Digital (DEM)", progressDialog);
                         }
                         @Override public void onError(Exception e) { handleGuardadoError(e, progressDialog); }
                     });
@@ -269,7 +281,7 @@ public class MapFragment extends Fragment {
                                 if (progressDialog.isShowing()) progressDialog.dismiss();
                                 return;
                             }
-                            persistirPuntoMapa(res, name, fallbackNotes, isMgb, "GPS Dispositivo (Fallback)", "Métrica (Offline)", progressDialog);
+                            persistirPuntoMapa(res, name, fallbackNotes, isMgb, "Altura GPS dispositivo (Sin Red)", "Métrica (Offline)", progressDialog);
                         }
                         @Override public void onError(Exception e) { handleGuardadoError(e, progressDialog); }
                     });
@@ -330,7 +342,7 @@ public class MapFragment extends Fragment {
         new Handler(Looper.getMainLooper()).post(() -> {
             if (isAdded() && dialog != null && dialog.isShowing()) {
                 dialog.dismiss();
-                UIUtils.showErrorToast(requireContext(), "Error técnico: " + e.getMessage());
+                UIUtils.showErrorToast(requireContext(), getString(R.string.err_technical_prefix) + e.getMessage());
             }
         });
     }
@@ -438,6 +450,85 @@ public class MapFragment extends Fragment {
         }
     }
 
+    private void onMarkerClickInternal(String title) {
+        if (!isAdded()) return;
+        
+        new Thread(() -> {
+            DatabaseHelper dbHelper = DatabaseHelper.getInstance(requireContext());
+            SQLiteDatabase db = dbHelper.getReadableDatabase();
+            Cursor c = db.query(DatabaseHelper.TABLE_PUNTOS, null, 
+                    DatabaseHelper.COLUMN_NOMBRE + " = ?", new String[]{title}, 
+                    null, null, null, "1");
+            
+            if (c != null && c.moveToFirst()) {
+                ContentValues v = new ContentValues();
+                // Extraer todos los campos necesarios para la UI
+                v.put("name", title);
+                v.put("lat", c.getString(c.getColumnIndexOrThrow(DatabaseHelper.COLUMN_LATITUD)));
+                v.put("lon", c.getString(c.getColumnIndexOrThrow(DatabaseHelper.COLUMN_LONGITUD)));
+                v.put("alt_e", c.getString(c.getColumnIndexOrThrow(DatabaseHelper.COLUMN_ALTURA)));
+                v.put("alt_o", c.getString(c.getColumnIndexOrThrow(DatabaseHelper.COLUMN_ALTURA_ORTO)));
+                v.put("este", c.getString(c.getColumnIndexOrThrow(DatabaseHelper.COLUMN_ESTE)));
+                v.put("norte", c.getString(c.getColumnIndexOrThrow(DatabaseHelper.COLUMN_NORTE)));
+                v.put("zona", c.getString(c.getColumnIndexOrThrow(DatabaseHelper.COLUMN_ZONA)) + " " + c.getString(c.getColumnIndexOrThrow(DatabaseHelper.COLUMN_HEMISFERIO)));
+                v.put("fe", c.getString(c.getColumnIndexOrThrow(DatabaseHelper.COLUMN_FACTOR_ESCALA)));
+                v.put("fa", c.getString(c.getColumnIndexOrThrow(DatabaseHelper.COLUMN_FACTOR_ALTURA)));
+                v.put("fc", c.getString(c.getColumnIndexOrThrow(DatabaseHelper.COLUMN_FACTOR_COMBINADO)));
+                v.put("geoid", c.getString(c.getColumnIndexOrThrow(DatabaseHelper.COLUMN_MODELO_GEOIDAL)));
+                v.put("type", c.getString(c.getColumnIndexOrThrow(DatabaseHelper.COLUMN_TIPO_REGISTRO)));
+                v.put("date", c.getString(c.getColumnIndexOrThrow(DatabaseHelper.COLUMN_FECHA)));
+                c.close();
+                
+                new Handler(Looper.getMainLooper()).post(() -> showPointDetailsDialog(v));
+            } else {
+                if (c != null) c.close();
+            }
+        }).start();
+    }
+
+    private void showPointDetailsDialog(ContentValues p) {
+        if (!isAdded()) return;
+        BottomSheetDialog dialog = new BottomSheetDialog(requireContext());
+        View view = getLayoutInflater().inflate(R.layout.layout_dialog_point_details, null);
+        dialog.setContentView(view);
+
+        ((TextView)view.findViewById(R.id.txt_det_point_name)).setText(p.getAsString("name"));
+
+        setDetailRow(view.findViewById(R.id.row_lat), "Latitud:", p.getAsString("lat"), R.drawable.ic_visibility_pro);
+        setDetailRow(view.findViewById(R.id.row_lon), "Longitud:", p.getAsString("lon"), R.drawable.ic_visibility_pro);
+        setDetailRow(view.findViewById(R.id.row_alt_ellip), "Alt. Elipsoidal:", p.getAsString("alt_e") + " m", R.drawable.ic_precision);
+        setDetailRow(view.findViewById(R.id.row_alt_orto), "Alt. Ortométrica:", p.getAsString("alt_o") + " m", R.drawable.ic_precision);
+        
+        setDetailRow(view.findViewById(R.id.row_este), "Este (X):", p.getAsString("este") + " m", R.drawable.ic_manual);
+        setDetailRow(view.findViewById(R.id.row_norte), "Norte (Y):", p.getAsString("norte") + " m", R.drawable.ic_manual);
+        setDetailRow(view.findViewById(R.id.row_zona), "Zona / Hemisferio:", p.getAsString("zona"), R.drawable.ic_info);
+        
+        setDetailRow(view.findViewById(R.id.row_fe), "Factor Escala (k):", p.getAsString("fe"), R.drawable.ic_auto);
+        setDetailRow(view.findViewById(R.id.row_fa), "Factor Altura (ha):", p.getAsString("fa"), R.drawable.ic_auto);
+        setDetailRow(view.findViewById(R.id.row_fc), "Factor Combinado (K):", p.getAsString("fc"), R.drawable.ic_auto);
+        
+        setDetailRow(view.findViewById(R.id.row_geoid), "Modelo Geoidal:", p.getAsString("geoid"), R.drawable.ic_shield_pro);
+        setDetailRow(view.findViewById(R.id.row_type), "Tipo Registro:", p.getAsString("type"), R.drawable.ic_register);
+        setDetailRow(view.findViewById(R.id.row_date), "Fecha:", p.getAsString("date"), R.drawable.ic_calendar);
+
+        view.findViewById(R.id.btn_det_close).setOnClickListener(v -> dialog.dismiss());
+        dialog.show();
+    }
+
+    private void setDetailRow(View row, String label, String value, int iconRes) {
+        if (row == null) return;
+        TextView txtLabel = row.findViewById(R.id.txt_detail_label);
+        TextView txtValue = row.findViewById(R.id.txt_detail_value);
+        ImageView imgIcon = row.findViewById(R.id.img_detail_icon);
+        
+        if (txtLabel != null) txtLabel.setText(label);
+        if (txtValue != null) {
+            txtValue.setText(value);
+            txtValue.setTextColor(ContextCompat.getColor(requireContext(), R.color.accent_light));
+        }
+        if (imgIcon != null) imgIcon.setImageResource(iconRes);
+    }
+
     private void showGoToCoordsDialog() {
         if (!isAdded()) return;
 
@@ -464,6 +555,7 @@ public class MapFragment extends Fragment {
                 double lon = Double.parseDouble(lonStr);
 
                 if (mapView != null) {
+                    mapView.getController().setZoom(18.5);
                     mapView.getController().animateTo(new GeoPoint(lat, lon));
                     UIUtils.showInfoToast(requireContext(), "Navegando a posición...");
                 }

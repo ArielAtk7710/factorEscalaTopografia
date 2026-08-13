@@ -35,9 +35,18 @@ public class MapManager {
     private final MapView mapView;
     private final Context context;
     private MyLocationNewOverlay locationOverlay;
-    private static boolean isFirstFix = true; // Estático para que solo centre una vez por sesión de app
+    private boolean isFirstFix = true; // No estático para que cada instancia maneje su centrado inicial
     private boolean autoCenterEnabled = true;
     private int currentMapMode = 0; // 0: Predeterminado (OSM), 1: Satélite (ArcGIS)
+    private OnMarkerClickListener markerClickListener;
+
+    public interface OnMarkerClickListener {
+        void onMarkerLabelClick(String markerTitle);
+    }
+
+    public void setOnMarkerClickListener(OnMarkerClickListener listener) {
+        this.markerClickListener = listener;
+    }
     
     // Almacenamos solo los datos técnicos para persistencia de sesión
     private static class MarkerData {
@@ -91,9 +100,21 @@ public class MapManager {
         boolean showLocation = prefs.getBoolean("ShowLocation", true);
         int mapType = prefs.getInt(KEY_MAP_TYPE, 0); 
 
+        // Configuración crítica de osmdroid
+        SharedPreferences globalPrefs = android.preference.PreferenceManager.getDefaultSharedPreferences(context);
+        org.osmdroid.config.Configuration.getInstance().load(context, globalPrefs);
+        org.osmdroid.config.Configuration.getInstance().setUserAgentValue(context.getPackageName());
+        
         File osmdroidDir = new File(context.getExternalFilesDir(null), "osmdroid");
+        if (!osmdroidDir.exists()) osmdroidDir.mkdirs();
+        
+        org.osmdroid.config.Configuration.getInstance().setOsmdroidBasePath(osmdroidDir);
+        
         String cacheFolder = (mapType == 1) ? "tiles_sat" : "tiles_street";
-        org.osmdroid.config.Configuration.getInstance().setOsmdroidTileCache(new File(osmdroidDir, cacheFolder));
+        File cacheDir = new File(osmdroidDir, cacheFolder);
+        if (!cacheDir.exists()) cacheDir.mkdirs();
+        
+        org.osmdroid.config.Configuration.getInstance().setOsmdroidTileCache(cacheDir);
 
         mapView.setUseDataConnection(true); 
 
@@ -130,7 +151,11 @@ public class MapManager {
         SharedPreferences prefs = context.getSharedPreferences("AppPrefs", Context.MODE_PRIVATE);
         int mapType = prefs.getInt(KEY_MAP_TYPE, 0);
         
+        org.osmdroid.config.Configuration.getInstance().setUserAgentValue(context.getPackageName());
+        
         File osmdroidDir = new File(context.getExternalFilesDir(null), "osmdroid");
+        org.osmdroid.config.Configuration.getInstance().setOsmdroidBasePath(osmdroidDir);
+        
         String cacheFolder = (mapType == 1) ? "tiles_sat" : "tiles_street";
         org.osmdroid.config.Configuration.getInstance().setOsmdroidTileCache(new File(osmdroidDir, cacheFolder));
 
@@ -169,8 +194,13 @@ public class MapManager {
             }
 
             File osmdroidDir = new File(context.getExternalFilesDir(null), "osmdroid");
+            org.osmdroid.config.Configuration.getInstance().setOsmdroidBasePath(osmdroidDir);
+            
             String cacheFolder = (enableSatellite) ? "tiles_sat" : "tiles_street";
-            org.osmdroid.config.Configuration.getInstance().setOsmdroidTileCache(new File(osmdroidDir, cacheFolder));
+            File cacheDir = new File(osmdroidDir, cacheFolder);
+            if (!cacheDir.exists()) cacheDir.mkdirs();
+            
+            org.osmdroid.config.Configuration.getInstance().setOsmdroidTileCache(cacheDir);
 
             mapView.invalidate();
         } catch (Exception e) {
@@ -195,6 +225,15 @@ public class MapManager {
         mapView.getController().animateTo(locationOverlay.getMyLocation());
     }
 
+    /**
+     * Centra el mapa en una ubicación específica de forma inmediata.
+     */
+    public void centerToLocation(Location location) {
+        if (mapView == null || location == null) return;
+        GeoPoint point = new GeoPoint(location.getLatitude(), location.getLongitude());
+        mapView.getController().setCenter(point);
+    }
+
     public void updateMyLocation(Location location) {
         if (location == null) return;
         GeoPoint point = new GeoPoint(location.getLatitude(), location.getLongitude());
@@ -204,7 +243,7 @@ public class MapManager {
         }
     }
 
-    private static class LabelInfoWindow extends MarkerInfoWindow {
+    private class LabelInfoWindow extends MarkerInfoWindow {
         public LabelInfoWindow(int layoutResId, MapView mapView) {
             super(layoutResId, mapView);
         }
@@ -212,7 +251,16 @@ public class MapManager {
         public void onOpen(Object item) {
             Marker marker = (Marker) item;
             TextView txt = mView.findViewById(R.id.txt_marker_name);
-            if (txt != null) txt.setText(marker.getTitle());
+            if (txt != null) {
+                txt.setText(marker.getTitle());
+            }
+            
+            // Hacer que la etiqueta sea clicable
+            mView.setOnClickListener(v -> {
+                if (markerClickListener != null) {
+                    markerClickListener.onMarkerLabelClick(marker.getTitle());
+                }
+            });
         }
     }
 
@@ -252,6 +300,7 @@ public class MapManager {
             if (overlays.get(i) instanceof Marker) {
                 Marker m = (Marker) overlays.get(i);
                 if (m.getTitle() != null && !m.getTitle().isEmpty()) {
+                    m.closeInfoWindow(); // Cerrar la etiqueta/nombre antes de borrar el pin
                     mapView.getOverlays().remove(i);
                 }
             }

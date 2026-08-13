@@ -4,6 +4,7 @@ import android.content.Context;
 import android.graphics.Typeface;
 import android.os.Bundle;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.Fragment;
 import androidx.viewpager2.adapter.FragmentStateAdapter;
 import androidx.viewpager2.widget.ViewPager2;
@@ -79,7 +80,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private static final String KEY_LANG = "Language";
     private static final String KEY_THEME = "Theme";
     public static final String KEY_PRESSURE_OFFSET = "PressureOffset";
-    public static final String KEY_GEOID_MODEL = "GeoidModel"; // 0: EGM96, 1: MGB
+    public static final String KEY_GEOID_MODEL = "GeoidModel"; // 0: EGM96, 1: MGBol08
 
     // Nuevas llaves para ajustes de Mapas
     public static final String KEY_MAP_MODE = "MapMode"; // 0: Online, 2: Satélite
@@ -274,15 +275,13 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         if (drawer.isDrawerOpen(GravityCompat.START)) {
             drawer.closeDrawer(GravityCompat.START);
         } else {
-            new androidx.appcompat.app.AlertDialog.Builder(this)
-                .setTitle(R.string.title_exit_app)
-                .setMessage(R.string.msg_exit_app)
-                .setPositiveButton(R.string.btn_accept, (dialog, which) -> {
+            UIUtils.showConfirmDialog(this, 
+                R.string.title_exit_app, 
+                R.string.msg_exit_app, 
+                () -> {
                     MapManager.clearSession(); // Limpiar pines al salir
                     finishAffinity();
-                })
-                .setNegativeButton(R.string.btn_cancel, null)
-                .show();
+                });
         }
     }
 
@@ -374,7 +373,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             showAboutDialog();
             return true;
         } else if (id == R.id.action_tutorial) {
-            UIUtils.showInfoToast(this, getString(R.string.menu_tutorial));
+            showQuickGuideDialog();
             return true;
         } else if (id == R.id.action_calibrate) {
             showCompassCalibrateDialog();
@@ -404,6 +403,19 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         }
         
         view.findViewById(R.id.btn_about_close).setOnClickListener(v -> dialog.dismiss());
+        dialog.show();
+    }
+
+    private void showQuickGuideDialog() {
+        View view = getLayoutInflater().inflate(R.layout.layout_dialog_guide, null);
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        AlertDialog dialog = builder.create();
+        if (dialog.getWindow() != null) {
+            dialog.getWindow().setBackgroundDrawableResource(android.R.color.transparent);
+        }
+        dialog.setView(view);
+
+        view.findViewById(R.id.btn_guide_close).setOnClickListener(v -> dialog.dismiss());
         dialog.show();
     }
 
@@ -538,14 +550,14 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         
         view.findViewById(R.id.btn_clear_cache_street).setOnClickListener(v -> {
             UIUtils.showConfirmDialog(this, 
-                R.string.title_confirm_cache_clear, 
-                R.string.msg_confirm_cache_clear, 
+                R.string.title_confirm_cache_street, 
+                R.string.msg_confirm_cache_street, 
                 () -> clearMapCache(0));
         });
         view.findViewById(R.id.btn_clear_cache_sat).setOnClickListener(v -> {
             UIUtils.showConfirmDialog(this, 
-                R.string.title_confirm_cache_clear, 
-                R.string.msg_confirm_cache_clear, 
+                R.string.title_confirm_cache_sat, 
+                R.string.msg_confirm_cache_sat, 
                 () -> clearMapCache(1));
         });
 
@@ -593,16 +605,20 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     }
 
     private void updateCacheSizeUI() {
+        if (txtCacheSizeStreet == null && txtCacheSizeSat == null) return;
+        
         File osmdroidDir = new File(getExternalFilesDir(null), "osmdroid");
         
         if (txtCacheSizeStreet != null) {
             File streetCache = new File(osmdroidDir, "tiles_street");
-            txtCacheSizeStreet.setText(FileUtils.formatSize(FileUtils.getFolderSize(streetCache)));
+            long size = FileUtils.getFolderSize(streetCache);
+            txtCacheSizeStreet.setText(FileUtils.formatSize(size));
         }
         
         if (txtCacheSizeSat != null) {
             File satCache = new File(osmdroidDir, "tiles_sat");
-            txtCacheSizeSat.setText(FileUtils.formatSize(FileUtils.getFolderSize(satCache)));
+            long size = FileUtils.getFolderSize(satCache);
+            txtCacheSizeSat.setText(FileUtils.formatSize(size));
         }
     }
 
@@ -634,15 +650,15 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 if (txtStatus == null) return;
                 switch (accuracy) {
                     case SensorManager.SENSOR_STATUS_ACCURACY_HIGH:
-                        txtStatus.setText("Alta Precisión");
+                        txtStatus.setText(getString(R.string.label_high_precision_status));
                         txtStatus.setTextColor(Color.GREEN);
                         break;
                     case SensorManager.SENSOR_STATUS_ACCURACY_MEDIUM:
-                        txtStatus.setText("Media (Mover dispositivo)");
+                        txtStatus.setText(getString(R.string.precision_medium_move));
                         txtStatus.setTextColor(Color.YELLOW);
                         break;
                     default:
-                        txtStatus.setText("Baja (Calibración necesaria)");
+                        txtStatus.setText(getString(R.string.precision_low_calibrate));
                         txtStatus.setTextColor(Color.RED);
                         break;
                 }

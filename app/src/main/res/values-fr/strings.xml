@@ -93,9 +93,10 @@
     <string name="cond_low">Basse pression</string>
     <string name="cond_offset">Baromètre décalé</string>
     <string name="val_normal_input">0 ou vide</string>
-    <string name="val_high_input">1.5 o 2.3</string>
-    <string name="val_low_input">-1.5 o -0.8</string>
+    <string name="val_high_input">1.5 ou 2.3</string>
+    <string name="val_low_input">-1.5 ou -0.8</string>
     <string name="val_offset_input">Calibrer</string>
+    <string name="val_err_offset">±0.5 to ±2.0</string>
     <string name="msg_restart_required">L\'application redémarrera pour appliquer les modifications.</string>
 
     <!-- Maps Settings Section -->
@@ -406,5 +407,43 @@
     <string name="guide_section_data_title">6. Gestion des Données</string>
     <string name="guide_section_data_body">Exportez vos relevés en <b>TXT</b> pour les rapports humains ou en <b>JSON</b> pour une intégration directe avec les logiciels SIG/CAO depuis l\'onglet REGISTRES.</string>
 
+    <string name="title_confirm_cache_street">Confirmer le nettoyage du cache routier</string>
+    <string name="msg_confirm_cache_street">Voulez-vous supprimer le cache de la carte routière ?</string>
+    <string name="title_confirm_cache_sat">Confirmer le nettoyage du cache satellite</string>
+    <string name="msg_confirm_cache_sat">Voulez-vous supprimer le cache de la carte satellite ?</string>
+    <string name="label_height_gps_disp">Haut. GPS Appareil</string>
+    <string name="label_height_online_dem">Haut. en ligne DEM</string>
+    <string name="msg_navigating_to">Navigation vers la position...</string>
+    <string name="label_height_info">Informations sur l\'altitude</string>
+    <string name="msg_map_clean_success">Carte visuellement nettoyée. Les enregistrements restent en sécurité.</string>
+    <string name="msg_no_points_found">Aucun point enregistré</string>
+    <string name="err_invalid_coords">Saisissez des coordonnées valides</string>
+    <string name="err_numeric_format">Format numérique invalide</string>
+    <string name="precision_excellent">Excellente</string>
+    <string name="precision_good">Bonne</string>
+    <string name="precision_medium">Moyenne</string>
+    <string name="precision_low">Faible</string>
+    <string name="label_lat_label">Latitude :</string>
+    <string name="label_lon_label">Longitude :</string>
+    <string name="label_alt_ellip_label">Haut. ellipsoïdale :</string>
+    <string name="label_alt_orto_label">Haut. orthométrique :</string>
+    <string name="label_este_label">Est (X) :</string>
+    <string name="label_norte_label">Nord (Y) :</string>
+    <string name="label_zona_label">Zone / Hémisphère :</string>
+    <string name="label_fe_label">Facteur d\'échelle (k) :</string>
+    <string name="label_fa_label">Facteur d\'élévation (ha) :</string>
+    <string name="label_fc_label">Facteur combiné (K) :</string>
+    <string name="label_geoid_label">Modèle géoïdal :</string>
+    <string name="label_type_label">Type d\'enregistrement :</string>
+    <string name="label_date_label">Date :</string>
+
+    <string name="msg_saving_data">Enregistrement des données...</string>
+    <string name="err_technical_prefix">Erreur technique : </string>
+    <string name="label_high_precision_status">Haute Précision</string>
+    <string name="precision_medium_move">Moyenne (Déplacer l\'appareil)</string>
+    <string name="precision_low_calibrate">Faible (Calibrage nécessaire)</string>
     <string name="desc_high_precision">Topographie de Haute Précision</string>
+    <string name="val_normal_offset">0.0</string>
+    <string name="val_high_offset">+1.0 to +3.0</string>
+    <string name="val_low_offset">-1.0 to -3.0</string>
 </resources>

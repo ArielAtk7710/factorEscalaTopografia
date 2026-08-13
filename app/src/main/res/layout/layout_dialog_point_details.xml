@@ -1,0 +1,138 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="#1B1E23"
+    android:orientation="vertical"
+    android:padding="24dp">
+
+    <TextView
+        android:id="@+id/txt_det_point_name"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Información del Punto"
+        android:textColor="@color/accent_orange"
+        android:textSize="20sp"
+        android:textStyle="bold"
+        android:gravity="center"
+        android:layout_marginBottom="20dp" />
+
+    <androidx.core.widget.NestedScrollView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:maxHeight="500dp">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <!-- Coordenadas Geodésicas -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="COORDENADAS GEODÉSICAS"
+                android:textColor="@color/accent_orange"
+                android:textSize="12sp"
+                android:textStyle="bold"
+                android:layout_marginBottom="8dp" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:background="@color/bg_surface"
+                android:padding="12dp"
+                android:layout_marginBottom="16dp">
+
+                <include layout="@layout/item_weather_detail_pro" android:id="@+id/row_lat" />
+                <include layout="@layout/item_weather_detail_pro" android:id="@+id/row_lon" />
+                <include layout="@layout/item_weather_detail_pro" android:id="@+id/row_alt_ellip" />
+                <include layout="@layout/item_weather_detail_pro" android:id="@+id/row_alt_orto" />
+            </LinearLayout>
+
+            <!-- Coordenadas UTM -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="PROYECCIÓN UTM"
+                android:textColor="@color/accent_orange"
+                android:textSize="12sp"
+                android:textStyle="bold"
+                android:layout_marginBottom="8dp" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:background="@color/bg_surface"
+                android:padding="12dp"
+                android:layout_marginBottom="16dp">
+
+                <include layout="@layout/item_weather_detail_pro" android:id="@+id/row_este" />
+                <include layout="@layout/item_weather_detail_pro" android:id="@+id/row_norte" />
+                <include layout="@layout/item_weather_detail_pro" android:id="@+id/row_zona" />
+            </LinearLayout>
+
+            <!-- Factores -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="FACTORES DE CORRECCIÓN"
+                android:textColor="@color/accent_orange"
+                android:textSize="12sp"
+                android:textStyle="bold"
+                android:layout_marginBottom="8dp" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:background="@color/bg_surface"
+                android:padding="12dp"
+                android:layout_marginBottom="16dp">
+
+                <include layout="@layout/item_weather_detail_pro" android:id="@+id/row_fe" />
+                <include layout="@layout/item_weather_detail_pro" android:id="@+id/row_fa" />
+                <include layout="@layout/item_weather_detail_pro" android:id="@+id/row_fc" />
+            </LinearLayout>
+
+            <!-- Metadata -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="DETALLES TÉCNICOS"
+                android:textColor="@color/accent_orange"
+                android:textSize="12sp"
+                android:textStyle="bold"
+                android:layout_marginBottom="8dp" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:background="@color/bg_surface"
+                android:padding="12dp"
+                android:layout_marginBottom="8dp">
+
+                <include layout="@layout/item_weather_detail_pro" android:id="@+id/row_geoid" />
+                <include layout="@layout/item_weather_detail_pro" android:id="@+id/row_type" />
+                <include layout="@layout/item_weather_detail_pro" android:id="@+id/row_date" />
+            </LinearLayout>
+
+        </LinearLayout>
+    </androidx.core.widget.NestedScrollView>
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/btn_det_close"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/btn_understood"
+        android:layout_marginTop="16dp"
+        app:backgroundTint="@color/accent_orange"
+        android:textColor="@android:color/white"
+        android:textStyle="bold"
+        app:cornerRadius="8dp" />
+
+</LinearLayout>

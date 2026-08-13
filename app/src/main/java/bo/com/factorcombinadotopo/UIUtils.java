@@ -105,7 +105,9 @@ public class UIUtils {
         txtMsg.setText(msgRes);
         
         // Lógica específica para advertencia de caché
-        if (titleRes == R.string.title_confirm_cache_clear) {
+        if (titleRes == R.string.title_confirm_cache_clear || 
+            titleRes == R.string.title_confirm_cache_street || 
+            titleRes == R.string.title_confirm_cache_sat) {
             txtWarn.setVisibility(View.VISIBLE);
             txtWarn.setText(R.string.warn_cache_clear);
         } else {
