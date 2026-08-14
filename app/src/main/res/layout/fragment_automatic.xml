@@ -20,13 +20,13 @@
             android:orientation="vertical"
             android:padding="16dp">
 
-            <!-- 1. CABECERA: REFERENCIA Y MAPA -->
+            <!-- 1. CABECERA: REFERENCIA -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
                 android:gravity="center_vertical"
-                android:layout_marginBottom="8dp">
+                android:layout_marginBottom="16dp">
 
                 <TextView
                     android:layout_width="0dp"
@@ -40,66 +40,11 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="@string/label_map"
-                    android:textColor="@color/accent_light"
-                    android:textSize="13sp"
-                    android:textStyle="bold"
-                    android:layout_marginEnd="8dp" />
-
-                <com.google.android.material.switchmaterial.SwitchMaterial
-                    android:id="@+id/switch_mapa"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    app:thumbTint="@color/switch_thumb_selector"
-                    app:trackTint="@color/switch_track_selector" />
+                    android:text="@string/msg_automatic_mode"
+                    android:textColor="@color/accent_orange"
+                    android:textSize="12sp"
+                    android:textStyle="bold" />
             </LinearLayout>
-
-            <androidx.cardview.widget.CardView
-                android:id="@+id/card_mapa"
-                android:layout_width="match_parent"
-                android:layout_height="220dp"
-                android:layout_marginBottom="12dp"
-                android:visibility="gone"
-                app:cardBackgroundColor="@color/bg_surface"
-                app:cardCornerRadius="12dp"
-                app:cardElevation="0dp">
-
-                <FrameLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent">
-
-                    <org.osmdroid.views.MapView
-                        android:id="@+id/mini_map_view"
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent" />
-
-                    <com.google.android.material.floatingactionbutton.FloatingActionButton
-                        android:id="@+id/fab_mini_toggle_map_type"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_gravity="bottom|end"
-                        android:layout_marginEnd="12dp"
-                        android:layout_marginBottom="68dp"
-                        android:src="@drawable/ic_map"
-                        app:backgroundTint="@color/accent_light"
-                        app:fabSize="mini"
-                        app:tint="@android:color/white"
-                        android:contentDescription="Cambiar Capa" />
-
-                    <com.google.android.material.floatingactionbutton.FloatingActionButton
-                        android:id="@+id/fab_mini_center_location"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_gravity="bottom|end"
-                        android:layout_margin="12dp"
-                        android:src="@drawable/ic_map_pin"
-                        app:backgroundTint="@color/accent_orange"
-                        app:fabSize="mini"
-                        app:tint="@android:color/white"
-                        android:contentDescription="Centrar Ubicación" />
-
-                </FrameLayout>
-            </androidx.cardview.widget.CardView>
 
             <!-- 2. BARRA DE ESTADO GPS (PRECISIÓN Y SATÉLITES) -->
             <LinearLayout
@@ -128,7 +73,16 @@
                     </LinearLayout>
                 </LinearLayout>
 
-                <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:orientation="vertical" android:gravity="end">
+                <LinearLayout
+                    android:id="@+id/layout_sat_container"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:orientation="vertical"
+                    android:gravity="end"
+                    android:background="?attr/selectableItemBackground"
+                    android:clickable="true"
+                    android:focusable="true">
                     <TextView android:text="@string/label_satellites" android:textSize="10sp" android:textColor="@color/text_secondary" android:textStyle="bold" android:layout_width="wrap_content" android:layout_height="wrap_content"/>
                     <LinearLayout android:layout_width="wrap_content" android:layout_height="wrap_content" android:orientation="horizontal" android:gravity="center_vertical">
                         <ImageView android:layout_width="14dp" android:layout_height="14dp" android:src="@drawable/ic_sat_icon" app:tint="@color/accent_orange" android:layout_marginEnd="4dp" android:contentDescription="Satelites"/>

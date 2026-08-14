@@ -53,8 +53,7 @@ public class MapFragment extends Fragment {
 
     private MapView mapView;
     private MapManager mapManager;
-    private TextView txtLat, txtLon, txtAlt;
-    private View sepAlt;
+    private TextView txtLat, txtLon;
     private LinearLayout layoutCoords;
     private SurveyViewModel viewModel;
     private android.location.Location lastGpsLocation;
@@ -86,8 +85,6 @@ public class MapFragment extends Fragment {
             mapView = view.findViewById(R.id.map_view);
             txtLat = view.findViewById(R.id.txt_map_lat);
             txtLon = view.findViewById(R.id.txt_map_lon);
-            txtAlt = view.findViewById(R.id.txt_map_alt);
-            sepAlt = view.findViewById(R.id.sep_map_alt);
             layoutCoords = view.findViewById(R.id.layout_map_coords);
 
             mapManager = new MapManager(requireContext(), mapView);
@@ -101,7 +98,7 @@ public class MapFragment extends Fragment {
             view.findViewById(R.id.fab_toggle_map_type).setOnClickListener(v -> {
                 if (mapManager != null) {
                     mapManager.toggleMapType();
-                    UIUtils.showInfoToast(requireContext(), "Modo: " + mapManager.getCurrentMapModeName());
+                    UIUtils.showInfoToast(requireContext(), getString(R.string.label_map_prefix) + mapManager.getCurrentMapModeName());
                 }
             });
 
@@ -151,9 +148,6 @@ public class MapFragment extends Fragment {
                 }
                 
                 mapManager.updateMyLocation(location);
-                if (txtAlt != null) {
-                    txtAlt.setText(String.format(Locale.getDefault(), "ALT: %.1fm", location.getAltitude()));
-                }
             }
         });
     }
@@ -375,7 +369,7 @@ public class MapFragment extends Fragment {
             new Handler(Looper.getMainLooper()).post(() -> {
                 if (!isAdded()) return;
                 if (allPoints.isEmpty()) {
-                    UIUtils.showInfoToast(requireContext(), "No hay puntos registrados");
+                    UIUtils.showInfoToast(requireContext(), getString(R.string.msg_no_points_registered));
                     return;
                 }
 
@@ -466,7 +460,7 @@ public class MapFragment extends Fragment {
             
             if (c != null && c.moveToFirst()) {
                 ContentValues v = new ContentValues();
-                // Extraer todos los campos necesarios para la UI
+                // Extraer todos los campos necesarios para la UI con safe defaults
                 v.put("name", title);
                 v.put("lat", c.getString(c.getColumnIndexOrThrow(DatabaseHelper.COLUMN_LATITUD)));
                 v.put("lon", c.getString(c.getColumnIndexOrThrow(DatabaseHelper.COLUMN_LONGITUD)));
@@ -474,7 +468,11 @@ public class MapFragment extends Fragment {
                 v.put("alt_o", c.getString(c.getColumnIndexOrThrow(DatabaseHelper.COLUMN_ALTURA_ORTO)));
                 v.put("este", c.getString(c.getColumnIndexOrThrow(DatabaseHelper.COLUMN_ESTE)));
                 v.put("norte", c.getString(c.getColumnIndexOrThrow(DatabaseHelper.COLUMN_NORTE)));
-                v.put("zona", c.getString(c.getColumnIndexOrThrow(DatabaseHelper.COLUMN_ZONA)) + " " + c.getString(c.getColumnIndexOrThrow(DatabaseHelper.COLUMN_HEMISFERIO)));
+                
+                String zona = c.getString(c.getColumnIndexOrThrow(DatabaseHelper.COLUMN_ZONA));
+                String hem = c.getString(c.getColumnIndexOrThrow(DatabaseHelper.COLUMN_HEMISFERIO));
+                v.put("zona", (zona != null ? zona : "") + " " + (hem != null ? hem : ""));
+                
                 v.put("fe", c.getString(c.getColumnIndexOrThrow(DatabaseHelper.COLUMN_FACTOR_ESCALA)));
                 v.put("fa", c.getString(c.getColumnIndexOrThrow(DatabaseHelper.COLUMN_FACTOR_ALTURA)));
                 v.put("fc", c.getString(c.getColumnIndexOrThrow(DatabaseHelper.COLUMN_FACTOR_COMBINADO)));
@@ -486,6 +484,8 @@ public class MapFragment extends Fragment {
                 new Handler(Looper.getMainLooper()).post(() -> showPointDetailsDialog(v));
             } else {
                 if (c != null) c.close();
+                new Handler(Looper.getMainLooper()).post(() -> 
+                    UIUtils.showInfoToast(requireContext(), getString(R.string.msg_point_details_unavailable)));
             }
         }).start();
     }
@@ -622,13 +622,6 @@ public class MapFragment extends Fragment {
             int color = isEnabled ? ContextCompat.getColor(requireContext(), R.color.flight_green) 
                                   : ContextCompat.getColor(requireContext(), R.color.flight_red);
             bg.setStroke(2, color);
-        }
-
-        // Toggle visibilidad de altitud según estado GPS
-        if (txtAlt != null && sepAlt != null) {
-            int vis = isEnabled ? View.VISIBLE : View.GONE;
-            txtAlt.setVisibility(vis);
-            sepAlt.setVisibility(vis);
         }
     }
 

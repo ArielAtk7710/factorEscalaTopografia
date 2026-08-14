@@ -136,8 +136,18 @@
                 android:textSize="11sp"
                 android:textStyle="italic"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="@id/btn_expand_details"
-                app:layout_constraintBottom_toBottomOf="@id/btn_expand_details" />
+                app:layout_constraintTop_toTopOf="@id/btn_expand_details" />
+
+            <TextView
+                android:id="@+id/txt_item_fecha_full"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="2026-08-01 17:30"
+                android:textColor="@color/text_secondary"
+                android:textSize="9sp"
+                android:textStyle="italic"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/txt_item_tipo_registro" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 
@@ -347,16 +357,6 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="2dp"/>
             </LinearLayout>
-
-            <TextView
-                android:id="@+id/txt_item_fecha_full"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Registrado: 2026-08-01 17:30"
-                android:textColor="@color/text_secondary"
-                android:textSize="10sp"
-                android:gravity="end"
-                android:layout_marginTop="8dp" />
 
         </LinearLayout>
 

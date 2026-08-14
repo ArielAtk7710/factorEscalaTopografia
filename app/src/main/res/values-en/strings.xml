@@ -76,8 +76,6 @@
     <string name="label_light_mode">Light Mode</string>
     <string name="lang_es">Spanish (Español)</string>
     <string name="lang_en">English</string>
-    <string name="lang_pt">Portuguese (Português)</string>
-    <string name="lang_fr">French (Français)</string>
     <string name="label_export_directory">Export Directory</string>
     <string name="label_map_export_path">Exported data path</string>
     <string name="text_export_path">Internal Storage > Documents > FactorEscalaTop</string>
@@ -188,9 +186,9 @@
     <string name="label_cloud_cover">Cloud Cover:</string>
     <string name="label_visibility">Visibility:</string>
     <string name="label_gusts_max">Max Gusts:</string>
-    <string name="label_rain_prob_v">Rain Prob.:</string>
+    <string name="label_rain_prob_v">Rain Probability:</string>
     <string name="label_rain_actual">Actual Rain:</string>
-    <string name="label_kp_solar">Solar Kp Index:</string>
+    <string name="label_kp_solar">Solar Activity Index (Kp):</string>
     <string name="msg_gps_no_signal">GPS no signal</string>
     <string name="msg_weather_danger">Danger detected. Takeoff not recommended.</string>
     <string name="msg_weather_caution">Caution. GPS interference possible.</string>
@@ -328,7 +326,7 @@
     <string name="label_reg_auto">Automatic Record</string>
     <string name="label_reg_map">Map Record</string>
     <string name="label_searching_location">Searching location...</string>
-    <string name="msg_gps_toggle_info">Device GPS: saves the altitude obtained from your GPS, Online Height: saves the altitude obtained from the Open-Meteo API (Copernicus DEM), which globally uses the EGM2008 vertical reference system, based on the marked latitude and longitude.</string>
+    <string name="msg_gps_toggle_info">\'Device GPS Altitude\' uses your phone\'s sensor for real-time ellipsoidal height. \'Online DEM Altitude\' retrieves the orthometric elevation (MSL) via Open-Meteo API (Copernicus GLO-90 Model) based on the coordinates marked on the map.</string>
 
     <!-- Terms and Conditions -->
     <string name="title_terms_conditions">📜 Terms and Conditions of Use</string>
@@ -411,11 +409,11 @@
     <string name="msg_confirm_cache_street">Do you want to delete the street map cache?</string>
     <string name="title_confirm_cache_sat">Confirm Satellite Cache Clear</string>
     <string name="msg_confirm_cache_sat">Do you want to delete the satellite map cache?</string>
-    <string name="label_height_gps_disp">GPS Height Device</string>
-    <string name="label_height_online_dem">Online Height DEM</string>
+    <string name="label_height_gps_disp">Device GPS Altitude</string>
+    <string name="label_height_online_dem">Online DEM Altitude</string>
     <string name="msg_navigating_to">Navigating to position...</string>
     <string name="label_height_info">Altitude Information</string>
-    <string name="msg_map_clean_success">Map visually cleaned. Records remain safe.</string>
+    <string name="msg_map_clean_success">Map display cleared. Records remain safe.</string>
     <string name="msg_no_points_found">No points registered</string>
     <string name="err_invalid_coords">Enter valid coordinates</string>
     <string name="err_numeric_format">Invalid numeric format</string>
@@ -440,7 +438,16 @@
     <string name="msg_saving_data">Saving data...</string>
     <string name="err_technical_prefix">Technical error: </string>
     <string name="label_high_precision_status">High Precision</string>
-    <string name="precision_medium_move">Medium (Move device)</string>
+    <string name="precision_medium_move">Medium (Rotate device)</string>
     <string name="precision_low_calibrate">Low (Calibration needed)</string>
     <string name="desc_high_precision">High Precision Topography</string>
+    <string name="msg_systems_ready">Systems ready</string>
+    <string name="label_map_prefix">Map: </string>
+    <string name="msg_point_details_unavailable">Details unavailable for this session point</string>
+    <string name="msg_no_points_registered">No registered points</string>
+    <string name="msg_automatic_mode">AUTOMATIC MODE</string>
+    <string name="label_constellation_status">GNSS Constellation Status</string>
+    <string name="label_satellites_used">SATELLITES IN USE</string>
+    <string name="label_total_visible">TOTAL VISIBLE</string>
+    <string name="label_visible_status">Visible</string>
 </resources>

@@ -5,6 +5,8 @@
     android:background="@drawable/bg_ppm_badge"
     android:backgroundTint="@color/accent_orange"
     android:orientation="vertical"
+    android:clickable="true"
+    android:focusable="true"
     android:paddingHorizontal="6dp"
     android:paddingVertical="3dp">
 

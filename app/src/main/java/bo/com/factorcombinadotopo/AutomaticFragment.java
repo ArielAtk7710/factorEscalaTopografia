@@ -21,13 +21,15 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
-import androidx.cardview.widget.CardView;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
-import com.google.android.material.switchmaterial.SwitchMaterial;
-import org.osmdroid.views.MapView;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+import com.google.android.material.bottomsheet.BottomSheetDialog;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import java.util.Locale;
 
 /**
@@ -41,14 +43,12 @@ public class AutomaticFragment extends Fragment {
     private TextView txtFa, txtFe, txtFc, txtPresicion, txtSat, txtTemp;
     private TextView txtGeoidUndulation, txtGeoidModel;
 
-    private SwitchMaterial switchMapa;
-    private CardView cardMapa;
-    private MapView miniMapView;
+    private View layoutSatContainer;
     private Button btnGuardarPunto;
 
-    private MapManager miniMapManager;
     private SurveyViewModel viewModel;
     private TopoCalculoManager.TopoResult lastResult;
+    private GnssStatus lastGnssStatus;
 
     private boolean isGpsCurrentlyEnabled = true;
 
@@ -56,13 +56,16 @@ public class AutomaticFragment extends Fragment {
         @Override
         public void onSatelliteStatusChanged(@NonNull GnssStatus status) {
             if (!isAdded()) return;
+            lastGnssStatus = status;
             int satellitesInUse = 0;
-            for (int i = 0; i < status.getSatelliteCount(); i++) {
+            int satelliteCount = status.getSatelliteCount();
+            for (int i = 0; i < satelliteCount; i++) {
                 if (status.usedInFix(i)) satellitesInUse++;
             }
-            if (txtSat != null) txtSat.setText(String.valueOf(satellitesInUse));
-        }
-    };
+        // Actualizar UI del satélite en uso inmediatamente
+        if (txtSat != null) txtSat.setText(String.valueOf(satellitesInUse));
+    }
+};
 
     private final BroadcastReceiver gpsReceiver = new BroadcastReceiver() {
         @Override
@@ -104,40 +107,22 @@ public class AutomaticFragment extends Fragment {
         txtGeoidUndulation = view.findViewById(R.id.txt_geoid_undulation);
         txtGeoidModel = view.findViewById(R.id.txt_geoid_model);
         
-        switchMapa = view.findViewById(R.id.switch_mapa);
-        cardMapa = view.findViewById(R.id.card_mapa);
-        miniMapView = view.findViewById(R.id.mini_map_view);
+        layoutSatContainer = view.findViewById(R.id.layout_sat_container);
         btnGuardarPunto = view.findViewById(R.id.btn_guardar_punto_auto);
 
-        view.findViewById(R.id.fab_mini_toggle_map_type).setOnClickListener(v -> {
-            if (miniMapManager != null) {
-                miniMapManager.toggleMapType();
-                UIUtils.showInfoToast(requireContext(), "Mapa: " + miniMapManager.getCurrentMapModeName());
-            }
-        });
-
-        view.findViewById(R.id.fab_mini_center_location).setOnClickListener(v -> {
-            if (miniMapManager != null) miniMapManager.centerOnCurrentLocation();
-        });
-
-        setupMiniMap();
         setupViewModelObservers();
 
         btnGuardarPunto.setOnClickListener(v -> showSavePointDialog());
-        switchMapa.setOnCheckedChangeListener((bv, isChecked) -> handleMapState(isChecked));
-    }
-
-    private void setupMiniMap() {
-        miniMapManager = new MapManager(requireContext(), miniMapView);
-        miniMapManager.setAutoCenterEnabled(true);
+        
+        if (layoutSatContainer != null) {
+            layoutSatContainer.setOnClickListener(v -> showSatelliteDetailsDialog());
+        }
     }
 
     private void setupViewModelObservers() {
-        // Observar Ubicación Raw para el mapa y la precisión
+        // Observar Ubicación Raw para la precisión
         viewModel.getRawLocation().observe(getViewLifecycleOwner(), loc -> {
             if (loc == null) return;
-            if (switchMapa.isChecked()) miniMapManager.updateMyLocation(loc);
-            
             String level = getPrecisionLevel(loc.getAccuracy());
             txtPresicion.setText(String.format(Locale.US, "± %.0f m - %s", loc.getAccuracy(), level));
         });
@@ -188,7 +173,7 @@ public class AutomaticFragment extends Fragment {
 
     private void checkGpsState() {
         LocationManager lm = (LocationManager) requireContext().getSystemService(Context.LOCATION_SERVICE);
-        boolean isEnabled = lm.isProviderEnabled(LocationManager.GPS_PROVIDER);
+        boolean isEnabled = lm != null && lm.isProviderEnabled(LocationManager.GPS_PROVIDER);
         if (!isEnabled) resetUIData();
         isGpsCurrentlyEnabled = isEnabled;
     }
@@ -206,21 +191,6 @@ public class AutomaticFragment extends Fragment {
         txtLat.setText("0"); txtLon.setText("0"); txtAlt.setText("-- m");
         txtAltOrto.setText("-- m"); txtEste.setText("0.00"); txtNorte.setText("0.00");
         txtPresicion.setText("± -- m"); txtSat.setText("0");
-    }
-
-    private void handleMapState(boolean visible) {
-        cardMapa.setVisibility(visible ? View.VISIBLE : View.GONE);
-        if (visible) {
-            miniMapManager.onResume();
-            // Centrado inmediato si ya tenemos ubicación previa
-            Location loc = viewModel.getRawLocation().getValue();
-            if (loc != null) {
-                miniMapManager.updateMyLocation(loc);
-            }
-            miniMapView.invalidate();
-        } else {
-            miniMapManager.onPause();
-        }
     }
 
     private void showSavePointDialog() {
@@ -295,6 +265,88 @@ public class AutomaticFragment extends Fragment {
         });
     }
 
+    private void showSatelliteDetailsDialog() {
+        if (!isAdded()) return;
+        
+        BottomSheetDialog dialog = new BottomSheetDialog(requireContext());
+        View view = getLayoutInflater().inflate(R.layout.layout_dialog_satellite_info, null);
+        dialog.setContentView(view);
+
+        TextView txtUsed = view.findViewById(R.id.txt_sat_used);
+        TextView txtTotal = view.findViewById(R.id.txt_sat_total);
+        RecyclerView rv = view.findViewById(R.id.rv_satellites);
+        rv.setLayoutManager(new LinearLayoutManager(requireContext()));
+
+        if (lastGnssStatus != null) {
+            int usedCount = 0;
+            int totalCount = lastGnssStatus.getSatelliteCount();
+            List<SatelliteInfo> satList = new ArrayList<>();
+
+            for (int i = 0; i < totalCount; i++) {
+                SatelliteInfo info = new SatelliteInfo();
+                info.svid = lastGnssStatus.getSvid(i);
+                info.constellation = getConstellationName(lastGnssStatus.getConstellationType(i));
+                info.signal = lastGnssStatus.getCn0DbHz(i);
+                info.usedInFix = lastGnssStatus.usedInFix(i);
+                if (info.usedInFix) usedCount++;
+                satList.add(info);
+            }
+
+            txtUsed.setText(String.valueOf(usedCount));
+            txtTotal.setText(String.valueOf(totalCount));
+            rv.setAdapter(new SatelliteAdapter(satList));
+        }
+
+        view.findViewById(R.id.btn_close_sat_info).setOnClickListener(v -> dialog.dismiss());
+        dialog.show();
+    }
+
+    private String getConstellationName(int type) {
+        switch (type) {
+            case GnssStatus.CONSTELLATION_GPS: return "GPS";
+            case GnssStatus.CONSTELLATION_GLONASS: return "GLONASS";
+            case GnssStatus.CONSTELLATION_BEIDOU: return "BEIDOU";
+            case GnssStatus.CONSTELLATION_GALILEO: return "GALILEO";
+            case GnssStatus.CONSTELLATION_QZSS: return "QZSS";
+            case GnssStatus.CONSTELLATION_SBAS: return "SBAS";
+            default: return "Desconocida";
+        }
+    }
+
+    private static class SatelliteInfo {
+        int svid;
+        String constellation;
+        float signal;
+        boolean usedInFix;
+    }
+
+    private static class SatelliteAdapter extends RecyclerView.Adapter<SatelliteAdapter.ViewHolder> {
+        private final List<SatelliteInfo> list;
+        SatelliteAdapter(List<SatelliteInfo> list) { this.list = list; }
+        @NonNull @Override public ViewHolder onCreateViewHolder(@NonNull ViewGroup p, int vt) {
+            return new ViewHolder(LayoutInflater.from(p.getContext()).inflate(R.layout.item_satellite_info, p, false));
+        }
+        @Override public void onBindViewHolder(@NonNull ViewHolder h, int pos) {
+            SatelliteInfo si = list.get(pos);
+            h.txtId.setText(String.format(Locale.US, "%02d", si.svid));
+            h.txtConst.setText(si.constellation);
+            h.txtSignal.setText(String.format(Locale.US, "%.1f", si.signal));
+            h.txtStatus.setText(si.usedInFix ? "En uso" : h.itemView.getContext().getString(R.string.label_visible_status));
+            h.txtStatus.setTextColor(si.usedInFix ? 0xFF10B981 : 0xFF9FA2A3); // flight_green vs text_secondary
+        }
+        @Override public int getItemCount() { return list.size(); }
+        static class ViewHolder extends RecyclerView.ViewHolder {
+            TextView txtId, txtConst, txtStatus, txtSignal;
+            ViewHolder(View v) {
+                super(v);
+                txtId = v.findViewById(R.id.txt_sat_id);
+                txtConst = v.findViewById(R.id.txt_sat_constellation);
+                txtStatus = v.findViewById(R.id.txt_sat_status);
+                txtSignal = v.findViewById(R.id.txt_sat_signal);
+            }
+        }
+    }
+
     @Override
     public void onResume() {
         super.onResume();
@@ -306,11 +358,8 @@ public class AutomaticFragment extends Fragment {
     @Override
     public void onDestroyView() {
         super.onDestroyView();
-        if (miniMapManager != null) {
-            miniMapManager.onDestroy();
-        }
-        if (miniMapView != null) {
-            miniMapView.onDetach();
-        }
+        // Limpieza de referencias
+        layoutSatContainer = null;
+        btnGuardarPunto = null;
     }
 }

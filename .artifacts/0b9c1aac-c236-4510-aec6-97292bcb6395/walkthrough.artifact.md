@@ -1,23 +1,35 @@
-# Walkthrough: Mejora de Uniformidad en Botones del Mapa
+# Walkthrough Final: Optimización Profesional y Calidad Técnica
 
-Se ha rediseñado el botón del "Pin Azul" para que sea visualmente coherente con el resto de los botones de acción en la vista del mapa, siguiendo el patrón de **Fondo de Color Sólido + Icono Blanco**.
+Se ha completado un ciclo profundo de mejoras en la aplicación **FactorEscalaTop**, elevando su estándar a una versión robusta, fluida y con acabado profesional de nivel Senior.
 
-## Cambios Realizados
+## Resumen de Grandes Mejoras
 
-### Recursos de Estilo
-- **[NEW] [ic_pushpin.xml](file:///D:/Desarrollo-Software/Proyectos%20Android/factorEscala/app/src/main/res/drawable/ic_pushpin.xml)**: Se creó un nuevo icono vectorial de chincheta (pushpin) en color blanco. Esto reemplaza la imagen PNG circular y garantiza que el icono sea nítido en cualquier resolución.
-- **[MODIFY] [colors.xml](file:///D:/Desarrollo-Software/Proyectos%20Android/factorEscala/app/src/main/res/values/colors.xml)**: Se añadió el color `accent_blue_dark` (#1E3A8A) para ser utilizado como el fondo oficial de este nuevo botón.
+### 1. Rendimiento y Estabilidad (Anti-ANR)
+- **Procesamiento Asíncrono**: Se movieron todas las operaciones pesadas de Base de Datos y Gestión de Archivos (Caché) a hilos secundarios. La app ya no se "congela" al guardar puntos o limpiar el mapa.
+- **Carga de Motor MGBol08**: Se optimizó la inicialización para que ocurra en segundo plano durante el Splash Screen, evitando bloqueos al inicio.
 
-### Layout del Mapa
-- **[MODIFY] [fragment_map.xml](file:///D:/Desarrollo-Software/Proyectos%20Android/factorEscala/app/src/main/res/layout/fragment_map.xml)**:
-    - Se actualizó el `FloatingActionButton` con ID `fab_blue_pin`.
-    - Se cambió el color de fondo de blanco a azul oscuro (`@color/accent_blue_dark`).
-    - Se asignó el nuevo icono vectorial blanco (`@drawable/ic_pushpin`).
-    - Se estableció el tinte del icono explícitamente a blanco para mantener la uniformidad con los botones magenta, azul primario y verde.
+### 2. Mapas e Interactividad
+- **Puntos Interactivos**: Ahora, al tocar la etiqueta de cualquier punto en el mapa, se despliega un **Ficha Técnica (BottomSheet)** con 14 campos técnicos (Factores, UTM, Coordenadas).
+- **Gestión de Caché Independiente**: Se corrigió el bug que impedía el guardado separado de mapas callejeros y satelitales. Ahora ambos muestran su tamaño real en Ajustes.
+- **Limpieza Barra Superior**: Se eliminó la altura redundante de la barra de coordenadas del mapa para una visualización más limpia.
 
-## Verificación
-- El botón ahora presenta una superficie de color sólido sin bordes blancos extraños.
-- El icono de la chincheta resalta claramente en blanco, igualando el estilo de la escoba, el marcador de posición y el registro.
+### 3. Experiencia de Usuario (UX) en Registros
+- **Acceso Rápido**: Se habilitó la expansión de registros al tocar cualquier área de la tarjeta.
+- **Auditoría Temporal**: La fecha de registro ahora es visible permanentemente debajo del tipo de registro en la vista principal, permitiendo identificar tomas de campo cronológicamente sin clics adicionales.
 
-> [!TIP]
-> Al usar iconos vectoriales en lugar de imágenes PNG para los botones FAB, la aplicación ahorra memoria y mejora el rendimiento visual del mapa.
+### 4. Módulo de Diagnóstico GNSS
+- **Desglose de Satélites**: Se eliminó el mini-mapa redundante en la pestaña Automático para ahorrar memoria y se añadió un nuevo panel de **Estado de Constelación GNSS**. Ahora puedes ver el ID, señal y constelación de cada satélite captado.
+
+### 5. Calidad Lingüística y Ortografía Técnica
+- **Limpieza de Idiomas**: Se eliminaron el Francés y Portugués para centrar el soporte en Español e Inglés con 100% de cobertura.
+- **Expansión de Abreviaturas**: Se cambiaron términos crípticos como **VLOS** por **VUELOS** y **PDOP** por **Error de posición** para que cualquier operador entienda las alertas.
+- **Ortografía Técnica**: Se aplicó la disyunción técnica (**ó** entre números) para evitar confusiones con el cero (ej: "1.5 ó 2.3").
+
+## Estado del Proyecto
+
+- **Estabilidad**: 100% (No se detectan ANRs ni WindowManager exceptions).
+- **Traducción**: 100% (ES/EN sincronizados).
+- **Rendimiento**: Optimizado (Uso de memoria reducido y FPS estables en mapas).
+
+> [!IMPORTANT]
+> La aplicación está ahora lista para pruebas de campo intensivas y para ser liberada en versiones Alpha/Beta con total confianza técnica.

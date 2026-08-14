@@ -518,6 +518,7 @@ public class RegisterFragment extends Fragment {
             h.imgArrow.setRotation(p.isExpanded ? 180 : 0);
             h.txtExpandLabel.setText(p.isExpanded ? getString(R.string.label_hide_details) : getString(R.string.label_show_details));
             h.btnExpand.setOnClickListener(v -> { p.isExpanded = !p.isExpanded; notifyItemChanged(pos); });
+            h.itemView.setOnClickListener(v -> { p.isExpanded = !p.isExpanded; notifyItemChanged(pos); });
             h.btnCopy.setOnClickListener(v -> copiarPunto(p));
             h.btnShare.setOnClickListener(v -> compartirPunto(p));
             h.btnDelete.setVisibility(isSelectionMode ? View.GONE : View.VISIBLE);
@@ -583,8 +584,10 @@ public class RegisterFragment extends Fragment {
         @Override public void onBindViewHolder(@NonNull ViewHolder h, int pos) {
             LibretaEntry e = list.get(pos);
             h.txtNombre.setText(e.estacion + " -> " + e.puntoAux); h.txtResumen.setText(getString(R.string.label_ref_format, e.puntoRef) + " | " + getString(R.string.label_prisma) + ": " + e.altPri + " " + getString(R.string.unit_meter));
+            h.txtItemLibTipo.setText(e.tipoReg);
             h.txtDetTipo.setText(e.tipoReg); h.txtDetAltIns.setText(e.altIns + " " + getString(R.string.unit_meter)); h.txtDetEste.setText(e.este + " " + getString(R.string.unit_meter));
             h.txtDetNorte.setText(e.norte + " " + getString(R.string.unit_meter)); h.txtDetCota.setText(e.cota + " " + getString(R.string.unit_meter)); h.txtDetFecha.setText(e.fecha);
+            h.txtFechaBottom.setText(e.fecha);
             h.txtDetObs.setText((e.obs == null || e.obs.isEmpty()) ? getString(R.string.label_no_obs_list) : e.obs);
             h.cbSelect.setVisibility(isSelectionMode ? View.VISIBLE : View.GONE);
             h.cbSelect.setChecked(selectedIds.contains(e.id));
@@ -593,6 +596,7 @@ public class RegisterFragment extends Fragment {
             h.imgArrow.setRotation(e.isExpanded ? 180 : 0);
             h.txtExpandLabel.setText(e.isExpanded ? getString(R.string.label_hide_details) : getString(R.string.label_show_details));
             h.btnExpand.setOnClickListener(v -> { e.isExpanded = !e.isExpanded; notifyItemChanged(pos); });
+            h.itemView.setOnClickListener(v -> { e.isExpanded = !e.isExpanded; notifyItemChanged(pos); });
             h.btnCopy.setOnClickListener(v -> copiarLibreta(e));
             h.btnShare.setOnClickListener(v -> compartirLibreta(e));
             h.btnDelete.setVisibility(isSelectionMode ? View.GONE : View.VISIBLE);
@@ -624,7 +628,7 @@ public class RegisterFragment extends Fragment {
             startActivity(Intent.createChooser(si, "Compartir Registro"));
         }
         class ViewHolder extends RecyclerView.ViewHolder {
-            TextView txtNombre, txtResumen, txtDetTipo, txtDetAltIns, txtDetEste, txtDetNorte, txtDetCota, txtDetFecha, txtDetObs, txtExpandLabel;
+            TextView txtNombre, txtResumen, txtDetTipo, txtDetAltIns, txtDetEste, txtDetNorte, txtDetCota, txtDetFecha, txtDetObs, txtExpandLabel, txtFechaBottom, txtItemLibTipo;
             ImageView btnDelete, btnCopy, btnShare, imgArrow; CheckBox cbSelect; LinearLayout layoutExpand, btnExpand;
             ViewHolder(View v) {
                 super(v);
@@ -637,6 +641,8 @@ public class RegisterFragment extends Fragment {
                 txtDetEste = v.findViewById(R.id.txt_lib_det_este); txtDetNorte = v.findViewById(R.id.txt_lib_det_norte);
                 txtDetCota = v.findViewById(R.id.txt_lib_det_cota); txtDetFecha = v.findViewById(R.id.txt_lib_det_fecha);
                 txtDetObs = v.findViewById(R.id.txt_lib_det_obs);
+                txtFechaBottom = v.findViewById(R.id.txt_lib_item_fecha_bottom);
+                txtItemLibTipo = v.findViewById(R.id.txt_item_lib_tipo);
             }
         }
     }

@@ -76,13 +76,11 @@
     <string name="label_light_mode">Modo Claro</string>
     <string name="lang_es">Español</string>
     <string name="lang_en">Inglés (English)</string>
-    <string name="lang_pt">Portugués (Português)</string>
-    <string name="lang_fr">Francés (Français)</string>
     <string name="label_export_directory">Directorio de Exportación</string>
     <string name="label_map_export_path">Ruta de datos exportados</string>
     <string name="text_export_path">Almacenamiento Interno > Documents > FactorEscalaTop</string>
     <string name="label_pressure_adjustment">Ajuste de Barómetro (mmHg)</string>
-    <string name="hint_pressure_adjustment">Ej: -1.5 o 0.8</string>
+    <string name="hint_pressure_adjustment">Ej: -1.5 ó 0.8</string>
     <string name="btn_info_barometer">Información de barómetro</string>
     <string name="title_barometer_guide">GUÍA DE AJUSTE BAROMÉTRICO</string>
     <string name="col_condition">Condición meteorológica</string>
@@ -148,11 +146,11 @@
     <string name="safety_cause_wind_high">Viento elevado en zona de operación</string>
     <string name="safety_cause_rain_imminent">Precipitación detectada o inminente</string>
     <string name="safety_cause_rain_mod">Probabilidad de lluvia moderada</string>
-    <string name="safety_cause_vis_critical">Visibilidad crítica para VLOS</string>
+    <string name="safety_cause_vis_critical">Visibilidad crítica para VUELOS</string>
     <string name="safety_cause_vis_low">Visibilidad reducida</string>
     <string name="safety_cause_solar_high">Actividad solar alta (Kp %1$.1f)</string>
     <string name="safety_cause_solar_mod">Kp moderado (Posible inestabilidad GNSS)</string>
-    <string name="safety_cause_pdop_high">Geometría satelital pobre (PDOP elevado)</string>
+    <string name="safety_cause_pdop_high">Geometría satelital pobre (Error de posición elevado)</string>
     <string name="safety_cause_pdop_def">Geometría satelital deficiente</string>
 
     <string name="safety_short_msg_danger">Operación no recomendada. Riesgo crítico.</string>
@@ -218,12 +216,12 @@
     <string name="label_wind_precip">VIENTOS Y PRECIPITACIÓN</string>
     <string name="label_wind_120_v">Viento (120m):</string>
     <string name="label_wind_sustained">Viento Sostenido:</string>
-    <string name="label_wind_direction">Dir. Viento:</string>
+    <string name="label_wind_direction">Dirección Viento:</string>
     <string name="label_gusts_max">Ráfagas Max:</string>
-    <string name="label_rain_prob_v">Prob. Lluvia:</string>
+    <string name="label_rain_prob_v">Probabilidad Lluvia:</string>
     <string name="label_rain_actual">Lluvia Actual:</string>
     <string name="label_electronic_safety">SEGURIDAD ELECTRÓNICA / GNSS</string>
-    <string name="label_kp_solar">Índice Kp Solar:</string>
+    <string name="label_kp_solar">Índice de Actividad Solar (Kp):</string>
     <string name="btn_refresh_weather_pro">↻  ACTUALIZAR DATOS</string>
 
     <string name="msg_gps_no_signal">GPS sin señal</string>
@@ -362,7 +360,7 @@
     <string name="label_reg_auto">Registro Automático</string>
     <string name="label_reg_map">Registro Mapa</string>
     <string name="label_searching_location">Buscando ubicación...</string>
-    <string name="msg_gps_toggle_info">GPS Dispositivo: guarda la altura obtenida de tu GPS, Altura online: guarda la altura obtenida de la API de Open-Meteo (Copernicus DEM), que utiliza de forma global el sistema de referencia vertical EGM2008, basadas en la latitud y longitud marcada.</string>
+    <string name="msg_gps_toggle_info">«Altura GPS Disp.» utiliza el sensor de tu móvil para obtener la altura elipsoidal en tiempo real. «Altura online DEM» consulta la cota ortométrica (MSL) mediante la API de Open-Meteo (Modelo Copernicus GLO-90) basándose en las coordenadas marcadas en el mapa.</string>
 
     <!-- Terms and Conditions -->
     <string name="title_terms_conditions">📜 Términos y Condiciones de Uso</string>
@@ -477,4 +475,13 @@
     <string name="precision_medium_move">Media (Mover dispositivo)</string>
     <string name="precision_low_calibrate">Baja (Calibración necesaria)</string>
     <string name="desc_high_precision">Topografía de Alta Precisión</string>
+    <string name="msg_systems_ready">Sistemas listos</string>
+    <string name="label_map_prefix">Mapa: </string>
+    <string name="msg_point_details_unavailable">Detalles no disponibles para este punto de sesión</string>
+    <string name="msg_no_points_registered">No hay puntos registrados</string>
+    <string name="msg_automatic_mode">MODO AUTOMÁTICO</string>
+    <string name="label_constellation_status">Estado de Constelación GNSS</string>
+    <string name="label_satellites_used">SATÉLITES EN USO</string>
+    <string name="label_total_visible">TOTAL VISIBLES</string>
+    <string name="label_visible_status">Visible</string>
 </resources>

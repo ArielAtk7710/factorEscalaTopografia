@@ -28,7 +28,7 @@ public class SplashScreen extends AppCompatActivity {
                 long delay = Math.max(0, 4500 - elapsedTime);
 
                 new Handler(Looper.getMainLooper()).postDelayed(() -> {
-                    if (txtStatus != null) txtStatus.setText("Sistemas listos");
+                    if (txtStatus != null) txtStatus.setText(getString(R.string.msg_systems_ready));
                     
                     new Handler(Looper.getMainLooper()).postDelayed(() -> {
                         startActivity(Intent.makeRestartActivityTask(new Intent(SplashScreen.this, MainActivity.class).getComponent()));

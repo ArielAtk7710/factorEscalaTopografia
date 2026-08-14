@@ -83,7 +83,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     public static final String KEY_GEOID_MODEL = "GeoidModel"; // 0: EGM96, 1: MGBol08
 
     // Nuevas llaves para ajustes de Mapas
-    public static final String KEY_MAP_MODE = "MapMode"; // 0: Online, 2: Satélite
     public static final String KEY_SHOW_LOCATION = "ShowLocation";
     public static final String KEY_REAL_TIME_UPDATE = "RealTimeUpdate";
     private static final String KEY_TERMS_ACCEPTED = "TermsAccepted";
@@ -113,8 +112,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         SharedPreferences prefs = getSharedPreferences(PREFS_NAME, MODE_PRIVATE);
         
         // Asegurar modo Online por defecto en el primer inicio absoluto
-        if (!prefs.contains(KEY_MAP_MODE)) {
-            prefs.edit().putInt(KEY_MAP_MODE, 0).apply();
+        if (!prefs.contains(MapManager.KEY_MAP_TYPE)) {
+            prefs.edit().putInt(MapManager.KEY_MAP_TYPE, 0).apply();
         }
         if (!prefs.contains(KEY_GEOID_MODEL)) {
             prefs.edit().putInt(KEY_GEOID_MODEL, 1).apply();
@@ -447,8 +446,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         
         // 1. Configurar Idioma
         Spinner spLang = view.findViewById(R.id.sp_language);
-        String[] langNames = {getString(R.string.lang_es), getString(R.string.lang_en), getString(R.string.lang_pt), getString(R.string.lang_fr)};
-        String[] langCodes = {"es", "en", "pt", "fr"};
+        String[] langNames = {getString(R.string.lang_es), getString(R.string.lang_en)};
+        String[] langCodes = {"es", "en"};
         
         ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, langNames);
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
@@ -538,10 +537,11 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         });
 
         com.google.android.material.button.MaterialButtonToggleGroup toggleMapMode = view.findViewById(R.id.toggle_map_mode);
-        toggleMapMode.check(R.id.btn_mode_online);
+        int currentMapType = prefs.getInt(MapManager.KEY_MAP_TYPE, 0);
+        toggleMapMode.check(currentMapType == 1 ? R.id.btn_mode_offline_aesthetic : R.id.btn_mode_online);
         
-        // Forzamos el modo Online en las preferencias si no estaba ya
-        prefs.edit().putInt(KEY_MAP_MODE, 0).apply();
+        // El modo del mapa se gestiona principalmente desde el Fragmento de Mapa,
+        // pero permitimos visualizar el estado actual en Ajustes.
 
         // Caché
         txtCacheSizeStreet = view.findViewById(R.id.txt_cache_size_street);

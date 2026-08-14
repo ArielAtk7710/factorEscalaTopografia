@@ -109,22 +109,22 @@ public class MapManager {
         
         File osmdroidDir = new File(context.getExternalFilesDir(null), "osmdroid");
         if (!osmdroidDir.exists()) osmdroidDir.mkdirs();
-        
         org.osmdroid.config.Configuration.getInstance().setOsmdroidBasePath(osmdroidDir);
         
         String cacheFolder = (mapType == 1) ? "tiles_sat" : "tiles_street";
         File cacheDir = new File(osmdroidDir, cacheFolder);
         if (!cacheDir.exists()) cacheDir.mkdirs();
-        
         org.osmdroid.config.Configuration.getInstance().setOsmdroidTileCache(cacheDir);
 
         mapView.setUseDataConnection(true); 
-
+        
+        // Cargar modo inicial
         if (mapType == 1) {
-            setSatelliteMode(true);
+            currentMapMode = 1;
+            mapView.setTileSource(new ArcGISTileSource());
         } else {
-            mapView.setTileSource(TileSourceFactory.MAPNIK);
             currentMapMode = 0;
+            mapView.setTileSource(TileSourceFactory.MAPNIK);
         }
         
         mapView.setMultiTouchControls(true);
@@ -184,9 +184,13 @@ public class MapManager {
             SharedPreferences prefs = context.getSharedPreferences("AppPrefs", Context.MODE_PRIVATE);
             prefs.edit().putInt(KEY_MAP_TYPE, enableSatellite ? 1 : 0).apply();
 
-            if (mapView.getTileProvider() != null) {
-                mapView.getTileProvider().clearTileCache();
-            }
+            File osmdroidDir = new File(context.getExternalFilesDir(null), "osmdroid");
+            String cacheFolder = (enableSatellite) ? "tiles_sat" : "tiles_street";
+            File cacheDir = new File(osmdroidDir, cacheFolder);
+            if (!cacheDir.exists()) cacheDir.mkdirs();
+            
+            // Actualizar configuración global
+            org.osmdroid.config.Configuration.getInstance().setOsmdroidTileCache(cacheDir);
 
             if (enableSatellite) {
                 currentMapMode = 1;
@@ -195,15 +199,6 @@ public class MapManager {
                 currentMapMode = 0;
                 mapView.setTileSource(TileSourceFactory.MAPNIK);
             }
-
-            File osmdroidDir = new File(context.getExternalFilesDir(null), "osmdroid");
-            org.osmdroid.config.Configuration.getInstance().setOsmdroidBasePath(osmdroidDir);
-            
-            String cacheFolder = (enableSatellite) ? "tiles_sat" : "tiles_street";
-            File cacheDir = new File(osmdroidDir, cacheFolder);
-            if (!cacheDir.exists()) cacheDir.mkdirs();
-            
-            org.osmdroid.config.Configuration.getInstance().setOsmdroidTileCache(cacheDir);
 
             mapView.invalidate();
         } catch (Exception e) {
@@ -258,12 +253,17 @@ public class MapManager {
                 txt.setText(marker.getTitle());
             }
             
-            // Hacer que la etiqueta sea clicable
+            // Hacer que la etiqueta sea clicable y evitar que cierre por toque accidental
             mView.setOnClickListener(v -> {
                 if (markerClickListener != null) {
                     markerClickListener.onMarkerLabelClick(marker.getTitle());
                 }
             });
+            
+            // Asegurar que el click en el texto también funcione
+            if (txt != null) {
+                txt.setOnClickListener(v -> mView.performClick());
+            }
         }
     }
 
