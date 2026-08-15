@@ -351,12 +351,12 @@
 
     <!-- About Section -->
     <string name="title_about_detailed">ℹ️ About FactorEscalaTop</string>
-    <string name="about_version_region"><b>Version:</b> 2.3 (Free / PRO)\n<b>Region:</b> Plurinational State of Bolivia</string>
-    <string name="about_app_description">Specialized application for topographic support, specifically calibrated for the Bolivian cartographic grid. It allows surveyors, engineers, and students to optimize their field work through:\n\n
-        • Automated calculation of scale, elevation, and combined factors.\n
-        • GNSS positioning and coordinate management.\n
-        • Map visualization and topographic point registration.\n
-        • Real-time weather information for planning.\n\n
+    <string name="about_version_region"><b>Version:</b> 2.4 (Free / PRO)\n<b>Region:</b> Plurinational State of Bolivia</string>
+    <string name="about_app_description">Specialized application for topographic support, specifically calibrated for the Bolivian cartographic grid. It allows surveyors and engineers to optimize their work through:\n\n
+        • Calculation of scale, elevation, and combined factors.\n
+        • Area and distance measurement on satellite imagery.\n
+        • Advanced GNSS constellation diagnosis.\n
+        • Weather information and flight safety for drones.\n\n
         <b>🎖️ Proudly endorsed by the College of Surveyors of La Paz.</b></string>
 
     <string name="title_collaborators">👥 Developers and Collaborators</string>
@@ -388,19 +388,19 @@
     <string name="title_quick_guide">📖 Quick User Guide</string>
 
     <string name="guide_section_gen_title">1. General Concepts</string>
-    <string name="guide_section_gen_body">FactorEscalaTop is a topographic suite for calculating correction factors (k, ha, K) and GNSS data management, specifically calibrated for Bolivia.</string>
+    <string name="guide_section_gen_body">FactorEscalaTop 2.4 is a comprehensive topographic suite for calculating correction factors (k, ha, K), GNSS data management, and map measurements, specifically calibrated for Bolivia.</string>
 
     <string name="guide_section_calc_title">2. Calculation Modes</string>
     <string name="guide_section_calc_body"><b>Automatic:</b> Obtains real-time data from GPS.\n<b>Manual:</b> Allows simulating scenarios by entering coordinates from blueprints or projects.</string>
 
     <string name="guide_section_map_title">3. Navigation and Map</string>
-    <string name="guide_section_map_body"><b>Orange Crosshair:</b> Your central target.\n<b>Search (Magnifier):</b> Tap the top panel to navigate to exact coordinates.\n<b>Orange Needles:</b> Temporary session marks that follow you throughout the app.</string>
+    <string name="guide_section_map_body"><b>Orange Crosshair:</b> Central target.\n<b>Search (Magnifier):</b> Navigate to exact coordinates.\n<b>Interactive Points:</b> Tap a point\'s name to see its technical sheet.\n<b>Measurement:</b> Use the <b>Light Blue</b> button for areas and <b>Red</b> for distances.</string>
 
     <string name="guide_section_alt_title">4. Altitude and DEM Models</string>
     <string name="guide_section_alt_body"><b>Device GPS:</b> Ellipsoidal height from the mobile.\n<b>Online Height:</b> Obtains the elevation (MSL) via Open-Meteo API (Copernicus DEM) with EGM2008 correction.</string>
 
     <string name="guide_section_drone_title">5. Flight Assistant</string>
-    <string name="guide_section_drone_body">Analyzes drone safety using a traffic light (Green to Red) based on winds, rain, and the Solar Kp Index to protect your GPS signal.</string>
+    <string name="guide_section_drone_body">Analyzes drone safety via traffic light (Green to Red). Tap the <b>SATELLITES</b> section for a detailed constellation diagnosis and signal strength.</string>
 
     <string name="guide_section_data_title">6. Data Management</string>
     <string name="guide_section_data_body">Export your surveys in <b>TXT</b> for human reports or <b>JSON</b> for direct integration with GIS/CAD software from the RECORDS tab.</string>

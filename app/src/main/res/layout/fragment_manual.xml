@@ -392,7 +392,7 @@
                 <View
                     android:layout_width="match_parent"
                     android:layout_height="1dp"
-                    android:background="#33FFFFFF"
+                    android:background="@color/divider"
                     android:layout_marginVertical="8dp" />
 
                 <!-- Fila 2: Presión -->

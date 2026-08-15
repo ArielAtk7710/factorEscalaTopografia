@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="24dp"
+    android:height="24dp"
+    android:viewportWidth="24"
+    android:viewportHeight="24">
+
+    <!-- Cuerpo de la Regla (Blanco) -->
+    <!-- Se usa fillType="evenOdd" para crear los huecos de las marcas de medida -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:fillType="evenOdd"
+        android:pathData="M2,18 L18,2 L22,6 L6,22 Z
+                  M5,13.5 L7,15.5 M8,10.5 L10,12.5 M11,7.5 L13,9.5 M14,4.5 L16,6.5
+                  M6.5,12 L8,13.5 M9.5,9 L11,10.5 M12.5,6 L14,7.5" />
+
+    <!-- Líneas de las marcas (en el color del fondo rojo suave para que parezcan huecos) -->
+    <!-- Como es un vector simple, dibujaremos las líneas encima para mayor claridad -->
+    <path
+        android:strokeColor="#FF7070"
+        android:strokeWidth="1.2"
+        android:pathData="M5,13.5 L7,15.5 M8,10.5 L10,12.5 M11,7.5 L13,9.5 M14,4.5 L16,6.5
+                  M6.5,12 L8,13.5 M9.5,9 L11,10.5 M12.5,6 L14,7.5" />
+</vector>

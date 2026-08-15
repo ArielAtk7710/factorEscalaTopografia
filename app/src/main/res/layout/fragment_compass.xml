@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#000000"
+    android:background="@color/bg_main"
     tools:context=".CompassFragment">
 
     <ScrollView
@@ -34,7 +34,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="@string/label_current_location"
-                    android:textColor="#FFFFFF"
+                    android:textColor="@color/text_primary"
                     android:textSize="12sp"
                     android:textStyle="bold"
                     android:alpha="0.8" />
@@ -56,7 +56,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="0° N"
-                    android:textColor="#FFFFFF"
+                    android:textColor="@color/text_primary"
                     android:textSize="46sp"
                     android:fontFamily="sans-serif-thin" />
 
@@ -91,7 +91,7 @@
                     android:layout_gravity="top|center_horizontal"
                     android:src="@drawable/ic_simple_arrow"
                     android:rotation="180"
-                    app:tint="#F97316"
+                    app:tint="@color/accent_orange"
                     android:translationY="-10dp" />
 
                 <!-- Dial -->
@@ -145,7 +145,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
-                android:background="#0A0F1E"
+                android:background="@color/primary_dark"
                 android:padding="16dp"
                 app:layout_constraintBottom_toBottomOf="parent">
 
@@ -186,7 +186,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:text="@string/msg_compass_horizontal_hint"
-                    android:textColor="#374151"
+                    android:textColor="@color/secondary_dark"
                     android:textSize="7sp"
                     android:gravity="center"
                     android:layout_marginTop="10dp"

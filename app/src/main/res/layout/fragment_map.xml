@@ -62,7 +62,7 @@
                 android:layout_height="16dp"
                 android:layout_gravity="center_vertical"
                 android:layout_marginHorizontal="10dp"
-                android:background="#44FFFFFF" />
+                android:background="@color/divider" />
 
             <TextView
                 android:id="@+id/txt_map_lon"
@@ -76,13 +76,15 @@
 
     </FrameLayout>
 
+    <!-- Herramientas de Medición y Limpieza (Izquierda) -->
     <LinearLayout
+        android:id="@+id/layout_fab_left"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_margin="12dp"
         android:orientation="vertical"
         app:layout_constraintBottom_toBottomOf="@+id/map_container"
-        app:layout_constraintEnd_toEndOf="parent">
+        app:layout_constraintStart_toStartOf="parent">
 
         <com.google.android.material.floatingactionbutton.FloatingActionButton
             android:id="@+id/fab_clear_map"
@@ -96,13 +98,46 @@
             app:tint="@android:color/white" />
 
         <com.google.android.material.floatingactionbutton.FloatingActionButton
+            android:id="@+id/fab_draw_polygon"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="12dp"
+            android:contentDescription="Medir Área"
+            android:src="@drawable/ic_area_polygon_pro"
+            app:backgroundTint="#00BFFF"
+            app:fabSize="mini"
+            app:tint="@android:color/white" />
+
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
+            android:id="@+id/fab_measure_distance"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:contentDescription="Medir Distancia"
+            android:src="@drawable/ic_ruler_diagonal_pro"
+            app:backgroundTint="@color/accent_red_soft"
+            app:fabSize="mini"
+            app:tint="@android:color/white" />
+
+    </LinearLayout>
+
+    <!-- Controles de Navegación y Sesión (Derecha) -->
+    <LinearLayout
+        android:id="@+id/layout_fab_container"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="12dp"
+        android:orientation="vertical"
+        app:layout_constraintBottom_toBottomOf="@+id/map_container"
+        app:layout_constraintEnd_toEndOf="parent">
+
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
             android:id="@+id/fab_mark_point"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginBottom="12dp"
             android:contentDescription="Información"
             android:src="@drawable/ic_pushpin"
-            app:backgroundTint="@color/accent_blue_dark"
+            app:backgroundTint="@color/accent_orange"
             app:fabSize="mini"
             app:tint="@android:color/white" />
 
@@ -134,8 +169,46 @@
             android:layout_height="wrap_content"
             android:contentDescription="Centrar Ubicación"
             android:src="@drawable/ic_map_pin"
-            app:backgroundTint="@color/accent_orange"
+            app:backgroundTint="@color/accent_blue_dark"
             app:tint="@android:color/white" />
     </LinearLayout>
+
+    <com.google.android.material.card.MaterialCardView
+        android:id="@+id/card_polygon_controls"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="16dp"
+        android:visibility="gone"
+        app:cardBackgroundColor="@color/bg_surface"
+        app:cardCornerRadius="12dp"
+        app:cardElevation="8dp"
+        app:layout_constraintBottom_toTopOf="@+id/layout_fab_left"
+        app:layout_constraintStart_toStartOf="parent">
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:padding="8dp">
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btn_cancel_polygon"
+                style="@style/Widget.MaterialComponents.Button.TextButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Cancelar"
+                android:textColor="@color/state_error"
+                android:textSize="11sp" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btn_finish_polygon"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:text="Finalizar"
+                android:textSize="11sp"
+                app:backgroundTint="@color/accent_orange" />
+        </LinearLayout>
+    </com.google.android.material.card.MaterialCardView>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

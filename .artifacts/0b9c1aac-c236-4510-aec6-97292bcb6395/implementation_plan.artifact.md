@@ -1,43 +1,48 @@
-# Plan de Implementación: Medición de Áreas y Polígonos en el Mapa
+# Plan Maestro: v2.5 - Estabilidad, Temas y Modo Offline
 
-Este plan detalla la adición de una herramienta técnica para dibujar polígonos en el mapa, calcular su área superficial de forma precisa y visualizarla con un estilo profesional (celeste transparente).
+Este plan detalla las acciones técnicas para asegurar la compatibilidad total de temas (Claro/Oscuro), restringir la orientación de pantalla y robustecer el funcionamiento sin conexión a internet (Offline).
 
-## Análisis de Factibilidad
-- **Librería osmdroid**: Soporta la clase `Polygon` con personalización de color de relleno y borde.
-- **Cálculo de Área**: Implementaremos una función geodésica en `GeoUtils` que utilice el radio de la tierra para calcular el área en metros cuadrados (m²) y hectáreas (ha), asegurando precisión técnica.
-- **Interacción**: Se requiere un modo de "Dibujo" donde los toques en el mapa agreguen vértices al polígono actual.
+## 1. Compatibilidad de Temas (Claro/Oscuro)
 
-## Cambios Propuestos
+### Auditoría Visual
+- **Problema**: Algunos diálogos y celdas utilizan colores hexadecimales hardcoded (ej: `#FFFFFF`, `#1B1E23`) que no cambian al alternar el tema.
+- **Acción**: Reemplazar todos los colores fijos en los layouts XML por recursos semánticos:
+    - `@color/bg_main` para fondos de pantalla.
+    - `@color/bg_surface` para tarjetas y diálogos.
+    - `@color/text_primary` y `@color/text_secondary` para tipografía.
+- **Acción**: Verificar que `values-night/colors.xml` tenga los contrastes adecuados para el "Modo Oscuro" forzado.
 
-### 1. Utilidades Geográficas (GeoUtils)
-- **[MODIFY] [GeoUtils.java](file:///D:/Desarrollo-Software/Proyectos%20Android/factorEscala/app/src/main/java/bo/com/factorcombinadotopo/GeoUtils.java)**:
-    - Añadir método `calculateGeodesicArea(List<GeoPoint> points)` para obtener el área en m².
-    - Añadir método `formatArea(double areaM2)` para mostrar el resultado en m² o hectáreas (si supera los 10,000 m²).
+## 2. Restricciones Globales de UI
 
-### 2. Gestión de Mapas (MapManager)
-- **[MODIFY] [MapManager.java](file:///D:/Desarrollo-Software/Proyectos%20Android/factorEscala/app/src/main/java/bo/com/factorcombinadotopo/MapManager.java)**:
-    - Añadir soporte para gestionar una lista de polígonos activos.
-    - Método `addPolygon(List<GeoPoint> points, String areaText)`: Crea el overlay con color celeste transparente (`#4000BFFF`) y coloca un marcador de texto en el centroide con el valor del área.
+### Orientación de Pantalla
+- **[MODIFY] [AndroidManifest.xml](file:///D:/Desarrollo-Software/Proyectos%20Android/factorEscala/app/src/main/AndroidManifest.xml)**:
+    - Añadir `android:screenOrientation="portrait"` a `MainActivity` y `SplashScreen`. Esto evitará reinicios accidentales de sensores y mapas al inclinar el dispositivo.
 
-### 3. Interfaz de Usuario (Layout)
-- **[MODIFY] [fragment_map.xml](file:///D:/Desarrollo-Software/Proyectos%20Android/factorEscala/app/src/main/res/layout/fragment_map.xml)**:
-    - Añadir un nuevo botón flotante (FAB) con un icono de "Regla" o "Polígono" (Azul Celeste).
-    - Añadir un pequeño panel flotante o botones de "Finalizar" y "Cancelar" que solo aparezcan durante el modo de dibujo.
+### Modo Oscuro por Defecto
+- Asegurar que en el primer arranque, antes de que el usuario elija nada, la app inicie en modo oscuro (`AppCompatDelegate.MODE_NIGHT_YES`).
 
-### 4. Lógica del Mapa (MapFragment)
-- **[MODIFY] [MapFragment.java](file:///D:/Desarrollo-Software/Proyectos%20Android/factorEscala/app/src/main/java/bo/com/factorcombinadotopo/MapFragment.java)**:
-    - Implementar el estado `isDrawingArea`.
-    - Capturar clics largos o toques directos (vía un `MapEventsReceiver`) para ir recolectando los puntos del polígono.
-    - Al presionar "Finalizar", invocar el cálculo y delegar el dibujo al `MapManager`.
+## 3. Estrategia de Funcionamiento Offline
 
-## Plan de Verificación
+### Detección y Mensajería
+- **Asistente de Vuelo (Clima)**: Si no hay red, mostrar un mensaje claro: "Esta función requiere conexión a Internet para el análisis meteorológico".
+- **Altura Online (DEM)**: Si falla la conexión, activar automáticamente el **Respaldo de Altura GPS** informando al usuario: "Sin conexión. Utilizando sensor GPS local como respaldo".
 
-### Pruebas de Precisión
-- Dibujar un cuadrado conocido (ej: una manzana urbana de 100m x 100m) y verificar que el área reportada sea cercana a 10,000 m² (1 ha).
+### Robustez de Callbacks (Estabilidad)
+- **Acción**: Revisar todos los hilos secundarios en `WeatherFragment`, `MapFragment` y `AutomaticFragment`.
+- **Protección**: Envolver cada interacción con la UI en una verificación `if (isAdded() && getContext() != null)`. Esto evitará el 90% de los cierres inesperados (Crashes) por fragmentos destruidos.
 
-### Pruebas de UI
-- Verificar que el polígono sea transparente y permita ver los detalles del mapa (mosaicos ArcGIS) debajo.
-- Asegurar que el texto del área sea legible en modo satelital y callejero.
+## Plan de Ejecución
+
+1.  **Fase 1**: Modificar `AndroidManifest.xml` para bloquear la rotación.
+2.  **Fase 2**: Auditoría masiva de colores en layouts (Limpieza de hardcoded hex).
+3.  **Fase 3**: Implementar checks de `NetworkUtils` en los disparadores de Clima y Elevación.
+4.  **Fase 4**: Blindaje de estabilidad con `isAdded()` en callbacks asíncronos.
 
 ---
-**¿Deseas que proceda con la implementación de esta herramienta de medición de polígonos?**
+## Verificación Final
+
+- **Prueba Offline**: Iniciar la app en Modo Avión y verificar que no se cuelgue al entrar a Clima o intentar guardar un punto en el mapa.
+- **Prueba de Tema**: Cambiar el tema del sistema a "Claro" y verificar que la app siga siendo legible (o se mantenga en oscuro si el usuario lo prefiere).
+
+> [!IMPORTANT]
+> Estas medidas transforman la aplicación de una herramienta de consumo en una **Herramienta de Grado Industrial**, capaz de operar en zonas remotas sin señal y sin riesgos de bloqueo.

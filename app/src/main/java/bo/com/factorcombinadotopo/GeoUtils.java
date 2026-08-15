@@ -1,5 +1,8 @@
 package bo.com.factorcombinadotopo;
 
+import java.util.List;
+import org.osmdroid.util.GeoPoint;
+
 public class GeoUtils {
 
     /**
@@ -101,5 +104,52 @@ public class GeoUtils {
      */
     public static String formatLatLon(double value) {
         return String.format(java.util.Locale.US, "%.6f", value);
+    }
+
+    /**
+     * Calcula el área geodésica de un polígono en metros cuadrados.
+     * Basado en el algoritmo de área sobre una esfera (aprox. WGS84).
+     */
+    public static double calculateArea(List<GeoPoint> points) {
+        if (points.size() < 3) return 0.0;
+        double area = 0.0;
+        double radius = 6378137.0; // Radio ecuatorial WGS84 en metros
+        
+        for (int i = 0; i < points.size(); i++) {
+            GeoPoint p1 = points.get(i);
+            GeoPoint p2 = points.get((i + 1) % points.size());
+            
+            double lat1 = Math.toRadians(p1.getLatitude());
+            double lon1 = Math.toRadians(p1.getLongitude());
+            double lat2 = Math.toRadians(p2.getLatitude());
+            double lon2 = Math.toRadians(p2.getLongitude());
+            
+            area += (lon2 - lon1) * (2 + Math.sin(lat1) + Math.sin(lat2));
+        }
+        
+        area = Math.abs(area * radius * radius / 2.0);
+        return area;
+    }
+
+    /**
+     * Formatea el área para mostrar m² o Hectáreas (ha).
+     */
+    public static String formatArea(double areaM2) {
+        if (areaM2 < 10000.0) {
+            return String.format(java.util.Locale.US, "Área: %.2f m²", areaM2);
+        } else {
+            return String.format(java.util.Locale.US, "Área: %.3f ha", areaM2 / 10000.0);
+        }
+    }
+
+    /**
+     * Formatea la distancia para mostrar metros (m) o Kilómetros (km).
+     */
+    public static String formatDistance(double meters) {
+        if (meters < 1000.0) {
+            return String.format(java.util.Locale.US, "%.2f m", meters);
+        } else {
+            return String.format(java.util.Locale.US, "%.3f km", meters / 1000.0);
+        }
     }
 }

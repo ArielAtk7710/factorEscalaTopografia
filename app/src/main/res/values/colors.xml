@@ -36,6 +36,10 @@
     <color name="bg_weather_rain">#37474F</color>
 
     <color name="color_magenta">#E91E63</color>
+    <color name="accent_red_soft">#FF7070</color>
+    <color name="overlay_bg_dark">#CC000000</color>
+    <color name="text_white_pure">#FFFFFF</color>
+    <color name="text_gray_light">#E0E0E0</color>
 
     <!-- Weather UI / Pro Icons -->
     <color name="weather_blue_active">#5D98DB</color>

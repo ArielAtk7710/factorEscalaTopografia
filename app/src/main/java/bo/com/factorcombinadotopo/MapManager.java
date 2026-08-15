@@ -12,6 +12,8 @@ import org.osmdroid.tileprovider.tilesource.TileSourceFactory;
 import org.osmdroid.util.GeoPoint;
 import org.osmdroid.util.MapTileIndex;
 import org.osmdroid.views.MapView;
+import org.osmdroid.views.overlay.Polygon;
+import org.osmdroid.views.overlay.Polyline;
 import org.osmdroid.views.overlay.CopyrightOverlay;
 import org.osmdroid.views.overlay.Marker;
 import org.osmdroid.views.overlay.infowindow.MarkerInfoWindow;
@@ -19,6 +21,7 @@ import org.osmdroid.views.overlay.mylocation.GpsMyLocationProvider;
 import org.osmdroid.views.overlay.mylocation.MyLocationNewOverlay;
 
 import android.graphics.drawable.Drawable;
+import androidx.core.graphics.drawable.DrawableCompat;
 import androidx.core.content.ContextCompat;
 
 import java.io.File;
@@ -300,17 +303,138 @@ public class MapManager {
         sessionMarkers.clear();
     }
 
+    /**
+     * Añade un polígono al mapa con un color celeste transparente y etiqueta de área.
+     */
+    public void addPolygon(List<GeoPoint> points, String areaText) {
+        if (mapView == null || points == null || points.size() < 3) return;
+
+        Polygon polygon = new Polygon(mapView);
+        polygon.setPoints(points);
+        // Celeste transparente (#4000BFFF)
+        polygon.getFillPaint().setColor(0x4000BFFF);
+        polygon.getOutlinePaint().setColor(0xFF00BFFF);
+        polygon.getOutlinePaint().setStrokeWidth(3.0f);
+
+        synchronized (overlayLock) {
+            mapView.getOverlays().add(polygon);
+
+            // Añadir pines azules en los vértices para mayor claridad técnica
+            Drawable vertexIcon = ContextCompat.getDrawable(context, R.drawable.ic_map_needle_pin);
+            if (vertexIcon != null) {
+                vertexIcon = DrawableCompat.wrap(vertexIcon).mutate();
+                DrawableCompat.setTint(vertexIcon, ContextCompat.getColor(context, R.color.accent_primary));
+            }
+
+            for (int i = 0; i < points.size(); i++) {
+                Marker vertexMarker = new Marker(mapView);
+                vertexMarker.setPosition(points.get(i));
+                vertexMarker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM);
+                vertexMarker.setIcon(vertexIcon);
+                vertexMarker.setInfoWindow(null); // No queremos info windows en cada vértice
+                mapView.getOverlays().add(vertexMarker);
+            }
+
+            // Calcular centroide para la etiqueta de área
+            double sumLat = 0, sumLon = 0;
+            for (GeoPoint p : points) {
+                sumLat += p.getLatitude();
+                sumLon += p.getLongitude();
+            }
+            GeoPoint centroid = new GeoPoint(sumLat / points.size(), sumLon / points.size());
+
+            Marker areaLabel = new Marker(mapView);
+            areaLabel.setPosition(centroid);
+            areaLabel.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_CENTER);
+            areaLabel.setIcon(null); // Sin icono de pin para el texto central
+            areaLabel.setTitle(areaText);
+            areaLabel.setInfoWindow(new LabelInfoWindow(R.layout.layout_marker_label, mapView));
+            
+            mapView.getOverlays().add(areaLabel);
+            areaLabel.showInfoWindow();
+        }
+        mapView.invalidate();
+    }
+
+    /**
+     * Añade una ruta de medición de distancia con etiquetas en cada segmento.
+     */
+    public void addDistancePath(List<GeoPoint> points, List<String> segmentTexts, String totalText) {
+        if (mapView == null || points == null || points.size() < 2) return;
+
+        Polyline line = new Polyline(mapView);
+        line.setPoints(points);
+        // Rojo suave (#FF7070)
+        int redSoft = ContextCompat.getColor(context, R.color.accent_red_soft);
+        line.getOutlinePaint().setColor(redSoft);
+        line.getOutlinePaint().setStrokeWidth(5.0f);
+
+        synchronized (overlayLock) {
+            mapView.getOverlays().add(line);
+
+            // Añadir pines rojos en los vértices
+            Drawable vertexIcon = ContextCompat.getDrawable(context, R.drawable.ic_map_needle_pin);
+            if (vertexIcon != null) {
+                vertexIcon = DrawableCompat.wrap(vertexIcon).mutate();
+                DrawableCompat.setTint(vertexIcon, redSoft);
+            }
+
+            for (int i = 0; i < points.size(); i++) {
+                Marker vertexMarker = new Marker(mapView);
+                vertexMarker.setPosition(points.get(i));
+                vertexMarker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM);
+                vertexMarker.setIcon(vertexIcon);
+                vertexMarker.setInfoWindow(null);
+                mapView.getOverlays().add(vertexMarker);
+
+                // Si es el último punto, añadir etiqueta de TOTAL
+                if (i == points.size() - 1 && totalText != null) {
+                    Marker totalLabel = new Marker(mapView);
+                    totalLabel.setPosition(points.get(i));
+                    totalLabel.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_TOP);
+                    totalLabel.setIcon(null);
+                    totalLabel.setTitle("TOTAL: " + totalText);
+                    totalLabel.setInfoWindow(new LabelInfoWindow(R.layout.layout_marker_label, mapView));
+                    mapView.getOverlays().add(totalLabel);
+                    totalLabel.showInfoWindow();
+                }
+            }
+
+            // Etiquetas de segmentos (en el punto medio de cada tramo)
+            if (segmentTexts != null) {
+                for (int i = 0; i < segmentTexts.size(); i++) {
+                    GeoPoint p1 = points.get(i);
+                    GeoPoint p2 = points.get(i + 1);
+                    GeoPoint mid = new GeoPoint((p1.getLatitude() + p2.getLatitude()) / 2.0, (p1.getLongitude() + p2.getLongitude()) / 2.0);
+
+                    Marker segLabel = new Marker(mapView);
+                    segLabel.setPosition(mid);
+                    segLabel.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_CENTER);
+                    segLabel.setIcon(null);
+                    segLabel.setTitle(segmentTexts.get(i));
+                    segLabel.setInfoWindow(new LabelInfoWindow(R.layout.layout_marker_label, mapView));
+                    mapView.getOverlays().add(segLabel);
+                    segLabel.showInfoWindow();
+                }
+            }
+        }
+        mapView.invalidate();
+    }
+
     private void removeVisualMarkers() {
-        // Eliminar de forma segura buscando marcadores de tipo Pin Naranja
+        // Eliminar de forma segura buscando marcadores de tipo Pin Naranja, Polígonos y Polilíneas
         List<org.osmdroid.views.overlay.Overlay> overlays = mapView.getOverlays();
         synchronized (overlayLock) {
             for (int i = overlays.size() - 1; i >= 0; i--) {
-                if (overlays.get(i) instanceof Marker) {
-                    Marker m = (Marker) overlays.get(i);
+                org.osmdroid.views.overlay.Overlay o = overlays.get(i);
+                if (o instanceof Marker) {
+                    Marker m = (Marker) o;
                     if (m.getTitle() != null && !m.getTitle().isEmpty()) {
-                        m.closeInfoWindow(); // Cerrar la etiqueta/nombre antes de borrar el pin
+                        m.closeInfoWindow();
                         overlays.remove(i);
                     }
+                } else if (o instanceof Polygon || o instanceof Polyline) {
+                    overlays.remove(i);
                 }
             }
         }

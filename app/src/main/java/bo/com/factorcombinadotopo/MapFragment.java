@@ -43,6 +43,13 @@ import org.osmdroid.events.ScrollEvent;
 import org.osmdroid.events.ZoomEvent;
 import org.osmdroid.views.MapView;
 
+import android.graphics.drawable.Drawable;
+import androidx.core.graphics.drawable.DrawableCompat;
+import org.osmdroid.views.overlay.Marker;
+import org.osmdroid.events.MapEventsReceiver;
+import org.osmdroid.views.overlay.MapEventsOverlay;
+import org.osmdroid.views.overlay.Polyline;
+
 import java.util.Locale;
 
 /**
@@ -61,6 +68,16 @@ public class MapFragment extends Fragment {
     private static final int PERMISSION_REQUEST_CODE = 200;
     private static boolean hasCenteredOnce = false; // Memoria de centrado inicial único
     private AlertDialog activeProgressDialog;
+
+    // Lógica de polígonos y distancias
+    private boolean isDrawingArea = false;
+    private boolean isMeasuringDistance = false;
+    private final List<GeoPoint> polygonPoints = new ArrayList<>();
+    private final List<GeoPoint> distancePoints = new ArrayList<>();
+    private final List<String> segmentDistances = new ArrayList<>();
+    private Polyline drawingPreview;
+    private View cardPolygonControls;
+    private final List<Marker> tempVertexMarkers = new ArrayList<>();
 
     private final BroadcastReceiver gpsStatusReceiver = new BroadcastReceiver() {
         @Override
@@ -115,9 +132,17 @@ public class MapFragment extends Fragment {
             view.findViewById(R.id.fab_clear_map).setOnClickListener(v -> {
                 if (mapManager != null) {
                     mapManager.clearManualMarkers();
+                    cancelDrawing();
                     UIUtils.showInfoToast(requireContext(), "Mapa visualmente limpio. Los registros permanecen seguros.");
                 }
             });
+
+            // Lógica de Medición de Áreas y Distancias
+            cardPolygonControls = view.findViewById(R.id.card_polygon_controls);
+            view.findViewById(R.id.fab_draw_polygon).setOnClickListener(v -> startDrawingMode());
+            view.findViewById(R.id.fab_measure_distance).setOnClickListener(v -> startDistanceMode());
+            view.findViewById(R.id.btn_cancel_polygon).setOnClickListener(v -> cancelDrawing());
+            view.findViewById(R.id.btn_finish_polygon).setOnClickListener(v -> finishMeasurement());
 
             // Hacer que el panel superior de coordenadas también actúe como botón de búsqueda
             if (layoutCoords != null) {
@@ -125,6 +150,7 @@ public class MapFragment extends Fragment {
             }
 
             setupMapListener();
+            setupMapEvents();
             
             // Vincular con el ViewModel compartido de la Actividad
             viewModel = new ViewModelProvider(requireActivity()).get(SurveyViewModel.class);
@@ -261,6 +287,10 @@ public class MapFragment extends Fragment {
                         if (activeProgressDialog != null && activeProgressDialog.isShowing()) activeProgressDialog.dismiss();
                         return;
                     }
+                    
+                    // Informar al usuario del respaldo
+                    UIUtils.showWarningToast(requireContext(), "Sin conexión. Usando sensor GPS local como respaldo.");
+                    
                     // Fallback Local por error de red
                     android.location.Location targetLoc = new android.location.Location("map");
                     targetLoc.setLatitude(lat);
@@ -481,11 +511,14 @@ public class MapFragment extends Fragment {
                 v.put("date", c.getString(c.getColumnIndexOrThrow(DatabaseHelper.COLUMN_FECHA)));
                 c.close();
                 
-                new Handler(Looper.getMainLooper()).post(() -> showPointDetailsDialog(v));
+                new Handler(Looper.getMainLooper()).post(() -> {
+                    if (isAdded()) showPointDetailsDialog(v);
+                });
             } else {
                 if (c != null) c.close();
-                new Handler(Looper.getMainLooper()).post(() -> 
-                    UIUtils.showInfoToast(requireContext(), getString(R.string.msg_point_details_unavailable)));
+                new Handler(Looper.getMainLooper()).post(() -> {
+                    if (isAdded()) UIUtils.showInfoToast(requireContext(), getString(R.string.msg_point_details_unavailable));
+                });
             }
         }).start();
     }
@@ -576,6 +609,184 @@ public class MapFragment extends Fragment {
     private static class PointRef {
         String nombre;
         double lat, lon;
+    }
+
+    private void setupMapEvents() {
+        MapEventsReceiver mReceive = new MapEventsReceiver() {
+            @Override
+            public boolean singleTapConfirmedHelper(GeoPoint p) {
+                if (isDrawingArea) {
+                    addPointToPolygon(p);
+                    return true;
+                }
+                if (isMeasuringDistance) {
+                    addPointToDistancePath(p);
+                    return true;
+                }
+                return false;
+            }
+
+            @Override
+            public boolean longPressHelper(GeoPoint p) { return false; }
+        };
+
+        MapEventsOverlay eventsOverlay = new MapEventsOverlay(mReceive);
+        mapView.getOverlays().add(0, eventsOverlay); // Al fondo para no tapar otros overlays
+    }
+
+    private void startDrawingMode() {
+        cancelDrawing(); // Limpiar estados previos
+        isDrawingArea = true;
+        polygonPoints.clear();
+        if (cardPolygonControls != null) cardPolygonControls.setVisibility(View.VISIBLE);
+        UIUtils.showInfoToast(requireContext(), "Toque el mapa para añadir vértices de área");
+        
+        if (drawingPreview == null) {
+            drawingPreview = new Polyline(mapView);
+            drawingPreview.getOutlinePaint().setColor(0xFF00BFFF);
+            drawingPreview.getOutlinePaint().setStrokeWidth(4.0f);
+        } else {
+            drawingPreview.setPoints(new ArrayList<>());
+        }
+        mapView.getOverlays().add(drawingPreview);
+    }
+
+    private void startDistanceMode() {
+        cancelDrawing(); // Limpiar estados previos
+        isMeasuringDistance = true;
+        distancePoints.clear();
+        segmentDistances.clear();
+        if (cardPolygonControls != null) cardPolygonControls.setVisibility(View.VISIBLE);
+        UIUtils.showInfoToast(requireContext(), "Toque el mapa para medir distancias");
+
+        if (drawingPreview == null) {
+            drawingPreview = new Polyline(mapView);
+            drawingPreview.getOutlinePaint().setColor(ContextCompat.getColor(requireContext(), R.color.accent_red_soft));
+            drawingPreview.getOutlinePaint().setStrokeWidth(5.0f);
+        } else {
+            drawingPreview.setPoints(new ArrayList<>());
+            drawingPreview.getOutlinePaint().setColor(ContextCompat.getColor(requireContext(), R.color.accent_red_soft));
+        }
+        mapView.getOverlays().add(drawingPreview);
+    }
+
+    private void addPointToPolygon(GeoPoint p) {
+        polygonPoints.add(p);
+        drawingPreview.addPoint(p);
+        
+        // Marcador visual para el vértice usando el icono de aguja en azul
+        Marker v = new Marker(mapView);
+        v.setPosition(p);
+        v.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM); // Punta de la aguja
+        
+        Drawable d = ContextCompat.getDrawable(requireContext(), R.drawable.ic_map_needle_pin);
+        if (d != null) {
+            d = DrawableCompat.wrap(d).mutate();
+            DrawableCompat.setTint(d, ContextCompat.getColor(requireContext(), R.color.accent_primary));
+            v.setIcon(d);
+        }
+        
+        v.setTitle("Vértice " + polygonPoints.size());
+        v.setInfoWindow(null);
+        
+        mapView.getOverlays().add(v);
+        tempVertexMarkers.add(v);
+        mapView.invalidate();
+    }
+
+    private void addPointToDistancePath(GeoPoint p) {
+        if (!distancePoints.isEmpty()) {
+            GeoPoint last = distancePoints.get(distancePoints.size() - 1);
+            double dist = last.distanceToAsDouble(p);
+            segmentDistances.add(GeoUtils.formatDistance(dist));
+        }
+        
+        distancePoints.add(p);
+        drawingPreview.addPoint(p);
+
+        // Marcador visual para el vértice usando el icono de aguja en rojo suave
+        Marker v = new Marker(mapView);
+        v.setPosition(p);
+        v.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM); // Punta de la aguja
+        
+        Drawable d = ContextCompat.getDrawable(requireContext(), R.drawable.ic_map_needle_pin);
+        if (d != null) {
+            d = DrawableCompat.wrap(d).mutate();
+            DrawableCompat.setTint(d, ContextCompat.getColor(requireContext(), R.color.accent_red_soft));
+            v.setIcon(d);
+        }
+        
+        v.setTitle("Punto " + distancePoints.size());
+        v.setInfoWindow(null);
+        
+        mapView.getOverlays().add(v);
+        tempVertexMarkers.add(v);
+        mapView.invalidate();
+    }
+
+    private void cancelDrawing() {
+        isDrawingArea = false;
+        isMeasuringDistance = false;
+        polygonPoints.clear();
+        distancePoints.clear();
+        segmentDistances.clear();
+        if (cardPolygonControls != null) cardPolygonControls.setVisibility(View.GONE);
+        
+        if (drawingPreview != null) {
+            mapView.getOverlays().remove(drawingPreview);
+            drawingPreview = null;
+        }
+        
+        for (Marker m : tempVertexMarkers) {
+            mapView.getOverlays().remove(m);
+        }
+        tempVertexMarkers.clear();
+        mapView.invalidate();
+    }
+
+    private void finishMeasurement() {
+        if (isDrawingArea) {
+            finishDrawingArea();
+        } else if (isMeasuringDistance) {
+            finishDistanceMeasurement();
+        }
+    }
+
+    private void finishDrawingArea() {
+        if (polygonPoints.size() < 3) {
+            UIUtils.showWarningToast(requireContext(), "Se requieren al menos 3 puntos");
+            return;
+        }
+
+        double areaM2 = GeoUtils.calculateArea(polygonPoints);
+        String areaText = GeoUtils.formatArea(areaM2);
+
+        if (mapManager != null) {
+            mapManager.addPolygon(new ArrayList<>(polygonPoints), areaText);
+        }
+
+        cancelDrawing(); 
+        UIUtils.showSuccessToast(requireContext(), "Área medida: " + areaText);
+    }
+
+    private void finishDistanceMeasurement() {
+        if (distancePoints.size() < 2) {
+            UIUtils.showWarningToast(requireContext(), "Se requieren al menos 2 puntos");
+            return;
+        }
+
+        double totalDist = 0;
+        for (int i = 0; i < distancePoints.size() - 1; i++) {
+            totalDist += distancePoints.get(i).distanceToAsDouble(distancePoints.get(i + 1));
+        }
+        String totalText = GeoUtils.formatDistance(totalDist);
+
+        if (mapManager != null) {
+            mapManager.addDistancePath(new ArrayList<>(distancePoints), new ArrayList<>(segmentDistances), totalText);
+        }
+
+        cancelDrawing();
+        UIUtils.showSuccessToast(requireContext(), "Distancia Total: " + totalText);
     }
 
     private void setupMapListener() {

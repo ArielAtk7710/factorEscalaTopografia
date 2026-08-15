@@ -106,7 +106,7 @@
                         android:id="@+id/layout_gps_warning"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:background="#33000000"
+                        android:background="@color/overlay_bg_dark"
                         android:orientation="horizontal"
                         android:padding="12dp"
                         android:gravity="center_vertical">
@@ -351,7 +351,7 @@
         android:id="@+id/layout_weather_loading"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="#DD111827"
+        android:background="@color/overlay_bg_dark"
         android:gravity="center"
         android:orientation="vertical"
         android:padding="32dp"

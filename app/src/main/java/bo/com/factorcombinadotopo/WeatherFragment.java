@@ -233,11 +233,6 @@ public class WeatherFragment extends Fragment {
         rvWeekly.setAdapter(weeklyAdapter);
     }
 
-    private void loadWeatherData() {
-        // Método deprecado en favor del ViewModel compartido.
-        // Se mantiene vacío para evitar errores de compilación si hay referencias antiguas.
-    }
-
     private void updateLocationName(double lat, double lon) {
         if (!isAdded()) return;
         

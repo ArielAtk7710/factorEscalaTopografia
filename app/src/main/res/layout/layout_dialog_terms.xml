@@ -5,7 +5,7 @@
     android:layout_height="wrap_content"
     android:orientation="vertical"
     android:padding="24dp"
-    android:background="#CC000000">
+    android:background="@color/overlay_bg_dark">
 
     <TextView
         android:id="@+id/txt_dialog_terms_title"

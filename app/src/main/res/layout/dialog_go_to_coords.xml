@@ -31,7 +31,7 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="16dp"
             android:text="Navegar a Coordenadas"
-            android:textColor="#FFFFFF"
+            android:textColor="@color/text_white_pure"
             android:textSize="20sp"
             android:textStyle="bold" />
     </LinearLayout>
@@ -41,7 +41,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="LATITUD (DECIMAL)"
-        android:textColor="#E0E0E0"
+        android:textColor="@color/text_gray_light"
         android:textSize="10sp"
         android:textStyle="bold"
         android:layout_marginStart="4dp"
@@ -56,7 +56,7 @@
         android:hint="Ej: -16.504260"
         android:padding="12dp"
         android:textColor="@color/accent_orange"
-        android:textColorHint="#99E0E0E0"
+        android:textColorHint="@color/text_gray_light"
         android:textStyle="bold"
         android:inputType="numberDecimal|numberSigned"
         android:maxLines="1" />
@@ -66,7 +66,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="LONGITUD (DECIMAL)"
-        android:textColor="#E0E0E0"
+        android:textColor="@color/text_gray_light"
         android:textSize="10sp"
         android:textStyle="bold"
         android:layout_marginStart="4dp"
@@ -82,7 +82,7 @@
         android:hint="Ej: -68.090811"
         android:padding="12dp"
         android:textColor="@color/accent_orange"
-        android:textColorHint="#99E0E0E0"
+        android:textColorHint="@color/text_gray_light"
         android:textStyle="bold"
         android:inputType="numberDecimal|numberSigned"
         android:maxLines="1" />
@@ -110,7 +110,7 @@
         android:layout_marginTop="12dp"
         android:text="@string/btn_cancel"
         android:textAllCaps="false"
-        android:textColor="#FFFFFF"
+        android:textColor="@color/text_white_pure"
         app:strokeColor="@color/accent_orange"
         app:strokeWidth="1.2dp"
         app:cornerRadius="8dp" />

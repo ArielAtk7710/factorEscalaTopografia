@@ -385,12 +385,12 @@
 
     <!-- About Section -->
     <string name="title_about_detailed">ℹ️ Acerca de FactorEscalaTop</string>
-    <string name="about_version_region"><b>Versión:</b> 2.3 (Gratuita / PRO)\n<b>Región:</b> Estado Plurinacional de Bolivia</string>
-    <string name="about_app_description">Aplicación especializada para el apoyo topográfico, calibrada específicamente para la grilla cartográfica boliviana. Permite a topógrafos, ingenieros y estudiantes optimizar su trabajo en campo mediante:\n\n
-        • Cálculo automatizado de los factores de escala, elevación y combinado.\n
-        • Posicionamiento GNSS y gestión de coordenadas.\n
-        • Visualización de mapas y registro de puntos topográficos.\n
-        • Información meteorológica en tiempo real para planificación.\n\n
+    <string name="about_version_region"><b>Versión:</b> 2.4 (Gratuita / PRO)\n<b>Región:</b> Estado Plurinacional de Bolivia</string>
+    <string name="about_app_description">Aplicación especializada para el apoyo topográfico, calibrada específicamente para la grilla cartográfica boliviana. Permite a topógrafos e ingenieros optimizar su trabajo mediante:\n\n
+        • Cálculo de factores de escala, elevación y combinado.\n
+        • Medición de áreas y distancias sobre cartografía satelital.\n
+        • Diagnóstico avanzado de la constelación de satélites GNSS.\n
+        • Información meteorológica y de seguridad para drones.\n\n
         <b>🎖️ Orgullosamente avalada por el Colegio de Topógrafos de La Paz.</b></string>
 
     <string name="title_collaborators">👥 Desarrolladores y Colaboradores</string>
@@ -426,19 +426,19 @@
     <string name="title_quick_guide">📖 Guía Rápida de Uso</string>
 
     <string name="guide_section_gen_title">1. Conceptos Generales</string>
-    <string name="guide_section_gen_body">FactorEscalaTop es una suite topográfica para el cálculo de factores de corrección (k, ha, K) y gestión de datos GNSS, calibrada específicamente para Bolivia.</string>
+    <string name="guide_section_gen_body">FactorEscalaTop 2.4 es una suite topográfica integral para el cálculo de factores de corrección (k, ha, K), gestión de datos GNSS y mediciones sobre cartografía, calibrada específicamente para Bolivia.</string>
 
     <string name="guide_section_calc_title">2. Modos de Cálculo</string>
     <string name="guide_section_calc_body"><b>Automático:</b> Obtiene datos en tiempo real del GPS.\n<b>Manual:</b> Permite simular escenarios ingresando coordenadas de planos o proyectos.</string>
 
     <string name="guide_section_map_title">3. Navegación y Mapa</string>
-    <string name="guide_section_map_body"><b>Mira Naranja:</b> Tu objetivo central.\n<b>Buscador (Lupa):</b> Toca el panel superior para navegar a coordenadas exactas.\n<b>Agujas Naranja:</b> Marcas temporales de sesión que te siguen en toda la app.</string>
+    <string name="guide_section_map_body"><b>Mira Naranja:</b> Objetivo central.\n<b>Buscador (Lupa):</b> Navega a coordenadas exactas.\n<b>Puntos Interactivos:</b> Toca el nombre de un punto para ver su ficha técnica.\n<b>Medición:</b> Usa el botón <b>Celeste</b> para áreas y el <b>Rojo</b> para distancias.</string>
 
     <string name="guide_section_alt_title">4. Altura y Modelos DEM</string>
     <string name="guide_section_alt_body"><b>GPS Dispositivo:</b> Altura elipsoidal del móvil.\n<b>Altura Online:</b> Obtiene la cota (MSL) vía API de Open-Meteo (Copernicus DEM) con corrección EGM2008.</string>
 
     <string name="guide_section_drone_title">5. Asistente de Vuelo</string>
-    <string name="guide_section_drone_body">Analiza la seguridad para drones mediante un semáforo (Verde a Rojo) basado en vientos, lluvia y el índice Kp Solar para proteger tu señal GPS.</string>
+    <string name="guide_section_drone_body">Analiza la seguridad para drones mediante un semáforo (Verde a Rojo). Toca la sección de <b>SATÉLITES</b> para un diagnóstico detallado de la constelación y potencia de señal.</string>
 
     <string name="guide_section_data_title">6. Gestión de Datos</string>
     <string name="guide_section_data_body">Exporta tus levantamientos en <b>TXT</b> para reportes humanos o <b>JSON</b> para integración directa con software GIS/CAD desde la pestaña REGISTROS.</string>

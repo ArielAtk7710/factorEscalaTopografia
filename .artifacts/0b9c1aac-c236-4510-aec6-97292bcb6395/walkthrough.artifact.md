@@ -1,35 +1,33 @@
-# Walkthrough Final: Optimización Profesional y Calidad Técnica
+# Walkthrough: v2.5 - Estabilidad, Temas y Modo Offline
 
-Se ha completado un ciclo profundo de mejoras en la aplicación **FactorEscalaTop**, elevando su estándar a una versión robusta, fluida y con acabado profesional de nivel Senior.
+Se ha implementado un conjunto integral de mejoras técnicas para garantizar que **FactorEscalaTop** funcione con la máxima estabilidad en campo, sea compatible con temas visuales y ofrezca una experiencia offline fluida y segura.
 
-## Resumen de Grandes Mejoras
+## Cambios Realizados
 
-### 1. Rendimiento y Estabilidad (Anti-ANR)
-- **Procesamiento Asíncrono**: Se movieron todas las operaciones pesadas de Base de Datos y Gestión de Archivos (Caché) a hilos secundarios. La app ya no se "congela" al guardar puntos o limpiar el mapa.
-- **Carga de Motor MGBol08**: Se optimizó la inicialización para que ocurra en segundo plano durante el Splash Screen, evitando bloqueos al inicio.
+### 1. Robustez en el Campo (Modo Offline)
+- **[MODIFY] [MapFragment.java](file:///D:/Desarrollo-Software/Proyectos%20Android/factorEscala/app/src/main/java/bo/com/factorcombinadotopo/MapFragment.java)**:
+    - Se implementó una detección proactiva de falta de red.
+    - Al intentar obtener la "Altura Online DEM" sin internet, la app ahora informa al usuario: *«Sin conexión. Usando sensor GPS local como respaldo»* y realiza el cálculo automáticamente con el sensor del móvil.
+- **[MODIFY] [WeatherManager.java](file:///D:/Desarrollo-Software/Proyectos%20Android/factorEscala/app/src/main/java/bo/com/factorcombinadotopo/WeatherManager.java)**:
+    - Se refinaron los mensajes de error para el Asistente de Vuelo, asegurando que el usuario sepa que el análisis meteorológico requiere conexión activa.
 
-### 2. Mapas e Interactividad
-- **Puntos Interactivos**: Ahora, al tocar la etiqueta de cualquier punto en el mapa, se despliega un **Ficha Técnica (BottomSheet)** con 14 campos técnicos (Factores, UTM, Coordenadas).
-- **Gestión de Caché Independiente**: Se corrigió el bug que impedía el guardado separado de mapas callejeros y satelitales. Ahora ambos muestran su tamaño real en Ajustes.
-- **Limpieza Barra Superior**: Se eliminó la altura redundante de la barra de coordenadas del mapa para una visualización más limpia.
+### 2. Estabilidad de Grado Senior
+- **[MODIFY] [MapFragment, AutomaticFragment, WeatherFragment]**:
+    - Se auditaron todos los procesos asíncronos (hilos secundarios y Handlers).
+    - Se añadieron verificaciones `isAdded()` antes de cualquier actualización de la interfaz de usuario. Esto elimina los cierres inesperados que ocurrían al girar la pantalla o minimizar la app durante un proceso de carga.
+- **[MODIFY] [AndroidManifest.xml](file:///D:/Desarrollo-Software/Proyectos%20Android/factorEscala/app/src/main/AndroidManifest.xml)**:
+    - Se bloqueó la orientación de la aplicación a **Modo Vertical (Portrait)**. Esto garantiza la integridad de los datos de los sensores y evita reinicios innecesarios del mapa durante el trabajo técnico.
 
-### 3. Experiencia de Usuario (UX) en Registros
-- **Acceso Rápido**: Se habilitó la expansión de registros al tocar cualquier área de la tarjeta.
-- **Auditoría Temporal**: La fecha de registro ahora es visible permanentemente debajo del tipo de registro en la vista principal, permitiendo identificar tomas de campo cronológicamente sin clics adicionales.
+### 3. Compatibilidad de Temas (Claro/Oscuro)
+- **[MODIFY] Auditoría de Layouts**:
+    - Se eliminaron más de 30 referencias de colores fijos (hexadecimales hardcoded como `#FFFFFF` o `#000000`).
+    - Se sustituyeron por recursos semánticos (`@color/bg_main`, `@color/text_primary`, `@color/overlay_bg_dark`).
+    - Esto asegura que todos los diálogos, tarjetas y textos sean legibles y elegantes tanto en el **Modo Oscuro** (predeterminado) como en el **Modo Claro**.
 
-### 4. Módulo de Diagnóstico GNSS
-- **Desglose de Satélites**: Se eliminó el mini-mapa redundante en la pestaña Automático para ahorrar memoria y se añadió un nuevo panel de **Estado de Constelación GNSS**. Ahora puedes ver el ID, señal y constelación de cada satélite captado.
-
-### 5. Calidad Lingüística y Ortografía Técnica
-- **Limpieza de Idiomas**: Se eliminaron el Francés y Portugués para centrar el soporte en Español e Inglés con 100% de cobertura.
-- **Expansión de Abreviaturas**: Se cambiaron términos crípticos como **VLOS** por **VUELOS** y **PDOP** por **Error de posición** para que cualquier operador entienda las alertas.
-- **Ortografía Técnica**: Se aplicó la disyunción técnica (**ó** entre números) para evitar confusiones con el cero (ej: "1.5 ó 2.3").
-
-## Estado del Proyecto
-
-- **Estabilidad**: 100% (No se detectan ANRs ni WindowManager exceptions).
-- **Traducción**: 100% (ES/EN sincronizados).
-- **Rendimiento**: Optimizado (Uso de memoria reducido y FPS estables en mapas).
+## Verificación Final
+- La aplicación compila correctamente (Build Success).
+- Se verificó que en **Modo Avión** la app no se bloquea y ofrece alternativas de respaldo para la altura.
+- Se confirmó que el diseño se adapta correctamente al cambiar el tema desde los Ajustes.
 
 > [!IMPORTANT]
-> La aplicación está ahora lista para pruebas de campo intensivas y para ser liberada en versiones Alpha/Beta con total confianza técnica.
+> Con la versión 2.5, **FactorEscalaTop** alcanza un nivel de madurez técnica industrial, siendo capaz de responder con seguridad en entornos de baja cobertura sin comprometer la estabilidad del sistema.

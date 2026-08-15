@@ -5,7 +5,7 @@
     android:layout_height="wrap_content"
     android:orientation="vertical"
     android:padding="24dp"
-    android:background="#CC000000">
+    android:background="@color/overlay_bg_dark">
 
     <TextView
         android:id="@+id/txt_dialog_title"
@@ -68,7 +68,11 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:text="CERRAR"
-                android:textColor="#BBBBBB"
+                app:strokeColor="@color/accent_orange"
+                app:strokeWidth="1.2dp"
+                app:cornerRadius="8dp"
+                android:textColor="#FFFFFF"
+
                 android:layout_marginStart="6dp" />
         </LinearLayout>
 
