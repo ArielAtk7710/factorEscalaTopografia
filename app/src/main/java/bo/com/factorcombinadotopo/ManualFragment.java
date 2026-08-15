@@ -142,7 +142,12 @@ public class ManualFragment extends Fragment {
             }
 
             if (canCalculate) {
-                UIUtils.showInfoToast(requireContext(), "Calculando datos faltantes...");
+                if (!NetworkUtils.isNetworkAvailable(requireContext())) {
+                    UIUtils.showInfoToast(requireContext(), getString(R.string.msg_offline_warning));
+                } else {
+                    UIUtils.showInfoToast(requireContext(), "Calculando datos faltantes...");
+                }
+                
                 if (proyeccion.getSelectedItemPosition() == 0) calculateWithUtm(() -> showSaveDialogInternal());
                 else calculateWithGeo(() -> showSaveDialogInternal());
                 return;

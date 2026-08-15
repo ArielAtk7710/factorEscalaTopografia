@@ -450,4 +450,6 @@
     <string name="label_satellites_used">SATELLITES IN USE</string>
     <string name="label_total_visible">TOTAL VISIBLE</string>
     <string name="label_visible_status">Visible</string>
+    <string name="msg_offline_warning">Online feature unavailable. Working in Offline Mode (Local Sensors only).</string>
+    <string name="msg_weather_offline">Weather analysis requires an Internet connection.</string>
 </resources>

@@ -20,9 +20,15 @@ import org.osmdroid.views.overlay.infowindow.MarkerInfoWindow;
 import org.osmdroid.views.overlay.mylocation.GpsMyLocationProvider;
 import org.osmdroid.views.overlay.mylocation.MyLocationNewOverlay;
 
+import android.graphics.Bitmap;
+import android.graphics.Canvas;
+import android.graphics.drawable.BitmapDrawable;
+import android.view.LayoutInflater;
+import android.view.View;
 import android.graphics.drawable.Drawable;
 import androidx.core.graphics.drawable.DrawableCompat;
 import androidx.core.content.ContextCompat;
+import android.view.ViewGroup;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -304,6 +310,28 @@ public class MapManager {
     }
 
     /**
+     * Crea un Bitmap a partir del layout de etiqueta naranja para uso como icono permanente.
+     */
+    private Drawable createLabelDrawable(String text) {
+        try {
+            View view = LayoutInflater.from(context).inflate(R.layout.layout_marker_label, null);
+            TextView tv = view.findViewById(R.id.txt_marker_name);
+            if (tv != null) tv.setText(text);
+
+            view.measure(View.MeasureSpec.UNSPECIFIED, View.MeasureSpec.UNSPECIFIED);
+            view.layout(0, 0, view.getMeasuredWidth(), view.getMeasuredHeight());
+
+            Bitmap bitmap = Bitmap.createBitmap(view.getMeasuredWidth(), view.getMeasuredHeight(), Bitmap.Config.ARGB_8888);
+            Canvas canvas = new Canvas(bitmap);
+            view.draw(canvas);
+
+            return new BitmapDrawable(context.getResources(), bitmap);
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
+    /**
      * Añade un polígono al mapa con un color celeste transparente y etiqueta de área.
      */
     public void addPolygon(List<GeoPoint> points, String areaText) {
@@ -311,6 +339,7 @@ public class MapManager {
 
         Polygon polygon = new Polygon(mapView);
         polygon.setPoints(points);
+        polygon.setInfoWindow(null); // Eliminar burbuja gris predeterminada
         // Celeste transparente (#4000BFFF)
         polygon.getFillPaint().setColor(0x4000BFFF);
         polygon.getOutlinePaint().setColor(0xFF00BFFF);
@@ -323,7 +352,7 @@ public class MapManager {
             Drawable vertexIcon = ContextCompat.getDrawable(context, R.drawable.ic_map_needle_pin);
             if (vertexIcon != null) {
                 vertexIcon = DrawableCompat.wrap(vertexIcon).mutate();
-                DrawableCompat.setTint(vertexIcon, ContextCompat.getColor(context, R.color.accent_primary));
+                DrawableCompat.setTint(vertexIcon, ContextCompat.getColor(context, R.color.color_blue_intense));
             }
 
             for (int i = 0; i < points.size(); i++) {
@@ -346,12 +375,18 @@ public class MapManager {
             Marker areaLabel = new Marker(mapView);
             areaLabel.setPosition(centroid);
             areaLabel.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_CENTER);
-            areaLabel.setIcon(null); // Sin icono de pin para el texto central
-            areaLabel.setTitle(areaText);
-            areaLabel.setInfoWindow(new LabelInfoWindow(R.layout.layout_marker_label, mapView));
             
+            // Usar icono permanente en lugar de InfoWindow volátil
+            Drawable labelIcon = createLabelDrawable(areaText);
+            if (labelIcon != null) {
+                areaLabel.setIcon(labelIcon);
+            } else {
+                areaLabel.setTitle(areaText);
+                areaLabel.setInfoWindow(new LabelInfoWindow(R.layout.layout_marker_label, mapView));
+            }
+            
+            areaLabel.setInfoWindow(null); // Desactivar reacción al toque
             mapView.getOverlays().add(areaLabel);
-            areaLabel.showInfoWindow();
         }
         mapView.invalidate();
     }
@@ -364,6 +399,7 @@ public class MapManager {
 
         Polyline line = new Polyline(mapView);
         line.setPoints(points);
+        line.setInfoWindow(null); // Eliminar burbuja gris predeterminada
         // Rojo suave (#FF7070)
         int redSoft = ContextCompat.getColor(context, R.color.accent_red_soft);
         line.getOutlinePaint().setColor(redSoft);
@@ -387,20 +423,24 @@ public class MapManager {
                 vertexMarker.setInfoWindow(null);
                 mapView.getOverlays().add(vertexMarker);
 
-                // Si es el último punto, añadir etiqueta de TOTAL
+                // Si es el último punto, añadir etiqueta de TOTAL permanente
                 if (i == points.size() - 1 && totalText != null) {
                     Marker totalLabel = new Marker(mapView);
                     totalLabel.setPosition(points.get(i));
                     totalLabel.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_TOP);
-                    totalLabel.setIcon(null);
-                    totalLabel.setTitle("TOTAL: " + totalText);
-                    totalLabel.setInfoWindow(new LabelInfoWindow(R.layout.layout_marker_label, mapView));
+                    
+                    Drawable totalIcon = createLabelDrawable("TOTAL: " + totalText);
+                    if (totalIcon != null) {
+                        totalLabel.setIcon(totalIcon);
+                    } else {
+                        totalLabel.setTitle("TOTAL: " + totalText);
+                    }
+                    totalLabel.setInfoWindow(null);
                     mapView.getOverlays().add(totalLabel);
-                    totalLabel.showInfoWindow();
                 }
             }
 
-            // Etiquetas de segmentos (en el punto medio de cada tramo)
+            // Etiquetas de segmentos permanentes (en el punto medio de cada tramo)
             if (segmentTexts != null) {
                 for (int i = 0; i < segmentTexts.size(); i++) {
                     GeoPoint p1 = points.get(i);
@@ -410,11 +450,15 @@ public class MapManager {
                     Marker segLabel = new Marker(mapView);
                     segLabel.setPosition(mid);
                     segLabel.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_CENTER);
-                    segLabel.setIcon(null);
-                    segLabel.setTitle(segmentTexts.get(i));
-                    segLabel.setInfoWindow(new LabelInfoWindow(R.layout.layout_marker_label, mapView));
+                    
+                    Drawable segIcon = createLabelDrawable(segmentTexts.get(i));
+                    if (segIcon != null) {
+                        segLabel.setIcon(segIcon);
+                    } else {
+                        segLabel.setTitle(segmentTexts.get(i));
+                    }
+                    segLabel.setInfoWindow(null);
                     mapView.getOverlays().add(segLabel);
-                    segLabel.showInfoWindow();
                 }
             }
         }
@@ -422,17 +466,14 @@ public class MapManager {
     }
 
     private void removeVisualMarkers() {
-        // Eliminar de forma segura buscando marcadores de tipo Pin Naranja, Polígonos y Polilíneas
+        // Eliminar todos los marcadores técnicos, polígonos y rutas sin excepción
         List<org.osmdroid.views.overlay.Overlay> overlays = mapView.getOverlays();
         synchronized (overlayLock) {
             for (int i = overlays.size() - 1; i >= 0; i--) {
                 org.osmdroid.views.overlay.Overlay o = overlays.get(i);
                 if (o instanceof Marker) {
-                    Marker m = (Marker) o;
-                    if (m.getTitle() != null && !m.getTitle().isEmpty()) {
-                        m.closeInfoWindow();
-                        overlays.remove(i);
-                    }
+                    ((Marker) o).closeInfoWindow(); // Cerrar etiquetas para evitar fugas de memoria
+                    overlays.remove(i);
                 } else if (o instanceof Polygon || o instanceof Polyline) {
                     overlays.remove(i);
                 }

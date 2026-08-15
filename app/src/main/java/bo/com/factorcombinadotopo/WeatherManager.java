@@ -106,7 +106,7 @@ public class WeatherManager {
     public static void checkFlightSafety(Context context, double lat, double lon, double pdop, WeatherCallback callback) {
         // 🛡️ Validación Senior de Conectividad Proactiva
         if (!NetworkUtils.isNetworkAvailable(context)) {
-            callback.onError("Sin conexión a Internet. Verifique su señal en el campo.");
+            callback.onError(context.getString(R.string.msg_weather_offline));
             return;
         }
 

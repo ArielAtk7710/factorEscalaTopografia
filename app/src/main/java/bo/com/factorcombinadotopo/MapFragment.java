@@ -77,6 +77,7 @@ public class MapFragment extends Fragment {
     private final List<String> segmentDistances = new ArrayList<>();
     private Polyline drawingPreview;
     private View cardPolygonControls;
+    private TextView txtMeasurementTitle;
     private final List<Marker> tempVertexMarkers = new ArrayList<>();
 
     private final BroadcastReceiver gpsStatusReceiver = new BroadcastReceiver() {
@@ -139,6 +140,7 @@ public class MapFragment extends Fragment {
 
             // Lógica de Medición de Áreas y Distancias
             cardPolygonControls = view.findViewById(R.id.card_polygon_controls);
+            txtMeasurementTitle = view.findViewById(R.id.txt_measurement_title);
             view.findViewById(R.id.fab_draw_polygon).setOnClickListener(v -> startDrawingMode());
             view.findViewById(R.id.fab_measure_distance).setOnClickListener(v -> startDistanceMode());
             view.findViewById(R.id.btn_cancel_polygon).setOnClickListener(v -> cancelDrawing());
@@ -289,7 +291,7 @@ public class MapFragment extends Fragment {
                     }
                     
                     // Informar al usuario del respaldo
-                    UIUtils.showWarningToast(requireContext(), "Sin conexión. Usando sensor GPS local como respaldo.");
+                    UIUtils.showWarningToast(requireContext(), getString(R.string.msg_offline_warning));
                     
                     // Fallback Local por error de red
                     android.location.Location targetLoc = new android.location.Location("map");
@@ -639,6 +641,7 @@ public class MapFragment extends Fragment {
         isDrawingArea = true;
         polygonPoints.clear();
         if (cardPolygonControls != null) cardPolygonControls.setVisibility(View.VISIBLE);
+        if (txtMeasurementTitle != null) txtMeasurementTitle.setText("MEDICIÓN DE ÁREA (POLÍGONO)");
         UIUtils.showInfoToast(requireContext(), "Toque el mapa para añadir vértices de área");
         
         if (drawingPreview == null) {
@@ -657,6 +660,7 @@ public class MapFragment extends Fragment {
         distancePoints.clear();
         segmentDistances.clear();
         if (cardPolygonControls != null) cardPolygonControls.setVisibility(View.VISIBLE);
+        if (txtMeasurementTitle != null) txtMeasurementTitle.setText("MEDICIÓN DE DISTANCIA (REGLA)");
         UIUtils.showInfoToast(requireContext(), "Toque el mapa para medir distancias");
 
         if (drawingPreview == null) {
@@ -682,7 +686,7 @@ public class MapFragment extends Fragment {
         Drawable d = ContextCompat.getDrawable(requireContext(), R.drawable.ic_map_needle_pin);
         if (d != null) {
             d = DrawableCompat.wrap(d).mutate();
-            DrawableCompat.setTint(d, ContextCompat.getColor(requireContext(), R.color.accent_primary));
+            DrawableCompat.setTint(d, ContextCompat.getColor(requireContext(), R.color.color_blue_intense));
             v.setIcon(d);
         }
         
@@ -731,6 +735,7 @@ public class MapFragment extends Fragment {
         distancePoints.clear();
         segmentDistances.clear();
         if (cardPolygonControls != null) cardPolygonControls.setVisibility(View.GONE);
+        if (txtMeasurementTitle != null) txtMeasurementTitle.setText("MEDICIÓN");
         
         if (drawingPreview != null) {
             mapView.getOverlays().remove(drawingPreview);

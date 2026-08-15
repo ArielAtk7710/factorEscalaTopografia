@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <!-- Standard Palette for the App (Light/Dark via qualifiers) -->
-    <color name="colorPrimary">#2196F3</color>
+    <color name="colorPrimary">@color/accent_primary</color>
     <color name="colorPrimaryDark">#15171B</color>
-    <color name="colorAccent">#FF9800</color>
+    <color name="colorAccent">@color/accent_orange</color>
 
     <!-- Semantical Colors -->
     <color name="bg_main">#F3F4F6</color>
@@ -19,7 +19,7 @@
     <color name="accent_orange">#F97316</color>
 
     <!-- State & Alerts -->
-    <color name="state_info">#3B82F6</color>
+    <color name="state_info">@color/accent_primary</color>
     <color name="state_success">#10B981</color>
     <color name="state_warning">#F59E0B</color>
     <color name="state_error">#EF4444</color>
@@ -48,8 +48,11 @@
     <color name="weather_orange">#F97316</color>
 
     <!-- Navigation & UI Mappings -->
+    <color name="accent_primary_alpha22">#222563EB</color>
+    <color name="accent_primary_alpha80">#802563EB</color>
     <color name="accent_blue_dark">#1E3A8A</color>
     <color name="nav_background">@color/bg_surface</color>
-    <color name="nav_selected">@color/accent_primary</color>
+    <color name="nav_selected">@color/accent_light</color>
     <color name="nav_unselected">@color/text_secondary</color>
+    <color name="color_blue_intense">#0040FF</color>
 </resources>

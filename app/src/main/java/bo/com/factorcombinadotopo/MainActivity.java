@@ -96,6 +96,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     private ActivityResultLauncher<String[]> requestPermissionLauncher;
 
+    private ImageView imgOfflineStatus;
+    private android.net.ConnectivityManager.NetworkCallback networkCallback;
+
     private boolean isGpsEnabledGlobal = true;
     private final BroadcastReceiver gpsStateReceiver = new BroadcastReceiver() {
         @Override
@@ -139,6 +142,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         }
 
         drawer = findViewById(R.id.drawer_layout);
+        imgOfflineStatus = findViewById(R.id.img_offline_status);
+        setupNetworkMonitoring();
 
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
                 this, drawer, toolbar, R.string.btn_confirm, R.string.btn_cancel);
@@ -267,6 +272,39 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             };
         }
         requestPermissionLauncher.launch(permissions);
+    }
+
+    private void setupNetworkMonitoring() {
+        android.net.ConnectivityManager cm = (android.net.ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+        if (cm == null) return;
+
+        networkCallback = new android.net.ConnectivityManager.NetworkCallback() {
+            @Override
+            public void onAvailable(@NonNull android.net.Network network) {
+                runOnUiThread(() -> { if (imgOfflineStatus != null) imgOfflineStatus.setVisibility(View.GONE); });
+            }
+
+            @Override
+            public void onLost(@NonNull android.net.Network network) {
+                runOnUiThread(() -> { if (imgOfflineStatus != null) imgOfflineStatus.setVisibility(View.VISIBLE); });
+            }
+        };
+
+        cm.registerDefaultNetworkCallback(networkCallback);
+        
+        // Estado inicial
+        if (imgOfflineStatus != null) {
+            imgOfflineStatus.setVisibility(NetworkUtils.isNetworkAvailable(this) ? View.GONE : View.VISIBLE);
+        }
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        if (networkCallback != null) {
+            android.net.ConnectivityManager cm = (android.net.ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+            if (cm != null) cm.unregisterNetworkCallback(networkCallback);
+        }
     }
 
     @Override

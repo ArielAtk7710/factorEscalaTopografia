@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="colorPrimary">#2F3751</color>
+    <color name="colorPrimary">@color/accent_primary</color>
     <color name="colorPrimaryDark">#1B1D20</color>
-    <color name="colorAccent">#5D98DB</color>
+    <color name="colorAccent">@color/accent_orange</color>
 
     <!-- Dark Theme Palette -->
     <color name="bg_main">#1B1D20</color>
@@ -21,7 +21,7 @@
     <color name="text_gray_light">#E0E0E0</color>
 
     <!-- Toast State Colors -->
-    <color name="state_info">#5D98DB</color>
+    <color name="state_info">@color/accent_primary</color>
     <color name="state_success">#4CAF50</color>
     <color name="state_warning">#FF8C2A</color>
     <color name="state_error">#F44336</color>
@@ -36,4 +36,6 @@
     <color name="weather_text_primary">#111827</color> <!-- O el color de texto claro que prefieras -->
     <color name="weather_green_safe">#10B981</color>
     <color name="weather_orange">#F97316</color>
+    <color name="accent_primary_alpha22">#222E589A</color>
+    <color name="accent_primary_alpha80">#802E589A</color>
 </resources>

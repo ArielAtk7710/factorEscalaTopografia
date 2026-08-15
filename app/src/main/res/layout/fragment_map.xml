@@ -104,7 +104,7 @@
             android:layout_marginBottom="12dp"
             android:contentDescription="Medir Área"
             android:src="@drawable/ic_area_polygon_pro"
-            app:backgroundTint="#00BFFF"
+            app:backgroundTint="@color/color_blue_intense"
             app:fabSize="mini"
             app:tint="@android:color/white" />
 
@@ -177,37 +177,55 @@
         android:id="@+id/card_polygon_controls"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_margin="16dp"
+        android:layout_marginTop="70dp"
         android:visibility="gone"
         app:cardBackgroundColor="@color/bg_surface"
         app:cardCornerRadius="12dp"
         app:cardElevation="8dp"
-        app:layout_constraintBottom_toTopOf="@+id/layout_fab_left"
-        app:layout_constraintStart_toStartOf="parent">
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
 
         <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:padding="8dp">
+            android:orientation="vertical"
+            android:padding="8dp"
+            android:gravity="center">
 
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/btn_cancel_polygon"
-                style="@style/Widget.MaterialComponents.Button.TextButton"
+            <TextView
+                android:id="@+id/txt_measurement_title"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Cancelar"
-                android:textColor="@color/state_error"
-                android:textSize="11sp" />
+                android:text="MEDICIÓN"
+                android:textColor="@color/accent_orange"
+                android:textSize="10sp"
+                android:textStyle="bold"
+                android:layout_marginBottom="4dp" />
 
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/btn_finish_polygon"
+            <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="8dp"
-                android:text="Finalizar"
-                android:textSize="11sp"
-                app:backgroundTint="@color/accent_orange" />
+                android:orientation="horizontal">
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btn_cancel_polygon"
+                    style="@style/Widget.MaterialComponents.Button.TextButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Cancelar"
+                    android:textColor="@color/state_error"
+                    android:textSize="11sp" />
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btn_finish_polygon"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="8dp"
+                    android:text="Finalizar"
+                    android:textSize="11sp"
+                    app:backgroundTint="@color/accent_orange" />
+            </LinearLayout>
         </LinearLayout>
     </com.google.android.material.card.MaterialCardView>
 

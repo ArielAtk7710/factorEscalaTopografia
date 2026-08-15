@@ -116,7 +116,7 @@
                     android:layout_height="56dp"
                     android:layout_gravity="center"
                     android:src="@drawable/ic_level_circle"
-                    app:tint="#223B82F6" />
+                    app:tint="@color/accent_primary_alpha22" />
 
                 <ImageView
                     android:id="@+id/img_level_bubble"
@@ -130,12 +130,12 @@
                     android:layout_width="1dp"
                     android:layout_height="40dp"
                     android:layout_gravity="center"
-                    android:background="#803B82F6" />
+                    android:background="@color/accent_primary_alpha80" />
                 <View
                     android:layout_width="40dp"
                     android:layout_height="1dp"
                     android:layout_gravity="center"
-                    android:background="#803B82F6" />
+                    android:background="@color/accent_primary_alpha80" />
 
             </FrameLayout>
 

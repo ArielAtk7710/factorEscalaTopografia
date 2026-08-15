@@ -484,4 +484,6 @@
     <string name="label_satellites_used">SATÉLITES EN USO</string>
     <string name="label_total_visible">TOTAL VISIBLES</string>
     <string name="label_visible_status">Visible</string>
+    <string name="msg_offline_warning">Función Online no disponible. Trabajando en modo Offline (Solo Sensores Locales).</string>
+    <string name="msg_weather_offline">El análisis meteorológico requiere conexión a Internet.</string>
 </resources>

@@ -410,6 +410,7 @@ public class WeatherFragment extends Fragment {
             return new ViewHolder(LayoutInflater.from(p.getContext()).inflate(R.layout.item_hourly_weather, p, false));
         }
         @Override public void onBindViewHolder(@NonNull ViewHolder h, int pos) {
+            if (!isAdded()) return;
             WeatherManager.HourlyStatus hs = list.get(pos);
             h.txtTime.setText(hs.time);
             h.txtTemp.setText(String.format(Locale.getDefault(), "%.0f°", hs.wind)); 
@@ -442,6 +443,7 @@ public class WeatherFragment extends Fragment {
             return new ViewHolder(LayoutInflater.from(p.getContext()).inflate(R.layout.item_daily_weather, p, false));
         }
         @Override public void onBindViewHolder(@NonNull ViewHolder h, int pos) {
+            if (!isAdded()) return;
             WeatherManager.DailyForecast df = list.get(pos);
             h.txtDay.setText(formatDate(df.date));
             h.txtTempRange.setText(String.format(Locale.getDefault(), "%.0f° / %.0f°", df.tempMax, df.tempMin));
