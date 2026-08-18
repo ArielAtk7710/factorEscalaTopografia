@@ -23,8 +23,10 @@ public class SurveyViewModel extends AndroidViewModel {
 
     private Location lastWeatherLocation;
     private long lastWeatherTimestamp = 0;
+    private long lastWeatherErrorTimestamp = 0;
     private static final float WEATHER_UPDATE_DISTANCE_THRESHOLD = 1000f; // 1 km
     private static final long WEATHER_UPDATE_TIME_THRESHOLD = 30 * 60 * 1000; // 30 min
+    private static final long WEATHER_ERROR_BACKOFF = 5 * 60 * 1000; // 5 min si hubo error
 
     public SurveyViewModel(@NonNull Application application) {
         super(application);
@@ -90,13 +92,18 @@ public class SurveyViewModel extends AndroidViewModel {
     private void shouldRefreshWeatherAuto(Location loc) {
         long currentTime = System.currentTimeMillis();
         
-        // 1. Si es la primera vez
+        // 1. Si hubo un error reciente (Sin red), esperar 5 min antes de reintentar
+        if (currentTime - lastWeatherErrorTimestamp < WEATHER_ERROR_BACKOFF) {
+            return;
+        }
+
+        // 2. Si es la primera vez
         if (lastWeatherLocation == null || lastWeatherTimestamp == 0) {
             refreshWeather(loc);
             return;
         }
 
-        // 2. Si ya hay una carga en curso, no hacer nada
+        // 3. Si ya hay una carga en curso, no hacer nada
         if (Boolean.TRUE.equals(isWeatherLoading.getValue())) return;
 
         // 3. Verificar distancia
@@ -125,6 +132,7 @@ public class SurveyViewModel extends AndroidViewModel {
 
             @Override
             public void onError(String error) {
+                lastWeatherErrorTimestamp = System.currentTimeMillis();
                 errorResult.postValue(error);
                 isWeatherLoading.postValue(false);
             }

@@ -281,6 +281,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         networkCallback = new android.net.ConnectivityManager.NetworkCallback() {
             @Override
             public void onAvailable(@NonNull android.net.Network network) {
+                NetworkUtils.resetOfflineWarning();
                 runOnUiThread(() -> { if (imgOfflineStatus != null) imgOfflineStatus.setVisibility(View.GONE); });
             }
 

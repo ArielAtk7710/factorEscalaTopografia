@@ -142,9 +142,11 @@ public class ManualFragment extends Fragment {
             }
 
             if (canCalculate) {
-                if (!NetworkUtils.isNetworkAvailable(requireContext())) {
+                if (NetworkUtils.shouldShowOfflineWarning(requireContext())) {
                     UIUtils.showInfoToast(requireContext(), getString(R.string.msg_offline_warning));
-                } else {
+                }
+                
+                if (NetworkUtils.isNetworkAvailable(requireContext())) {
                     UIUtils.showInfoToast(requireContext(), "Calculando datos faltantes...");
                 }
                 

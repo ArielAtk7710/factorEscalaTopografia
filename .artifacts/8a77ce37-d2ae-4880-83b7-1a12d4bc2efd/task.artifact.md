@@ -1,0 +1,4 @@
+- [x] Refactorizar `SurveyApplication.java` para una configuración global de mapas segura.
+- [x] Optimizar `MapManager.java` (Limpieza de ciclo de vida y manejo de memoria).
+- [x] Ajustar `MapFragment.java` (Prevención de cuelgues gráficos y sincronización).
+- [x] Verificar estabilidad del mapa.

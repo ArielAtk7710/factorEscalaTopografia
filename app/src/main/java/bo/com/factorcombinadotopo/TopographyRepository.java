@@ -119,7 +119,7 @@ public class TopographyRepository {
 
                 callback.onResult(res, isMgb);
 
-                fetchTemperatureIfNeeded(lat, lon);
+                new Thread(() -> fetchTemperatureIfNeeded(lat, lon)).start();
 
             } catch (Exception e) {
                 callback.onError(e);
@@ -160,8 +160,9 @@ public class TopographyRepository {
 
                 callback.onResult(res, isMgb);
 
-                // Actualizar temperatura de forma independiente
-                fetchTemperatureIfNeeded(loc.getLatitude(), loc.getLongitude());
+                // Ejecutar actualización de temperatura en un hilo separado totalmente independiente
+                // para evitar que el pool de hilos de cálculo (3 hilos) se agote por Timeouts de red.
+                new Thread(() -> fetchTemperatureIfNeeded(loc.getLatitude(), loc.getLongitude())).start();
 
             } catch (Exception e) {
                 callback.onError(e);
@@ -170,6 +171,7 @@ public class TopographyRepository {
     }
 
     private synchronized void fetchTemperatureIfNeeded(double lat, double lon) {
+        if (!NetworkUtils.isNetworkAvailable(context)) return;
         if (System.currentTimeMillis() - lastTempRequestTime < 600000) return;
         lastTempRequestTime = System.currentTimeMillis();
 

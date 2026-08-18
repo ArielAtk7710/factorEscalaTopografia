@@ -101,6 +101,9 @@ public class MapFragment extends Fragment {
 
         try {
             mapView = view.findViewById(R.id.map_view);
+            // 🛡️ Medida de seguridad: Desactivar aceleración de hardware si el mapa causa cierres
+            mapView.setLayerType(View.LAYER_TYPE_SOFTWARE, null);
+
             txtLat = view.findViewById(R.id.txt_map_lat);
             txtLon = view.findViewById(R.id.txt_map_lon);
             layoutCoords = view.findViewById(R.id.layout_map_coords);
@@ -290,8 +293,10 @@ public class MapFragment extends Fragment {
                         return;
                     }
                     
-                    // Informar al usuario del respaldo
-                    UIUtils.showWarningToast(requireContext(), getString(R.string.msg_offline_warning));
+                    // Informar al usuario del respaldo (Solo una vez)
+                    if (NetworkUtils.shouldShowOfflineWarning(requireContext())) {
+                        UIUtils.showWarningToast(requireContext(), getString(R.string.msg_offline_warning));
+                    }
                     
                     // Fallback Local por error de red
                     android.location.Location targetLoc = new android.location.Location("map");

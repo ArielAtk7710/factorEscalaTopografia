@@ -141,7 +141,13 @@ public class AutomaticFragment extends Fragment {
         });
 
         viewModel.getErrorResult().observe(getViewLifecycleOwner(), err -> {
-            if (err != null) UIUtils.showErrorToast(requireContext(), err);
+            if (err != null) {
+                // Solo mostrar errores si NO son de clima para no saturar la vista Automática.
+                // Los errores de clima se mostrarán en su propio fragmento.
+                if (!err.contains(getString(R.string.msg_weather_offline)) && !err.contains("clima")) {
+                    UIUtils.showErrorToast(requireContext(), err);
+                }
+            }
         });
     }
 

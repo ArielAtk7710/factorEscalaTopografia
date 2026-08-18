@@ -11,6 +11,8 @@ import android.os.Build;
  */
 public class NetworkUtils {
 
+    private static boolean offlineWarningShown = false;
+
     /**
      * Verifica si el dispositivo tiene una conexión activa a Internet.
      * Soporta redes Wi-Fi, Datos Móviles y Ethernet.
@@ -20,20 +22,48 @@ public class NetworkUtils {
         ConnectivityManager cm = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
         if (cm == null) return false;
 
+        boolean available = false;
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             android.net.Network network = cm.getActiveNetwork();
-            if (network == null) return false;
-            NetworkCapabilities capabilities = cm.getNetworkCapabilities(network);
-            return capabilities != null && (
-                    capabilities.hasTransport(NetworkCapabilities.TRANSPORT_WIFI) ||
-                    capabilities.hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR) ||
-                    capabilities.hasTransport(NetworkCapabilities.TRANSPORT_ETHERNET) ||
-                    capabilities.hasTransport(NetworkCapabilities.TRANSPORT_VPN)
-            );
+            if (network != null) {
+                NetworkCapabilities capabilities = cm.getNetworkCapabilities(network);
+                available = capabilities != null && (
+                        capabilities.hasTransport(NetworkCapabilities.TRANSPORT_WIFI) ||
+                        capabilities.hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR) ||
+                        capabilities.hasTransport(NetworkCapabilities.TRANSPORT_ETHERNET) ||
+                        capabilities.hasTransport(NetworkCapabilities.TRANSPORT_VPN)
+                );
+            }
         } else {
             // Soporte para versiones antiguas de Android (Legacy)
             android.net.NetworkInfo activeNetworkInfo = cm.getActiveNetworkInfo();
-            return activeNetworkInfo != null && activeNetworkInfo.isConnected();
+            available = activeNetworkInfo != null && activeNetworkInfo.isConnected();
         }
+
+        return available;
+    }
+
+    /**
+     * Determina si se debe mostrar la advertencia de "Sin Internet".
+     * Solo retorna true la primera vez que se llama en un estado de desconexión.
+     */
+    public static boolean shouldShowOfflineWarning(Context context) {
+        if (isNetworkAvailable(context)) {
+            offlineWarningShown = false;
+            return false;
+        }
+        
+        if (!offlineWarningShown) {
+            offlineWarningShown = true;
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * Restablece el flag de advertencia. Llamar cuando la red vuelve a estar disponible.
+     */
+    public static void resetOfflineWarning() {
+        offlineWarningShown = false;
     }
 }

@@ -111,19 +111,21 @@ public class MapManager {
         boolean showLocation = prefs.getBoolean("ShowLocation", true);
         int mapType = prefs.getInt(KEY_MAP_TYPE, 0); 
 
-        // Configuración crítica de osmdroid
-        SharedPreferences globalPrefs = android.preference.PreferenceManager.getDefaultSharedPreferences(context);
-        org.osmdroid.config.Configuration.getInstance().load(context, globalPrefs);
-        org.osmdroid.config.Configuration.getInstance().setUserAgentValue(context.getPackageName());
+        // Configuración crítica de osmdroid (No recargar prefs globales aquí para evitar bloqueos)
+        org.osmdroid.config.IConfigurationProvider config = org.osmdroid.config.Configuration.getInstance();
+        config.setUserAgentValue(context.getPackageName());
         
-        File osmdroidDir = new File(context.getExternalFilesDir(null), "osmdroid");
-        if (!osmdroidDir.exists()) osmdroidDir.mkdirs();
-        org.osmdroid.config.Configuration.getInstance().setOsmdroidBasePath(osmdroidDir);
-        
-        String cacheFolder = (mapType == 1) ? "tiles_sat" : "tiles_street";
-        File cacheDir = new File(osmdroidDir, cacheFolder);
-        if (!cacheDir.exists()) cacheDir.mkdirs();
-        org.osmdroid.config.Configuration.getInstance().setOsmdroidTileCache(cacheDir);
+        File extDir = context.getExternalFilesDir(null);
+        if (extDir != null) {
+            File osmdroidDir = new File(extDir, "osmdroid");
+            if (!osmdroidDir.exists()) osmdroidDir.mkdirs();
+            config.setOsmdroidBasePath(osmdroidDir);
+            
+            String cacheFolder = (mapType == 1) ? "tiles_sat" : "tiles_street";
+            File cacheDir = new File(osmdroidDir, cacheFolder);
+            if (!cacheDir.exists()) cacheDir.mkdirs();
+            config.setOsmdroidTileCache(cacheDir);
+        }
 
         mapView.setUseDataConnection(true); 
         
@@ -154,7 +156,7 @@ public class MapManager {
         mapView.getOverlays().add(locationOverlay);
 
         isInitialized = true;
-        mapView.onResume(); 
+        // Se elimina mapView.onResume() de aquí, se gestiona en el ciclo de vida del fragmento
         mapView.invalidate();
     }
 
@@ -163,15 +165,16 @@ public class MapManager {
         SharedPreferences prefs = context.getSharedPreferences("AppPrefs", Context.MODE_PRIVATE);
         int mapType = prefs.getInt(KEY_MAP_TYPE, 0);
         
-        org.osmdroid.config.Configuration.getInstance().setUserAgentValue(context.getPackageName());
+        org.osmdroid.config.IConfigurationProvider config = org.osmdroid.config.Configuration.getInstance();
+        config.setUserAgentValue(context.getPackageName());
         
-        File osmdroidDir = new File(context.getExternalFilesDir(null), "osmdroid");
-        org.osmdroid.config.Configuration.getInstance().setOsmdroidBasePath(osmdroidDir);
-        
-        String cacheFolder = (mapType == 1) ? "tiles_sat" : "tiles_street";
-        org.osmdroid.config.Configuration.getInstance().setOsmdroidTileCache(new File(osmdroidDir, cacheFolder));
+        File extDir = context.getExternalFilesDir(null);
+        if (extDir != null) {
+            File osmdroidDir = new File(extDir, "osmdroid");
+            String cacheFolder = (mapType == 1) ? "tiles_sat" : "tiles_street";
+            config.setOsmdroidTileCache(new File(osmdroidDir, cacheFolder));
+        }
 
-        mapView.onResume(); 
         mapView.setUseDataConnection(true);
         
         if (mapType == 1) {
@@ -532,9 +535,7 @@ public class MapManager {
      * Libera recursos críticos para evitar fugas de memoria (Memory Leaks).
      */
     public void onDestroy() {
-        if (mapView != null) {
-            mapView.onDetach();
-        }
+        // Se elimina mapView.onDetach() de aquí para evitar cierre doble (ya se llama en el Fragmento)
         if (locationOverlay != null) {
             locationOverlay.disableMyLocation();
             locationOverlay.disableFollowLocation();

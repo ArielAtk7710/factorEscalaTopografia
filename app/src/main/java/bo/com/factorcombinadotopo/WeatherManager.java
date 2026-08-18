@@ -104,9 +104,11 @@ public class WeatherManager {
     }
 
     public static void checkFlightSafety(Context context, double lat, double lon, double pdop, WeatherCallback callback) {
-        // 🛡️ Validación Senior de Conectividad Proactiva
+        // 🛡️ Validación Senior de Conectividad Proactiva (Solo una vez)
         if (!NetworkUtils.isNetworkAvailable(context)) {
-            callback.onError(context.getString(R.string.msg_weather_offline));
+            if (NetworkUtils.shouldShowOfflineWarning(context)) {
+                callback.onError(context.getString(R.string.msg_weather_offline));
+            }
             return;
         }
 
