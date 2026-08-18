@@ -1,6 +1,7 @@
 package bo.com.factorcombinadotopo;
 
 import android.app.Application;
+import android.content.SharedPreferences;
 import android.util.Log;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
@@ -43,13 +44,18 @@ public class SurveyApplication extends Application {
         // 1. Configurar directorios de osmdroid
         org.osmdroid.config.IConfigurationProvider osmConfig = org.osmdroid.config.Configuration.getInstance();
         
+        // Leer preferencia de mapa para inicializar la carpeta de caché correcta desde el arranque
+        SharedPreferences prefs = getSharedPreferences("AppPrefs", MODE_PRIVATE);
+        int mapType = prefs.getInt(MapManager.KEY_MAP_TYPE, 0);
+        String cacheFolder = (mapType == 1) ? "tiles_sat" : "tiles_street";
+
         File extDir = getExternalFilesDir(null);
         if (extDir != null) {
             File osmdroidDir = new File(extDir, "osmdroid");
             if (!osmdroidDir.exists()) osmdroidDir.mkdirs();
             
             osmConfig.setOsmdroidBasePath(osmdroidDir);
-            osmConfig.setOsmdroidTileCache(new File(osmdroidDir, "tiles_street"));
+            osmConfig.setOsmdroidTileCache(new File(osmdroidDir, cacheFolder));
         }
 
         // Optimización para Uso Offline (500 MB por capa)

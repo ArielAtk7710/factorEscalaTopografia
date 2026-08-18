@@ -113,6 +113,11 @@ public class CompassFragment extends Fragment implements SensorEventListener {
         if (System.currentTimeMillis() - lastLocationRequestTime < 60000) return;
         lastLocationRequestTime = System.currentTimeMillis();
 
+        if (!NetworkUtils.isNetworkAvailable(requireContext())) {
+            if (txtLocation != null) txtLocation.setText("Ubicación (Modo Offline)");
+            return;
+        }
+
         new Thread(() -> {
             try {
                 Geocoder geocoder = new Geocoder(requireContext(), Locale.getDefault());

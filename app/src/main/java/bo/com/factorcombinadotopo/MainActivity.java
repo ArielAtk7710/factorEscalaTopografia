@@ -282,12 +282,18 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             @Override
             public void onAvailable(@NonNull android.net.Network network) {
                 NetworkUtils.resetOfflineWarning();
-                runOnUiThread(() -> { if (imgOfflineStatus != null) imgOfflineStatus.setVisibility(View.GONE); });
+                runOnUiThread(() -> { 
+                    if (imgOfflineStatus != null) imgOfflineStatus.setVisibility(View.GONE);
+                    updateFragmentsNetworkState(true);
+                });
             }
 
             @Override
             public void onLost(@NonNull android.net.Network network) {
-                runOnUiThread(() -> { if (imgOfflineStatus != null) imgOfflineStatus.setVisibility(View.VISIBLE); });
+                runOnUiThread(() -> { 
+                    if (imgOfflineStatus != null) imgOfflineStatus.setVisibility(View.VISIBLE);
+                    updateFragmentsNetworkState(false);
+                });
             }
         };
 
@@ -295,7 +301,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         
         // Estado inicial
         if (imgOfflineStatus != null) {
-            imgOfflineStatus.setVisibility(NetworkUtils.isNetworkAvailable(this) ? View.GONE : View.VISIBLE);
+            boolean isAvailable = NetworkUtils.isNetworkAvailable(this);
+            imgOfflineStatus.setVisibility(isAvailable ? View.GONE : View.VISIBLE);
+            updateFragmentsNetworkState(isAvailable);
         }
     }
 
@@ -335,6 +343,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             showCompassPro();
         } else if (id == R.id.nav_field_notebook) {
             showFieldNotebook();
+        } else if (id == R.id.nav_stakeout) {
+            showStakeout();
         } else if (id == R.id.nav_weather) {
             showWeather();
         }
@@ -343,17 +353,31 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         return true;
     }
 
+    private void updateFragmentsNetworkState(boolean isOnline) {
+        for (Fragment fragment : getSupportFragmentManager().getFragments()) {
+            if (fragment instanceof MapFragment) {
+                ((MapFragment) fragment).setNetworkState(isOnline);
+            }
+        }
+    }
+
     private void showHome() {
         // Remover cualquier fragmento adicional que se haya puesto sobre el FrameLayout
-        // Filtramos para NO remover los fragmentos que pertenecen al ViewPager2
         for (Fragment fragment : getSupportFragmentManager().getFragments()) {
             if (fragment instanceof CompassFragment || 
                 fragment instanceof FieldNotebookFragment || 
+                fragment instanceof StakeoutFragment ||
                 fragment instanceof WeatherFragment) {
                 getSupportFragmentManager().beginTransaction().remove(fragment).commit();
             }
         }
-        mViewPager.setVisibility(View.VISIBLE);
+        
+        // Dar un respiro al sistema para limpiar fragmentos antes de mostrar el ViewPager (Mapa)
+        new Handler(Looper.getMainLooper()).postDelayed(() -> {
+            if (mViewPager != null) {
+                mViewPager.setVisibility(View.VISIBLE);
+            }
+        }, 300); // 300ms de carga segura
     }
 
     private void showCompassPro() {
@@ -364,14 +388,20 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         hideMainAndShowFragment(new FieldNotebookFragment());
     }
 
+    private void showStakeout() {
+        hideMainAndShowFragment(new StakeoutFragment());
+    }
+
     private void showWeather() {
         hideMainAndShowFragment(new WeatherFragment());
     }
 
     private void hideMainAndShowFragment(Fragment fragment) {
-        mViewPager.setVisibility(View.GONE);
+        if (mViewPager != null) {
+            mViewPager.setVisibility(View.GONE);
+        }
         getSupportFragmentManager().beginTransaction()
-                .add(R.id.main_content_frame, fragment)
+                .replace(R.id.main_content_frame, fragment) // Usar replace en lugar de add para evitar superposiciones
                 .commit();
     }
 

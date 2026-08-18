@@ -1,0 +1,14 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="24dp"
+    android:height="24dp"
+    android:viewportWidth="24"
+    android:viewportHeight="24">
+    <!-- Mitad Izquierda (Celeste Claro) -->
+    <path
+        android:fillColor="#7AB8FF"
+        android:pathData="M12,2 L3,22 L12,16 Z" />
+    <!-- Mitad Derecha (Azul Intenso) -->
+    <path
+        android:fillColor="#0084FF"
+        android:pathData="M12,2 L12,16 L21,22 Z" />
+</vector>

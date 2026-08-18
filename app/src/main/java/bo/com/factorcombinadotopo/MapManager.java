@@ -175,7 +175,7 @@ public class MapManager {
             config.setOsmdroidTileCache(new File(osmdroidDir, cacheFolder));
         }
 
-        mapView.setUseDataConnection(true);
+        updateNetworkState(NetworkUtils.isNetworkAvailable(context));
         
         if (mapType == 1) {
             if (currentMapMode != 1) setSatelliteMode(true);
@@ -190,6 +190,16 @@ public class MapManager {
         mapView.invalidate();
     }
 
+    /**
+     * Activa o desactiva la conexión de datos del mapa.
+     * Mejora el rendimiento offline al evitar intentos de descarga fallidos.
+     */
+    public void updateNetworkState(boolean isOnline) {
+        if (mapView != null) {
+            mapView.setUseDataConnection(isOnline);
+        }
+    }
+
     public void setSatelliteMode(boolean enableSatellite) {
         if (mapView == null) return;
         try {
@@ -201,9 +211,10 @@ public class MapManager {
             File cacheDir = new File(osmdroidDir, cacheFolder);
             if (!cacheDir.exists()) cacheDir.mkdirs();
             
-            // Actualizar configuración global
+            // Actualizar configuración global de caché
             org.osmdroid.config.Configuration.getInstance().setOsmdroidTileCache(cacheDir);
 
+            // Cambiar fuente y limpiar memoria para forzar recarga desde el nuevo almacén
             if (enableSatellite) {
                 currentMapMode = 1;
                 mapView.setTileSource(new ArcGISTileSource());
@@ -211,7 +222,8 @@ public class MapManager {
                 currentMapMode = 0;
                 mapView.setTileSource(TileSourceFactory.MAPNIK);
             }
-
+            
+            mapView.getTileProvider().clearTileCache();
             mapView.invalidate();
         } catch (Exception e) {
             e.printStackTrace();
@@ -231,25 +243,44 @@ public class MapManager {
     }
 
     public void centerOnCurrentLocation() {
-        if (mapView == null || locationOverlay == null || locationOverlay.getMyLocation() == null) return;
-        mapView.getController().animateTo(locationOverlay.getMyLocation());
+        try {
+            if (mapView == null || locationOverlay == null || locationOverlay.getMyLocation() == null) return;
+            IMapController controller = mapView.getController();
+            if (controller != null) {
+                controller.animateTo(locationOverlay.getMyLocation());
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     /**
      * Centra el mapa en una ubicación específica de forma inmediata.
      */
     public void centerToLocation(Location location) {
-        if (mapView == null || location == null) return;
-        GeoPoint point = new GeoPoint(location.getLatitude(), location.getLongitude());
-        mapView.getController().setCenter(point);
+        try {
+            if (mapView == null || location == null) return;
+            GeoPoint point = new GeoPoint(location.getLatitude(), location.getLongitude());
+            IMapController controller = mapView.getController();
+            if (controller != null) {
+                controller.setCenter(point);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     public void updateMyLocation(Location location) {
-        if (location == null || !isInitialized) return;
-        GeoPoint point = new GeoPoint(location.getLatitude(), location.getLongitude());
-        if (isFirstFix && autoCenterEnabled) {
-            mapView.getController().animateTo(point);
-            isFirstFix = false;
+        try {
+            if (location == null || !isInitialized || mapView == null) return;
+            GeoPoint point = new GeoPoint(location.getLatitude(), location.getLongitude());
+            IMapController controller = mapView.getController();
+            if (isFirstFix && autoCenterEnabled && controller != null) {
+                controller.animateTo(point);
+                isFirstFix = false;
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 
@@ -284,14 +315,18 @@ public class MapManager {
      */
     public void restoreMarkers() {
         if (mapView == null) return;
-        synchronized (overlayLock) {
-            // Limpiar cualquier marcador visual residual pero conservar la lista técnica
-            removeVisualMarkers();
-            for (MarkerData data : sessionMarkers) {
-                addMarkerToView(data.lat, data.lon, data.name);
+        try {
+            synchronized (overlayLock) {
+                // Limpiar cualquier marcador visual residual pero conservar la lista técnica
+                removeVisualMarkers();
+                for (MarkerData data : sessionMarkers) {
+                    addMarkerToView(data.lat, data.lon, data.name);
+                }
             }
+            mapView.invalidate();
+        } catch (Exception e) {
+            e.printStackTrace();
         }
-        mapView.invalidate();
     }
 
     /**
@@ -469,18 +504,23 @@ public class MapManager {
     }
 
     private void removeVisualMarkers() {
-        // Eliminar todos los marcadores técnicos, polígonos y rutas sin excepción
-        List<org.osmdroid.views.overlay.Overlay> overlays = mapView.getOverlays();
-        synchronized (overlayLock) {
-            for (int i = overlays.size() - 1; i >= 0; i--) {
-                org.osmdroid.views.overlay.Overlay o = overlays.get(i);
-                if (o instanceof Marker) {
-                    ((Marker) o).closeInfoWindow(); // Cerrar etiquetas para evitar fugas de memoria
-                    overlays.remove(i);
-                } else if (o instanceof Polygon || o instanceof Polyline) {
-                    overlays.remove(i);
+        if (mapView == null) return;
+        try {
+            // Eliminar todos los marcadores técnicos, polígonos y rutas sin excepción
+            List<org.osmdroid.views.overlay.Overlay> overlays = mapView.getOverlays();
+            synchronized (overlayLock) {
+                for (int i = overlays.size() - 1; i >= 0; i--) {
+                    org.osmdroid.views.overlay.Overlay o = overlays.get(i);
+                    if (o instanceof Marker) {
+                        ((Marker) o).closeInfoWindow(); // Cerrar etiquetas para evitar fugas de memoria
+                        overlays.remove(i);
+                    } else if (o instanceof Polygon || o instanceof Polyline) {
+                        overlays.remove(i);
+                    }
                 }
             }
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 
@@ -488,12 +528,16 @@ public class MapManager {
      * Añade un marcador a la sesión y lo dibuja.
      */
     public void addManualMarker(IGeoPoint point, String name) {
-        if (point == null || !isInitialized) return;
-        synchronized (overlayLock) {
-            sessionMarkers.add(new MarkerData(point.getLatitude(), point.getLongitude(), name));
-            addMarkerToView(point.getLatitude(), point.getLongitude(), name);
+        if (point == null || !isInitialized || mapView == null) return;
+        try {
+            synchronized (overlayLock) {
+                sessionMarkers.add(new MarkerData(point.getLatitude(), point.getLongitude(), name));
+                addMarkerToView(point.getLatitude(), point.getLongitude(), name);
+            }
+            mapView.invalidate();
+        } catch (Exception e) {
+            e.printStackTrace();
         }
-        mapView.invalidate();
     }
 
     private void addMarkerToView(double lat, double lon, String name) {

@@ -1,38 +1,43 @@
-# Plan de Estabilización del Módulo de Mapas (Fix Crashes)
+# Plan de Optimización de Experiencia Offline Total
 
-El usuario reporta que la aplicación se congela y se cierra al entrar a la opción de Mapa. Basado en el análisis del código, se han identificado inconsistencias críticas en la inicialización de `osmdroid`, redundancias en el ciclo de vida y posibles problemas de renderizado de hardware.
+Este plan detalla las medidas finales para garantizar que la aplicación factorEscala funcione de forma fluida, sin bloqueos y sin cierres repentinos cuando no hay conexión a internet.
 
 ## User Review Required
 
 > [!IMPORTANT]
-> Se unificará la configuración de los mapas en un solo lugar y se desactivará la aceleración de hardware para el componente de mapa si se detectan problemas de renderizado. Esto garantizará que la app sea estable en dispositivos de gama baja o con versiones de Android recientes.
+> Se desactivarán proactivamente los servicios de red en el motor de mapas y los buscadores de direcciones (Geocoder) cuando se detecte que el dispositivo está offline. Esto eliminará los "micro-cuelgues" de 1 o 2 segundos causados por el sistema operativo al intentar contactar servidores inexistentes.
+
+## Análisis de Riesgos Offline
+
+### 1. Geocodificador (Nombres de Ciudades)
+- **Problema**: El `Geocoder` de Android suele bloquear el hilo durante varios segundos intentando conectar a los servidores de Google.
+- **Solución**: Verificar `NetworkUtils.isNetworkAvailable` antes de llamar al servicio. Si no hay red, mostrar directamente "Ubicación Offline".
+
+### 2. Motor de Mapas (osmdroid)
+- **Problema**: `osmdroid` intenta resolver URLs de mosaicos incluso sin red, lo que consume batería y puede causar lentitud en la respuesta táctil.
+- **Solución**: Configurar `mapView.setUseDataConnection(false)` dinámicamente cuando no haya internet detectado.
+
+### 3. Cálculos de Elevación y Clima
+- **Problema**: Las promesas de Retrofit pueden quedar pendientes si el cambio de estado de red es errático.
+- **Solución**: Cancelar peticiones activas al detectar pérdida de señal y asegurar que los hilos de cálculo local (Topografía) tengan prioridad absoluta.
 
 ## Proposed Changes
 
-### Global Configuration (Thread Safety)
+### [MODIFY] [CompassFragment.java](file:///D:/Desarrollo-Software/Proyectos%20Android/factorEscala/app/src/main/java/bo/com/factorcombinadotopo/CompassFragment.java)
+- Añadir guarda de red en `updateLocationName`.
 
-#### [MODIFY] [SurveyApplication.java](file:///D:/Desarrollo-Software/Proyectos%20Android/factorEscala/app/src/main/java/bo/com/factorcombinadotopo/SurveyApplication.java)
-- Mover la carga de configuración de `osmdroid` (`Configuration.getInstance().load`) al hilo principal en `onCreate` para evitar condiciones de carrera.
-- Unificar el uso de `SharedPreferences` (usar el predeterminado para coincidir con `MapManager`).
+### [MODIFY] [WeatherFragment.java](file:///D:/Desarrollo-Software/Proyectos%20Android/factorEscala/app/src/main/java/bo/com/factorcombinadotopo/WeatherFragment.java)
+- Añadir guarda de red en `updateLocationName`.
 
-### Map Lifecycle & Resources (Fix Crashes)
+### [MODIFY] [MapManager.java](file:///D:/Desarrollo-Software/Proyectos%20Android/factorEscala/app/src/main/java/bo/com/factorcombinadotopo/MapManager.java)
+- Implementar `updateNetworkState(boolean isOnline)` para activar/desactivar la conexión de datos del mapa en tiempo real.
 
-#### [MODIFY] [MapManager.java](file:///D:/Desarrollo-Software/Proyectos%20Android/factorEscala/app/src/main/java/bo/com/factorcombinadotopo/MapManager.java)
-- Eliminar `mapView.onResume()` del constructor (es demasiado pronto).
-- Eliminar la redundancia de `mapView.onDetach()` en `onDestroy` (ya se llama en el Fragmento).
-- Asegurar que `initConfiguration` no sobreescriba configuraciones globales de forma innecesaria en cada recreación.
-- Implementar un chequeo de seguridad para `getExternalFilesDir(null)`.
-
-#### [MODIFY] [MapFragment.java](file:///D:/Desarrollo-Software/Proyectos%20Android/factorEscala/app/src/main/java/bo/com/factorcombinadotopo/MapFragment.java)
-- Añadir `mapView.setLayerType(View.LAYER_TYPE_SOFTWARE, null)` como medida preventiva de estabilidad.
-- Corregir el orden de inicialización para asegurar que los eventos del mapa se registren solo después de que el `MapManager` esté listo.
+### [MODIFY] [MainActivity.java](file:///D:/Desarrollo-Software/Proyectos%20Android/factorEscala/app/src/main/java/bo/com/factorcombinadotopo/MainActivity.java)
+- Notificar al `MapManager` sobre los cambios de red en el `networkCallback`.
 
 ## Verification Plan
 
-### Automated Tests
-- Ejecutar `gradle assembleDebug` para asegurar que los cambios no rompan la compilación.
-
 ### Manual Verification
-1. **Entrada al Mapa**: Verificar que al abrir la pestaña de Mapa, la aplicación no se cierre.
-2. **Cambio de Capa**: Alternar entre Mapa de Calles y Satélite; confirmar que los mosaicos carguen sin "congelar" la UI.
-3. **Persistencia**: Añadir un punto, salir de la app, volver a entrar y verificar que el marcador se restaure correctamente.
+1. **Modo Avión Estricto**: Abrir la app en modo avión. Navegar por todas las pestañas. El mapa debe cargar lo que tenga en caché al instante, y la brújula/replanteo deben mostrar datos GPS sin pausas.
+2. **Reconexión en Caliente**: Activar Wifi mientras se usa el mapa; verificar que el mapa empieza a descargar nuevas zonas automáticamente.
+3. **Estabilidad de Geocoder**: Verificar que en la Brújula aparece "Ubicación Offline" o similar de inmediato al estar sin red.

@@ -236,6 +236,11 @@ public class WeatherFragment extends Fragment {
     private void updateLocationName(double lat, double lon) {
         if (!isAdded()) return;
         
+        if (!NetworkUtils.isNetworkAvailable(requireContext())) {
+            if (txtLocationName != null) txtLocationName.setText("Modo Offline");
+            return;
+        }
+
         new Thread(() -> {
             try {
                 android.location.Geocoder geocoder = new android.location.Geocoder(requireContext(), Locale.getDefault());

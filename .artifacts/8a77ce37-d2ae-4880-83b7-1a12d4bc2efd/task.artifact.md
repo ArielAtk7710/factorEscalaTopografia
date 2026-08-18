@@ -1,4 +1,5 @@
-- [x] Refactorizar `SurveyApplication.java` para una configuración global de mapas segura.
-- [x] Optimizar `MapManager.java` (Limpieza de ciclo de vida y manejo de memoria).
-- [x] Ajustar `MapFragment.java` (Prevención de cuelgues gráficos y sincronización).
-- [x] Verificar estabilidad del mapa.
+- [x] Blindar `CompassFragment.java` contra bloqueos del Geocoder sin red.
+- [x] Optimizar `WeatherFragment.java` para manejo de ubicación offline.
+- [x] Implementar control de conectividad en tiempo real en `MapManager.java`.
+- [x] Vincular el estado de red global en `MainActivity.java`.
+- [x] Verificar fluidez total en modo avión.

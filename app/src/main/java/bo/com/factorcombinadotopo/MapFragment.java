@@ -169,18 +169,29 @@ public class MapFragment extends Fragment {
 
     private void setupViewModelObservers() {
         viewModel.getRawLocation().observe(getViewLifecycleOwner(), location -> {
-            if (isAdded() && mapManager != null && location != null) {
-                this.lastGpsLocation = location;
-                
-                // Centrado automático solo la primera vez por sesión
-                if (!hasCenteredOnce) {
-                    mapManager.centerToLocation(location);
-                    hasCenteredOnce = true;
-                }
-                
-                mapManager.updateMyLocation(location);
+            // 🛡️ SEGURIDAD CRÍTICA: Detener procesamiento si el mapa no es visible
+            if (!isMapActuallyVisible() || mapManager == null || location == null) {
+                return;
             }
+            
+            this.lastGpsLocation = location;
+            
+            // Centrado automático solo la primera vez por sesión
+            if (!hasCenteredOnce) {
+                mapManager.centerToLocation(location);
+                hasCenteredOnce = true;
+            }
+            
+            mapManager.updateMyLocation(location);
         });
+    }
+
+    /**
+     * Verifica si el fragmento y su vista son realmente visibles para el usuario.
+     * Esto previene crashes al intentar dibujar sobre una vista desconectada o GONE.
+     */
+    private boolean isMapActuallyVisible() {
+        return isAdded() && isResumed() && getView() != null && getView().isShown();
     }
 
     private void showSavePointDialogMap() {
@@ -619,6 +630,8 @@ public class MapFragment extends Fragment {
     }
 
     private void setupMapEvents() {
+        if (mapView == null) return;
+        
         MapEventsReceiver mReceive = new MapEventsReceiver() {
             @Override
             public boolean singleTapConfirmedHelper(GeoPoint p) {
@@ -813,6 +826,15 @@ public class MapFragment extends Fragment {
         IGeoPoint center = mapView.getMapCenter();
         txtLat.setText(String.format(Locale.getDefault(), "LAT: %.6f", center.getLatitude()));
         txtLon.setText(String.format(Locale.getDefault(), "LON: %.6f", center.getLongitude()));
+    }
+
+    /**
+     * Actualiza el estado de conexión del motor de mapas.
+     */
+    public void setNetworkState(boolean isOnline) {
+        if (mapManager != null) {
+            mapManager.updateNetworkState(isOnline);
+        }
     }
 
     private void checkLocationPermissions() {
