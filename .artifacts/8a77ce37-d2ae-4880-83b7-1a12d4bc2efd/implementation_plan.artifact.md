@@ -1,43 +1,63 @@
-# Plan de Optimización de Experiencia Offline Total
+# Plan de Trabajo: Capa de Procesamiento GNSS Avanzado
 
-Este plan detalla las medidas finales para garantizar que la aplicación factorEscala funcione de forma fluida, sin bloqueos y sin cierres repentinos cuando no hay conexión a internet.
+Este plan describe la implementación de una capa de filtrado y estabilización de posición GPS/GNSS que actuará como intermediario entre los datos crudos del sistema operativo Android y el motor de cálculos topográficos de **factorEscala**.
 
-## User Review Required
+## REGLA DE INTEGRIDAD
+Se confirma que las siguientes clases de cálculo geodésico permanecerán **INTACTAS**:
+- `IGMUtmConverter`, `TopoCalculoManager`, `IGMConstants`, `IGMScaleCalculator`, `IGMElevationCalculator`, `IGMPressureCalculator`, `MGBEngine`, `EGM96Engine`, `GeoUtils`, y todas las clases con prefijo `IGM`.
 
-> [!IMPORTANT]
-> Se desactivarán proactivamente los servicios de red en el motor de mapas y los buscadores de direcciones (Geocoder) cuando se detecte que el dispositivo está offline. Esto eliminará los "micro-cuelgues" de 1 o 2 segundos causados por el sistema operativo al intentar contactar servidores inexistentes.
+## Objetivos Técnicos
+1. **Control de Calidad**: Analizar Accuracy y satélites antes del procesamiento.
+2. **Detección de Outliers**: Filtrar saltos de posición mediante análisis de velocidad cinemática ($v = d / \Delta t$).
+3. **Estabilización (Promedio Ponderado)**: Implementar un buffer de posiciones donde el peso sea inversamente proporcional al cuadrado de la incertidumbre ($1/\sigma^2$).
+4. **Filtro de Estabilidad**: Implementar un filtro de suavizado para reducir el ruido en coordenadas estáticas.
+5. **Diferenciación RAW vs FILTERED**: Mantener ambos flujos de datos para comparación y auditoría.
 
-## Análisis de Riesgos Offline
-
-### 1. Geocodificador (Nombres de Ciudades)
-- **Problema**: El `Geocoder` de Android suele bloquear el hilo durante varios segundos intentando conectar a los servidores de Google.
-- **Solución**: Verificar `NetworkUtils.isNetworkAvailable` antes de llamar al servicio. Si no hay red, mostrar directamente "Ubicación Offline".
-
-### 2. Motor de Mapas (osmdroid)
-- **Problema**: `osmdroid` intenta resolver URLs de mosaicos incluso sin red, lo que consume batería y puede causar lentitud en la respuesta táctil.
-- **Solución**: Configurar `mapView.setUseDataConnection(false)` dinámicamente cuando no haya internet detectado.
-
-### 3. Cálculos de Elevación y Clima
-- **Problema**: Las promesas de Retrofit pueden quedar pendientes si el cambio de estado de red es errático.
-- **Solución**: Cancelar peticiones activas al detectar pérdida de señal y asegurar que los hilos de cálculo local (Topografía) tengan prioridad absoluta.
+---
 
 ## Proposed Changes
 
-### [MODIFY] [CompassFragment.java](file:///D:/Desarrollo-Software/Proyectos%20Android/factorEscala/app/src/main/java/bo/com/factorcombinadotopo/CompassFragment.java)
-- Añadir guarda de red en `updateLocationName`.
+### 1. Nuevo Módulo de Procesamiento GNSS
 
-### [MODIFY] [WeatherFragment.java](file:///D:/Desarrollo-Software/Proyectos%20Android/factorEscala/app/src/main/java/bo/com/factorcombinadotopo/WeatherFragment.java)
-- Añadir guarda de red en `updateLocationName`.
+#### [NEW] [GnssFilter.java](file:///D:/Desarrollo-Software/Proyectos%20Android/factorEscala/app/src/main/java/bo/com/factorcombinadotopo/gnss/GnssFilter.java)
+- Clase principal encargada de gestionar el buffer de posiciones.
+- Mantendrá una lista circular de las últimas $n$ posiciones válidas.
+- Implementará el método `filter(Location rawLocation)` que retorna un objeto con la posición suavizada.
 
-### [MODIFY] [MapManager.java](file:///D:/Desarrollo-Software/Proyectos%20Android/factorEscala/app/src/main/java/bo/com/factorcombinadotopo/MapManager.java)
-- Implementar `updateNetworkState(boolean isOnline)` para activar/desactivar la conexión de datos del mapa en tiempo real.
+#### [NEW] [GnssMeasurement.java](file:///D:/Desarrollo-Software/Proyectos%20Android/factorEscala/app/src/main/java/bo/com/factorcombinadotopo/gnss/GnssMeasurement.java)
+- Estructura de datos para almacenar la latitud, longitud, altitud y precisión filtrada, preservando el tipo `double`.
 
-### [MODIFY] [MainActivity.java](file:///D:/Desarrollo-Software/Proyectos%20Android/factorEscala/app/src/main/java/bo/com/factorcombinadotopo/MainActivity.java)
-- Notificar al `MapManager` sobre los cambios de red en el `networkCallback`.
+### 2. Integración en el Flujo de Datos
+
+#### [MODIFY] [SurveyViewModel.java](file:///D:/Desarrollo-Software/Proyectos%20Android/factorEscala/app/src/main/java/bo/com/factorcombinadotopo/SurveyViewModel.java)
+- Instanciar `GnssFilter`.
+- En `processNewLocation(Location loc)`, pasar la `loc` por el filtro.
+- Crear nuevas `LiveData` para exponer la posición filtrada y la comparación de deltas ($\Delta E, \Delta N, \Delta H$).
+- Enviar la posición **FILTRADA** al `TopographyRepository` para que los cálculos topográficos se realicen sobre la base estabilizada.
+
+### 3. Interfaz de Comparación y Auditoría
+
+#### [MODIFY] [fragment_automatic.xml](file:///D:/Desarrollo-Software/Proyectos%20Android/factorEscala/app/src/main/res/layout/fragment_automatic.xml)
+- Añadir una sección de "Auditoría de Precisión" (ocultable o en la parte inferior).
+- Mostrar los valores RAW frente a los valores FILTERED.
+- Mostrar los deltas en metros para verificar la efectividad del filtrado.
+
+#### [MODIFY] [AutomaticFragment.java](file:///D:/Desarrollo-Software/Proyectos%20Android/factorEscala/app/src/main/java/bo/com/factorcombinadotopo/AutomaticFragment.java)
+- Vincular los nuevos campos de la UI.
+- Implementar el botón "INICIAR MEDICIÓN ESTÁTICA" que resetee el filtro y acumule datos para un reporte de precisión.
+
+---
 
 ## Verification Plan
 
-### Manual Verification
-1. **Modo Avión Estricto**: Abrir la app en modo avión. Navegar por todas las pestañas. El mapa debe cargar lo que tenga en caché al instante, y la brújula/replanteo deben mostrar datos GPS sin pausas.
-2. **Reconexión en Caliente**: Activar Wifi mientras se usa el mapa; verificar que el mapa empieza a descargar nuevas zonas automáticamente.
-3. **Estabilidad de Geocoder**: Verificar que en la Brújula aparece "Ubicación Offline" o similar de inmediato al estar sin red.
+### Prueba de Regresión (Integridad Matemática)
+1. **Entrada Idéntica**: Se inyectará manualmente una coordenada fija a la app.
+2. **Cálculo Topográfico**: Se verificará que el resultado (Factor de Escala, Combined Factor) sea **exactamente igual** (hasta el 9º decimal) antes y después de añadir la capa de filtrado, confirmando que la capa GNSS no altera la matemática topográfica.
+
+### Prueba Cinemática (Detección de Outliers)
+1. Simular un salto de coordenadas de 100 metros en 1 segundo.
+2. Verificar que el `GnssFilter` marque la posición como `OUTLIER` y mantenga la posición anterior estable.
+
+### Prueba Estática (Estabilización)
+1. Dejar el dispositivo fijo.
+2. Comparar la oscilación de los decimales de la coordenada Este/Norte RAW frente a la FILTERED. La versión filtrada debe mostrar una deriva significativamente menor.
