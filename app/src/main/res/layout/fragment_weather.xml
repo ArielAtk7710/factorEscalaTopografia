@@ -152,8 +152,7 @@
                         android:id="@+id/img_assistant_icon"
                         android:layout_width="24dp"
                         android:layout_height="24dp"
-                        app:srcCompat="@drawable/ic_info"
-                        app:tint="@color/accent_orange"
+                        app:srcCompat="@drawable/ic_info_round_blue"
                         tools:ignore="ContentDescription" />
 
                     <LinearLayout

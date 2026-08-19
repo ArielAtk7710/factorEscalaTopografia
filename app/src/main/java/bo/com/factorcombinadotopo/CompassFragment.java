@@ -46,6 +46,7 @@ public class CompassFragment extends Fragment implements SensorEventListener {
 
     private SurveyViewModel viewModel;
     private long lastLocationRequestTime = 0;
+    private Thread geocoderThread;
 
     @Nullable
     @Override
@@ -118,10 +119,18 @@ public class CompassFragment extends Fragment implements SensorEventListener {
             return;
         }
 
-        new Thread(() -> {
+        // Cancelar hilo previo si existe
+        if (geocoderThread != null && geocoderThread.isAlive()) {
+            geocoderThread.interrupt();
+        }
+
+        geocoderThread = new Thread(() -> {
             try {
                 Geocoder geocoder = new Geocoder(requireContext(), Locale.getDefault());
                 List<Address> addresses = geocoder.getFromLocation(lat, lon, 1);
+                
+                if (Thread.interrupted()) return;
+
                 if (addresses != null && !addresses.isEmpty()) {
                     String city = addresses.get(0).getLocality();
                     String country = addresses.get(0).getCountryName();
@@ -131,7 +140,8 @@ public class CompassFragment extends Fragment implements SensorEventListener {
                     });
                 }
             } catch (Exception ignored) {}
-        }).start();
+        });
+        geocoderThread.start();
     }
 
     @Override
@@ -145,6 +155,9 @@ public class CompassFragment extends Fragment implements SensorEventListener {
     public void onPause() {
         super.onPause();
         if (sensorManager != null) sensorManager.unregisterListener(this);
+        if (geocoderThread != null && geocoderThread.isAlive()) {
+            geocoderThread.interrupt();
+        }
     }
 
     @Override

@@ -247,6 +247,14 @@
     <string name="msg_gps_required">Please turn on your GPS to operate correctly.</string>
     <string name="msg_manual_entry_hint">Please enter data manually</string>
     <string name="msg_activate_gps">Please activate GPS on your device</string>
+    <string name="title_precision_info">GNSS Quality Details</string>
+    <string name="label_h_accuracy">Horizontal Accuracy (H-Acc)</string>
+    <string name="label_v_accuracy">Vertical Accuracy (V-Acc)</string>
+    <string name="label_speed_accuracy">Speed Accuracy</string>
+    <string name="label_bearing_accuracy">Bearing Accuracy</string>
+    <string name="label_provider_source">Data Provider</string>
+    <string name="label_fix_timestamp">Measurement Time</string>
+
     <string name="msg_point_saved_format">Point \'%1$s\' saved to Register</string>
     <string name="msg_select_points_export">Select points to export</string>
     <string name="msg_select_points_delete">Select points to delete</string>
@@ -330,13 +338,12 @@
 
     <!-- Terms and Conditions -->
     <string name="title_terms_conditions">📜 Terms and Conditions of Use</string>
-    <string name="terms_body">By using FactorEscalaTop 2.4, you formally accept the following terms and conditions:\n\n
+    <string name="terms_body">By using FactorEscalaTop v2.4, you formally accept the following terms and conditions:\n\n
         <b>Geographic Scope:</b> The application is designed and calibrated exclusively for the reference systems and cartographic grid of Bolivia.\n\n
-        <b>Technical Support Tool:</b> The data provided is for guidance only and does not replace the procedures, technical controls, or professional equipment required for official or legal surveys.\n\n
+        <b>Technical Support Tool:</b> The data provided is for guidance only and does not replace certified procedures or professional equipment. The new <b>GNSS Processing Layer</b> improves stability but does not eliminate mobile hardware intrinsic error.\n\n
         <b>Reference Systems:</b> The app utilizes official <b>MGBol08</b> models and the global <b>EGM2008</b> standard for geodetic precision.\n\n
-        <b>Connectivity and APIs:</b> "Online Height" and "Weather" functions depend on third-party services (Open-Meteo, Esri). The availability of these external services depends on their own providers.\n\n
+        <b>Connectivity and APIs:</b> "Online Height" and "Weather" functions depend on third-party services (Open-Meteo, Esri). The app guarantees 100% offline operability for basic topographic calculations and cached maps.\n\n
         <b>User Responsibility:</b> It is the professional\'s exclusive obligation to verify, validate, and certify all calculations before their application in formal projects.\n\n
-        <b>Limit of Liability:</b> The developer assumes no responsibility for damages derived from the use or reliance on the application\'s calculations.\n\n
         <b>Regulatory Compliance:</b> The user agrees to use the tool in accordance with Law 164 and current regulations in the Plurinational State of Bolivia.</string>
 
     <string name="title_privacy_policy">🔒 Privacy Policy</string>
@@ -351,13 +358,13 @@
 
     <!-- About Section -->
     <string name="title_about_detailed">ℹ️ About FactorEscalaTop</string>
-    <string name="about_version_region"><b>Version:</b> 2.4 (Free / PRO)\n<b>Region:</b> Plurinational State of Bolivia</string>
-    <string name="about_app_description">Specialized application for topographic support, specifically calibrated for the Bolivian cartographic grid. It allows surveyors and engineers to optimize their work through:\n\n
-        • Calculation of scale, elevation, and combined factors.\n
-        • Area and distance measurement on satellite imagery.\n
-        • Advanced GNSS constellation diagnosis.\n
-        • Weather information and flight safety for drones.\n\n
-        <b>🎖️ Proudly endorsed by the College of Surveyors of La Paz.</b></string>
+    <string name="about_version_region"><b>Version:</b> 2.4 (Pro Stability)\n<b>Region:</b> Plurinational State of Bolivia</string>
+    <string name="about_app_description">Professional application for topographic and geodetic support, calibrated for the Bolivian cartographic grid. Optimized in v2.4 with:\n\n
+        • <b>Stakeout Mode</b>: Point import (.txt) and assisted navigation.\n
+        • <b>Advanced GNSS Processing</b>: Coordinate stabilization via weighted average and jump detection (Outliers).\n
+        • <b>Independent Map Cache</b>: Separate management for street and satellite maps (Total Offline Mode).\n
+        • <b>IGM Factors</b>: Calculation of scale, elevation, and combined factors with 9-decimal precision.\n\n
+        <b>🎖️ Technically endorsed for field support by professionals in the field.</b></string>
 
     <string name="title_collaborators">👥 Developers and Collaborators</string>
     <string name="about_collaborators_body">This project has been driven by the joint effort of software engineering and technical field experience:\n\n
@@ -388,13 +395,13 @@
     <string name="title_quick_guide">📖 Quick User Guide</string>
 
     <string name="guide_section_gen_title">1. General Concepts</string>
-    <string name="guide_section_gen_body">FactorEscalaTop 2.4 is a comprehensive topographic suite for calculating correction factors (k, ha, K), GNSS data management, and map measurements, specifically calibrated for Bolivia.</string>
+    <string name="guide_section_gen_body">FactorEscalaTop v2.4 is a topographic workstation for calculating correction factors (k, ha, K), advanced GNSS data management, and precision stakeout, designed for the Bolivian environment.</string>
 
-    <string name="guide_section_calc_title">2. Calculation Modes</string>
-    <string name="guide_section_calc_body"><b>Automatic:</b> Obtains real-time data from GPS.\n<b>Manual:</b> Allows simulating scenarios by entering coordinates from blueprints or projects.</string>
+    <string name="guide_section_calc_title">2. Stabilization and Calculations</string>
+    <string name="guide_section_calc_body"><b>Static Mode:</b> Tap "START STATIC" over a fixed point to average the GNSS signal and fix UTM decimals.\n<b>GNSS Filter:</b> The app automatically discards erratic position jumps (Outliers) for greater reliability.</string>
 
-    <string name="guide_section_map_title">3. Navigation and Map</string>
-    <string name="guide_section_map_body"><b>Orange Crosshair:</b> Central target.\n<b>Search (Magnifier):</b> Navigate to exact coordinates.\n<b>Interactive Points:</b> Tap a point\'s name to see its technical sheet.\n<b>Measurement:</b> Use the <b>Light Blue</b> button for areas and <b>Red</b> for distances.</string>
+    <string name="guide_section_map_title">3. Navigation and Stakeout</string>
+    <string name="guide_section_map_body"><b>Stakeout Mode:</b> Import .txt files (Name, E, N, UTM, Zone, Hem) and follow the dynamic arrow towards the target.\n<b>Offline Maps:</b> Download cached zones (Street or Satellite) and manage them independently in Settings.</string>
 
     <string name="guide_section_alt_title">4. Altitude and DEM Models</string>
     <string name="guide_section_alt_body"><b>Device GPS:</b> Ellipsoidal height from the mobile.\n<b>Online Height:</b> Obtains the elevation (MSL) via Open-Meteo API (Copernicus DEM) with EGM2008 correction.</string>
@@ -452,4 +459,18 @@
     <string name="label_visible_status">Visible</string>
     <string name="msg_offline_warning">Online feature unavailable. Working in Offline Mode (Local Sensors only).</string>
     <string name="msg_weather_offline">Weather analysis requires an Internet connection.</string>
+    <string name="title_stakeout_guide">Professional Stakeout Guide</string>
+    <string name="stakeout_guide_body"><b>1. DATA IMPORT (.txt):</b>\n
+        Each line of the file must follow this exact comma-separated format:\n
+        <i>Name, EastE, NorthN, UTM, Zone, Hemisphere</i>\n
+        Ex: P01, 816663.123E, 8088744.094N, UTM, 19, S\n\n
+        <b>2. STATIC MODE SWITCH (Target Icon):</b>\n
+        This button controls the advanced GNSS Processing Layer.\n\n
+        • <b>🔴 RED (Dynamic Mode):</b> Use while walking towards the point. GPS responds instantly to your movement.\n\n
+        • <b>🟢 GREEN (Precision Filter):</b> Use upon reaching the stakeout point. The system averages the position to eliminate noise and fix the exact distance.\n\n
+        <b>3. RECOMMENDED FIELD PROTOCOL:</b>\n
+        1. Approach the point following the arrow in <b>RED</b> mode.\n
+        2. When less than 1 meter away, stop and switch to <b>GREEN</b> mode.\n
+        3. Keep the equipment motionless for <b>15 to 20 seconds</b>.\n
+        4. The distance will stabilize. Mark the ground with full confidence.</string>
 </resources>

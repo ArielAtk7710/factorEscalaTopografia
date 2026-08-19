@@ -44,6 +44,19 @@ public class NetworkUtils {
     }
 
     /**
+     * Verifica si hay red disponible de forma estricta.
+     * Útil para evitar falsos positivos de Wi-Fi sin internet.
+     */
+    public static boolean isNetworkAvailableStrict(Context context) {
+        if (!isNetworkAvailable(context)) return false;
+        
+        // En Android moderno, isNetworkAvailable ya valida capacidades.
+        // Podríamos añadir un check de socket aquí, pero para evitar lags
+        // confiamos en el sistema operativo y su validación de internet.
+        return true;
+    }
+
+    /**
      * Determina si se debe mostrar la advertencia de "Sin Internet".
      * Solo retorna true la primera vez que se llama en un estado de desconexión.
      */

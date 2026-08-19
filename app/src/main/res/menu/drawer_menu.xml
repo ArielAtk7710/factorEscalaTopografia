@@ -20,7 +20,7 @@
         <item
             android:id="@+id/nav_stakeout"
             android:icon="@drawable/ic_map_pin"
-            android:title="Replanteo UTM" />
+            android:title="Modo Replanteo" />
         <item
             android:id="@+id/nav_weather"
             android:icon="@drawable/ic_pressure"

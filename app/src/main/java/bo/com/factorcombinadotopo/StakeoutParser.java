@@ -15,9 +15,9 @@ import java.util.regex.Pattern;
  */
 public class StakeoutParser {
 
-    // Regex: Nombre, EsteE, NorteN, UTM, Zona, Hemisferio
-    // Ejemplo: P01, 816663.123E,8088744.094N,UTM,19,S
-    private static final String REGEX = "^([^,]+),\\s*([\\d.]+)\\s*E,\\s*([\\d.]+)\\s*N,\\s*UTM,\\s*(\\d+),\\s*([NS])";
+    // Regex ultra-flexible: Nombre, EsteE, NorteN, UTM, Zona, Hemisferio
+    // Soporta variaciones de espacios y separadores regionales (punto/coma decimal)
+    private static final String REGEX = "^([^,]+)\\s*,\\s*([\\d.,]+)\\s*E\\s*,\\s*([\\d.,]+)\\s*N\\s*,\\s*UTM\\s*,\\s*(\\d+)\\s*,\\s*([NS])";
 
     public static List<StakeoutPoint> parseUri(Context context, Uri uri) throws Exception {
         List<StakeoutPoint> points = new ArrayList<>();
@@ -33,9 +33,13 @@ public class StakeoutParser {
 
                 Matcher matcher = pattern.matcher(line);
                 if (matcher.find()) {
-                    String id = matcher.group(1);
-                    double east = Double.parseDouble(matcher.group(2));
-                    double north = Double.parseDouble(matcher.group(3));
+                    String id = matcher.group(1).trim();
+                    // Limpiar posibles comas decimales para que Double.parseDouble no falle
+                    String eastStr = matcher.group(2).replace(",", ".");
+                    String northStr = matcher.group(3).replace(",", ".");
+                    
+                    double east = Double.parseDouble(eastStr);
+                    double north = Double.parseDouble(northStr);
                     int zone = Integer.parseInt(matcher.group(4));
                     char hem = matcher.group(5).toUpperCase().charAt(0);
 

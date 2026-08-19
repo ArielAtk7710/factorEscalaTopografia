@@ -53,6 +53,7 @@ public class WeatherFragment extends Fragment {
     private View layoutLoading;
 
     private SurveyViewModel viewModel;
+    private Thread geocoderThread;
 
     // Lists
     private RecyclerView rvHourly, rvWeekly;
@@ -192,7 +193,7 @@ public class WeatherFragment extends Fragment {
 
         setDetailLabel(detWind120, R.string.label_wind_120_v, R.drawable.ic_wind_pro);
         setDetailLabel(detWindSust, R.string.label_wind_sustained, R.drawable.ic_wind_pro);
-        setDetailLabel(detWindDir, R.string.label_wind_direction, R.drawable.ic_info);
+        setDetailLabel(detWindDir, R.string.label_wind_direction, R.drawable.ic_info_round_blue);
         setDetailLabel(detGusts, R.string.label_gusts_max, R.drawable.ic_wind_pro);
         setDetailLabel(detRainProb, R.string.label_rain_prob_v, R.drawable.ic_rain_drop_pro);
         setDetailLabel(detRainAct, R.string.label_rain_actual, R.drawable.ic_rain_drop_pro);
@@ -241,10 +242,18 @@ public class WeatherFragment extends Fragment {
             return;
         }
 
-        new Thread(() -> {
+        // Cancelar hilo previo
+        if (geocoderThread != null && geocoderThread.isAlive()) {
+            geocoderThread.interrupt();
+        }
+
+        geocoderThread = new Thread(() -> {
             try {
                 android.location.Geocoder geocoder = new android.location.Geocoder(requireContext(), Locale.getDefault());
                 List<android.location.Address> addresses = geocoder.getFromLocation(lat, lon, 1);
+                
+                if (Thread.interrupted()) return;
+
                 if (addresses != null && !addresses.isEmpty()) {
                     android.location.Address address = addresses.get(0);
                     String cityName = address.getLocality();
@@ -265,7 +274,16 @@ public class WeatherFragment extends Fragment {
             } catch (Exception e) {
                 e.printStackTrace();
             }
-        }).start();
+        });
+        geocoderThread.start();
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        if (geocoderThread != null && geocoderThread.isAlive()) {
+            geocoderThread.interrupt();
+        }
     }
 
     private void updateUI(WeatherManager.SafetyStatus status) {
@@ -306,7 +324,6 @@ public class WeatherFragment extends Fragment {
         // Assistant
         txtFlightRec.setText(status.safetyAnalysis.ventanaOptima);
         txtAssistantTitle.setTextColor(strokeColor);
-        imgAssistantIcon.setColorFilter(strokeColor);
         if (txtViewDetails != null) {
             txtViewDetails.setTextColor(strokeColor);
         }

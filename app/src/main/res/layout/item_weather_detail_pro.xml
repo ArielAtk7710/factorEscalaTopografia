@@ -13,8 +13,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:srcCompat="@drawable/ic_info"
-        app:tint="@color/accent_light"
+        app:srcCompat="@drawable/ic_info_round_blue"
         tools:ignore="ContentDescription" />
 
     <TextView

@@ -282,6 +282,14 @@
     <string name="msg_gps_required">Por favor, encienda su GPS para operar correctamente.</string>
     <string name="msg_manual_entry_hint">Ingrese los datos de forma manual</string>
     <string name="msg_activate_gps">Active el GPS de su dispositivo</string>
+    <string name="title_precision_info">Detalles de Calidad GNSS</string>
+    <string name="label_h_accuracy">Precisión Horizontal (H-Acc)</string>
+    <string name="label_v_accuracy">Precisión Vertical (V-Acc)</string>
+    <string name="label_speed_accuracy">Precisión de Velocidad</string>
+    <string name="label_bearing_accuracy">Precisión de Rumbo</string>
+    <string name="label_provider_source">Proveedor de Datos</string>
+    <string name="label_fix_timestamp">Hora de la Medición</string>
+
     <string name="msg_point_saved_format">Punto \'%1$s\' guardado exitosamente</string>
     <string name="msg_select_points_export">Seleccione los puntos que desea exportar</string>
     <string name="msg_select_points_delete">Seleccione puntos para borrar</string>
@@ -364,13 +372,12 @@
 
     <!-- Terms and Conditions -->
     <string name="title_terms_conditions">📜 Términos y Condiciones de Uso</string>
-    <string name="terms_body">Al utilizar FactorEscalaTop 2.4, aceptas formalmente los siguientes términos y condiciones:\n\n
+    <string name="terms_body">Al utilizar FactorEscalaTop v2.4, aceptas formalmente los siguientes términos y condiciones:\n\n
         <b>Alcance Geográfico:</b> La aplicación está diseñada y calibrada exclusivamente para los sistemas de referencia y la grilla cartográfica de Bolivia.\n\n
-        <b>Herramienta de Apoyo Técnico:</b> Los datos suministrados son de carácter orientativo y no sustituyen los procedimientos, controles técnicos ni equipos profesionales requeridos para levantamientos oficiales o legales.\n\n
+        <b>Herramienta de Apoyo Técnico:</b> Los datos suministrados son de carácter orientativo y no sustituyen los procedimientos ni equipos profesionales certificados. La nueva <b>Capa de Procesamiento GNSS</b> mejora la estabilidad, pero no elimina el error intrínseco del hardware móvil.\n\n
         <b>Sistemas de Referencia:</b> La app utiliza los modelos oficiales <b>MGBol08</b> y el estándar global <b>EGM2008</b> para la precisión geodésica.\n\n
-        <b>Conectividad y APIs:</b> Las funciones de "Altura Online" y "Clima" dependen de servicios de terceros (Open-Meteo, Esri). El funcionamiento de estos servicios externos depende de sus propios proveedores y disponibilidad.\n\n
+        <b>Conectividad y APIs:</b> Las funciones de "Altura Online" y "Clima" dependen de servicios de terceros (Open-Meteo, Esri). La app garantiza operatividad 100% offline para cálculos topográficos básicos y mapas en caché.\n\n
         <b>Responsabilidad del Usuario:</b> Es obligación exclusiva del profesional verificar, validar y certificar todos los cálculos antes de su aplicación en proyectos formales.\n\n
-        <b>Límite de Responsabilidad:</b> El desarrollador no asume responsabilidad por daños derivados del uso o la dependencia de los cálculos de la aplicación.\n\n
         <b>Cumplimiento Normativo:</b> El usuario se compromete a utilizar la herramienta en conformidad con la Ley 164 y normativa vigente en el Estado Plurinacional de Bolivia.</string>
 
     <string name="title_privacy_policy">🔒 Política de Privacidad</string>
@@ -385,13 +392,13 @@
 
     <!-- About Section -->
     <string name="title_about_detailed">ℹ️ Acerca de FactorEscalaTop</string>
-    <string name="about_version_region"><b>Versión:</b> 2.4 (Gratuita / PRO)\n<b>Región:</b> Estado Plurinacional de Bolivia</string>
-    <string name="about_app_description">Aplicación especializada para el apoyo topográfico, calibrada específicamente para la grilla cartográfica boliviana. Permite a topógrafos e ingenieros optimizar su trabajo mediante:\n\n
-        • Cálculo de factores de escala, elevación y combinado.\n
-        • Medición de áreas y distancias sobre cartografía satelital.\n
-        • Diagnóstico avanzado de la constelación de satélites GNSS.\n
-        • Información meteorológica y de seguridad para drones.\n\n
-        <b>🎖️ Orgullosamente avalada por el Colegio de Topógrafos de La Paz.</b></string>
+    <string name="about_version_region"><b>Versión:</b> 2.4 (Estabilidad Pro)\n<b>Región:</b> Estado Plurinacional de Bolivia</string>
+    <string name="about_app_description">Aplicación profesional para el apoyo topográfico y geodésico, calibrada para la grilla cartográfica boliviana. Optimizada en la v2.4 con:\n\n
+        • <b>Modo Replanteo</b>: Importación de puntos (.txt) y navegación asistida.\n
+        • <b>Procesamiento GNSS Avanzado</b>: Estabilización de coordenadas mediante promedio ponderado y detección de saltos (Outliers).\n
+        • <b>Caché de Mapas Independiente</b>: Gestión separada para mapas de calles y satélite (Modo Offline Total).\n
+        • <b>Factores IGM</b>: Cálculo de escala, altura y combinado con precisión de 9 decimales.\n\n
+        <b>🎖️ Avalada técnicamente para apoyo en campo por profesionales del área.</b></string>
 
     <string name="title_collaborators">👥 Desarrolladores y Colaboradores</string>
     <string name="about_collaborators_body">Este proyecto ha sido impulsado gracias al esfuerzo conjunto de ingeniería de software y la experiencia técnica en campo:\n\n
@@ -426,13 +433,13 @@
     <string name="title_quick_guide">📖 Guía Rápida de Uso</string>
 
     <string name="guide_section_gen_title">1. Conceptos Generales</string>
-    <string name="guide_section_gen_body">FactorEscalaTop 2.4 es una suite topográfica integral para el cálculo de factores de corrección (k, ha, K), gestión de datos GNSS y mediciones sobre cartografía, calibrada específicamente para Bolivia.</string>
+    <string name="guide_section_gen_body">FactorEscalaTop v2.4 es una estación de trabajo topográfica para el cálculo de factores de corrección (k, ha, K), gestión avanzada de datos GNSS y replanteo de precisión, diseñada para el entorno boliviano.</string>
 
-    <string name="guide_section_calc_title">2. Modos de Cálculo</string>
-    <string name="guide_section_calc_body"><b>Automático:</b> Obtiene datos en tiempo real del GPS.\n<b>Manual:</b> Permite simular escenarios ingresando coordenadas de planos o proyectos.</string>
+    <string name="guide_section_calc_title">2. Estabilización y Cálculos</string>
+    <string name="guide_section_calc_body"><b>Modo Estático:</b> Pulsa "INICIAR ESTÁTICO" sobre un punto fijo para promediar la señal GNSS y fijar los decimales UTM.\n<b>Filtro GNSS:</b> La app descarta automáticamente saltos de posición erráticos (Outliers) para una mayor confiabilidad.</string>
 
-    <string name="guide_section_map_title">3. Navegación y Mapa</string>
-    <string name="guide_section_map_body"><b>Mira Naranja:</b> Objetivo central.\n<b>Buscador (Lupa):</b> Navega a coordenadas exactas.\n<b>Puntos Interactivos:</b> Toca el nombre de un punto para ver su ficha técnica.\n<b>Medición:</b> Usa el botón <b>Celeste</b> para áreas y el <b>Rojo</b> para distancias.</string>
+    <string name="guide_section_map_title">3. Navegación y Replanteo</string>
+    <string name="guide_section_map_body"><b>Modo Replanteo:</b> Importa archivos .txt (Nombre, E, N, UTM, Zona, Hem) y sigue la flecha dinámica hacia el objetivo.\n<b>Mapas Offline:</b> Descarga zonas en caché (Calles o Satélite) y gestiónalas de forma independiente en Ajustes.</string>
 
     <string name="guide_section_alt_title">4. Altura y Modelos DEM</string>
     <string name="guide_section_alt_body"><b>GPS Dispositivo:</b> Altura elipsoidal del móvil.\n<b>Altura Online:</b> Obtiene la cota (MSL) vía API de Open-Meteo (Copernicus DEM) con corrección EGM2008.</string>
@@ -486,4 +493,18 @@
     <string name="label_visible_status">Visible</string>
     <string name="msg_offline_warning">Función Online no disponible. Trabajando en modo Offline (Solo Sensores Locales).</string>
     <string name="msg_weather_offline">El análisis meteorológico requiere conexión a Internet.</string>
+    <string name="title_stakeout_guide">Guía de Replanteo Profesional</string>
+    <string name="stakeout_guide_body"><b>1. IMPORTACIÓN DE DATOS (.txt):</b>\n
+        Cada línea del archivo debe seguir este formato exacto separado por comas:\n
+        <i>Nombre, EsteE, NorteN, UTM, Zona, Hemisferio</i>\n
+        Ej: P01, 816663.123E, 8088744.094N, UTM, 19, S\n\n
+        <b>2. SWITCH MODO ESTÁTICO (Icono Mira):</b>\n
+        Este botón controla la Capa de Procesamiento GNSS avanzada.\n\n
+        • <b>🔴 ROJO (Modo Dinámico):</b> Úselo mientras camina hacia el punto. El GPS responde al instante a su movimiento.\n\n
+        • <b>🟢 VERDE (Filtro de Precisión):</b> Úselo al llegar al punto de replanteo. El sistema promedia la posición para eliminar el ruido y fijar la distancia exacta.\n\n
+        <b>3. PROTOCOLO DE CAMPO RECOMENDADO:</b>\n
+        1. Acérquese al punto siguiendo la flecha en modo <b>ROJO</b>.\n
+        2. Al estar a menos de 1 metro, deténgase y cambie a modo <b>VERDE</b>.\n
+        3. Mantenga el equipo inmóvil por <b>15 a 20 segundos</b>.\n
+        4. La distancia se estabilizará. Marque el suelo con total confianza.</string>
 </resources>

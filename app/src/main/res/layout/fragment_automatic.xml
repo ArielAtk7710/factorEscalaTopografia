@@ -47,49 +47,232 @@
             </LinearLayout>
 
             <!-- 2. BARRA DE ESTADO GPS (PRECISIÓN Y SATÉLITES) -->
-            <LinearLayout
+            <com.google.android.material.card.MaterialCardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:background="@color/bg_surface"
-                android:padding="12dp"
-                android:layout_marginBottom="16dp">
-
-                <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:orientation="vertical">
-                    <TextView android:text="@string/label_precision" android:textSize="10sp" android:textColor="@color/text_secondary" android:textStyle="bold" android:layout_width="wrap_content" android:layout_height="wrap_content"/>
-                    <LinearLayout
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:orientation="horizontal"
-                        android:gravity="center_vertical">
-                        <ImageView
-                            android:layout_width="14dp"
-                            android:layout_height="14dp"
-                            android:src="@drawable/ic_precision"
-                            app:tint="@color/accent_orange"
-                            android:layout_marginEnd="4dp"
-                            android:contentDescription="Precision Icon"/>
-                        <TextView android:id="@+id/txt_presicion" android:text="± -- m" android:textColor="@color/accent_orange" android:textSize="15sp" android:textStyle="bold" android:layout_width="wrap_content" android:layout_height="wrap_content"/>
-                    </LinearLayout>
-                </LinearLayout>
+                android:layout_marginBottom="8dp"
+                app:cardBackgroundColor="@color/bg_surface"
+                app:cardCornerRadius="8dp"
+                app:cardElevation="2dp"
+                app:strokeColor="@color/accent_orange"
+                app:strokeWidth="1.5dp">
 
                 <LinearLayout
-                    android:id="@+id/layout_sat_container"
-                    android:layout_width="0dp"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:orientation="vertical"
-                    android:gravity="end"
-                    android:background="?attr/selectableItemBackground"
-                    android:clickable="true"
-                    android:focusable="true">
-                    <TextView android:text="@string/label_satellites" android:textSize="10sp" android:textColor="@color/text_secondary" android:textStyle="bold" android:layout_width="wrap_content" android:layout_height="wrap_content"/>
-                    <LinearLayout android:layout_width="wrap_content" android:layout_height="wrap_content" android:orientation="horizontal" android:gravity="center_vertical">
-                        <ImageView android:layout_width="14dp" android:layout_height="14dp" android:src="@drawable/ic_sat_icon" app:tint="@color/accent_orange" android:layout_marginEnd="4dp" android:contentDescription="Satelites"/>
-                        <TextView android:id="@+id/txt_sat" android:text="0" android:textColor="@color/accent_orange" android:textSize="15sp" android:textStyle="bold" android:layout_width="wrap_content" android:layout_height="wrap_content"/>
+                    android:orientation="horizontal"
+                    android:paddingHorizontal="12dp">
+
+                    <LinearLayout
+                        android:id="@+id/layout_precision_container"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:paddingVertical="8dp"
+                        android:background="?attr/selectableItemBackground"
+                        android:clickable="true"
+                        android:focusable="true"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/label_precision"
+                            android:textColor="@color/text_secondary"
+                            android:textSize="10sp"
+                            android:textStyle="bold" />
+
+                        <LinearLayout
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:gravity="center_vertical"
+                            android:orientation="horizontal">
+
+                            <ImageView
+                                android:layout_width="14dp"
+                                android:layout_height="14dp"
+                                android:layout_marginEnd="4dp"
+                                android:contentDescription="Precision Icon"
+                                android:src="@drawable/ic_precision"
+                                app:tint="@color/accent_orange" />
+
+                            <TextView
+                                android:id="@+id/txt_precision"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="± -- m"
+                                android:textColor="@color/accent_orange"
+                                android:textSize="15sp"
+                                android:textStyle="bold" />
+                        </LinearLayout>
+                    </LinearLayout>
+
+                    <!-- Divisor Vertical -->
+                    <View
+                        android:layout_width="1.5dp"
+                        android:layout_height="match_parent"
+                        android:layout_marginHorizontal="8dp"
+                        android:background="@color/accent_orange" />
+
+                    <LinearLayout
+                        android:id="@+id/layout_sat_container"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:paddingVertical="8dp"
+                        android:background="?attr/selectableItemBackground"
+                        android:clickable="true"
+                        android:focusable="true"
+                        android:gravity="end"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/label_satellites"
+                            android:textColor="@color/text_secondary"
+                            android:textSize="10sp"
+                            android:textStyle="bold" />
+
+                        <LinearLayout
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:gravity="center_vertical"
+                            android:orientation="horizontal">
+
+                            <ImageView
+                                android:layout_width="14dp"
+                                android:layout_height="14dp"
+                                android:layout_marginEnd="4dp"
+                                android:contentDescription="Satélites"
+                                android:src="@drawable/ic_sat_icon"
+                                app:tint="@color/accent_orange" />
+
+                            <TextView
+                                android:id="@+id/txt_sat"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="0"
+                                android:textColor="@color/accent_orange"
+                                android:textSize="15sp"
+                                android:textStyle="bold" />
+                        </LinearLayout>
                     </LinearLayout>
                 </LinearLayout>
-            </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+            <!-- 3. AUDITORÍA GNSS (COMPARATIVA RAW VS FILTERED) -->
+            <com.google.android.material.card.MaterialCardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="16dp"
+                app:cardBackgroundColor="@color/bg_surface"
+                app:cardCornerRadius="12dp"
+                app:cardElevation="4dp"
+                app:strokeColor="@color/accent_primary"
+                app:strokeWidth="1.5dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="12dp">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical"
+                        android:layout_marginBottom="8dp">
+                        <TextView
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:text="AUDITORÍA DE PRECISIÓN GNSS"
+                            android:textColor="@color/accent_orange"
+                            android:textSize="10sp"
+                            android:textStyle="bold" />
+
+                        <ImageView
+                            android:id="@+id/btn_gnss_info"
+                            android:layout_width="22dp"
+                            android:layout_height="22dp"
+                            android:src="@drawable/ic_info_round_blue"
+                            android:layout_marginEnd="12dp"
+                            android:background="?attr/selectableItemBackgroundBorderless"
+                            android:clickable="true"
+                            android:focusable="true"
+                            android:contentDescription="Información Modo Estático" />
+
+                        <com.google.android.material.button.MaterialButton
+                            android:id="@+id/btn_reset_gnss"
+                            style="@style/Widget.MaterialComponents.Button"
+                            android:layout_width="wrap_content"
+                            android:layout_height="32dp"
+                            android:text="INICIAR ESTÁTICO"
+                            android:textColor="@android:color/white"
+                            android:textSize="10sp"
+                            android:textStyle="bold"
+                            android:insetTop="0dp"
+                            android:insetBottom="0dp"
+                            android:paddingHorizontal="16dp"
+                            app:backgroundTint="@color/state_error"
+                            app:cornerRadius="8dp" />
+                    </LinearLayout>
+
+                    <TableLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:stretchColumns="1,2">
+
+                        <TableRow android:layout_marginBottom="4dp">
+                            <TextView android:text="" android:textSize="9sp" />
+                            <TextView android:text="RAW (CRUDO)" android:textSize="9sp" android:textStyle="bold" android:gravity="center" android:textColor="@color/text_secondary" />
+                            <TextView android:text="GNSS FILTERED" android:textSize="9sp" android:textStyle="bold" android:gravity="center" android:textColor="@color/state_success" />
+                        </TableRow>
+
+                        <TableRow android:layout_marginBottom="4dp">
+                            <TextView android:text="LAT" android:textSize="10sp" android:textStyle="bold" android:textColor="@color/text_secondary" />
+                            <TextView android:id="@+id/txt_lat_raw" android:text="0.000000" android:textSize="11sp" android:gravity="center" />
+                            <TextView android:id="@+id/txt_lat_filtered" android:text="0.000000" android:textSize="11sp" android:gravity="center" android:textColor="@color/state_success" />
+                        </TableRow>
+
+                        <TableRow android:layout_marginBottom="4dp">
+                            <TextView android:text="LON" android:textSize="10sp" android:textStyle="bold" android:textColor="@color/text_secondary" />
+                            <TextView android:id="@+id/txt_lon_raw" android:text="0.000000" android:textSize="11sp" android:gravity="center" />
+                            <TextView android:id="@+id/txt_lon_filtered" android:text="0.000000" android:textSize="11sp" android:gravity="center" android:textColor="@color/state_success" />
+                        </TableRow>
+
+                    </TableLayout>
+
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="1dp"
+                        android:background="@color/divider"
+                        android:layout_marginVertical="8dp" />
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:gravity="center">
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="DELTA POSICIÓN: "
+                            android:textSize="10sp"
+                            android:textColor="@color/text_secondary" />
+                        <TextView
+                            android:id="@+id/txt_gnss_delta"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="0.000 m"
+                            android:textSize="12sp"
+                            android:textStyle="bold"
+                            android:textColor="@color/accent_orange" />
+                    </LinearLayout>
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
 
             <!-- SECCIÓN 1: COORDENADAS GEODÉSICAS -->
             <TextView android:text="@string/title_geodetic_coords" android:textColor="@color/text_secondary" android:textSize="12sp" android:textStyle="bold" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginBottom="8dp"/>

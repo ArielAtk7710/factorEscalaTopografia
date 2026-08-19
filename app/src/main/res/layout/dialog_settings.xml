@@ -98,14 +98,13 @@
 
                 <ImageButton
                     android:id="@+id/btn_geoid_info"
-                    android:layout_width="48dp"
-                    android:layout_height="48dp"
+                    android:layout_width="32dp"
+                    android:layout_height="32dp"
                     android:layout_marginStart="8dp"
-                    android:background="@drawable/bg_spinner_with_arrow"
-                    android:backgroundTint="@color/bg_surface_secondary"
+                    android:background="?attr/selectableItemBackgroundBorderless"
                     android:contentDescription="@string/desc_geoid_info"
-                    android:src="@drawable/ic_info"
-                    app:tint="@color/accent_light" />
+                    android:src="@drawable/ic_info_round_blue"
+                    android:scaleType="centerInside" />
             </LinearLayout>
 
             <TextView
@@ -139,12 +138,12 @@
 
                 <ImageButton
                     android:id="@+id/btn_barometer_info"
-                    android:layout_width="48dp"
-                    android:layout_height="48dp"
+                    android:layout_width="32dp"
+                    android:layout_height="32dp"
                     android:layout_marginStart="8dp"
                     android:background="?attr/selectableItemBackgroundBorderless"
-                    android:src="@drawable/ic_info"
-                    app:tint="@color/accent_light"
+                    android:src="@drawable/ic_info_round_blue"
+                    android:scaleType="centerInside"
                     android:contentDescription="@string/btn_info_barometer" />
             </LinearLayout>
 
@@ -226,14 +225,13 @@
 
                 <ImageButton
                     android:id="@+id/btn_map_info"
-                    android:layout_width="48dp"
-                    android:layout_height="48dp"
+                    android:layout_width="32dp"
+                    android:layout_height="32dp"
                     android:layout_marginStart="8dp"
-                    android:background="@drawable/bg_spinner_with_arrow"
-                    android:backgroundTint="@color/bg_surface_secondary"
+                    android:background="?attr/selectableItemBackgroundBorderless"
                     android:contentDescription="@string/desc_map_info"
-                    android:src="@drawable/ic_info"
-                    app:tint="@color/accent_light" />
+                    android:src="@drawable/ic_info_round_blue"
+                    android:scaleType="centerInside" />
             </LinearLayout>
 
             <!-- Caché (Fila Horizontal) -->

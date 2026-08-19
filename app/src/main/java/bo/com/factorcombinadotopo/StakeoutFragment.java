@@ -22,12 +22,15 @@ import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.Spinner;
 import android.widget.TextView;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import android.content.res.ColorStateList;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
+import bo.com.factorcombinadotopo.gnss.GnssMeasurement;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
@@ -41,6 +44,7 @@ public class StakeoutFragment extends Fragment implements SensorEventListener {
     private TextView txtDistance, txtDirection, txtTargetE, txtTargetN, txtRelAzimuth;
     private TextView txtPrecision, txtSat;
     private ImageView imgArrow;
+    private FloatingActionButton fabStatic;
 
     private SensorManager sensorManager;
     private Sensor accelerometer, magnetometer;
@@ -50,7 +54,8 @@ public class StakeoutFragment extends Fragment implements SensorEventListener {
     private SurveyViewModel viewModel;
     private List<StakeoutPoint> pointList = new ArrayList<>();
     private StakeoutPoint selectedPoint;
-    private Location lastLocation;
+    private GnssMeasurement lastFilteredLocation;
+    private boolean isStaticModeActive = false;
 
     private final GnssStatus.Callback gnssCallback = new GnssStatus.Callback() {
         @Override
@@ -93,6 +98,7 @@ public class StakeoutFragment extends Fragment implements SensorEventListener {
         txtPrecision = view.findViewById(R.id.txt_stakeout_precision);
         txtSat = view.findViewById(R.id.txt_stakeout_sat);
         imgArrow = view.findViewById(R.id.img_stakeout_arrow);
+        fabStatic = view.findViewById(R.id.fab_stakeout_static);
 
         view.findViewById(R.id.btn_stakeout_info).setOnClickListener(v -> showFormatInfoDialog());
 
@@ -102,6 +108,21 @@ public class StakeoutFragment extends Fragment implements SensorEventListener {
             intent.setType("text/plain");
             importLauncher.launch(intent);
         });
+
+        if (fabStatic != null) {
+            fabStatic.setOnClickListener(v -> {
+                isStaticModeActive = !isStaticModeActive;
+                viewModel.startStaticMeasurement();
+                
+                if (isStaticModeActive) {
+                    fabStatic.setBackgroundTintList(ColorStateList.valueOf(requireContext().getColor(R.color.state_success)));
+                    UIUtils.showSuccessToast(requireContext(), "Modo Estático: Promediando posición...");
+                } else {
+                    fabStatic.setBackgroundTintList(ColorStateList.valueOf(requireContext().getColor(R.color.state_error)));
+                    UIUtils.showInfoToast(requireContext(), "Modo Estático desactivado.");
+                }
+            });
+        }
 
         spPoints.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
@@ -121,10 +142,12 @@ public class StakeoutFragment extends Fragment implements SensorEventListener {
         }
 
         viewModel = new ViewModelProvider(requireActivity()).get(SurveyViewModel.class);
-        viewModel.getRawLocation().observe(getViewLifecycleOwner(), location -> {
-            lastLocation = location;
-            if (location != null && txtPrecision != null) {
-                txtPrecision.setText(String.format(Locale.US, "± %.0f m", location.getAccuracy()));
+        
+        // Observar Ubicación Filtrada para máxima estabilidad en Replanteo
+        viewModel.getFilteredLocation().observe(getViewLifecycleOwner(), gnss -> {
+            lastFilteredLocation = gnss;
+            if (gnss != null && txtPrecision != null) {
+                txtPrecision.setText(String.format(Locale.US, "± %.2f m", gnss.accuracy));
             }
             updateStakeoutUI();
         });
@@ -141,6 +164,8 @@ public class StakeoutFragment extends Fragment implements SensorEventListener {
                 adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
                 spPoints.setAdapter(adapter);
                 UIUtils.showSuccessToast(requireContext(), "Puntos importados: " + imported.size());
+            } else {
+                UIUtils.showWarningToast(requireContext(), "El archivo no contiene puntos con el formato correcto.");
             }
         } catch (Exception e) {
             UIUtils.showErrorToast(requireContext(), "Error al importar: " + e.getMessage());
@@ -149,24 +174,20 @@ public class StakeoutFragment extends Fragment implements SensorEventListener {
 
     private void showFormatInfoDialog() {
         new androidx.appcompat.app.AlertDialog.Builder(requireContext())
-                .setTitle("Formato de Importación")
-                .setMessage("El archivo .txt debe tener el siguiente formato por línea:\n\n" +
-                        "Nombre, EsteE, NorteN, UTM, Zona, Hemisferio\n\n" +
-                        "Ejemplo:\n" +
-                        "P01, 816663.123E, 8088744.094N, UTM, 19, S\n\n" +
-                        "Asegúrese de usar comas para separar los campos.")
-                .setPositiveButton("Entendido", null)
+                .setTitle(getString(R.string.title_stakeout_guide))
+                .setMessage(android.text.Html.fromHtml(getString(R.string.stakeout_guide_body), android.text.Html.FROM_HTML_MODE_LEGACY))
+                .setPositiveButton(getString(R.string.btn_understood), null)
                 .show();
     }
 
     private void updateStakeoutUI() {
-        if (lastLocation == null || selectedPoint == null) return;
+        if (lastFilteredLocation == null || selectedPoint == null) return;
 
-        // 1. Convertir ubicación actual GPS a UTM usando el motor IGM
+        // 1. Convertir ubicación actual FILTRADA a UTM usando el motor IGM
         IGMCoordinate.UtmPoint currentUtm = IGMUtmConverter.forward(
-                lastLocation.getLatitude(), lastLocation.getLongitude(), IGMConstants.Ellipsoid.WGS84);
+                lastFilteredLocation.latitude, lastFilteredLocation.longitude, IGMConstants.Ellipsoid.WGS84);
 
-        // 2. Cálculo de Distancia Euclidiana (En el plano UTM)
+        // 2. Cálculo de Distancia Euclidiana (En el plano UTM sobre base estable)
         double dx = selectedPoint.getEasting() - currentUtm.easting;
         double dy = selectedPoint.getNorthing() - currentUtm.northing;
         double distance = Math.sqrt(dx * dx + dy * dy);
@@ -236,8 +257,8 @@ public class StakeoutFragment extends Fragment implements SensorEventListener {
                 float azimut = (float) Math.toDegrees(orientation[0]);
                 if (azimut < 0) azimut += 360;
                 
-                // Filtro de suavizado (Alpha 0.1)
-                currentDeviceHeading = currentDeviceHeading + 0.1f * (azimut - currentDeviceHeading);
+                // Filtro de suavizado (Alpha 0.15) - Armonizado con posición filtrada
+                currentDeviceHeading = currentDeviceHeading + 0.15f * (azimut - currentDeviceHeading);
                 updateStakeoutUI();
             }
         }

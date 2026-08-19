@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@color/bg_surface"
+    android:orientation="vertical"
+    android:padding="24dp">
+
+    <TextView
+        android:id="@+id/txt_precision_info_title"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/title_precision_info"
+        android:textColor="@color/accent_orange"
+        android:textSize="20sp"
+        android:textStyle="bold"
+        android:gravity="center"
+        android:layout_marginBottom="20dp" />
+
+    <androidx.core.widget.NestedScrollView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:maxHeight="500dp">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <include layout="@layout/item_weather_detail_pro" android:id="@+id/row_h_acc" />
+            <include layout="@layout/item_weather_detail_pro" android:id="@+id/row_v_acc" />
+            <include layout="@layout/item_weather_detail_pro" android:id="@+id/row_speed_acc" />
+            <include layout="@layout/item_weather_detail_pro" android:id="@+id/row_bearing_acc" />
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="@color/divider"
+                android:layout_marginVertical="12dp" />
+
+            <include layout="@layout/item_weather_detail_pro" android:id="@+id/row_provider" />
+            <include layout="@layout/item_weather_detail_pro" android:id="@+id/row_timestamp" />
+
+        </LinearLayout>
+    </androidx.core.widget.NestedScrollView>
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/btn_precision_info_close"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/btn_understood"
+        android:layout_marginTop="16dp"
+        app:backgroundTint="@color/accent_orange"
+        android:textColor="@android:color/white"
+        android:textStyle="bold"
+        app:cornerRadius="8dp" />
+
+</LinearLayout>

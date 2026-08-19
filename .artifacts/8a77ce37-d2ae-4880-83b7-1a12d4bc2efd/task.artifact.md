@@ -1,5 +1,7 @@
-- [x] Blindar `CompassFragment.java` contra bloqueos del Geocoder sin red.
-- [x] Optimizar `WeatherFragment.java` para manejo de ubicación offline.
-- [x] Implementar control de conectividad en tiempo real en `MapManager.java`.
-- [x] Vincular el estado de red global en `MainActivity.java`.
-- [x] Verificar fluidez total en modo avión.
+- [x] Crear el nuevo recurso vectorial `ic_info_round_blue.xml`.
+- [x] Actualizar el icono de información en `fragment_automatic.xml`.
+- [x] Actualizar el icono de información en `fragment_stakeout.xml`.
+- [x] Actualizar los iconos de información en `dialog_settings.xml`.
+- [x] Actualizar el icono de información en `dialog_save_point_map.xml`.
+- [x] Actualizar el icono de información en `item_weather_detail_pro.xml`.
+- [x] Realizar prueba de compilación.

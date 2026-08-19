@@ -137,7 +137,7 @@
             android:layout_marginBottom="12dp"
             android:contentDescription="Información"
             android:src="@drawable/ic_pushpin"
-            app:backgroundTint="@color/accent_orange"
+            app:backgroundTint="@color/colorAccent"
             app:fabSize="mini"
             app:tint="@android:color/white" />
 

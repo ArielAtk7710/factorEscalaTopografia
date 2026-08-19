@@ -556,7 +556,7 @@ public class MapFragment extends Fragment {
         
         setDetailRow(view.findViewById(R.id.row_este), "Este (X):", p.getAsString("este") + " m", R.drawable.ic_manual);
         setDetailRow(view.findViewById(R.id.row_norte), "Norte (Y):", p.getAsString("norte") + " m", R.drawable.ic_manual);
-        setDetailRow(view.findViewById(R.id.row_zona), "Zona / Hemisferio:", p.getAsString("zona"), R.drawable.ic_info);
+        setDetailRow(view.findViewById(R.id.row_zona), "Zona / Hemisferio:", p.getAsString("zona"), R.drawable.ic_info_round_blue);
         
         setDetailRow(view.findViewById(R.id.row_fe), "Factor Escala (k):", p.getAsString("fe"), R.drawable.ic_auto);
         setDetailRow(view.findViewById(R.id.row_fa), "Factor Altura (ha):", p.getAsString("fa"), R.drawable.ic_auto);

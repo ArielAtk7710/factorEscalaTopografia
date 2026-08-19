@@ -7,13 +7,19 @@ import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 
+import bo.com.factorcombinadotopo.gnss.GnssFilter;
+import bo.com.factorcombinadotopo.gnss.GnssMeasurement;
+
 /**
  * ViewModel para gestionar el estado de los cálculos topográficos en tiempo real en Java.
  */
 public class SurveyViewModel extends AndroidViewModel {
 
     private final TopographyRepository repository;
+    private final GnssFilter gnssFilter = new GnssFilter();
+    
     private final MutableLiveData<Location> rawLocation = new MutableLiveData<>();
+    private final MutableLiveData<GnssMeasurement> filteredLocation = new MutableLiveData<>();
     private final MutableLiveData<TopoCalculoManager.TopoResult> calculationResult = new MutableLiveData<>();
     private final MutableLiveData<Boolean> usesMgb = new MutableLiveData<>();
     private final MutableLiveData<Double> ambientTemperature = new MutableLiveData<>();
@@ -35,6 +41,10 @@ public class SurveyViewModel extends AndroidViewModel {
 
     public LiveData<Location> getRawLocation() {
         return rawLocation;
+    }
+
+    public LiveData<GnssMeasurement> getFilteredLocation() {
+        return filteredLocation;
     }
 
     public LiveData<TopoCalculoManager.TopoResult> getCalculationResult() {
@@ -71,7 +81,18 @@ public class SurveyViewModel extends AndroidViewModel {
         
         rawLocation.postValue(loc);
 
-        repository.calculateCompleteAsync(loc, new TopographyRepository.CalculationCallback() {
+        // 🛡️ CAPA GNSS AVANZADA: Filtrar antes de calcular
+        GnssMeasurement filtered = gnssFilter.filter(loc);
+        filteredLocation.postValue(filtered);
+
+        // Crear objeto de ubicación filtrada para el motor de cálculo
+        Location processedLoc = new Location(loc);
+        processedLoc.setLatitude(filtered.latitude);
+        processedLoc.setLongitude(filtered.longitude);
+        processedLoc.setAltitude(filtered.altitude);
+        // La precisión filtrada es informativa, no afecta al motor IGM
+        
+        repository.calculateCompleteAsync(processedLoc, new TopographyRepository.CalculationCallback() {
             @Override
             public void onResult(TopoCalculoManager.TopoResult result, boolean isMgb) {
                 calculationResult.postValue(result);
@@ -86,7 +107,11 @@ public class SurveyViewModel extends AndroidViewModel {
         });
 
         // Disparar actualización de clima en segundo plano con control de umbral
-        shouldRefreshWeatherAuto(loc);
+        shouldRefreshWeatherAuto(processedLoc);
+    }
+
+    public void startStaticMeasurement() {
+        gnssFilter.reset();
     }
 
     private void shouldRefreshWeatherAuto(Location loc) {

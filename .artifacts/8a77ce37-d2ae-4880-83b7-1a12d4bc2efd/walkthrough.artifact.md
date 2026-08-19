@@ -1,27 +1,29 @@
-# Walkthrough - Blindaje Final Modo Offline Perfecto
+# Walkthrough - Unificación Visual de Iconos de Información
 
-Se han implementado optimizaciones profundas para asegurar que la aplicación factorEscala sea totalmente fluida y estable en zonas sin cobertura de internet, eliminando bloqueos de interfaz y esperas innecesarias.
+Se ha implementado un nuevo estándar visual para todos los iconos de información de la aplicación, siguiendo la directriz de diseño: fondo circular azul con la letra "i" en blanco.
 
-## Mejoras de Rendimiento Offline
+## Cambios Realizados
 
-### 1. Desconexión Proactiva de Red
-- **[MapManager.java](file:///D:/Desarrollo-Software/Proyectos%20Android/factorEscala/app/src/main/java/bo/com/factorcombinadotopo/MapManager.java)**: Se añadió el método `updateNetworkState(boolean isOnline)`. Ahora, el motor de mapas desactiva totalmente su conexión de datos al detectar que el dispositivo está offline, evitando intentos de descarga en bucle que ralentizan el desplazamiento táctil.
-- **[MainActivity.java](file:///D:/Desarrollo-Software/Proyectos%20Android/factorEscala/app/src/main/java/bo/com/factorcombinadotopo/MainActivity.java)**: Se vinculó el monitoreo de red global con el fragmento de mapa para activar/desactivar los datos en tiempo real.
+### 1. Nuevo Recurso Visual
+- **[ic_info_round_blue.xml](file:///D:/Desarrollo-Software/Proyectos%20Android/factorEscala/app/src/main/res/drawable/ic_info_round_blue.xml)**: Se diseñó un nuevo icono vectorial que integra un círculo sólido en el azul de la paleta (`accent_primary`) y una letra "i" calada en blanco puro.
 
-### 2. Eliminación de Bloqueos del Geocoder
-- **[CompassFragment.java](file:///D:/Desarrollo-Software/Proyectos%20Android/factorEscala/app/src/main/java/bo/com/factorcombinadotopo/CompassFragment.java)**: Se implementó una guarda de red. Si no hay internet, la brújula muestra instantáneamente "Ubicación (Modo Offline)" sin intentar contactar con los servidores de Google, lo que elimina el cuelgue de 2 segundos que ocurría anteriormente.
-- **[WeatherFragment.java](file:///D:/Desarrollo-Software/Proyectos%20Android/factorEscala/app/src/main/java/bo/com/factorcombinadotopo/WeatherFragment.java)**: Optimización similar para la sección de clima, garantizando que el nombre de la ciudad aparezca como "Modo Offline" de forma inmediata.
+### 2. Actualización de Pantallas y Diálogos
+Se reemplazó el icono antiguo por el nuevo en todos los módulos clave:
 
-## Beneficios para el Usuario
-1.  **Fluidez Inmediata**: Al entrar al mapa sin red, este ya no "piensa" si descargar; usa la caché de inmediato.
-2.  **Ahorro de Batería**: Al desactivar los servicios de red de forma proactiva, el procesador no gasta energía intentando conectar con servidores inalcanzables.
-3.  **Interfaz Responsiva**: La brújula y el replanteo muestran datos GPS al instante, sin que la interfaz se congele buscando nombres de ciudades en la nube.
+- **Modo Replanteo y Automático**: Los botones de ayuda técnica ahora resaltan como círculos azules.
+- **Ajustes del Sistema**: Los botones de información para "Modelo Geoidal", "Barómetro" y "Mapas" han sido unificados, eliminando los fondos grises previos para un look más limpio.
+- **Asistente de Vuelo (Dron)**: El icono del asistente en la sección de clima ahora mantiene el estilo azul corporativo de forma permanente.
+- **Guardado de Puntos**: El diálogo de guardado desde el mapa ahora utiliza el nuevo estándar para el botón de ayuda de altura.
+- **Listas Técnicas**: Se actualizó el icono genérico de detalles en las filas de información meteorológica y topográfica.
 
-## Verificación Final
+### 3. Ajustes de Lógica
+- **[WeatherFragment.java](file:///D:/Desarrollo-Software/Proyectos%20Android/factorEscala/app/src/main/java/bo/com/factorcombinadotopo/WeatherFragment.java)**: Se eliminó el tintado dinámico del icono del asistente para preservar la integridad visual del círculo azul y la letra blanca en todos los niveles de seguridad.
+
+## Resultado Visual
 
 > [!SUCCESS]
-> Se verificó que el proyecto compila correctamente. La app ahora es capaz de transicionar entre red Wifi y Modo Avión sin que el usuario perciba ningún retraso o bloqueo en las pantallas profesionales.
+> **Consistencia Total**: Todos los puntos de información de la aplicación ahora hablan el mismo lenguaje visual, mejorando la estética profesional de **FactorEscalaTop**.
 
-render_diffs(file:///D:/Desarrollo-Software/Proyectos%20Android/factorEscala/app/src/main/java/bo/com/factorcombinadotopo/MapManager.java)
-render_diffs(file:///D:/Desarrollo-Software/Proyectos%20Android/factorEscala/app/src/main/java/bo/com/factorcombinadotopo/CompassFragment.java)
-render_diffs(file:///D:/Desarrollo-Software/Proyectos%20Android/factorEscala/app/src/main/java/bo/com/factorcombinadotopo/MainActivity.java)
+render_diffs(file:///D:/Desarrollo-Software/Proyectos%20Android/factorEscala/app/src/main/res/layout/fragment_automatic.xml)
+render_diffs(file:///D:/Desarrollo-Software/Proyectos%20Android/factorEscala/app/src/main/res/layout/fragment_stakeout.xml)
+render_diffs(file:///D:/Desarrollo-Software/Proyectos%20Android/factorEscala/app/src/main/res/layout/dialog_settings.xml)

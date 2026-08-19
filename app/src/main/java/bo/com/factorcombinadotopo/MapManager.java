@@ -7,6 +7,8 @@ import android.widget.TextView;
 
 import org.osmdroid.api.IMapController;
 import org.osmdroid.api.IGeoPoint;
+import org.osmdroid.tileprovider.MapTileProviderBasic;
+import org.osmdroid.tileprovider.tilesource.ITileSource;
 import org.osmdroid.tileprovider.tilesource.OnlineTileSourceBase;
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory;
 import org.osmdroid.util.GeoPoint;
@@ -111,7 +113,7 @@ public class MapManager {
         boolean showLocation = prefs.getBoolean("ShowLocation", true);
         int mapType = prefs.getInt(KEY_MAP_TYPE, 0); 
 
-        // Configuración crítica de osmdroid (No recargar prefs globales aquí para evitar bloqueos)
+        // Configuración crítica de osmdroid
         org.osmdroid.config.IConfigurationProvider config = org.osmdroid.config.Configuration.getInstance();
         config.setUserAgentValue(context.getPackageName());
         
@@ -125,19 +127,23 @@ public class MapManager {
             File cacheDir = new File(osmdroidDir, cacheFolder);
             if (!cacheDir.exists()) cacheDir.mkdirs();
             config.setOsmdroidTileCache(cacheDir);
+
+            // Determinar fuente inicial
+            ITileSource tileSource;
+            if (mapType == 1) {
+                currentMapMode = 1;
+                tileSource = new ArcGISTileSource();
+            } else {
+                currentMapMode = 0;
+                tileSource = TileSourceFactory.MAPNIK;
+            }
+
+            // Forzar el proveedor con la caché específica desde el inicio
+            MapTileProviderBasic provider = new MapTileProviderBasic(context, tileSource);
+            mapView.setTileProvider(provider);
         }
 
         mapView.setUseDataConnection(true); 
-        
-        // Cargar modo inicial
-        if (mapType == 1) {
-            currentMapMode = 1;
-            mapView.setTileSource(new ArcGISTileSource());
-        } else {
-            currentMapMode = 0;
-            mapView.setTileSource(TileSourceFactory.MAPNIK);
-        }
-        
         mapView.setMultiTouchControls(true);
 
         IMapController mapController = mapView.getController();
@@ -156,7 +162,6 @@ public class MapManager {
         mapView.getOverlays().add(locationOverlay);
 
         isInitialized = true;
-        // Se elimina mapView.onResume() de aquí, se gestiona en el ciclo de vida del fragmento
         mapView.invalidate();
     }
 
@@ -206,24 +211,32 @@ public class MapManager {
             SharedPreferences prefs = context.getSharedPreferences("AppPrefs", Context.MODE_PRIVATE);
             prefs.edit().putInt(KEY_MAP_TYPE, enableSatellite ? 1 : 0).apply();
 
-            File osmdroidDir = new File(context.getExternalFilesDir(null), "osmdroid");
+            File extDir = context.getExternalFilesDir(null);
+            if (extDir == null) return;
+            
+            File osmdroidDir = new File(extDir, "osmdroid");
             String cacheFolder = (enableSatellite) ? "tiles_sat" : "tiles_street";
             File cacheDir = new File(osmdroidDir, cacheFolder);
             if (!cacheDir.exists()) cacheDir.mkdirs();
             
-            // Actualizar configuración global de caché
+            // 1. Actualizar configuración global ANTES de recrear el proveedor
             org.osmdroid.config.Configuration.getInstance().setOsmdroidTileCache(cacheDir);
 
-            // Cambiar fuente y limpiar memoria para forzar recarga desde el nuevo almacén
+            // 2. Determinar la fuente de mosaicos
+            ITileSource tileSource;
             if (enableSatellite) {
                 currentMapMode = 1;
-                mapView.setTileSource(new ArcGISTileSource());
+                tileSource = new ArcGISTileSource();
             } else {
                 currentMapMode = 0;
-                mapView.setTileSource(TileSourceFactory.MAPNIK);
+                tileSource = TileSourceFactory.MAPNIK;
             }
-            
-            mapView.getTileProvider().clearTileCache();
+
+            // 3. RECREAR EL PROVEEDOR: Esto es la clave para desconectar el SqlTileWriter anterior
+            // y abrir una nueva base de datos en la carpeta correcta.
+            MapTileProviderBasic newProvider = new MapTileProviderBasic(context, tileSource);
+            mapView.setTileProvider(newProvider);
+
             mapView.invalidate();
         } catch (Exception e) {
             e.printStackTrace();

@@ -16,8 +16,11 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.ImageView;
+import com.google.android.material.button.MaterialButton;
 import android.widget.EditText;
 import android.widget.TextView;
+import android.content.res.ColorStateList;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
@@ -40,8 +43,14 @@ public class AutomaticFragment extends Fragment {
 
     private TextView txtLat, txtLon, txtAlt, txtAltOrto, txtPresion, txtPresionHpa;
     private TextView txtEste, txtNorte, txtRefSystem;
-    private TextView txtFa, txtFe, txtFc, txtPresicion, txtSat, txtTemp;
+    private TextView txtFa, txtFe, txtFc, txtPrecision, txtSat, txtTemp;
     private TextView txtGeoidUndulation, txtGeoidModel;
+
+    // Campos de Auditoría GNSS
+    private TextView txtLatRaw, txtLonRaw, txtLatFiltered, txtLonFiltered, txtGnssDelta;
+    private MaterialButton btnResetGnss;
+    private View btnGnssInfo, layoutPrecisionContainer;
+    private boolean isStaticModeActive = false;
 
     private View layoutSatContainer;
     private Button btnGuardarPunto;
@@ -101,11 +110,21 @@ public class AutomaticFragment extends Fragment {
         txtFa = view.findViewById(R.id.txt_fa);
         txtFe = view.findViewById(R.id.txt_fe);
         txtFc = view.findViewById(R.id.txt_fc);
-        txtPresicion = view.findViewById(R.id.txt_presicion);
+        txtPrecision = view.findViewById(R.id.txt_precision);
         txtSat = view.findViewById(R.id.txt_sat);
         txtTemp = view.findViewById(R.id.txt_temp);
         txtGeoidUndulation = view.findViewById(R.id.txt_geoid_undulation);
         txtGeoidModel = view.findViewById(R.id.txt_geoid_model);
+
+        // Bindings Auditoría
+        txtLatRaw = view.findViewById(R.id.txt_lat_raw);
+        txtLonRaw = view.findViewById(R.id.txt_lon_raw);
+        txtLatFiltered = view.findViewById(R.id.txt_lat_filtered);
+        txtLonFiltered = view.findViewById(R.id.txt_lon_filtered);
+        txtGnssDelta = view.findViewById(R.id.txt_gnss_delta);
+        btnResetGnss = view.findViewById(R.id.btn_reset_gnss);
+        btnGnssInfo = view.findViewById(R.id.btn_gnss_info);
+        layoutPrecisionContainer = view.findViewById(R.id.layout_precision_container);
         
         layoutSatContainer = view.findViewById(R.id.layout_sat_container);
         btnGuardarPunto = view.findViewById(R.id.btn_guardar_punto_auto);
@@ -114,6 +133,31 @@ public class AutomaticFragment extends Fragment {
 
         btnGuardarPunto.setOnClickListener(v -> showSavePointDialog());
         
+        if (btnResetGnss != null) {
+            btnResetGnss.setOnClickListener(v -> {
+                isStaticModeActive = !isStaticModeActive;
+                viewModel.startStaticMeasurement();
+                
+                if (isStaticModeActive) {
+                    btnResetGnss.setText("ESTÁTICO ACTIVO");
+                    btnResetGnss.setBackgroundTintList(ColorStateList.valueOf(requireContext().getColor(R.color.state_success)));
+                    UIUtils.showSuccessToast(requireContext(), "Iniciando promedio estático...");
+                } else {
+                    btnResetGnss.setText("INICIAR ESTÁTICO");
+                    btnResetGnss.setBackgroundTintList(ColorStateList.valueOf(requireContext().getColor(R.color.state_error)));
+                    UIUtils.showInfoToast(requireContext(), "Modo estático desactivado.");
+                }
+            });
+        }
+
+        if (btnGnssInfo != null) {
+            btnGnssInfo.setOnClickListener(v -> showStaticModeHelpDialog());
+        }
+
+        if (layoutPrecisionContainer != null) {
+            layoutPrecisionContainer.setOnClickListener(v -> showPrecisionDetailsDialog());
+        }
+
         if (layoutSatContainer != null) {
             layoutSatContainer.setOnClickListener(v -> showSatelliteDetailsDialog());
         }
@@ -124,7 +168,26 @@ public class AutomaticFragment extends Fragment {
         viewModel.getRawLocation().observe(getViewLifecycleOwner(), loc -> {
             if (loc == null) return;
             String level = getPrecisionLevel(loc.getAccuracy());
-            txtPresicion.setText(String.format(Locale.US, "± %.0f m - %s", loc.getAccuracy(), level));
+            txtPrecision.setText(String.format(Locale.US, "± %.0f m - %s", loc.getAccuracy(), level));
+            
+            // Actualizar campos RAW en Auditoría
+            if (txtLatRaw != null) txtLatRaw.setText(String.format(Locale.US, "%.7f", loc.getLatitude()));
+            if (txtLonRaw != null) txtLonRaw.setText(String.format(Locale.US, "%.7f", loc.getLongitude()));
+        });
+
+        // Observar Ubicación Filtrada
+        viewModel.getFilteredLocation().observe(getViewLifecycleOwner(), gnss -> {
+            if (gnss == null) return;
+            if (txtLatFiltered != null) txtLatFiltered.setText(String.format(Locale.US, "%.7f", gnss.latitude));
+            if (txtLonFiltered != null) txtLonFiltered.setText(String.format(Locale.US, "%.7f", gnss.longitude));
+            
+            // Calcular Delta de posición respecto al raw actual
+            Location raw = viewModel.getRawLocation().getValue();
+            if (raw != null && txtGnssDelta != null) {
+                float[] results = new float[1];
+                Location.distanceBetween(raw.getLatitude(), raw.getLongitude(), gnss.latitude, gnss.longitude, results);
+                txtGnssDelta.setText(String.format(Locale.US, "%.3f m", results[0]));
+            }
         });
 
         // Observar Resultados de Cálculo
@@ -196,7 +259,7 @@ public class AutomaticFragment extends Fragment {
     private void resetUIData() {
         txtLat.setText("0"); txtLon.setText("0"); txtAlt.setText("-- m");
         txtAltOrto.setText("-- m"); txtEste.setText("0.00"); txtNorte.setText("0.00");
-        txtPresicion.setText("± -- m"); txtSat.setText("0");
+        txtPrecision.setText("± -- m"); txtSat.setText("0");
     }
 
     private void showSavePointDialog() {
@@ -228,6 +291,72 @@ public class AutomaticFragment extends Fragment {
         d.show();
     }
 
+    private void showStaticModeHelpDialog() {
+        new AlertDialog.Builder(requireContext())
+                .setTitle("Ayuda: Modo Estático GNSS")
+                .setMessage("El Modo Estático estabiliza tus coordenadas mediante un promedio ponderado inteligente.\n\n" +
+                        "¿Cómo usarlo?\n" +
+                        "1. Coloca el equipo en un punto de control fijo.\n" +
+                        "2. Pulsa 'INICIAR ESTÁTICO' (el botón cambiará a verde).\n" +
+                        "3. Espera 15-30 segundos sin mover el dispositivo.\n\n" +
+                        "¿Qué hace la App?\n" +
+                        "Limpia el ruido de la señal y utiliza las posiciones con mejor precisión para fijar los decimales de tus coordenadas UTM y el Factor Combinado.")
+                .setPositiveButton("Entendido", null)
+                .show();
+    }
+
+    private void showPrecisionDetailsDialog() {
+        Location loc = viewModel.getRawLocation().getValue();
+        if (loc == null) {
+            UIUtils.showWarningToast(requireContext(), getString(R.string.msg_gps_no_signal));
+            return;
+        }
+
+        BottomSheetDialog dialog = new BottomSheetDialog(requireContext());
+        View view = getLayoutInflater().inflate(R.layout.layout_dialog_precision_info, null);
+        dialog.setContentView(view);
+
+        // Vincular filas usando el componente reutilizable
+        setPrecisionRow(view.findViewById(R.id.row_h_acc), R.string.label_h_accuracy, 
+                String.format(Locale.US, "± %.2f m", loc.getAccuracy()), R.drawable.ic_precision);
+        
+        String vAcc = loc.hasVerticalAccuracy() ? String.format(Locale.US, "± %.2f m", loc.getVerticalAccuracyMeters()) : "N/A";
+        setPrecisionRow(view.findViewById(R.id.row_v_acc), R.string.label_v_accuracy, vAcc, R.drawable.ic_precision);
+
+        String sAcc = loc.hasSpeedAccuracy() ? String.format(Locale.US, "± %.2f m/s", loc.getSpeedAccuracyMetersPerSecond()) : "N/A";
+        setPrecisionRow(view.findViewById(R.id.row_speed_acc), R.string.label_speed_accuracy, sAcc, R.drawable.ic_temp_pro);
+
+        String bAcc = loc.hasBearingAccuracy() ? String.format(Locale.US, "± %.2f °", loc.getBearingAccuracyDegrees()) : "N/A";
+        setPrecisionRow(view.findViewById(R.id.row_bearing_acc), R.string.label_bearing_accuracy, bAcc, R.drawable.ic_compass_needle);
+
+        setPrecisionRow(view.findViewById(R.id.row_provider), R.string.label_provider_source, 
+                loc.getProvider().toUpperCase(), R.drawable.ic_shield_pro);
+
+        SimpleDateFormat sdf = new SimpleDateFormat("HH:mm:ss.SSS", Locale.getDefault());
+        setPrecisionRow(view.findViewById(R.id.row_timestamp), R.string.label_fix_timestamp, 
+                sdf.format(new Date(loc.getTime())), R.drawable.ic_calendar);
+
+        view.findViewById(R.id.btn_precision_info_close).setOnClickListener(v -> dialog.dismiss());
+        dialog.show();
+    }
+
+    private void setPrecisionRow(View container, int labelRes, String value, int iconRes) {
+        if (container == null) return;
+        TextView label = container.findViewById(R.id.txt_detail_label);
+        TextView txtValue = container.findViewById(R.id.txt_detail_value);
+        ImageView icon = container.findViewById(R.id.img_detail_icon);
+        
+        if (label != null) label.setText(labelRes);
+        if (txtValue != null) {
+            txtValue.setText(value);
+            txtValue.setTextColor(requireContext().getColor(R.color.accent_light)); // Azul de la paleta
+        }
+        if (icon != null) {
+            icon.setImageResource(iconRes);
+            icon.setColorFilter(requireContext().getColor(R.color.accent_light));
+        }
+    }
+
     private void ejecutarGuardado(String name, String notes) {
         DatabaseHelper db = DatabaseHelper.getInstance(requireContext());
         ContentValues v = new ContentValues();
@@ -250,7 +379,7 @@ public class AutomaticFragment extends Fragment {
         v.put(DatabaseHelper.COLUMN_MODELO_GEOIDAL, txtGeoidModel.getText().toString());
         v.put(DatabaseHelper.COLUMN_TIPO_REGISTRO, getString(R.string.label_reg_auto));
         
-        String precision = txtPresicion.getText().toString();
+        String precision = txtPrecision.getText().toString();
         v.put(DatabaseHelper.COLUMN_PRECISION, precision.contains("--") ? "Ninguno" : precision);
         
         String satellites = txtSat.getText().toString();
