@@ -145,6 +145,15 @@ public class WeatherFragment extends Fragment {
         
         // Mostrar fecha actual del sistema
         updateCurrentDateUI();
+
+        // 🚀 DISPARO DE CARGA BAJO DEMANDA
+        // Si no hay datos o la última ubicación es nula, intentamos cargar.
+        if (viewModel.getWeatherStatus().getValue() == null) {
+            Location loc = viewModel.getRawLocation().getValue();
+            if (loc != null) {
+                viewModel.refreshWeather(loc);
+            }
+        }
     }
 
     private void updateCurrentDateUI() {
@@ -398,17 +407,17 @@ public class WeatherFragment extends Fragment {
         sb.append(status.safetyAnalysis.detalle).append("\n\n");
         
         if (!status.safetyAnalysis.causas.isEmpty()) {
-            sb.append(getString(R.string.label_detected_causes)).append("\n");
+            sb.append("<b>").append(getString(R.string.label_detected_causes)).append("</b>\n");
             for (String causa : status.safetyAnalysis.causas) {
                 sb.append("• ").append(causa).append("\n");
             }
             sb.append("\n");
         }
         
-        sb.append(getString(R.string.msg_safety_disclaimer));
-        txtDesc.setText(sb.toString());
+        sb.append("<i>").append(getString(R.string.msg_safety_disclaimer)).append("</i>");
+        txtDesc.setText(android.text.Html.fromHtml(sb.toString(), android.text.Html.FROM_HTML_MODE_LEGACY));
 
-        // Icono dinámico según el riesgo principal determinado por el analizador
+        // Icono dinámico según el riesgo principal
         imgIcon.setImageResource(status.safetyAnalysis.mainIconRes);
         
         // Ajustar color del icono según nivel

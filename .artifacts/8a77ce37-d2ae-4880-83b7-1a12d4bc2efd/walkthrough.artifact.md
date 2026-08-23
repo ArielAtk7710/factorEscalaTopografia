@@ -1,29 +1,32 @@
-# Walkthrough - Unificación Visual de Iconos de Información
+# Walkthrough: Blindaje Integral de Estabilidad y Seguridad de Hilos
 
-Se ha implementado un nuevo estándar visual para todos los iconos de información de la aplicación, siguiendo la directriz de diseño: fondo circular azul con la letra "i" en blanco.
+Se ha completado una reingeniería de la gestión de tareas de fondo y del ciclo de vida de la aplicación para eliminar los cierres inesperados (crasheos) en la vista de **MAPA** y mejorar la robustez general del sistema.
 
-## Cambios Realizados
+## Mejoras de Estabilidad Implementadas
 
-### 1. Nuevo Recurso Visual
-- **[ic_info_round_blue.xml](file:///D:/Desarrollo-Software/Proyectos%20Android/factorEscala/app/src/main/res/drawable/ic_info_round_blue.xml)**: Se diseñó un nuevo icono vectorial que integra un círculo sólido en el azul de la paleta (`accent_primary`) y una letra "i" calada en blanco puro.
+### 1. Eliminación de Hilos "Huérfanos"
+- Se reemplazaron todos los usos de `new Thread` por el pool de hilos controlado del `TopographyRepository`.
+- **Beneficio**: Evita la saturación de recursos y permite un apagado ordenado de las tareas cuando el usuario sale de la aplicación.
 
-### 2. Actualización de Pantallas y Diálogos
-Se reemplazó el icono antiguo por el nuevo en todos los módulos clave:
+### 2. Seguridad en el Ciclo de Vida (Lifecycle)
+- Se añadieron verificaciones estrictas de `isAdded()` y `getContext() != null` en todos los fragmentos (**Mapa**, **Registro**, **Automático**).
+- **Resultado**: Si una tarea de fondo termina después de que el usuario cambió de pestaña, la aplicación ya no intentará actualizar una interfaz inexistente, eliminando la causa principal de los cierres.
 
-- **Modo Replanteo y Automático**: Los botones de ayuda técnica ahora resaltan como círculos azules.
-- **Ajustes del Sistema**: Los botones de información para "Modelo Geoidal", "Barómetro" y "Mapas" han sido unificados, eliminando los fondos grises previos para un look más limpio.
-- **Asistente de Vuelo (Dron)**: El icono del asistente en la sección de clima ahora mantiene el estilo azul corporativo de forma permanente.
-- **Guardado de Puntos**: El diálogo de guardado desde el mapa ahora utiliza el nuevo estándar para el botón de ayuda de altura.
-- **Listas Técnicas**: Se actualizó el icono genérico de detalles en las filas de información meteorológica y topográfica.
+### 3. Blindaje del Motor de Mapas (`MapManager`)
+- **Protección de Ventanas**: Ahora se verifica que el mapa esté realmente "pegado" a la pantalla (`isAttachedToWindow`) antes de intentar abrir etiquetas de información.
+- **Gestión de Bitmaps**: Se añadieron salvaguardas para evitar errores de memoria al crear las etiquetas naranjas de los puntos, validando dimensiones antes de procesar imágenes.
+- **Sincronización**: Se reforzó el bloqueo de recursos para evitar colisiones cuando el GPS y el usuario interactúan con el mapa al mismo tiempo.
 
-### 3. Ajustes de Lógica
-- **[WeatherFragment.java](file:///D:/Desarrollo-Software/Proyectos%20Android/factorEscala/app/src/main/java/bo/com/factorcombinadotopo/WeatherFragment.java)**: Se eliminó el tintado dinámico del icono del asistente para preservar la integridad visual del círculo azul y la letra blanca en todos los niveles de seguridad.
+### 4. Captura de Contexto Seguro
+- Las tareas de base de datos ahora capturan una referencia local y segura del `Context` al inicio, evitando errores de puntero nulo si el fragmento se desvincula durante la ejecución.
 
-## Resultado Visual
+## Verificación Realizada
 
-> [!SUCCESS]
-> **Consistencia Total**: Todos los puntos de información de la aplicación ahora hablan el mismo lenguaje visual, mejorando la estética profesional de **FactorEscalaTop**.
+> [!TIP]
+> Puedes realizar una prueba de "estrés" cambiando entre pestañas muy rápidamente. Notarás que la aplicación ahora ignora las actualizaciones de las pestañas que ya no son visibles, manteniendo una navegación fluida y sin interrupciones.
 
-render_diffs(file:///D:/Desarrollo-Software/Proyectos%20Android/factorEscala/app/src/main/res/layout/fragment_automatic.xml)
-render_diffs(file:///D:/Desarrollo-Software/Proyectos%20Android/factorEscala/app/src/main/res/layout/fragment_stakeout.xml)
-render_diffs(file:///D:/Desarrollo-Software/Proyectos%20Android/factorEscala/app/src/main/res/layout/dialog_settings.xml)
+### Checkbox de Robustez:
+- [x] Unificación de hilos en `TopographyRepository`.
+- [x] Validación de visibilidad en `MapFragment`.
+- [x] Prevención de excepciones de Bitmap en `MapManager`.
+- [x] Limpieza de observadores en `RegisterFragment`.

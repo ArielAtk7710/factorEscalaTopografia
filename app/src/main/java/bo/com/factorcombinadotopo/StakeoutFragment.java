@@ -24,10 +24,12 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import android.content.res.ColorStateList;
+import android.graphics.drawable.GradientDrawable;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 import bo.com.factorcombinadotopo.gnss.GnssMeasurement;
@@ -44,6 +46,7 @@ public class StakeoutFragment extends Fragment implements SensorEventListener {
     private TextView txtDistance, txtDirection, txtTargetE, txtTargetN, txtRelAzimuth;
     private TextView txtPrecision, txtSat;
     private ImageView imgArrow;
+    private View viewProximityRing;
     private FloatingActionButton fabStatic;
 
     private SensorManager sensorManager;
@@ -98,6 +101,7 @@ public class StakeoutFragment extends Fragment implements SensorEventListener {
         txtPrecision = view.findViewById(R.id.txt_stakeout_precision);
         txtSat = view.findViewById(R.id.txt_stakeout_sat);
         imgArrow = view.findViewById(R.id.img_stakeout_arrow);
+        viewProximityRing = view.findViewById(R.id.view_stakeout_proximity_ring);
         fabStatic = view.findViewById(R.id.fab_stakeout_static);
 
         view.findViewById(R.id.btn_stakeout_info).setOnClickListener(v -> showFormatInfoDialog());
@@ -109,6 +113,14 @@ public class StakeoutFragment extends Fragment implements SensorEventListener {
             importLauncher.launch(intent);
         });
 
+        FloatingActionButton fabDelete = view.findViewById(R.id.fab_delete_stakeout);
+        if (fabDelete != null) {
+            fabDelete.setOnClickListener(v -> UIUtils.showConfirmDialog(requireContext(), 
+                    R.string.dialog_delete_title, 
+                    R.string.dialog_delete_msg, 
+                    this::resetStakeoutData));
+        }
+
         if (fabStatic != null) {
             fabStatic.setOnClickListener(v -> {
                 isStaticModeActive = !isStaticModeActive;
@@ -118,7 +130,7 @@ public class StakeoutFragment extends Fragment implements SensorEventListener {
                     fabStatic.setBackgroundTintList(ColorStateList.valueOf(requireContext().getColor(R.color.state_success)));
                     UIUtils.showSuccessToast(requireContext(), "Modo Estático: Promediando posición...");
                 } else {
-                    fabStatic.setBackgroundTintList(ColorStateList.valueOf(requireContext().getColor(R.color.state_error)));
+                    fabStatic.setBackgroundTintList(ColorStateList.valueOf(requireContext().getColor(R.color.accent_orange)));
                     UIUtils.showInfoToast(requireContext(), "Modo Estático desactivado.");
                 }
             });
@@ -173,11 +185,30 @@ public class StakeoutFragment extends Fragment implements SensorEventListener {
     }
 
     private void showFormatInfoDialog() {
-        new androidx.appcompat.app.AlertDialog.Builder(requireContext())
-                .setTitle(getString(R.string.title_stakeout_guide))
-                .setMessage(android.text.Html.fromHtml(getString(R.string.stakeout_guide_body), android.text.Html.FROM_HTML_MODE_LEGACY))
-                .setPositiveButton(getString(R.string.btn_understood), null)
-                .show();
+        UIUtils.showProInfoDialog(requireContext(), 
+                getString(R.string.title_stakeout_guide), 
+                android.text.Html.fromHtml(getString(R.string.stakeout_guide_body), android.text.Html.FROM_HTML_MODE_LEGACY), 
+                R.drawable.ic_info_round_blue);
+    }
+
+    private void resetStakeoutData() {
+        pointList.clear();
+        selectedPoint = null;
+        
+        // Limpiar Spinner
+        ArrayAdapter<StakeoutPoint> adapter = new ArrayAdapter<>(requireContext(),
+                android.R.layout.simple_spinner_item, pointList);
+        spPoints.setAdapter(adapter);
+        
+        // Resetear UI
+        txtTargetE.setText("E: 0.000");
+        txtTargetN.setText("N: 0.000");
+        txtDistance.setText("0.00 m");
+        txtDirection.setText("SIN SEÑAL GPS");
+        imgArrow.setRotation(0);
+        txtRelAzimuth.setText("0°");
+        
+        UIUtils.showSuccessToast(requireContext(), "Datos de replanteo eliminados.");
     }
 
     private void updateStakeoutUI() {
@@ -207,6 +238,29 @@ public class StakeoutFragment extends Fragment implements SensorEventListener {
 
         // Feedback visual de dirección
         txtDirection.setText(getBearingDescription(relativeAngle));
+
+        // 6. Indicador de Proximidad Dinámico (Anillo de Color)
+        updateProximityRing(distance);
+    }
+
+    private void updateProximityRing(double distance) {
+        if (viewProximityRing == null) return;
+        GradientDrawable ring = (GradientDrawable) viewProximityRing.getBackground();
+        if (ring == null) return;
+
+        int color = android.graphics.Color.TRANSPARENT;
+        
+        if (distance <= 1.0) {
+            color = requireContext().getColor(R.color.flight_green);
+        } else if (distance <= 3.0) {
+            color = requireContext().getColor(R.color.flight_yellow);
+        } else if (distance <= 5.0) {
+            color = requireContext().getColor(R.color.accent_orange);
+        }
+
+        // El ancho del stroke es 4dp definido en el XML
+        int strokeWidth = (int) (4 * getResources().getDisplayMetrics().density);
+        ring.setStroke(strokeWidth, color);
     }
 
     private String getBearingDescription(float relAngle) {

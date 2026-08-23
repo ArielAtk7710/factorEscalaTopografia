@@ -1,18 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+<com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     app:cardBackgroundColor="@color/bg_surface"
-    app:cardCornerRadius="16dp"
-    app:cardElevation="8dp"
-    android:layout_margin="16dp">
+    app:cardCornerRadius="24dp"
+    app:cardElevation="0dp">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:padding="20dp">
+        android:padding="24dp">
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -29,7 +28,7 @@
                 android:padding="4dp"
                 android:background="@drawable/bg_spinner_with_arrow"
                 android:backgroundTint="@color/bg_surface_secondary"
-                android:contentDescription="Icon" />
+                android:contentDescription="Icono de Registro" />
 
             <TextView
                 android:layout_width="wrap_content"
@@ -63,7 +62,8 @@
             android:textColor="@color/text_primary"
             android:textColorHint="@color/text_secondary"
             android:inputType="text"
-            android:maxLines="1" />
+            android:maxLines="1"
+            android:autofillHints="name" />
 
         <!-- GPS / SIN GPS Toggle Section with Info Icon -->
         <LinearLayout
@@ -95,7 +95,7 @@
                     android:textColor="@color/color_toggle_text_map"
                     app:strokeColor="@color/accent_orange"
                     app:strokeWidth="1.5dp"
-                    app:cornerRadius="8dp" />
+                    app:cornerRadius="12dp" />
 
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/btn_toggle_gps_off"
@@ -110,7 +110,7 @@
                     android:textColor="@color/color_toggle_text_map"
                     app:strokeColor="@color/accent_orange"
                     app:strokeWidth="1.5dp"
-                    app:cornerRadius="8dp" />
+                    app:cornerRadius="12dp" />
 
             </com.google.android.material.button.MaterialButtonToggleGroup>
 
@@ -152,7 +152,7 @@
             android:gravity="top|start" />
 
         <!-- Action Buttons -->
-        <Button
+        <com.google.android.material.button.MaterialButton
             android:id="@+id/btn_dialog_save"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -163,9 +163,10 @@
             app:iconGravity="textStart"
             app:backgroundTint="@color/accent_primary"
             android:textColor="@android:color/white"
-            android:textStyle="bold" />
+            android:textStyle="bold"
+            app:cornerRadius="12dp" />
 
-        <Button
+        <com.google.android.material.button.MaterialButton
             android:id="@+id/btn_dialog_cancel"
             style="@style/Widget.MaterialComponents.Button.OutlinedButton"
             android:layout_width="match_parent"
@@ -174,7 +175,8 @@
             android:text="@string/btn_cancel"
             android:textAllCaps="false"
             android:textColor="@color/text_secondary"
-            app:strokeColor="@color/divider" />
+            app:strokeColor="@color/divider"
+            app:cornerRadius="12dp" />
 
     </LinearLayout>
-</androidx.cardview.widget.CardView>
+</com.google.android.material.card.MaterialCardView>

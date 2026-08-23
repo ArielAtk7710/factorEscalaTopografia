@@ -83,6 +83,15 @@
     <string name="hint_pressure_adjustment">Ej: -1.5 ó 0.8</string>
     <string name="btn_info_barometer">Información de barómetro</string>
     <string name="title_barometer_guide">GUÍA DE AJUSTE BAROMÉTRICO</string>
+    <string name="title_static_mode_help">MODO ESTÁTICO GNSS</string>
+    <string name="msg_static_mode_desc">El Modo Estático estabiliza tus coordenadas mediante un promedio ponderado inteligente.</string>
+    <string name="label_how_to_use">¿Cómo usarlo?</string>
+    <string name="msg_static_step_1">1. Coloca el equipo en un punto de control fijo.</string>
+    <string name="msg_static_step_2">2. Pulsa \'INICIAR ESTÁTICO\' (el botón cambiará a verde).</string>
+    <string name="msg_static_step_3">3. Espera 15-30 segundos sin mover el dispositivo.</string>
+    <string name="label_what_it_does">¿Qué hace la App?</string>
+    <string name="msg_static_benefit">Limpia el ruido de la señal y utiliza las posiciones con mejor precisión para fijar los decimales de tus coordenadas UTM y el Factor Combinado.</string>
+
     <string name="col_condition">Condición meteorológica</string>
     <string name="col_offset">Offset típico</string>
     <string name="col_input">Qué poner</string>
@@ -113,7 +122,7 @@
     <string name="btn_import_map">IMPORTAR MAPA</string>
     <string name="btn_delete_map">ELIMINAR MAPA</string>
     <string name="label_cache">Caché del Sistema</string>
-    <string name="label_cache_street">Mapa Callejero</string>
+    <string name="label_cache_street">Mapa Callejero y Satelital</string>
     <string name="label_cache_sat">Mapa Satelital</string>
     <string name="label_space_used">Espacio ocupado</string>
     <string name="btn_clear_cache">LIMPIAR CACHÉ</string>
@@ -494,17 +503,23 @@
     <string name="msg_offline_warning">Función Online no disponible. Trabajando en modo Offline (Solo Sensores Locales).</string>
     <string name="msg_weather_offline">El análisis meteorológico requiere conexión a Internet.</string>
     <string name="title_stakeout_guide">Guía de Replanteo Profesional</string>
-    <string name="stakeout_guide_body"><b>1. IMPORTACIÓN DE DATOS (.txt):</b>\n
-        Cada línea del archivo debe seguir este formato exacto separado por comas:\n
-        <i>Nombre, EsteE, NorteN, UTM, Zona, Hemisferio</i>\n
-        Ej: P01, 816663.123E, 8088744.094N, UTM, 19, S\n\n
-        <b>2. SWITCH MODO ESTÁTICO (Icono Mira):</b>\n
-        Este botón controla la Capa de Procesamiento GNSS avanzada.\n\n
-        • <b>🔴 ROJO (Modo Dinámico):</b> Úselo mientras camina hacia el punto. El GPS responde al instante a su movimiento.\n\n
-        • <b>🟢 VERDE (Filtro de Precisión):</b> Úselo al llegar al punto de replanteo. El sistema promedia la posición para eliminar el ruido y fijar la distancia exacta.\n\n
-        <b>3. PROTOCOLO DE CAMPO RECOMENDADO:</b>\n
-        1. Acérquese al punto siguiendo la flecha en modo <b>ROJO</b>.\n
-        2. Al estar a menos de 1 metro, deténgase y cambie a modo <b>VERDE</b>.\n
-        3. Mantenga el equipo inmóvil por <b>15 a 20 segundos</b>.\n
-        4. La distancia se estabilizará. Marque el suelo con total confianza.</string>
+    <string name="stakeout_guide_body"><b><font color="#F97316">1. FORMATO DE ARCHIVO (.txt):</font></b>\n
+        Para una carga correcta, el archivo debe ser de texto plano separado por <b>COMAS</b>. Cada línea debe seguir este orden estricto:\n\n
+        <i>Nombre, EsteE, NorteN, UTM, Zona, Hemisferio</i>\n\n
+        <b>REGLAS DE ORO:</b>\n
+        • Los valores de <b>Este</b> deben terminar con la letra <b>E</b>.\n
+        • Los valores de <b>Norte</b> deben terminar con la letra <b>N</b>.\n
+        • Evite usar espacios o caracteres especiales en los nombres.\n\n
+        <b><font color="#F97316">2. EJEMPLOS (BOLIVIA):</font></b>\n
+        <i>P01, 592534.123E, 8175960.456N, UTM, 19, S</i> (La Paz)\n
+        <i>P02, 480678.980E, 8033785.120N, UTM, 20, S</i> (Santa Cruz)\n\n
+        <b><font color="#F97316">3. GUÍA DE HERRAMIENTAS:</font></b>\n\n
+        <b>🔵 BOTÓN AZUL (LIBRETA):</b>\n
+        Permite seleccionar e <b>IMPORTAR</b> el archivo .txt desde la memoria interna. Los puntos aparecerán en el selector central.\n\n
+        <b>🎯 BOTÓN MIRA (PRECISIÓN GNSS):</b>\n
+        Controla el Filtro de Estabilización Avanzado:\n
+        • 🟠 <b>MODO NARANJA (Dinámico):</b> Úselo mientras camina. El GPS responde al instante a su posición.\n
+        • 🟢 <b>MODO VERDE (Estático):</b> Actívelo al estar a menos de 1 metro. El sistema promediará la señal por 15-30 segundos para eliminar el ruido y fijar la marca con precisión centimétrica.\n\n
+        <b>🗑️ BOTÓN ROJO (BASURERO):</b>\n
+        Limpia toda la sesión de replanteo, elimina los puntos cargados y resetea la flecha indicadora.</string>
 </resources>

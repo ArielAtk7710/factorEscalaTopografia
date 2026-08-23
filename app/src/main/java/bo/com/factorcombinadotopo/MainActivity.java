@@ -87,8 +87,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     public static final String KEY_REAL_TIME_UPDATE = "RealTimeUpdate";
     private static final String KEY_TERMS_ACCEPTED = "TermsAccepted";
 
-    private TextView txtCacheSizeStreet, txtCacheSizeSat;
-    private PopupWindow barometerInfoPopup, mapInfoPopup, geoidInfoPopup;
+    private TextView txtCacheSizeStreet;
 
     private FusedLocationProviderClient fusedLocationClient;
     private LocationCallback locationCallback;
@@ -167,6 +166,15 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         this.mViewPager.setAdapter(this.mSectionsPagerAdapter);
         this.mViewPager.setUserInputEnabled(false); // Desactivar deslizamiento para no interferir con el mapa
         this.mViewPager.setOffscreenPageLimit(1); // Mantener pestañas adyacentes vivas para evitar recargas del mapa
+        
+        // 🛡️ PROTECCIÓN DE CARGA: Esperar a que los servicios críticos estén listos
+        ((SurveyApplication)getApplication()).isReady.observe(this, isReady -> {
+            if (isReady) {
+                UIUtils.showSuccessToast(this, "Motor Geoidal y Sistemas Listos");
+            } else {
+                UIUtils.showInfoToast(this, "Iniciando sistemas...");
+            }
+        });
         
         TabLayout tabLayout = findViewById(R.id.tabs);
         new TabLayoutMediator(tabLayout, mViewPager, (tab, position) -> {
@@ -560,14 +568,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
         View btnGeoidInfo = view.findViewById(R.id.btn_geoid_info);
         btnGeoidInfo.setOnClickListener(v -> {
-            if (geoidInfoPopup != null && geoidInfoPopup.isShowing()) {
-                geoidInfoPopup.dismiss();
-                geoidInfoPopup = null;
-            } else {
-                geoidInfoPopup = UIUtils.showPopupInfo(this, view, 
-                        getString(R.string.title_geoid_adjustment), 
-                        getString(R.string.msg_geoid_mgb_info));
-            }
+            UIUtils.showPopupInfo(this, view, 
+                    getString(R.string.title_geoid_adjustment), 
+                    getString(R.string.msg_geoid_mgb_info));
         });
 
         // 2. Configurar Offset de Presión (0.0 por defecto)
@@ -576,33 +579,14 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         etOffset.setText(String.valueOf(currentOffset));
 
         View btnBarometerInfo = view.findViewById(R.id.btn_barometer_info);
-        btnBarometerInfo.setOnClickListener(v -> {
-            if (barometerInfoPopup != null && barometerInfoPopup.isShowing()) {
-                barometerInfoPopup.dismiss();
-                barometerInfoPopup = null;
-            } else {
-                barometerInfoPopup = UIUtils.showBarometerInfo(this, view);
-                // Cerrar automáticamente tras 10 segundos
-                new Handler(Looper.getMainLooper()).postDelayed(() -> {
-                    if (barometerInfoPopup != null) {
-                        barometerInfoPopup.dismiss();
-                        barometerInfoPopup = null;
-                    }
-                }, 10000);
-            }
-        });
+        btnBarometerInfo.setOnClickListener(v -> UIUtils.showBarometerInfo(this));
 
         // 3. SECCIÓN MAPAS (Solo ONLINE disponible en Ajustes)
         View btnMapInfo = view.findViewById(R.id.btn_map_info);
         btnMapInfo.setOnClickListener(v -> {
-            if (mapInfoPopup != null && mapInfoPopup.isShowing()) {
-                mapInfoPopup.dismiss();
-                mapInfoPopup = null;
-            } else {
-                mapInfoPopup = UIUtils.showPopupInfo(this, view, 
-                        getString(R.string.label_maps), 
-                        getString(R.string.msg_map_offline_auto));
-            }
+            UIUtils.showPopupInfo(this, view, 
+                    getString(R.string.label_maps), 
+                    getString(R.string.msg_map_offline_auto));
         });
 
         com.google.android.material.button.MaterialButtonToggleGroup toggleMapMode = view.findViewById(R.id.toggle_map_mode);
@@ -614,20 +598,13 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
         // Caché
         txtCacheSizeStreet = view.findViewById(R.id.txt_cache_size_street);
-        txtCacheSizeSat = view.findViewById(R.id.txt_cache_size_sat);
         updateCacheSizeUI();
         
         view.findViewById(R.id.btn_clear_cache_street).setOnClickListener(v -> {
             UIUtils.showConfirmDialog(this, 
                 R.string.title_confirm_cache_street, 
                 R.string.msg_confirm_cache_street, 
-                () -> clearMapCache(0));
-        });
-        view.findViewById(R.id.btn_clear_cache_sat).setOnClickListener(v -> {
-            UIUtils.showConfirmDialog(this, 
-                R.string.title_confirm_cache_sat, 
-                R.string.msg_confirm_cache_sat, 
-                () -> clearMapCache(1));
+                this::clearMapCache);
         });
 
         // GPS
@@ -664,42 +641,32 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
         dialog.setOnDismissListener(d -> {
             txtCacheSizeStreet = null;
-            txtCacheSizeSat = null;
-            if (barometerInfoPopup != null) barometerInfoPopup.dismiss();
-            if (mapInfoPopup != null) mapInfoPopup.dismiss();
-            if (geoidInfoPopup != null) geoidInfoPopup.dismiss();
         });
 
         dialog.show();
     }
 
     private void updateCacheSizeUI() {
-        if (txtCacheSizeStreet == null && txtCacheSizeSat == null) return;
+        if (txtCacheSizeStreet == null) return;
         
-        if (txtCacheSizeStreet != null) txtCacheSizeStreet.setText("...");
-        if (txtCacheSizeSat != null) txtCacheSizeSat.setText("...");
+        txtCacheSizeStreet.setText("...");
 
         TopographyRepository.getInstance(this).runOnBackground(() -> {
             File osmdroidDir = new File(getExternalFilesDir(null), "osmdroid");
-            
-            final long streetSize = FileUtils.getFolderSize(new File(osmdroidDir, "tiles_street"));
-            final long satSize = FileUtils.getFolderSize(new File(osmdroidDir, "tiles_sat"));
+            final long totalSize = FileUtils.getFolderSize(new File(osmdroidDir, "tiles_cache"));
 
             new Handler(Looper.getMainLooper()).post(() -> {
-                if (txtCacheSizeStreet != null) txtCacheSizeStreet.setText(FileUtils.formatSize(streetSize));
-                if (txtCacheSizeSat != null) txtCacheSizeSat.setText(FileUtils.formatSize(satSize));
+                if (txtCacheSizeStreet != null) txtCacheSizeStreet.setText(FileUtils.formatSize(totalSize));
             });
         });
     }
 
-    private void clearMapCache(int type) {
+    private void clearMapCache() {
         if (txtCacheSizeStreet != null) txtCacheSizeStreet.setText("...");
-        if (txtCacheSizeSat != null) txtCacheSizeSat.setText("...");
 
         TopographyRepository.getInstance(this).runOnBackground(() -> {
             File osmdroidDir = new File(getExternalFilesDir(null), "osmdroid");
-            String folderName = (type == 1) ? "tiles_sat" : "tiles_street";
-            File cacheDir = new File(osmdroidDir, folderName);
+            File cacheDir = new File(osmdroidDir, "tiles_cache");
             
             FileUtils.clearDirectory(cacheDir);
             

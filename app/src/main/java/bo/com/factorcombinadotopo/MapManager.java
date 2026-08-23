@@ -110,7 +110,6 @@ public class MapManager {
 
     private void initConfiguration() {
         SharedPreferences prefs = context.getSharedPreferences("AppPrefs", Context.MODE_PRIVATE);
-        boolean showLocation = prefs.getBoolean("ShowLocation", true);
         int mapType = prefs.getInt(KEY_MAP_TYPE, 0); 
 
         // Configuración crítica de osmdroid
@@ -123,8 +122,8 @@ public class MapManager {
             if (!osmdroidDir.exists()) osmdroidDir.mkdirs();
             config.setOsmdroidBasePath(osmdroidDir);
             
-            String cacheFolder = (mapType == 1) ? "tiles_sat" : "tiles_street";
-            File cacheDir = new File(osmdroidDir, cacheFolder);
+            // Carpeta única de caché compartida
+            File cacheDir = new File(osmdroidDir, "tiles_cache");
             if (!cacheDir.exists()) cacheDir.mkdirs();
             config.setOsmdroidTileCache(cacheDir);
 
@@ -138,7 +137,7 @@ public class MapManager {
                 tileSource = TileSourceFactory.MAPNIK;
             }
 
-            // Forzar el proveedor con la caché específica desde el inicio
+            // Forzar el proveedor con la caché compartida
             MapTileProviderBasic provider = new MapTileProviderBasic(context, tileSource);
             mapView.setTileProvider(provider);
         }
@@ -153,16 +152,29 @@ public class MapManager {
         CopyrightOverlay copyrightOverlay = new CopyrightOverlay(context);
         mapView.getOverlays().add(copyrightOverlay);
 
-        locationOverlay = new MyLocationNewOverlay(new GpsMyLocationProvider(context), mapView);
-        if (showLocation) {
-            locationOverlay.enableMyLocation();
-        }
-
-        locationOverlay.disableFollowLocation(); 
-        mapView.getOverlays().add(locationOverlay);
-
         isInitialized = true;
         mapView.invalidate();
+    }
+
+    /**
+     * Activa los servicios de ubicación (GPS) de forma segura.
+     * Solo debe llamarse cuando se tengan los permisos y el mapa sea visible.
+     */
+    public void activateLocationServices() {
+        if (locationOverlay != null || mapView == null) return;
+        
+        try {
+            locationOverlay = new MyLocationNewOverlay(new GpsMyLocationProvider(context), mapView);
+            SharedPreferences prefs = context.getSharedPreferences("AppPrefs", Context.MODE_PRIVATE);
+            if (prefs.getBoolean("ShowLocation", true)) {
+                locationOverlay.enableMyLocation();
+            }
+            locationOverlay.disableFollowLocation();
+            mapView.getOverlays().add(locationOverlay);
+            mapView.invalidate();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     public void refreshMap() {
@@ -176,8 +188,8 @@ public class MapManager {
         File extDir = context.getExternalFilesDir(null);
         if (extDir != null) {
             File osmdroidDir = new File(extDir, "osmdroid");
-            String cacheFolder = (mapType == 1) ? "tiles_sat" : "tiles_street";
-            config.setOsmdroidTileCache(new File(osmdroidDir, cacheFolder));
+            // Apuntar siempre a la caché compartida
+            config.setOsmdroidTileCache(new File(osmdroidDir, "tiles_cache"));
         }
 
         updateNetworkState(NetworkUtils.isNetworkAvailable(context));
@@ -215,8 +227,8 @@ public class MapManager {
             if (extDir == null) return;
             
             File osmdroidDir = new File(extDir, "osmdroid");
-            String cacheFolder = (enableSatellite) ? "tiles_sat" : "tiles_street";
-            File cacheDir = new File(osmdroidDir, cacheFolder);
+            // Carpeta compartida para ambas capas
+            File cacheDir = new File(osmdroidDir, "tiles_cache");
             if (!cacheDir.exists()) cacheDir.mkdirs();
             
             // 1. Actualizar configuración global ANTES de recrear el proveedor
@@ -303,6 +315,7 @@ public class MapManager {
         }
         @Override
         public void onOpen(Object item) {
+            if (mView == null || item == null) return;
             Marker marker = (Marker) item;
             TextView txt = mView.findViewById(R.id.txt_marker_name);
             if (txt != null) {
@@ -318,7 +331,9 @@ public class MapManager {
             
             // Asegurar que el click en el texto también funcione
             if (txt != null) {
-                txt.setOnClickListener(v -> mView.performClick());
+                txt.setOnClickListener(v -> {
+                    if (mView != null) mView.performClick();
+                });
             }
         }
     }
@@ -364,15 +379,22 @@ public class MapManager {
      * Crea un Bitmap a partir del layout de etiqueta naranja para uso como icono permanente.
      */
     private Drawable createLabelDrawable(String text) {
+        if (context == null) return null;
         try {
             View view = LayoutInflater.from(context).inflate(R.layout.layout_marker_label, null);
             TextView tv = view.findViewById(R.id.txt_marker_name);
             if (tv != null) tv.setText(text);
 
             view.measure(View.MeasureSpec.UNSPECIFIED, View.MeasureSpec.UNSPECIFIED);
-            view.layout(0, 0, view.getMeasuredWidth(), view.getMeasuredHeight());
+            int width = view.getMeasuredWidth();
+            int height = view.getMeasuredHeight();
 
-            Bitmap bitmap = Bitmap.createBitmap(view.getMeasuredWidth(), view.getMeasuredHeight(), Bitmap.Config.ARGB_8888);
+            // 🛡️ PROTECCIÓN: Evitar ArithmeticException si las dimensiones son 0
+            if (width <= 0 || height <= 0) return null;
+
+            view.layout(0, 0, width, height);
+
+            Bitmap bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
             Canvas canvas = new Canvas(bitmap);
             view.draw(canvas);
 
@@ -554,6 +576,8 @@ public class MapManager {
     }
 
     private void addMarkerToView(double lat, double lon, String name) {
+        if (mapView == null) return;
+        
         Marker marker = new Marker(mapView);
         marker.setPosition(new GeoPoint(lat, lon));
         marker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM); // Punta de la aguja
@@ -567,7 +591,11 @@ public class MapManager {
 
         marker.setInfoWindow(new LabelInfoWindow(R.layout.layout_marker_label, mapView));
         mapView.getOverlays().add(marker);
-        marker.showInfoWindow();
+        
+        // 🛡️ PROTECCIÓN CRÍTICA: Solo mostrar info window si la vista está adjunta
+        if (mapView.isAttachedToWindow()) {
+            marker.showInfoWindow();
+        }
     }
 
     public void onResume() {
@@ -589,13 +617,31 @@ public class MapManager {
     }
 
     /**
+     * Libera recursos críticos para evitar fugas de memoria y bloqueos de base de datos.
+     */
+    public void shutdown() {
+        try {
+            if (locationOverlay != null) {
+                locationOverlay.disableMyLocation();
+                locationOverlay.disableFollowLocation();
+                locationOverlay = null;
+            }
+            if (mapView != null) {
+                // Desconectar el proveedor de mosaicos para cerrar la base de datos de la caché
+                if (mapView.getTileProvider() != null) {
+                    mapView.getTileProvider().detach();
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    /**
      * Libera recursos críticos para evitar fugas de memoria (Memory Leaks).
+     * @deprecated Usar shutdown() para un cierre completo.
      */
     public void onDestroy() {
-        // Se elimina mapView.onDetach() de aquí para evitar cierre doble (ya se llama en el Fragmento)
-        if (locationOverlay != null) {
-            locationOverlay.disableMyLocation();
-            locationOverlay.disableFollowLocation();
-        }
+        shutdown();
     }
 }

@@ -4,7 +4,6 @@ import android.content.Context;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
 
 import bo.com.factorcombinadotopo.api.ApiService;
@@ -112,35 +111,23 @@ public class WeatherManager {
             return;
         }
 
-        AtomicReference<WeatherResponse> weatherRef = new AtomicReference<>(null);
-        AtomicReference<Double> kpRef = new AtomicReference<>(null);
-        AtomicBoolean weatherFailed = new AtomicBoolean(false);
-
-        // Parametros ampliados para Dron incluyendo Horario y Diario
-        String currentParams = "wind_speed_10m,wind_speed_80m,wind_speed_120m,wind_direction_10m,wind_gusts_10m,precipitation,temperature_2m,apparent_temperature,cloud_cover,visibility,weather_code,is_day";
-        String hourlyParams = "temperature_2m,precipitation_probability,weather_code,wind_speed_10m,wind_gusts_10m,cloud_cover";
-        String dailyParams = "weather_code,temperature_2m_max,temperature_2m_min,precipitation_probability_max";
-
-        getApiService().getDroneWeather(lat, lon, currentParams, hourlyParams, dailyParams, "auto", "ecmwf_ifs025")
-                .enqueue(new Callback<WeatherResponse>() {
+        // 🔗 NUEVO SISTEMA DE RESPALDO (10 SERVICIOS)
+        WeatherFallbackManager fallbackManager = new WeatherFallbackManager(context, lat, lon, new WeatherFallbackManager.FallbackCallback() {
             @Override
-            public void onResponse(Call<WeatherResponse> call, Response<WeatherResponse> response) {
-                if (response.isSuccessful() && response.body() != null) {
-                    weatherRef.set(response.body());
-                    checkCompletion(context, weatherRef, kpRef, pdop, callback);
-                } else {
-                    weatherFailed.set(true);
-                    callback.onError("Error en clima: " + response.code());
-                }
+            public void onSuccess(bo.com.factorcombinadotopo.models.UnifiedWeatherData data) {
+                // Obtener KP en paralelo como antes
+                fetchKpAndEvaluate(context, data, pdop, callback);
             }
 
             @Override
-            public void onFailure(Call<WeatherResponse> call, Throwable t) {
-                weatherFailed.set(true);
-                callback.onError("Fallo de red clima: " + t.getMessage());
+            public void onError(String finalError) {
+                callback.onError(finalError);
             }
         });
+        fallbackManager.start();
+    }
 
+    private static void fetchKpAndEvaluate(Context context, bo.com.factorcombinadotopo.models.UnifiedWeatherData weather, double pdop, WeatherCallback callback) {
         getApiService().getKpIndex("https://services.swpc.noaa.gov/products/noaa-planetary-k-index.json")
                 .enqueue(new Callback<List<bo.com.factorcombinadotopo.models.KpIndex>>() {
             @Override
@@ -150,82 +137,59 @@ public class WeatherManager {
                     bo.com.factorcombinadotopo.models.KpIndex lastEntry = response.body().get(response.body().size() - 1);
                     kp = lastEntry.kp;
                 }
-                kpRef.set(kp);
-                if (!weatherFailed.get()) checkCompletion(context, weatherRef, kpRef, pdop, callback);
+                evaluateSafetyUnified(context, weather, kp, pdop, callback);
             }
 
             @Override
             public void onFailure(Call<List<bo.com.factorcombinadotopo.models.KpIndex>> call, Throwable t) {
-                kpRef.set(-1.0);
-                if (!weatherFailed.get()) checkCompletion(context, weatherRef, kpRef, pdop, callback);
+                evaluateSafetyUnified(context, weather, -1.0, pdop, callback);
             }
         });
     }
 
-    private static void checkCompletion(Context context,
-                                        AtomicReference<WeatherResponse> weatherRef, 
-                                        AtomicReference<Double> kpRef, 
-                                        double pdop,
-                                        WeatherCallback callback) {
-        if (weatherRef.get() != null && kpRef.get() != null) {
-            evaluateSafety(context, weatherRef.get(), kpRef.get(), pdop, callback);
-        }
-    }
-
-    private static void evaluateSafety(Context context, WeatherResponse weather, double kp, double pdop, WeatherCallback callback) {
-        WeatherResponse.CurrentWeather cur = weather.current;
-        int rainProb = 0;
-        if (weather.hourly != null && weather.hourly.precipitationProbability != null && !weather.hourly.precipitationProbability.isEmpty()) {
-            rainProb = weather.hourly.precipitationProbability.get(0);
-        }
-
+    private static void evaluateSafetyUnified(Context context, bo.com.factorcombinadotopo.models.UnifiedWeatherData weather, double kp, double pdop, WeatherCallback callback) {
         // Basic status for legacy UI
         SafetyStatus status = new SafetyStatus(SafetyLevel.GREEN, R.string.safety_msg_optimal);
-        status.wind120 = cur.windSpeed120m;
-        status.windSustained = cur.windSpeed10m;
-        status.windDirection = cur.windDirection10m;
-        status.gusts = cur.windGusts10m;
+        status.wind120 = weather.windSpeed120m;
+        status.windSustained = weather.windSpeed10m;
+        status.windDirection = weather.windDirection10m;
+        status.gusts = weather.windGusts10m;
         status.kp = kp;
-        status.rain = cur.precipitation;
-        status.temperature = cur.temperature2m;
-        status.apparentTemperature = cur.apparentTemperature;
-        status.isDay = cur.isDay;
-        status.cloudCover = cur.cloudCover;
-        status.visibility = cur.visibility;
-        status.rainProbability = rainProb;
-        status.forecastDescResId = getWeatherDescRes(cur.weatherCode);
+        status.rain = weather.precipitation;
+        status.temperature = weather.temperature;
+        status.apparentTemperature = weather.apparentTemperature != 0 ? weather.apparentTemperature : weather.temperature;
+        status.isDay = weather.isDay;
+        status.cloudCover = weather.cloudCover;
+        status.visibility = weather.visibility;
+        status.rainProbability = weather.rainProbability;
+        status.forecastDescResId = getWeatherDescRes(weather.weatherCode);
 
         // Procesar Horarios
-        if (weather.hourly != null && weather.hourly.time != null) {
-            for (int i = 0; i < Math.min(24, weather.hourly.time.size()); i++) {
-                HourlyStatus hs = new HourlyStatus();
-                String fullTime = weather.hourly.time.get(i);
-                hs.time = fullTime.substring(fullTime.length() - 5); 
-                hs.wind = weather.hourly.windSpeed10m.get(i);
-                hs.gusts = weather.hourly.windGusts10m.get(i);
-                hs.rainProb = weather.hourly.precipitationProbability.get(i);
-                hs.cloudCover = weather.hourly.cloudCover.get(i);
-                hs.weatherCode = weather.hourly.weatherCode.get(i);
-                
-                if (hs.wind > 35 || hs.gusts > 45 || hs.rainProb > 30) hs.level = SafetyLevel.RED;
-                else if (hs.wind > 25 || hs.rainProb > 10) hs.level = SafetyLevel.YELLOW;
-                else hs.level = SafetyLevel.GREEN;
-                
-                status.hourlyList.add(hs);
-            }
+        for (bo.com.factorcombinadotopo.models.UnifiedWeatherData.Hourly h : weather.hourlyList) {
+            HourlyStatus hs = new HourlyStatus();
+            hs.time = h.time.contains("T") ? h.time.substring(h.time.indexOf("T") + 1, h.time.indexOf("T") + 6) : h.time;
+            hs.wind = h.windSpeed;
+            hs.gusts = h.windGusts;
+            hs.rainProb = h.rainProb;
+            hs.cloudCover = h.cloudCover;
+            hs.weatherCode = h.weatherCode;
+            
+            if (hs.wind > 35 || hs.gusts > 45 || hs.rainProb > 30) hs.level = SafetyLevel.RED;
+            else if (hs.wind > 25 || hs.rainProb > 10) hs.level = SafetyLevel.YELLOW;
+            else hs.level = SafetyLevel.GREEN;
+            
+            status.hourlyList.add(hs);
         }
 
         // Procesar Pronóstico Diario
-        if (weather.daily != null && weather.daily.time != null) {
-            for (int i = 0; i < weather.daily.time.size(); i++) {
-                DailyForecast df = new DailyForecast();
-                df.date = weather.daily.time.get(i);
-                df.weatherCode = weather.daily.weatherCode.get(i);
-                df.tempMax = weather.daily.tempMax.get(i);
-                df.tempMin = weather.daily.tempMin.get(i);
-                df.rainProb = weather.daily.rainProbMax.get(i);
-                status.dailyList.add(df);
-            }
+        for (bo.com.factorcombinadotopo.models.UnifiedWeatherData.Daily d : weather.dailyList) {
+            DailyForecast df = new DailyForecast();
+            df.date = d.date;
+            df.weatherCode = d.weatherCode;
+            df.tempMax = d.tempMax;
+            df.tempMin = d.tempMin;
+            df.rainProb = d.rainProb;
+            status.dailyList.add(df);
         }
 
         // 💡 ADVANCED ANALYSIS INTEGRATION
@@ -241,6 +205,10 @@ public class WeatherManager {
         }
         
         status.recommendation = status.safetyAnalysis.ventanaOptima;
+        
+        // Notificar al usuario qué proveedor proporcionó los datos en el detalle
+        status.safetyAnalysis.detalle += "\n\nFuente: " + weather.providerName;
+        
         callback.onSuccess(status);
     }
 

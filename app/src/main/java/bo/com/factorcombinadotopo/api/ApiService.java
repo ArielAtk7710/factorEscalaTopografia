@@ -29,4 +29,7 @@ public interface ApiService {
             @Query("latitude") double lat,
             @Query("longitude") double lon
     );
+
+    @GET
+    Call<com.google.gson.JsonObject> getGenericWeather(@Url String url);
 }

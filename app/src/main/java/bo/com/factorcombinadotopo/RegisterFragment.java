@@ -243,9 +243,11 @@ public class RegisterFragment extends Fragment {
     }
 
     private void cargarPuntos() {
-        if (!isAdded() || getContext() == null) return;
+        if (!isAdded()) return;
+        final Context safeContext = getContext();
+        if (safeContext == null) return;
         
-        new Thread(() -> {
+        TopographyRepository.getInstance(safeContext).runOnBackground(() -> {
             final List<Punto> tempPuntos = new ArrayList<>();
             Cursor cursor = dbHelper.obtenerPuntos();
             if (cursor != null && cursor.moveToFirst()) {
@@ -287,13 +289,15 @@ public class RegisterFragment extends Fragment {
                     }
                 });
             }
-        }).start();
+        });
     }
 
     private void cargarLibreta() {
-        if (!isAdded() || getContext() == null) return;
+        if (!isAdded()) return;
+        final Context safeContext = getContext();
+        if (safeContext == null) return;
         
-        new Thread(() -> {
+        TopographyRepository.getInstance(safeContext).runOnBackground(() -> {
             final List<LibretaEntry> tempLibreta = new ArrayList<>();
             Cursor cursor = dbHelper.obtenerLibreta();
             if (cursor != null && cursor.moveToFirst()) {
@@ -325,7 +329,7 @@ public class RegisterFragment extends Fragment {
                     }
                 });
             }
-        }).start();
+        });
     }
 
     private void actualizarVistaVacia(boolean isEmpty) {

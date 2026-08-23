@@ -175,6 +175,9 @@ public class MapFragment extends Fragment {
             }
             
             this.lastGpsLocation = location;
+
+            // Activar GPS del mapa de forma diferida si es la primera vez que recibimos posición
+            mapManager.activateLocationServices();
             
             // Centrado automático solo la primera vez por sesión
             if (!hasCenteredOnce) {
@@ -394,15 +397,16 @@ public class MapFragment extends Fragment {
     }
 
     private void showPointSelectionDialog() {
-        if (!isAdded() || getContext() == null) return;
-        Context context = getContext();
+        if (!isAdded()) return;
+        final Context safeContext = getContext();
+        if (safeContext == null) return;
 
-        new Thread(() -> {
-            DatabaseHelper db = DatabaseHelper.getInstance(context);
+        TopographyRepository.getInstance(safeContext).runOnBackground(() -> {
+            DatabaseHelper db = DatabaseHelper.getInstance(safeContext);
             Cursor cursor = db.obtenerPuntos();
             if (cursor == null) return;
 
-            List<PointRef> allPoints = new ArrayList<>();
+            final List<PointRef> allPoints = new ArrayList<>();
             while (cursor.moveToNext()) {
                 PointRef p = new PointRef();
                 p.nombre = cursor.getString(cursor.getColumnIndexOrThrow(DatabaseHelper.COLUMN_NOMBRE));
@@ -415,21 +419,22 @@ public class MapFragment extends Fragment {
             cursor.close();
 
             new Handler(Looper.getMainLooper()).post(() -> {
-                if (!isAdded()) return;
+                if (!isAdded() || getContext() == null) return;
                 if (allPoints.isEmpty()) {
-                    UIUtils.showInfoToast(requireContext(), getString(R.string.msg_no_points_registered));
+                    UIUtils.showInfoToast(safeContext, getString(R.string.msg_no_points_registered));
                     return;
                 }
 
                 // 🎨 NUEVO DISEÑO PREMIUM TRANSPARENTE
-                View dv = getLayoutInflater().inflate(R.layout.layout_dialog_point_selection, null);
-                AlertDialog.Builder b = new AlertDialog.Builder(requireContext());
+                LayoutInflater inflater = getLayoutInflater();
+                View dv = inflater.inflate(R.layout.layout_dialog_point_selection, null);
+                AlertDialog.Builder b = new AlertDialog.Builder(safeContext);
                 AlertDialog d = b.create();
                 if (d.getWindow() != null) d.getWindow().setBackgroundDrawableResource(android.R.color.transparent);
                 d.setView(dv);
 
                 androidx.recyclerview.widget.RecyclerView rv = dv.findViewById(R.id.rv_point_selection);
-                rv.setLayoutManager(new androidx.recyclerview.widget.LinearLayoutManager(requireContext()));
+                rv.setLayoutManager(new androidx.recyclerview.widget.LinearLayoutManager(safeContext));
                 
                 boolean[] selected = new boolean[allPoints.size()];
                 PointSelectionAdapter adapter = new PointSelectionAdapter(allPoints, selected);
@@ -457,7 +462,7 @@ public class MapFragment extends Fragment {
                 
                 d.show();
             });
-        }).start();
+        });
     }
 
     /**
@@ -498,16 +503,18 @@ public class MapFragment extends Fragment {
 
     private void onMarkerClickInternal(String title) {
         if (!isAdded()) return;
+        final Context safeContext = getContext();
+        if (safeContext == null) return;
         
-        new Thread(() -> {
-            DatabaseHelper dbHelper = DatabaseHelper.getInstance(requireContext());
+        TopographyRepository.getInstance(safeContext).runOnBackground(() -> {
+            DatabaseHelper dbHelper = DatabaseHelper.getInstance(safeContext);
             SQLiteDatabase db = dbHelper.getReadableDatabase();
             Cursor c = db.query(DatabaseHelper.TABLE_PUNTOS, null, 
                     DatabaseHelper.COLUMN_NOMBRE + " = ?", new String[]{title}, 
                     null, null, null, "1");
             
             if (c != null && c.moveToFirst()) {
-                ContentValues v = new ContentValues();
+                final ContentValues v = new ContentValues();
                 // Extraer todos los campos necesarios para la UI con safe defaults
                 v.put("name", title);
                 v.put("lat", c.getString(c.getColumnIndexOrThrow(DatabaseHelper.COLUMN_LATITUD)));
@@ -535,10 +542,10 @@ public class MapFragment extends Fragment {
             } else {
                 if (c != null) c.close();
                 new Handler(Looper.getMainLooper()).post(() -> {
-                    if (isAdded()) UIUtils.showInfoToast(requireContext(), getString(R.string.msg_point_details_unavailable));
+                    if (isAdded()) UIUtils.showInfoToast(safeContext, getString(R.string.msg_point_details_unavailable));
                 });
             }
-        }).start();
+        });
     }
 
     private void showPointDetailsDialog(ContentValues p) {
@@ -848,6 +855,15 @@ public class MapFragment extends Fragment {
         super.onResume();
         if (mapManager != null) {
             mapManager.onResume();
+            
+            // 🛡️ REPARACIÓN DE CRASHEO: Delay para asegurar que el layout esté calculado
+            // antes de intentar abrir InfoWindows de marcadores restaurados.
+            new Handler(Looper.getMainLooper()).postDelayed(() -> {
+                if (isMapActuallyVisible() && mapManager != null) {
+                    mapManager.restoreMarkers();
+                }
+            }, 300);
+
             mapManager.refreshMap();
             mapManager.invalidate(); 
         }
@@ -881,8 +897,13 @@ public class MapFragment extends Fragment {
             activeProgressDialog.dismiss();
         }
         activeProgressDialog = null;
+        
+        // 🛡️ CIERRE SEGURO: Liberar base de datos de mosaicos para evitar bloqueos en la sig. instancia
+        if (mapManager != null) {
+            mapManager.shutdown();
+        }
+        
         super.onDestroyView();
-        if (mapManager != null) mapManager.onDestroy();
         if (mapView != null) mapView.onDetach();
     }
 }

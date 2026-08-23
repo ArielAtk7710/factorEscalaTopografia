@@ -37,7 +37,7 @@
       </SelectionState>
       <SelectionState runConfigName="androidTest">
         <option name="selectionMode" value="DROPDOWN" />
-        <DropdownSelection timestamp="2026-08-09T23:53:56.694023100Z">
+        <DropdownSelection timestamp="2026-08-20T01:33:55.040453900Z">
           <Target type="DEFAULT_BOOT">
             <handle>
               <DeviceId pluginId="LocalEmulator" identifier="path=C:\Users\ArielAtk\.android\avd\Medium_Phone.avd" />

@@ -6,7 +6,6 @@ import android.os.Looper;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.PopupWindow;
 import android.widget.TextView;
@@ -43,48 +42,51 @@ public class UIUtils {
     }
 
     /**
-     * Crea una guía técnica sobre el ajuste de barómetro mediante un Popup temporal.
-     * Retorna la instancia para permitir al llamador cerrarla manualmente.
+     * Crea una guía técnica sobre el ajuste de barómetro mediante un Diálogo Pro.
      */
-    public static PopupWindow showBarometerInfo(Context context, View parentView) {
-        View popupView = LayoutInflater.from(context).inflate(R.layout.layout_barometer_info, null);
-        
-        final PopupWindow popupWindow = new PopupWindow(popupView, 
-                ViewGroup.LayoutParams.WRAP_CONTENT, 
-                ViewGroup.LayoutParams.WRAP_CONTENT, true);
+    public static void showBarometerInfo(Context context) {
+        View dv = LayoutInflater.from(context).inflate(R.layout.layout_barometer_info, null);
+        androidx.appcompat.app.AlertDialog.Builder b = new androidx.appcompat.app.AlertDialog.Builder(context);
+        androidx.appcompat.app.AlertDialog d = b.create();
+        if (d.getWindow() != null) d.getWindow().setBackgroundDrawableResource(android.R.color.transparent);
+        d.setView(dv);
 
-        popupWindow.setElevation(30);
-        popupWindow.setAnimationStyle(android.R.style.Animation_Dialog);
-        
-        // Centrar en la pantalla
-        popupWindow.showAtLocation(parentView, Gravity.CENTER, 0, 0);
+        dv.findViewById(R.id.btn_guide_close).setOnClickListener(v -> d.dismiss());
+        d.show();
+    }
 
-        // Auto-dismiss opcional o manual por el llamador
-        return popupWindow;
+    /**
+     * Muestra un diálogo de información profesional con el estilo unificado de la App.
+     */
+    public static void showProInfoDialog(Context context, String title, CharSequence content, int iconRes) {
+        View dv = LayoutInflater.from(context).inflate(R.layout.layout_dialog_info_pro, null);
+        androidx.appcompat.app.AlertDialog.Builder b = new androidx.appcompat.app.AlertDialog.Builder(context);
+        androidx.appcompat.app.AlertDialog d = b.create();
+        if (d.getWindow() != null) d.getWindow().setBackgroundDrawableResource(android.R.color.transparent);
+        d.setView(dv);
+
+        TextView txtTitle = dv.findViewById(R.id.txt_dialog_title);
+        TextView txtContent = dv.findViewById(R.id.txt_dialog_content);
+        ImageView imgIcon = dv.findViewById(R.id.img_dialog_icon);
+
+        txtTitle.setText(title);
+        txtContent.setText(content);
+        if (iconRes != 0) {
+            imgIcon.setImageResource(iconRes);
+            imgIcon.setColorFilter(context.getColor(R.color.accent_primary));
+        }
+
+        dv.findViewById(R.id.btn_dialog_close).setOnClickListener(v -> d.dismiss());
+        d.show();
     }
 
     /**
      * Crea una ventana flotante genérica con un título y un mensaje.
+     * Mantenido por compatibilidad, pero se recomienda usar showProInfoDialog.
      */
     public static PopupWindow showPopupInfo(Context context, View parentView, String title, String message) {
-        View popupView = LayoutInflater.from(context).inflate(R.layout.layout_map_guide, null);
-        
-        TextView txtTitle = popupView.findViewById(R.id.txt_guide_title);
-        TextView txtContent = popupView.findViewById(R.id.txt_guide_content);
-        
-        txtTitle.setText(title);
-        txtContent.setText(message);
-
-        final PopupWindow popupWindow = new PopupWindow(popupView, 
-                ViewGroup.LayoutParams.WRAP_CONTENT, 
-                ViewGroup.LayoutParams.WRAP_CONTENT, true);
-
-        popupWindow.setElevation(30);
-        popupWindow.setAnimationStyle(android.R.style.Animation_Dialog);
-        
-        popupWindow.showAtLocation(parentView, Gravity.CENTER, 0, 0);
-
-        return popupWindow;
+        showProInfoDialog(context, title, message, R.drawable.ic_info_round_blue);
+        return null; // Retornamos null ya que ahora es un diálogo, no un popup
     }
 
     public static void showConfirmDialog(Context context, int titleRes, int msgRes, Runnable onConfirm) {

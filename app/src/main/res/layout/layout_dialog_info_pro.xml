@@ -24,8 +24,8 @@
                 android:id="@+id/img_dialog_icon"
                 android:layout_width="32dp"
                 android:layout_height="32dp"
-                android:src="@drawable/ic_toast_warning"
-                android:contentDescription="Warning Icon" />
+                android:src="@drawable/ic_info_round_blue"
+                app:tint="@color/accent_primary" />
 
             <TextView
                 android:id="@+id/txt_dialog_title"
@@ -33,7 +33,7 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:layout_marginStart="12dp"
-                android:text="REPORTE DE SEGURIDAD"
+                android:text="TÍTULO"
                 android:textColor="@color/accent_orange"
                 android:textSize="18sp"
                 android:textStyle="bold" />
@@ -44,39 +44,14 @@
             android:layout_height="wrap_content"
             android:maxHeight="400dp">
 
-            <LinearLayout
+            <TextView
+                android:id="@+id/txt_dialog_content"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="vertical">
-
-                <TextView
-                    android:id="@+id/txt_dialog_desc"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:lineSpacingExtra="4sp"
-                    android:text="Descripción detallada..."
-                    android:textColor="@color/text_secondary"
-                    android:textSize="14sp"
-                    android:layout_marginBottom="16dp"/>
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:background="@drawable/bg_spinner_with_arrow"
-                    android:backgroundTint="@color/bg_surface_secondary"
-                    android:orientation="vertical"
-                    android:padding="16dp">
-
-                    <TextView
-                        android:id="@+id/txt_dialog_rec"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:text="Recomendación técnica..."
-                        android:textColor="@color/text_primary"
-                        android:textSize="14sp"
-                        android:textStyle="bold" />
-                </LinearLayout>
-            </LinearLayout>
+                android:lineSpacingExtra="4sp"
+                android:text="Contenido del mensaje informativo..."
+                android:textColor="@color/text_secondary"
+                android:textSize="14sp" />
         </androidx.core.widget.NestedScrollView>
 
         <com.google.android.material.button.MaterialButton

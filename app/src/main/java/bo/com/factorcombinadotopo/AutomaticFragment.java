@@ -292,17 +292,19 @@ public class AutomaticFragment extends Fragment {
     }
 
     private void showStaticModeHelpDialog() {
-        new AlertDialog.Builder(requireContext())
-                .setTitle("Ayuda: Modo Estático GNSS")
-                .setMessage("El Modo Estático estabiliza tus coordenadas mediante un promedio ponderado inteligente.\n\n" +
-                        "¿Cómo usarlo?\n" +
-                        "1. Coloca el equipo en un punto de control fijo.\n" +
-                        "2. Pulsa 'INICIAR ESTÁTICO' (el botón cambiará a verde).\n" +
-                        "3. Espera 15-30 segundos sin mover el dispositivo.\n\n" +
-                        "¿Qué hace la App?\n" +
-                        "Limpia el ruido de la señal y utiliza las posiciones con mejor precisión para fijar los decimales de tus coordenadas UTM y el Factor Combinado.")
-                .setPositiveButton("Entendido", null)
-                .show();
+        StringBuilder sb = new StringBuilder();
+        sb.append(getString(R.string.msg_static_mode_desc)).append("\n\n");
+        sb.append("<b>").append(getString(R.string.label_how_to_use)).append("</b>\n");
+        sb.append(getString(R.string.msg_static_step_1)).append("\n");
+        sb.append(getString(R.string.msg_static_step_2)).append("\n");
+        sb.append(getString(R.string.msg_static_step_3)).append("\n\n");
+        sb.append("<b>").append(getString(R.string.label_what_it_does)).append("</b>\n");
+        sb.append(getString(R.string.msg_static_benefit));
+
+        UIUtils.showProInfoDialog(requireContext(), 
+                getString(R.string.title_static_mode_help), 
+                android.text.Html.fromHtml(sb.toString(), android.text.Html.FROM_HTML_MODE_LEGACY), 
+                R.drawable.ic_precision);
     }
 
     private void showPrecisionDetailsDialog() {

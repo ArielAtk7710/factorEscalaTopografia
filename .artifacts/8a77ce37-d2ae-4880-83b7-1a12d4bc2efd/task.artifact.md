@@ -1,7 +1,5 @@
-- [x] Crear el nuevo recurso vectorial `ic_info_round_blue.xml`.
-- [x] Actualizar el icono de información en `fragment_automatic.xml`.
-- [x] Actualizar el icono de información en `fragment_stakeout.xml`.
-- [x] Actualizar los iconos de información en `dialog_settings.xml`.
-- [x] Actualizar el icono de información en `dialog_save_point_map.xml`.
-- [x] Actualizar el icono de información en `item_weather_detail_pro.xml`.
-- [x] Realizar prueba de compilación.
+- [x] Blindar `MapFragment.java` (Contexto seguro y validación de estado)
+- [x] Mejorar robustez en `MapManager.java` (Sincronización y protección de Bitmaps)
+- [x] Centralizar hilos en `TopographyRepository.java` (Eliminar `new Thread`)
+- [x] Asegurar tareas de fondo en `RegisterFragment.java`
+- [x] Verificar estabilidad global

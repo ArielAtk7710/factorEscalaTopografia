@@ -1,18 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+<com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     app:cardBackgroundColor="@color/bg_surface"
-    app:cardCornerRadius="16dp"
-    app:cardElevation="8dp"
-    android:layout_margin="16dp">
+    app:cardCornerRadius="24dp"
+    app:cardElevation="0dp">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:padding="20dp">
+        android:padding="24dp">
 
         <!-- Header -->
         <LinearLayout
@@ -29,7 +28,8 @@
                 app:tint="@color/accent_orange"
                 android:padding="4dp"
                 android:background="@drawable/bg_spinner_with_arrow"
-                android:backgroundTint="@color/bg_surface_secondary"/>
+                android:backgroundTint="@color/bg_surface_secondary"
+                android:contentDescription="Icono de Registro" />
 
             <TextView
                 android:layout_width="wrap_content"
@@ -93,7 +93,7 @@
             android:gravity="top|start" />
 
         <!-- Action Buttons -->
-        <Button
+        <com.google.android.material.button.MaterialButton
             android:id="@+id/btn_dialog_save"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -104,9 +104,10 @@
             app:iconGravity="textStart"
             app:backgroundTint="@color/accent_primary"
             android:textColor="@android:color/white"
-            android:textStyle="bold" />
+            android:textStyle="bold"
+            app:cornerRadius="12dp" />
 
-        <Button
+        <com.google.android.material.button.MaterialButton
             android:id="@+id/btn_dialog_cancel"
             style="@style/Widget.MaterialComponents.Button.OutlinedButton"
             android:layout_width="match_parent"
@@ -115,7 +116,8 @@
             android:text="@string/btn_cancel"
             android:textAllCaps="false"
             android:textColor="@color/text_secondary"
-            app:strokeColor="@color/divider" />
+            app:strokeColor="@color/divider"
+            app:cornerRadius="12dp" />
 
     </LinearLayout>
-</androidx.cardview.widget.CardView>
+</com.google.android.material.card.MaterialCardView>

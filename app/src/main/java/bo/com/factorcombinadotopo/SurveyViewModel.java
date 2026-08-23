@@ -106,8 +106,9 @@ public class SurveyViewModel extends AndroidViewModel {
             }
         });
 
-        // Disparar actualización de clima en segundo plano con control de umbral
-        shouldRefreshWeatherAuto(processedLoc);
+        // ❌ CARGA AUTOMÁTICA DESACTIVADA: El clima ahora se cargará bajo demanda 
+        // cuando el usuario entre a la pestaña de "Clima Vuelo Dron".
+        // shouldRefreshWeatherAuto(processedLoc);
     }
 
     public void startStaticMeasurement() {

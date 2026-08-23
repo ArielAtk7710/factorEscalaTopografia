@@ -244,13 +244,13 @@
                 android:textSize="12sp"
                 android:textStyle="bold" />
 
-            <!-- Caché Callejera -->
+            <!-- Caché Única (Callejero y Satelital) -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
                 android:gravity="center_vertical"
-                android:layout_marginBottom="4dp">
+                android:layout_marginBottom="6dp">
 
                 <LinearLayout
                     android:layout_width="0dp"
@@ -279,52 +279,6 @@
 
                 <Button
                     android:id="@+id/btn_clear_cache_street"
-                    style="?attr/materialButtonOutlinedStyle"
-                    android:layout_width="wrap_content"
-                    android:layout_height="36dp"
-                    android:layout_marginStart="6dp"
-                    android:text="@string/btn_clean"
-                    android:textSize="9sp"
-                    android:paddingHorizontal="8dp"
-                    app:strokeColor="@color/accent_light"
-                    android:textColor="@color/accent_light" />
-            </LinearLayout>
-
-            <!-- Caché Satelital -->
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:gravity="center_vertical"
-                android:layout_marginBottom="6dp">
-
-                <LinearLayout
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:background="@color/bg_surface"
-                    android:padding="10dp"
-                    android:orientation="horizontal"
-                    android:gravity="center_vertical">
-                    <TextView
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:text="@string/label_cache_sat"
-                        android:textColor="@color/text_secondary"
-                        android:textSize="10sp" />
-                    <TextView
-                        android:id="@+id/txt_cache_size_sat"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="0 MB"
-                        android:textColor="@color/accent_orange"
-                        android:textStyle="bold"
-                        android:textSize="12sp" />
-                </LinearLayout>
-
-                <Button
-                    android:id="@+id/btn_clear_cache_sat"
                     style="?attr/materialButtonOutlinedStyle"
                     android:layout_width="wrap_content"
                     android:layout_height="36dp"

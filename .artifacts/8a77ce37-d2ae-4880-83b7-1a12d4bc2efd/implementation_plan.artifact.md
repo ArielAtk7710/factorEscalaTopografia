@@ -1,45 +1,42 @@
-# Plan de Unificación Visual: Iconos de Información
+# Plan de Implementación: Activación de Herramientas de Ingeniería Topográfica
 
-Este plan detalla la unificación de los iconos de información en los módulos de **Modo Replanteo** y **Automático** para que coincidan con el estilo premium utilizado en los Ajustes del Sistema.
+Este plan detalla la activación de una serie de motores de cálculo "dormidos" (clases IGM) para crear nuevas herramientas profesionales en el menú lateral de la aplicación.
 
 ## User Review Required
 
 > [!IMPORTANT]
-> Los iconos de información pasarán de ser simples imágenes a botones con el estilo "Box" (fondo gris suave redondeado y marca de agua) similar al que se usa junto al Modelo Geoidal en Ajustes. Esto mejorará la accesibilidad táctil.
-
-## Estilo a Replicar (Referencia: Ajustes)
-- **Fondo**: `@drawable/bg_spinner_with_arrow`
-- **Tinte de Fondo**: `@color/bg_surface_secondary`
-- **Tinte de Icono**: `@color/accent_light` (Azul Suave)
-- **Dimensiones**: Se ajustarán a **32dp x 32dp** para armonizar con los botones de acción (`MaterialButton`) de los fragmentos, manteniendo la proporción visual.
+> Se habilitarán 4 nuevas secciones en el menú lateral bajo la categoría "HERRAMIENTAS DE INGENIERÍA". Estas herramientas utilizan algoritmos avanzados del IGM (Instituto Geográfico Militar) para cálculos de alta precisión.
 
 ## Proposed Changes
 
-### 1. Interfaz de Usuario (UI)
+### 1. Activación de Motores de Cálculo (Desbloqueo de Clases)
+Se eliminarán los comentarios de bloque en las siguientes clases técnicas para que el compilador pueda utilizarlas:
+- `IGMGeodesicCalculator.java`: Algoritmos de Bowring y Vincenty para distancias geodésicas.
+- `IGMDistanceReducer.java`: Reducción de distancias inclinadas al horizonte y elipsoide.
+- `IGMLineCalculator.java`: Cálculos entre dos puntos UTM (Distancia, Azimut, Convergencia).
+- `IGMLambertConverter.java`: Conversión entre coordenadas geográficas y la proyección Lambert (específica para Bolivia).
+- `IGMSurveyCalculator.java`: Cálculos de topografía plana y rumbos.
 
-#### [MODIFY] [fragment_automatic.xml](file:///D:/Desarrollo-Software/Proyectos%20Android/factorEscala/app/src/main/res/layout/fragment_automatic.xml)
-- Cambiar `btn_gnss_info` de `ImageView` a `ImageButton` (o aplicar el estilo al actual).
-- Aplicar:
-    - `android:layout_width="32dp"`
-    - `android:layout_height="32dp"`
-    - `android:background="@drawable/bg_spinner_with_arrow"`
-    - `android:backgroundTint="@color/bg_surface_secondary"`
-    - `app:tint="@color/accent_light"`
-    - `android:padding="6dp"` (para que el icono se vea centrado y de buen tamaño).
+### 2. Nuevas Vistas (Fragments)
+Se crearán 4 nuevos fragmentos con interfaces de usuario profesionales:
+- `GeodesicFragment.java`: Interfaz para problemas geodésicos directos e inversos.
+- `DistanceReductionFragment.java`: Calculadora de reducción de distancias.
+- `LineCalculatorFragment.java`: Herramienta para cálculo entre dos coordenadas UTM.
+- `LambertFragment.java`: Conversor específico para la proyección oficial de Bolivia.
 
-#### [MODIFY] [fragment_stakeout.xml](file:///D:/Desarrollo-Software/Proyectos%20Android/factorEscala/app/src/main/res/layout/fragment_stakeout.xml)
-- Replicar exactamente la misma configuración para `btn_stakeout_info`.
-- Esto reemplazará el icono azul plano actual por el botón estilizado.
+### 3. Actualización de Navegación
 
-### 2. Lógica de Código
+#### [MODIFY] [drawer_menu.xml](file:///D:/Desarrollo-Software/Proyectos Android/factorEscala/app/src/main/res/menu/drawer_menu.xml)
+- Añadir una nueva categoría `<item android:title="Herramientas de Ingeniería">`.
+- Incluir los 4 nuevos accesos directos con iconos técnicos.
 
-#### [MODIFY] [AutomaticFragment.java](file:///D:/Desarrollo-Software/Proyectos%20Android/factorEscala/app/src/main/java/bo/com/factorcombinadotopo/AutomaticFragment.java)
-#### [MODIFY] [StakeoutFragment.java](file:///D:/Desarrollo-Software/Proyectos%20Android/factorEscala/app/src/main/java/bo/com/factorcombinadotopo/StakeoutFragment.java)
-- Asegurar que los bindings se manejen correctamente si se cambia el tipo de vista de `ImageView` a `ImageButton` (aunque `View` suele ser suficiente).
+#### [MODIFY] [MainActivity.java](file:///D:/Desarrollo-Software/Proyectos Android/factorEscala/app/src/main/java/bo/com/factorcombinadotopo/MainActivity.java)
+- Implementar los métodos `showGeodesic()`, `showDistanceReduction()`, `showLineCalculator()` y `showLambert()` para gestionar el intercambio de fragmentos.
 
 ## Verification Plan
 
 ### Manual Verification
-1. **Consistencia**: Comparar lado a lado el botón de información de "Modelo Geoidal" (en Ajustes) con el nuevo botón en "Modo Replanteo". Deben tener el mismo color de fondo y diseño de borde.
-2. **Interactividad**: Confirmar que el área de toque es cómoda y que el diálogo se abre correctamente al pulsar.
-3. **Alineación**: Verificar que el nuevo tamaño de 32dp se alinea perfectamente con los títulos y botones vecinos en los card headers.
+1.  Desplegar la app y abrir el menú lateral.
+2.  Verificar que aparezca la nueva sección con las 4 herramientas.
+3.  Entrar a cada herramienta y realizar un cálculo de prueba comparando con los resultados esperados (ej. Vincenty para distancias largas).
+4.  Asegurar que la navegación de regreso al inicio (ViewPager) funcione correctamente.

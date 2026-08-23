@@ -119,7 +119,7 @@ public class TopographyRepository {
 
                 callback.onResult(res, isMgb);
 
-                new Thread(() -> fetchTemperatureIfNeeded(lat, lon)).start();
+                executor.execute(() -> fetchTemperatureIfNeeded(lat, lon));
 
             } catch (Exception e) {
                 callback.onError(e);
@@ -160,9 +160,8 @@ public class TopographyRepository {
 
                 callback.onResult(res, isMgb);
 
-                // Ejecutar actualización de temperatura en un hilo separado totalmente independiente
-                // para evitar que el pool de hilos de cálculo (3 hilos) se agote por Timeouts de red.
-                new Thread(() -> fetchTemperatureIfNeeded(loc.getLatitude(), loc.getLongitude())).start();
+                // Ejecutar actualización de temperatura de forma controlada en el executor
+                executor.execute(() -> fetchTemperatureIfNeeded(loc.getLatitude(), loc.getLongitude()));
 
             } catch (Exception e) {
                 callback.onError(e);

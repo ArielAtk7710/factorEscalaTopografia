@@ -44,23 +44,19 @@ public class SurveyApplication extends Application {
         // 1. Configurar directorios de osmdroid
         org.osmdroid.config.IConfigurationProvider osmConfig = org.osmdroid.config.Configuration.getInstance();
         
-        // Leer preferencia de mapa para inicializar la carpeta de caché correcta desde el arranque
-        SharedPreferences prefs = getSharedPreferences("AppPrefs", MODE_PRIVATE);
-        int mapType = prefs.getInt(MapManager.KEY_MAP_TYPE, 0);
-        String cacheFolder = (mapType == 1) ? "tiles_sat" : "tiles_street";
-
         File extDir = getExternalFilesDir(null);
         if (extDir != null) {
             File osmdroidDir = new File(extDir, "osmdroid");
             if (!osmdroidDir.exists()) osmdroidDir.mkdirs();
             
             osmConfig.setOsmdroidBasePath(osmdroidDir);
-            osmConfig.setOsmdroidTileCache(new File(osmdroidDir, cacheFolder));
+            // Unificar en una sola carpeta de caché para ambas capas
+            osmConfig.setOsmdroidTileCache(new File(osmdroidDir, "tiles_cache"));
         }
 
-        // Optimización para Uso Offline (500 MB por capa)
-        osmConfig.setTileFileSystemCacheMaxBytes(500L * 1024 * 1024); 
-        osmConfig.setTileFileSystemCacheTrimBytes(450L * 1024 * 1024); 
+        // Optimización para Uso Offline (1GB unificado)
+        osmConfig.setTileFileSystemCacheMaxBytes(1024L * 1024 * 1024); 
+        osmConfig.setTileFileSystemCacheTrimBytes(900L * 1024 * 1024); 
         osmConfig.setTileDownloadThreads((short) 8); // Descarga acelerada
         osmConfig.setExpirationExtendedDuration(30L * 24 * 60 * 60 * 1000); // 30 días de persistencia offline
 
