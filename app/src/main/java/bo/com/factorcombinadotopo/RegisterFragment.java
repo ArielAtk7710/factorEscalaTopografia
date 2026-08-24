@@ -152,14 +152,18 @@ public class RegisterFragment extends Fragment {
     }
 
     private void eliminarSeleccionados() {
+        if (!isAdded()) return;
+        final Context safeContext = getContext();
+        if (safeContext == null) return;
+
         if (selectedIds.isEmpty()) {
-            UIUtils.showWarningToast(requireContext(), getString(R.string.msg_no_points_selected));
+            UIUtils.showWarningToast(safeContext, getString(R.string.msg_no_points_selected));
             toggleSelectionMode();
             return;
         }
 
-        UIUtils.showConfirmDialog(requireContext(), R.string.dialog_delete_title, R.string.dialog_delete_msg, () -> {
-            TopographyRepository.getInstance(requireContext()).runOnBackground(() -> {
+        UIUtils.showConfirmDialog(safeContext, R.string.dialog_delete_title, R.string.dialog_delete_msg, () -> {
+            TopographyRepository.getInstance(safeContext).runOnBackground(() -> {
                 for (int id : selectedIds) {
                     if (activeTab == 0) dbHelper.eliminarPunto(id);
                     else dbHelper.eliminarLibreta(id);
@@ -167,7 +171,7 @@ public class RegisterFragment extends Fragment {
                 if (getActivity() != null) {
                     getActivity().runOnUiThread(() -> {
                         if (isAdded()) {
-                            UIUtils.showSuccessToast(requireContext(), getString(R.string.msg_point_deleted));
+                            UIUtils.showSuccessToast(safeContext, getString(R.string.msg_point_deleted));
                             toggleSelectionMode();
                             cargarDatos();
                         }
@@ -178,8 +182,12 @@ public class RegisterFragment extends Fragment {
     }
 
     private void exportarSeleccionados() {
+        if (!isAdded()) return;
+        final Context safeContext = getContext();
+        if (safeContext == null) return;
+
         if (selectedIds.isEmpty()) {
-            UIUtils.showWarningToast(requireContext(), getString(R.string.msg_no_points_selected));
+            UIUtils.showWarningToast(safeContext, getString(R.string.msg_no_points_selected));
             toggleSelectionMode();
             return;
         }
@@ -197,9 +205,12 @@ public class RegisterFragment extends Fragment {
 
     private void showExportOptionsDialog() {
         if (!isAdded()) return;
+        final Context safeContext = getContext();
+        if (safeContext == null) return;
         
-        View dv = getLayoutInflater().inflate(R.layout.dialog_export_options, null);
-        AlertDialog.Builder b = new AlertDialog.Builder(requireContext());
+        LayoutInflater inflater = LayoutInflater.from(safeContext);
+        View dv = inflater.inflate(R.layout.dialog_export_options, null);
+        AlertDialog.Builder b = new AlertDialog.Builder(safeContext);
         AlertDialog d = b.create();
         if (d.getWindow() != null) d.getWindow().setBackgroundDrawableResource(android.R.color.transparent);
         d.setView(dv);
@@ -207,16 +218,16 @@ public class RegisterFragment extends Fragment {
         dv.findViewById(R.id.btn_export_txt).setOnClickListener(v -> {
             if (activeTab == 0) exportarHistorialTxt(puntosList, "Completo");
             else exportarLibretaTxt(libretaList, "Completo_Libreta");
-            d.dismiss();
+            UIUtils.safeDismissDialog(d);
         });
 
         dv.findViewById(R.id.btn_export_json).setOnClickListener(v -> {
             exportarDatosJson();
-            d.dismiss();
+            UIUtils.safeDismissDialog(d);
         });
 
-        dv.findViewById(R.id.btn_export_cancel).setOnClickListener(v -> d.dismiss());
-        d.show();
+        dv.findViewById(R.id.btn_export_cancel).setOnClickListener(v -> UIUtils.safeDismissDialog(d));
+        UIUtils.safeShowDialog(d);
     }
 
     private void exportarDatosJson() {
@@ -527,14 +538,18 @@ public class RegisterFragment extends Fragment {
             h.btnShare.setOnClickListener(v -> compartirPunto(p));
             h.btnDelete.setVisibility(isSelectionMode ? View.GONE : View.VISIBLE);
             h.btnDelete.setOnClickListener(v -> {
-                UIUtils.showConfirmDialog(requireContext(), R.string.dialog_delete_title, R.string.dialog_delete_msg_single, () -> {
-                    TopographyRepository.getInstance(requireContext()).runOnBackground(() -> {
+                if (!isAdded()) return;
+                final Context safeContext = getContext();
+                if (safeContext == null) return;
+
+                UIUtils.showConfirmDialog(safeContext, R.string.dialog_delete_title, R.string.dialog_delete_msg_single, () -> {
+                    TopographyRepository.getInstance(safeContext).runOnBackground(() -> {
                         dbHelper.eliminarPunto(p.id);
                         if (getActivity() != null) {
                             getActivity().runOnUiThread(() -> {
                                 if (isAdded()) {
                                     cargarPuntos();
-                                    UIUtils.showSuccessToast(requireContext(), getString(R.string.msg_point_deleted));
+                                    UIUtils.showSuccessToast(safeContext, getString(R.string.msg_point_deleted));
                                 }
                             });
                         }
@@ -605,14 +620,18 @@ public class RegisterFragment extends Fragment {
             h.btnShare.setOnClickListener(v -> compartirLibreta(e));
             h.btnDelete.setVisibility(isSelectionMode ? View.GONE : View.VISIBLE);
             h.btnDelete.setOnClickListener(v -> {
-                UIUtils.showConfirmDialog(requireContext(), R.string.dialog_delete_title, R.string.dialog_delete_msg_single, () -> {
-                    TopographyRepository.getInstance(requireContext()).runOnBackground(() -> {
+                if (!isAdded()) return;
+                final Context safeContext = getContext();
+                if (safeContext == null) return;
+
+                UIUtils.showConfirmDialog(safeContext, R.string.dialog_delete_title, R.string.dialog_delete_msg_single, () -> {
+                    TopographyRepository.getInstance(safeContext).runOnBackground(() -> {
                         dbHelper.eliminarLibreta(e.id);
                         if (getActivity() != null) {
                             getActivity().runOnUiThread(() -> {
                                 if (isAdded()) {
                                     cargarLibreta();
-                                    UIUtils.showSuccessToast(requireContext(), getString(R.string.msg_point_deleted));
+                                    UIUtils.showSuccessToast(safeContext, getString(R.string.msg_point_deleted));
                                 }
                             });
                         }

@@ -150,6 +150,23 @@
                     android:textSize="13sp"
                     android:layout_marginBottom="16dp" />
 
+                <!-- Section 7: Engineering -->
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/guide_section_eng_title"
+                    android:textColor="@color/accent_primary"
+                    android:textSize="15sp"
+                    android:textStyle="bold"
+                    android:layout_marginBottom="4dp" />
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/guide_section_eng_body"
+                    android:textColor="@color/text_secondary"
+                    android:textSize="13sp"
+                    android:layout_marginBottom="16dp" />
+
             </LinearLayout>
         </androidx.core.widget.NestedScrollView>
 

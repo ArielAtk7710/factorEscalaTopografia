@@ -263,13 +263,18 @@ public class AutomaticFragment extends Fragment {
     }
 
     private void showSavePointDialog() {
+        if (!isAdded()) return;
+        final Context safeContext = getContext();
+        if (safeContext == null) return;
+        
         if (lastResult == null) {
-            UIUtils.showWarningToast(requireContext(), getString(R.string.msg_gps_no_signal));
+            UIUtils.showWarningToast(safeContext, getString(R.string.msg_gps_no_signal));
             return;
         }
 
-        View dv = getLayoutInflater().inflate(R.layout.dialog_save_point, null);
-        AlertDialog.Builder b = new AlertDialog.Builder(requireContext());
+        LayoutInflater inflater = LayoutInflater.from(safeContext);
+        View dv = inflater.inflate(R.layout.dialog_save_point, null);
+        AlertDialog.Builder b = new AlertDialog.Builder(safeContext);
         AlertDialog d = b.create();
         if (d.getWindow() != null) d.getWindow().setBackgroundDrawableResource(android.R.color.transparent);
         d.setView(dv);
@@ -284,11 +289,11 @@ public class AutomaticFragment extends Fragment {
                 return;
             }
             ejecutarGuardado(name, etObs.getText().toString());
-            d.dismiss();
+            UIUtils.safeDismissDialog(d);
         });
 
-        dv.findViewById(R.id.btn_dialog_cancel).setOnClickListener(v -> d.dismiss());
-        d.show();
+        dv.findViewById(R.id.btn_dialog_cancel).setOnClickListener(v -> UIUtils.safeDismissDialog(d));
+        UIUtils.safeShowDialog(d);
     }
 
     private void showStaticModeHelpDialog() {
@@ -360,7 +365,11 @@ public class AutomaticFragment extends Fragment {
     }
 
     private void ejecutarGuardado(String name, String notes) {
-        DatabaseHelper db = DatabaseHelper.getInstance(requireContext());
+        if (!isAdded()) return;
+        final Context safeContext = getContext();
+        if (safeContext == null) return;
+
+        DatabaseHelper db = DatabaseHelper.getInstance(safeContext);
         ContentValues v = new ContentValues();
         String time = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault()).format(new Date());
 
@@ -392,11 +401,11 @@ public class AutomaticFragment extends Fragment {
         
         v.put(DatabaseHelper.COLUMN_NOTAS, notes.isEmpty() ? getString(R.string.label_no_observations) : notes);
 
-        TopographyRepository.getInstance(requireContext()).runOnBackground(() -> {
+        TopographyRepository.getInstance(safeContext).runOnBackground(() -> {
             db.insertarPunto(v);
             new Handler(Looper.getMainLooper()).post(() -> {
                 if (isAdded()) {
-                    UIUtils.showSuccessToast(requireContext(), getString(R.string.msg_point_saved_format, name));
+                    UIUtils.showSuccessToast(safeContext, getString(R.string.msg_point_saved_format, name));
                 }
             });
         });

@@ -1,15 +1,14 @@
 package bo.com.factorcombinadotopo;
 
-/*
 /**
  * Topografía plana: azimut, rumbo, problema directo/inverso.
  * Fórmulas idénticas a calcular_1_007 .. calcular_7_007 del JS.
- * /
+ */
 public class IGMSurveyCalculator {
 
     /**
      * Azimut inverso (±180°).
-     * /
+     */
     public static double inverseAzimuth(double azimuth) {
         double inv = azimuth + 180.0;
         return inv >= 360.0 ? inv - 360.0 : inv;
@@ -17,14 +16,14 @@ public class IGMSurveyCalculator {
 
     /**
      * Rumbo con dirección cardinal (NE/NW/SE/SW).
-     * /
+     */
     public static String toBearing(double azimuth) {
         if (azimuth < 0 || azimuth > 360) {
             azimuth = ((azimuth % 360.0) + 360.0) % 360.0;
         }
         double angle = 0.0;
         String dir = "";
-        if (angle <= 90.0) {
+        if (azimuth <= 90.0) {
             angle = 90.0 - azimuth;
             dir = "N" + String.format(java.util.Locale.US, "%.2f", angle) + "°E";
         } else if (azimuth <= 180.0) {
@@ -42,7 +41,7 @@ public class IGMSurveyCalculator {
 
     /**
      * Problema directo: punto + distancia + azimut -> nuevo punto.
-     * /
+     */
     public static double[] direct(double x0, double y0, double dist, double azimuth) {
         double azRad = Math.toRadians(azimuth);
         double x1 = x0 + dist * Math.sin(azRad);
@@ -52,7 +51,7 @@ public class IGMSurveyCalculator {
 
     /**
      * Problema inverso: 2 puntos -> distancia + azimut.
-     * /
+     */
     public static InverseResult inverse(double x0, double y0, double x1, double y1) {
         double dx = x1 - x0;
         double dy = y1 - y0;
@@ -71,4 +70,3 @@ public class IGMSurveyCalculator {
         public double azimuth;
     }
 }
-*/

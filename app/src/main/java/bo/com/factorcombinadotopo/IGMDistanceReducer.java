@@ -1,10 +1,9 @@
 package bo.com.factorcombinadotopo;
 
-/*
 /**
  * Reducción de distancias al elipsoide.
  * Fórmulas idénticas a calcular_1_03 del JS.
- * /
+ */
 public class IGMDistanceReducer {
 
     public static class Result {
@@ -22,7 +21,7 @@ public class IGMDistanceReducer {
      * @param hb  altura punto B (m)
      * @param latRad latitud en radianes
      * @param ellip elipsoide
-     * /
+     */
     public static Result reduce(double dab, double ha, double hb, double latRad,
                                  IGMConstants.Ellipsoid ellip) {
         double a = ellip.a;
@@ -47,4 +46,3 @@ public class IGMDistanceReducer {
         return res;
     }
 }
-*/

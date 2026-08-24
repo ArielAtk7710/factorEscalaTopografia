@@ -130,6 +130,13 @@ public class ManualFragment extends Fragment {
 
         this.btn_guardar = view.findViewById(R.id.btn_guardar);
         this.btn_guardar.setOnClickListener(v -> guardarResultados());
+
+        view.findViewById(R.id.btn_manual_info).setOnClickListener(v -> {
+            UIUtils.showProInfoDialog(requireContext(), 
+                    "INGRESO MANUAL", 
+                    android.text.Html.fromHtml(getString(R.string.guide_manual_body), android.text.Html.FROM_HTML_MODE_LEGACY), 
+                    R.drawable.ic_info_round_blue);
+        });
     }
 
     private void guardarResultados() {
@@ -161,8 +168,13 @@ public class ManualFragment extends Fragment {
     }
 
     private void showSaveDialogInternal() {
-        View dv = getLayoutInflater().inflate(R.layout.dialog_save_point, null);
-        AlertDialog.Builder b = new AlertDialog.Builder(requireContext());
+        if (!isAdded()) return;
+        final Context safeContext = getContext();
+        if (safeContext == null) return;
+
+        LayoutInflater inflater = LayoutInflater.from(safeContext);
+        View dv = inflater.inflate(R.layout.dialog_save_point, null);
+        AlertDialog.Builder b = new AlertDialog.Builder(safeContext);
         AlertDialog dialog = b.create();
         if (dialog.getWindow() != null) dialog.getWindow().setBackgroundDrawableResource(android.R.color.transparent);
         dialog.setView(dv);
@@ -174,16 +186,19 @@ public class ManualFragment extends Fragment {
             String name = etPointName.getText().toString().trim();
             if (name.isEmpty()) { etPointName.setError(getString(R.string.hint_point_name)); return; }
             ejecutarGuardadoManual(name, etPointNotes.getText().toString());
-            dialog.dismiss();
+            UIUtils.safeDismissDialog(dialog);
         });
 
-        dv.findViewById(R.id.btn_dialog_cancel).setOnClickListener(v -> dialog.dismiss());
-        dialog.show();
+        dv.findViewById(R.id.btn_dialog_cancel).setOnClickListener(v -> UIUtils.safeDismissDialog(dialog));
+        UIUtils.safeShowDialog(dialog);
     }
 
     private void ejecutarGuardadoManual(String nombrePunto, String notas) {
         if (!isAdded()) return;
-        DatabaseHelper dbHelper = DatabaseHelper.getInstance(requireContext());
+        final Context safeContext = getContext();
+        if (safeContext == null) return;
+
+        DatabaseHelper dbHelper = DatabaseHelper.getInstance(safeContext);
         ContentValues values = new ContentValues();
         String timeStampLocal = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault()).format(new Date());
 
@@ -217,7 +232,7 @@ public class ManualFragment extends Fragment {
         String finalNotes = (notas == null || notas.trim().isEmpty()) ? getString(R.string.label_no_observations) : notas.trim();
         values.put(DatabaseHelper.COLUMN_NOTAS, finalNotes);
         dbHelper.insertarPunto(values);
-        UIUtils.showSuccessToast(requireContext(), getString(R.string.msg_point_saved_format, nombrePunto));
+        UIUtils.showSuccessToast(safeContext, getString(R.string.msg_point_saved_format, nombrePunto));
     }
 
     public void limpiar() {

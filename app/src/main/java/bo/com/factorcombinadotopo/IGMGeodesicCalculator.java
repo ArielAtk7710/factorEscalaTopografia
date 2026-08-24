@@ -1,11 +1,10 @@
 package bo.com.factorcombinadotopo;
 
-/*
 /**
  * Cálculos geodésicos: Bowring y Vincenty.
  * Fórmulas idénticas a calcular_1_004, calcular_2_004,
  * calcular_3_004 y calcular_4_004 del JS.
- * /
+ */
 public class IGMGeodesicCalculator {
 
     public static class GeoResult {
@@ -18,7 +17,7 @@ public class IGMGeodesicCalculator {
 
     /**
      * Bowring Directo (calcular_1_004 del JS).
-     * /
+     */
     public static GeoResult bowringDirect(double lat1, double lon1, double azimuth,
                                           double distance, IGMConstants.Ellipsoid ellip) {
         double a = ellip.a;
@@ -71,7 +70,7 @@ public class IGMGeodesicCalculator {
 
     /**
      * Bowring Inverso (calcular_2_004 del JS).
-     * /
+     */
     public static GeoResult bowringInverse(double lat1, double lon1, double lat2, double lon2,
                                            IGMConstants.Ellipsoid ellip) {
         double a = ellip.a;
@@ -131,7 +130,7 @@ public class IGMGeodesicCalculator {
     /**
      * Vincenty Directo (calcular_3_004 del JS).
      * Iterativo con while (sigma - lastSigma > 1e-15).
-     * /
+     */
     public static GeoResult vincentyDirect(double lat1, double lon1, double azimuth,
                                            double distance, IGMConstants.Ellipsoid ellip) {
         double a = ellip.a;
@@ -187,7 +186,7 @@ public class IGMGeodesicCalculator {
 
     /**
      * Vincenty Inverso (calcular_4_004 del JS).
-     * /
+     */
     public static GeoResult vincentyInverse(double lat1, double lon1, double lat2, double lon2,
                                             IGMConstants.Ellipsoid ellip) {
         double a = ellip.a;
@@ -247,4 +246,3 @@ public class IGMGeodesicCalculator {
         return r;
     }
 }
-*/

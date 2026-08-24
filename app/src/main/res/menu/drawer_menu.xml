@@ -25,5 +25,21 @@
             android:id="@+id/nav_weather"
             android:icon="@drawable/ic_pressure"
             android:title="@string/menu_weather_drone" />
+        <item
+            android:id="@+id/nav_geodesic"
+            android:icon="@drawable/ic_ruler_diagonal_pro"
+            android:title="Cálculos Geodésicos" />
+        <item
+            android:id="@+id/nav_distance_reduction"
+            android:icon="@drawable/ic_tape_measure_pro"
+            android:title="Reducción Distancias" />
+        <item
+            android:id="@+id/nav_line_calculator"
+            android:icon="@drawable/ic_stakeout_arrow_pro"
+            android:title="Línea UTM" />
+        <item
+            android:id="@+id/nav_lambert"
+            android:icon="@drawable/ic_area_polygon_pro"
+            android:title="Lambert Bolivia" />
     </group>
 </menu>

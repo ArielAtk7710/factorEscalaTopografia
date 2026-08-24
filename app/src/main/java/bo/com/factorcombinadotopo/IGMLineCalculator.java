@@ -1,10 +1,9 @@
 package bo.com.factorcombinadotopo;
 
-/*
 /**
  * Línea entre 2 puntos UTM.
  * Fórmulas idénticas a calcular6_4 del JS.
- * /
+ */
 public class IGMLineCalculator {
 
     public static class LineResult {
@@ -16,7 +15,7 @@ public class IGMLineCalculator {
 
     /**
      * Calcula distancia plana, acimut y convergencia entre 2 puntos UTM.
-     * /
+     */
     public static LineResult calculate(double east1, double north1, double east2, double north2,
                                         int zone, String hemisphere) {
         IGMCoordinate.GeoPoint geo1 = IGMUtmConverter.inverse(east1, north1, zone,
@@ -42,4 +41,3 @@ public class IGMLineCalculator {
         return r;
     }
 }
-*/

@@ -1,5 +1,6 @@
 package bo.com.factorcombinadotopo;
 
+import android.content.Context;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.location.Location;
@@ -388,8 +389,13 @@ public class WeatherFragment extends Fragment {
     }
 
     private void showSafetyDetailsDialog(WeatherManager.SafetyStatus status) {
-        View dv = getLayoutInflater().inflate(R.layout.layout_dialog_safety_details, null);
-        androidx.appcompat.app.AlertDialog.Builder b = new androidx.appcompat.app.AlertDialog.Builder(requireContext());
+        if (!isAdded()) return;
+        final Context safeContext = getContext();
+        if (safeContext == null) return;
+
+        LayoutInflater inflater = LayoutInflater.from(safeContext);
+        View dv = inflater.inflate(R.layout.layout_dialog_safety_details, null);
+        androidx.appcompat.app.AlertDialog.Builder b = new androidx.appcompat.app.AlertDialog.Builder(safeContext);
         androidx.appcompat.app.AlertDialog d = b.create();
         if (d.getWindow() != null) d.getWindow().setBackgroundDrawableResource(android.R.color.transparent);
         d.setView(dv);
@@ -429,8 +435,8 @@ public class WeatherFragment extends Fragment {
         }
         imgIcon.setColorFilter(tint);
 
-        dv.findViewById(R.id.btn_dialog_close).setOnClickListener(v -> d.dismiss());
-        d.show();
+        dv.findViewById(R.id.btn_dialog_close).setOnClickListener(v -> UIUtils.safeDismissDialog(d));
+        UIUtils.safeShowDialog(d);
     }
 
     // Adaptadores

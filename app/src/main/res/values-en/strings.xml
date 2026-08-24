@@ -340,9 +340,9 @@
     <string name="title_terms_conditions">📜 Terms and Conditions of Use</string>
     <string name="terms_body">By using FactorEscalaTop v2.4, you formally accept the following terms and conditions:\n\n
         <b>Geographic Scope:</b> The application is designed and calibrated exclusively for the reference systems and cartographic grid of Bolivia.\n\n
-        <b>Technical Support Tool:</b> The data provided is for guidance only and does not replace certified procedures or professional equipment. The new <b>GNSS Processing Layer</b> improves stability but does not eliminate mobile hardware intrinsic error.\n\n
+        <b>Technical Support Tool:</b> The data provided is for guidance only and does not replace certified procedures or professional equipment. The new <b>Engineering Suite</b> includes engines for Vincenty, Distance Reduction, and Lambert Projection.\n\n
         <b>Reference Systems:</b> The app utilizes official <b>MGBol08</b> models and the global <b>EGM2008</b> standard for geodetic precision.\n\n
-        <b>Connectivity and APIs:</b> "Online Height" and "Weather" functions depend on third-party services (Open-Meteo, Esri). The app guarantees 100% offline operability for basic topographic calculations and cached maps.\n\n
+        <b>Connectivity and APIs:</b> "Online Height" and "Weather" functions depend on third-party services. The app guarantees 100% offline operability for basic topographic calculations and engineering tools.\n\n
         <b>User Responsibility:</b> It is the professional\'s exclusive obligation to verify, validate, and certify all calculations before their application in formal projects.\n\n
         <b>Regulatory Compliance:</b> The user agrees to use the tool in accordance with Law 164 and current regulations in the Plurinational State of Bolivia.</string>
 
@@ -360,9 +360,10 @@
     <string name="title_about_detailed">ℹ️ About FactorEscalaTop</string>
     <string name="about_version_region"><b>Version:</b> 2.4 (Pro Stability)\n<b>Region:</b> Plurinational State of Bolivia</string>
     <string name="about_app_description">Professional application for topographic and geodetic support, calibrated for the Bolivian cartographic grid. Optimized in v2.4 with:\n\n
-        • <b>Stakeout Mode</b>: Point import (.txt) and assisted navigation.\n
-        • <b>Advanced GNSS Processing</b>: Coordinate stabilization via weighted average and jump detection (Outliers).\n
-        • <b>Independent Map Cache</b>: Separate management for street and satellite maps (Total Offline Mode).\n
+        • <b>Engineering Suite</b>: Engines for Vincenty, distance reduction, and official Lambert projection.\n
+        • <b>Stakeout Mode</b>: Point import (.txt) and assisted navigation with proximity alerts.\n
+        • <b>GNSS Pro Processing</b>: Coordinate stabilization via precision filter and jump detection.\n
+        • <b>Unified Cache (1GB)</b>: Optimized management for street and satellite maps (Total Offline Mode).\n
         • <b>IGM Factors</b>: Calculation of scale, elevation, and combined factors with 9-decimal precision.\n\n
         <b>🎖️ Technically endorsed for field support by professionals in the field.</b></string>
 
@@ -412,6 +413,9 @@
     <string name="guide_section_data_title">6. Data Management</string>
     <string name="guide_section_data_body">Export your surveys in <b>TXT</b> for human reports or <b>JSON</b> for direct integration with GIS/CAD software from the RECORDS tab.</string>
 
+    <string name="guide_section_eng_title">7. Engineering Tools</string>
+    <string name="guide_section_eng_body">Access advanced calculations from the side menu: <b>Geodesic (Vincenty)</b> for long baselines, <b>Reduction</b> to the ellipsoid, <b>UTM Line</b> and conversion to <b>Lambert Bolivia</b>. Each allows copying and sharing the technical report.</string>
+
     <string name="title_confirm_cache_street">Confirm Street Cache Clear</string>
     <string name="msg_confirm_cache_street">Do you want to delete the street map cache?</string>
     <string name="title_confirm_cache_sat">Confirm Satellite Cache Clear</string>
@@ -460,7 +464,52 @@
     <string name="msg_offline_warning">Online feature unavailable. Working in Offline Mode (Local Sensors only).</string>
     <string name="msg_weather_offline">Weather analysis requires an Internet connection.</string>
     <string name="title_stakeout_guide">Professional Stakeout Guide</string>
-    <string name="stakeout_guide_body"><b>1. DATA IMPORT (.txt):</b>\n
+    <string name="guide_geodesic_body"><b><font color="#F97316">GEODESIC CALCULATIONS:</font></b>\n
+        This tool solves the fundamental problems of geodesy on the WGS84 ellipsoid using <b>Vincenty\'s</b> algorithms.\n\n
+        • <b>DIRECT:</b> Allows finding the coordinates of a destination point from an initial point, an azimuth, and a distance.\n
+        • <b>INVERSE:</b> Calculates the geodesic distance and azimuths between two known coordinates.\n\n
+        Ideal for calculating long baselines where Earth\'s curvature is significant.</string>
+
+    <string name="guide_distance_reduction_body"><b><font color="#F97316">DISTANCE REDUCTION:</font></b>\n
+        Allows transforming a distance measured on the ground (Slope) to its equivalent value on the reference ellipsoid.\n\n
+        <b>PROCESS:</b>\n
+        1. <b>Horizontal Reduction:</b> Eliminates the effect of the elevation difference between points A and B.\n
+        2. <b>Ellipsoidal Reduction:</b> Projects the horizontal distance to the ellipsoid surface considering the mean height.\n\n
+        Essential for linking Total Station measurements with GNSS geodetic networks.</string>
+
+    <string name="guide_line_calculator_body"><b><font color="#F97316">UTM LINE CALCULATOR:</font></b>\n
+        Calculates geometric parameters between two coordinates projected in the UTM system.\n\n
+        • <b>Grid Distance:</b> Direct distance on the cartographic grid.\n
+        • <b>Grid Azimuth:</b> Angle relative to Grid North.\n
+        • <b>Meridian Convergence:</b> Angular difference between Geographic North and Grid North at each point.\n\n
+        Useful for civil engineering and urban cadastre projects.</string>
+
+    <string name="guide_lambert_body"><b><font color="#F97316">BOLIVIA LAMBERT PROJECTION:</font></b>\n
+        Specialized converter for the <b>LCC (Lambert Conformal Conic)</b> projection, officially used in Bolivia for regional scale mapping.\n\n
+        Allows bidirectional transformation between geographic coordinates (Lat/Lon) and Lambert plane coordinates (X, Y) maintaining angle conformity.\n\n
+        Configured with standard parameters for the Bolivian territory.</string>
+
+    <string name="guide_manual_body"><b><font color="#F97316">MANUAL DATA ENTRY:</font></b>\n
+        Module designed for processing individual coordinates entered via keyboard.\n\n
+        • <b>UTM Projection:</b> Enter metric coordinates (E, N), zone, and hemisphere to obtain correction factors.\n
+        • <b>Geodesic:</b> Enter Latitude and Longitude in decimal format.\n\n
+        The system will automatically apply the geoid model selected in settings for height and pressure calculations.</string>
+
+    <string name="guide_field_notebook_body"><b><font color="#F97316">DIGITAL FIELD NOTEBOOK:</font></b>\n
+        Optimizes the recording of topographic radiation directly from the mobile.\n\n
+        <b>REQUIRED DATA:</b>\n
+        • <b>Station:</b> Identification and instrument height.\n
+        • <b>Reference:</b> Sighted point for orientation.\n
+        • <b>Radiation:</b> ID of the auxiliary point and its metric coordinates.\n\n
+        Data is securely saved in the local database and can be exported from the RECORDS tab.</string>
+
+    <string name="guide_compass_body"><b><font color="#F97316">PROFESSIONAL COMPASS AND LEVEL:</font></b>\n
+        Support tool for orientation and sensor leveling.\n\n
+        • <b>Azimuth:</b> Real-time reading of the angle relative to Geographic North.\n
+        • <b>Bubble Level:</b> Visual indicator to ensure device horizontality (Crucial for GNSS precision).\n
+        • <b>Technical Panel:</b> Displays current location and GPS-synchronized UTM coordinates.</string>
+
+    <string name="stakeout_guide_body"><b><font color="#F97316">1. DATA IMPORT (.txt):</font></b>\n
         Each line of the file must follow this exact comma-separated format:\n
         <i>Name, EastE, NorthN, UTM, Zone, Hemisphere</i>\n
         Ex: P01, 816663.123E, 8088744.094N, UTM, 19, S\n\n

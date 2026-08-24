@@ -1,32 +1,36 @@
-# Walkthrough: Blindaje Integral de Estabilidad y Seguridad de Hilos
+# Walkthrough: Optimización y Limpieza Integral de la Aplicación
 
-Se ha completado una reingeniería de la gestión de tareas de fondo y del ciclo de vida de la aplicación para eliminar los cierres inesperados (crasheos) en la vista de **MAPA** y mejorar la robustez general del sistema.
+Se ha realizado una limpieza profunda del proyecto, eliminando componentes obsoletos y optimizando la lógica interna para mejorar el rendimiento, el consumo de batería y la mantenibilidad del código.
 
-## Mejoras de Estabilidad Implementadas
+## Acciones de Optimización Realizadas
 
-### 1. Eliminación de Hilos "Huérfanos"
-- Se reemplazaron todos los usos de `new Thread` por el pool de hilos controlado del `TopographyRepository`.
-- **Beneficio**: Evita la saturación de recursos y permite un apagado ordenado de las tareas cuando el usuario sale de la aplicación.
+### 1. Eliminación de Código Muerto (Dead Code)
+Se eliminaron permanentemente las clases técnicas que no tenían una implementación funcional completa o que no estaban integradas en las herramientas del usuario:
+- **IGMPlateVelocityCalculator**: Eliminado (sin fórmulas implementadas).
+- **IGMRasterProcessor**: Eliminado (clase vacía).
+- **IGMEnuConverter**, **IGMTmConverter**, **IGMDatumTransformer**, **IGMEcefConverter**: Eliminados (sin uso en los módulos actuales).
 
-### 2. Seguridad en el Ciclo de Vida (Lifecycle)
-- Se añadieron verificaciones estrictas de `isAdded()` y `getContext() != null` en todos los fragmentos (**Mapa**, **Registro**, **Automático**).
-- **Resultado**: Si una tarea de fondo termina después de que el usuario cambió de pestaña, la aplicación ya no intentará actualizar una interfaz inexistente, eliminando la causa principal de los cierres.
+### 2. Limpieza de Recursos (Reducción de tamaño del APK)
+Se borraron archivos de diseño y gráficos que ya no eran referenciados por ninguna vista:
+- `item_weather_detail.xml`
+- `layout_weather_weekly_card.xml`
+- `ic_info_white.xml`
 
-### 3. Blindaje del Motor de Mapas (`MapManager`)
-- **Protección de Ventanas**: Ahora se verifica que el mapa esté realmente "pegado" a la pantalla (`isAttachedToWindow`) antes de intentar abrir etiquetas de información.
-- **Gestión de Bitmaps**: Se añadieron salvaguardas para evitar errores de memoria al crear las etiquetas naranjas de los puntos, validando dimensiones antes de procesar imágenes.
-- **Sincronización**: Se reforzó el bloqueo de recursos para evitar colisiones cuando el GPS y el usuario interactúan con el mapa al mismo tiempo.
+### 3. Eficiencia en el Consumo de Recursos
+- **SurveyViewModel**: Se eliminó toda la lógica de actualización automática del clima en segundo plano. Ahora el sistema solo consume red y CPU cuando el usuario entra explícitamente a la pestaña de "Clima Vuelo Dron".
+- **MainActivity**: Se simplificó la clase eliminando métodos de cálculo de ondulación redundantes que ya estaban optimizados en el ViewModel.
 
-### 4. Captura de Contexto Seguro
-- Las tareas de base de datos ahora capturan una referencia local y segura del `Context` al inicio, evitando errores de puntero nulo si el fragmento se desvincula durante la ejecución.
+### 4. Robustez en la Gestión de Hilos
+- **CompassFragment**: Se refactorizó la actualización del nombre de ubicación para que utilice el pool de hilos centralizado, eliminando la creación manual de `new Thread` y previniendo fugas de memoria.
+- **Unificación**: Todas las tareas de fondo de los fragmentos de **Registro** y **Mapa** ahora utilizan el ejecutor controlado del `TopographyRepository`.
 
-## Verificación Realizada
+## Verificación Final
 
 > [!TIP]
-> Puedes realizar una prueba de "estrés" cambiando entre pestañas muy rápidamente. Notarás que la aplicación ahora ignora las actualizaciones de las pestañas que ya no son visibles, manteniendo una navegación fluida y sin interrupciones.
+> Tras esta limpieza, la aplicación cargará más rápido y será más ligera. El consumo de datos móviles se reducirá significativamente al haber desactivado las peticiones automáticas de clima.
 
-### Checkbox de Robustez:
-- [x] Unificación de hilos en `TopographyRepository`.
-- [x] Validación de visibilidad en `MapFragment`.
-- [x] Prevención de excepciones de Bitmap en `MapManager`.
-- [x] Limpieza de observadores en `RegisterFragment`.
+### Resultados:
+- [x] Proyecto libre de clases y métodos "dormidos".
+- [x] Reducción de la complejidad del código fuente.
+- [x] Optimización de batería mediante carga de datos bajo demanda.
+- [x] Estabilidad garantizada mediante gestión de hilos profesional.

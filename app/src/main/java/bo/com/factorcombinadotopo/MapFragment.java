@@ -68,6 +68,8 @@ public class MapFragment extends Fragment {
     private static final int PERMISSION_REQUEST_CODE = 200;
     private static boolean hasCenteredOnce = false; // Memoria de centrado inicial único
     private AlertDialog activeProgressDialog;
+    private final Handler stabilityHandler = new Handler(Looper.getMainLooper());
+    private Runnable pendingMarkersRunnable;
 
     // Lógica de polígonos y distancias
     private boolean isDrawingArea = false;
@@ -199,9 +201,12 @@ public class MapFragment extends Fragment {
 
     private void showSavePointDialogMap() {
         if (!isAdded()) return;
+        final Context safeContext = getContext();
+        if (safeContext == null) return;
 
-        View dv = getLayoutInflater().inflate(R.layout.dialog_save_point_map, null);
-        AlertDialog.Builder b = new AlertDialog.Builder(requireContext());
+        LayoutInflater inflater = LayoutInflater.from(safeContext);
+        View dv = inflater.inflate(R.layout.dialog_save_point_map, null);
+        AlertDialog.Builder b = new AlertDialog.Builder(safeContext);
         AlertDialog d = b.create();
         if (d.getWindow() != null) d.getWindow().setBackgroundDrawableResource(android.R.color.transparent);
         d.setView(dv);
@@ -213,9 +218,11 @@ public class MapFragment extends Fragment {
 
         if (btnInfo != null) {
             btnInfo.setOnClickListener(v -> {
-                UIUtils.showPopupInfo(requireContext(), dv, 
-                        getString(R.string.label_height_info), 
-                        getString(R.string.msg_gps_toggle_info));
+                if (isAdded()) {
+                    UIUtils.showPopupInfo(safeContext, dv, 
+                            getString(R.string.label_height_info), 
+                            getString(R.string.msg_gps_toggle_info));
+                }
             });
         }
 
@@ -229,19 +236,20 @@ public class MapFragment extends Fragment {
 
             boolean useGps = toggleGps.getCheckedButtonId() == R.id.btn_toggle_gps_on;
             ejecutarGuardadoMapa(name, etObs.getText().toString(), useGps);
-            d.dismiss();
+            UIUtils.safeDismissDialog(d);
         });
 
-        dv.findViewById(R.id.btn_dialog_cancel).setOnClickListener(v -> d.dismiss());
-        d.show();
+        dv.findViewById(R.id.btn_dialog_cancel).setOnClickListener(v -> UIUtils.safeDismissDialog(d));
+        UIUtils.safeShowDialog(d);
     }
 
     private void ejecutarGuardadoMapa(String name, String notes, boolean useGps) {
         if (!isAdded() || getContext() == null) return;
-        Context context = getContext();
+        final Context context = getContext();
 
         // 1. Mostrar Spin de Carga
-        View progressView = getLayoutInflater().inflate(R.layout.layout_dialog_progress, null);
+        LayoutInflater inflater = LayoutInflater.from(context);
+        View progressView = inflater.inflate(R.layout.layout_dialog_progress, null);
         TextView txtProgress = progressView.findViewById(R.id.txt_progress_label);
         if (txtProgress != null) txtProgress.setText(getString(R.string.msg_saving_data));
 
@@ -250,10 +258,18 @@ public class MapFragment extends Fragment {
                 .setCancelable(false)
                 .create();
         if (activeProgressDialog.getWindow() != null) activeProgressDialog.getWindow().setBackgroundDrawableResource(android.R.color.transparent);
-        activeProgressDialog.show();
+        UIUtils.safeShowDialog(activeProgressDialog);
 
         // 2. Obtener Coordenada del Centro (Cruz Naranja)
+        if (mapView == null) {
+            UIUtils.safeDismissDialog(activeProgressDialog);
+            return;
+        }
         IGeoPoint center = mapView.getMapCenter();
+        if (center == null) {
+            UIUtils.safeDismissDialog(activeProgressDialog);
+            return;
+        }
         double lat = center.getLatitude();
         double lon = center.getLongitude();
 
@@ -338,10 +354,10 @@ public class MapFragment extends Fragment {
 
     private void persistirPuntoMapa(TopoCalculoManager.TopoResult res, String name, String notes, boolean isMgb, String dem, String prec, AlertDialog dialog) {
         if (!isAdded() || getContext() == null) {
-            if (dialog != null && dialog.isShowing()) dialog.dismiss();
+            UIUtils.safeDismissDialog(dialog);
             return;
         }
-        Context context = getContext();
+        final Context context = getContext();
         DatabaseHelper db = DatabaseHelper.getInstance(context);
         ContentValues v = new ContentValues();
         String time = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault()).format(new Date());
@@ -372,25 +388,23 @@ public class MapFragment extends Fragment {
 
         TopographyRepository.getInstance(context).runOnBackground(() -> {
             db.insertarPunto(v);
-            new Handler(Looper.getMainLooper()).postDelayed(() -> {
+            new Handler(Looper.getMainLooper()).post(() -> {
                 if (isAdded()) {
-                    if (activeProgressDialog != null && activeProgressDialog.isShowing()) {
-                        activeProgressDialog.dismiss();
-                    }
+                    UIUtils.safeDismissDialog(activeProgressDialog);
                     UIUtils.showSuccessToast(requireContext(), getString(R.string.msg_point_saved_format, name));
                     if (mapManager != null) {
                         mapManager.addManualMarker(new GeoPoint(res.lat, res.lon), name);
                     }
                 }
                 activeProgressDialog = null;
-            }, 500);
+            });
         });
     }
 
     private void handleGuardadoError(Exception e, AlertDialog dialog) {
         new Handler(Looper.getMainLooper()).post(() -> {
-            if (isAdded() && dialog != null && dialog.isShowing()) {
-                dialog.dismiss();
+            if (isAdded()) {
+                UIUtils.safeDismissDialog(dialog);
                 UIUtils.showErrorToast(requireContext(), getString(R.string.err_technical_prefix) + e.getMessage());
             }
         });
@@ -831,6 +845,8 @@ public class MapFragment extends Fragment {
     private void updateCenterCoordinates() {
         if (mapView == null || txtLat == null || txtLon == null) return;
         IGeoPoint center = mapView.getMapCenter();
+        if (center == null) return;
+        
         txtLat.setText(String.format(Locale.getDefault(), "LAT: %.6f", center.getLatitude()));
         txtLon.setText(String.format(Locale.getDefault(), "LON: %.6f", center.getLongitude()));
     }
@@ -858,11 +874,12 @@ public class MapFragment extends Fragment {
             
             // 🛡️ REPARACIÓN DE CRASHEO: Delay para asegurar que el layout esté calculado
             // antes de intentar abrir InfoWindows de marcadores restaurados.
-            new Handler(Looper.getMainLooper()).postDelayed(() -> {
+            pendingMarkersRunnable = () -> {
                 if (isMapActuallyVisible() && mapManager != null) {
                     mapManager.restoreMarkers();
                 }
-            }, 300);
+            };
+            stabilityHandler.postDelayed(pendingMarkersRunnable, 300);
 
             mapManager.refreshMap();
             mapManager.invalidate(); 
@@ -887,15 +904,16 @@ public class MapFragment extends Fragment {
     @Override
     public void onPause() {
         super.onPause();
+        if (stabilityHandler != null && pendingMarkersRunnable != null) {
+            stabilityHandler.removeCallbacks(pendingMarkersRunnable);
+        }
         if (mapManager != null) mapManager.onPause();
         requireContext().unregisterReceiver(gpsStatusReceiver);
     }
 
     @Override
     public void onDestroyView() {
-        if (activeProgressDialog != null && activeProgressDialog.isShowing()) {
-            activeProgressDialog.dismiss();
-        }
+        UIUtils.safeDismissDialog(activeProgressDialog);
         activeProgressDialog = null;
         
         // 🛡️ CIERRE SEGURO: Liberar base de datos de mosaicos para evitar bloqueos en la sig. instancia

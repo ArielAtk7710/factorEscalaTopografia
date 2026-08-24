@@ -46,7 +46,6 @@ public class CompassFragment extends Fragment implements SensorEventListener {
 
     private SurveyViewModel viewModel;
     private long lastLocationRequestTime = 0;
-    private Thread geocoderThread;
 
     @Nullable
     @Override
@@ -82,6 +81,13 @@ public class CompassFragment extends Fragment implements SensorEventListener {
         // ViewModel compartido con la Actividad
         viewModel = new ViewModelProvider(requireActivity()).get(SurveyViewModel.class);
         setupViewModelObservers();
+
+        view.findViewById(R.id.btn_compass_info).setOnClickListener(v -> {
+            UIUtils.showProInfoDialog(requireContext(), 
+                    "BRÚJULA PRO", 
+                    android.text.Html.fromHtml(getString(R.string.guide_compass_body), android.text.Html.FROM_HTML_MODE_LEGACY), 
+                    R.drawable.ic_info_round_blue);
+        });
     }
 
     private void setupViewModelObservers() {
@@ -119,29 +125,24 @@ public class CompassFragment extends Fragment implements SensorEventListener {
             return;
         }
 
-        // Cancelar hilo previo si existe
-        if (geocoderThread != null && geocoderThread.isAlive()) {
-            geocoderThread.interrupt();
-        }
+        final Context safeContext = getContext();
+        if (safeContext == null) return;
 
-        geocoderThread = new Thread(() -> {
+        TopographyRepository.getInstance(safeContext).runOnBackground(() -> {
             try {
-                Geocoder geocoder = new Geocoder(requireContext(), Locale.getDefault());
+                Geocoder geocoder = new Geocoder(safeContext, Locale.getDefault());
                 List<Address> addresses = geocoder.getFromLocation(lat, lon, 1);
                 
-                if (Thread.interrupted()) return;
-
                 if (addresses != null && !addresses.isEmpty()) {
                     String city = addresses.get(0).getLocality();
                     String country = addresses.get(0).getCountryName();
-                    String locationName = (city != null ? city + ", " : "") + country;
+                    final String locationName = (city != null ? city + ", " : "") + country;
                     new Handler(Looper.getMainLooper()).post(() -> {
                         if (isAdded() && txtLocation != null) txtLocation.setText(locationName);
                     });
                 }
             } catch (Exception ignored) {}
         });
-        geocoderThread.start();
     }
 
     @Override
@@ -155,9 +156,6 @@ public class CompassFragment extends Fragment implements SensorEventListener {
     public void onPause() {
         super.onPause();
         if (sensorManager != null) sensorManager.unregisterListener(this);
-        if (geocoderThread != null && geocoderThread.isAlive()) {
-            geocoderThread.interrupt();
-        }
     }
 
     @Override

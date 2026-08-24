@@ -1,5 +1,6 @@
-- [x] Blindar `MapFragment.java` (Contexto seguro y validación de estado)
-- [x] Mejorar robustez en `MapManager.java` (Sincronización y protección de Bitmaps)
-- [x] Centralizar hilos en `TopographyRepository.java` (Eliminar `new Thread`)
-- [x] Asegurar tareas de fondo en `RegisterFragment.java`
-- [x] Verificar estabilidad global
+- [x] Eliminar clases inactivas del IGM
+- [x] Eliminar recursos XML obsoletos
+- [x] Limpiar código muerto en `MainActivity.java`
+- [x] Optimizar `SurveyViewModel.java` (Eliminar carga automática de clima)
+- [x] Refactorizar hilos en `CompassFragment.java`
+- [x] Verificar integridad del proyecto (Compilación)

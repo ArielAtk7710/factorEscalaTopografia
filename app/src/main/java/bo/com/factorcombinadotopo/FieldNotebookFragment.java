@@ -59,6 +59,13 @@ public class FieldNotebookFragment extends Fragment {
 
         btnGuardar.setOnClickListener(v -> guardarEnLibreta());
         btnCancelar.setOnClickListener(v -> limpiarFormulario());
+
+        view.findViewById(R.id.btn_notebook_info).setOnClickListener(v -> {
+            UIUtils.showProInfoDialog(requireContext(), 
+                    "LIBRETA DE CAMPO", 
+                    android.text.Html.fromHtml(getString(R.string.guide_field_notebook_body), android.text.Html.FROM_HTML_MODE_LEGACY), 
+                    R.drawable.ic_info_round_blue);
+        });
     }
 
     private void guardarEnLibreta() {

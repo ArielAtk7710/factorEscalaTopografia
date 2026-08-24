@@ -383,9 +383,9 @@
     <string name="title_terms_conditions">📜 Términos y Condiciones de Uso</string>
     <string name="terms_body">Al utilizar FactorEscalaTop v2.4, aceptas formalmente los siguientes términos y condiciones:\n\n
         <b>Alcance Geográfico:</b> La aplicación está diseñada y calibrada exclusivamente para los sistemas de referencia y la grilla cartográfica de Bolivia.\n\n
-        <b>Herramienta de Apoyo Técnico:</b> Los datos suministrados son de carácter orientativo y no sustituyen los procedimientos ni equipos profesionales certificados. La nueva <b>Capa de Procesamiento GNSS</b> mejora la estabilidad, pero no elimina el error intrínseco del hardware móvil.\n\n
+        <b>Herramienta de Apoyo Técnico:</b> Los datos suministrados son de carácter orientativo y no sustituyen los procedimientos ni equipos profesionales certificados. La nueva <b>Suite de Ingeniería</b> incluye motores para Vincenty, Reducción de Distancias y Proyección Lambert.\n\n
         <b>Sistemas de Referencia:</b> La app utiliza los modelos oficiales <b>MGBol08</b> y el estándar global <b>EGM2008</b> para la precisión geodésica.\n\n
-        <b>Conectividad y APIs:</b> Las funciones de "Altura Online" y "Clima" dependen de servicios de terceros (Open-Meteo, Esri). La app garantiza operatividad 100% offline para cálculos topográficos básicos y mapas en caché.\n\n
+        <b>Conectividad y APIs:</b> Las funciones de "Altura Online" y "Clima" dependen de servicios de terceros. La app garantiza operatividad 100% offline para cálculos topográficos básicos y herramientas de ingeniería.\n\n
         <b>Responsabilidad del Usuario:</b> Es obligación exclusiva del profesional verificar, validar y certificar todos los cálculos antes de su aplicación en proyectos formales.\n\n
         <b>Cumplimiento Normativo:</b> El usuario se compromete a utilizar la herramienta en conformidad con la Ley 164 y normativa vigente en el Estado Plurinacional de Bolivia.</string>
 
@@ -403,9 +403,10 @@
     <string name="title_about_detailed">ℹ️ Acerca de FactorEscalaTop</string>
     <string name="about_version_region"><b>Versión:</b> 2.4 (Estabilidad Pro)\n<b>Región:</b> Estado Plurinacional de Bolivia</string>
     <string name="about_app_description">Aplicación profesional para el apoyo topográfico y geodésico, calibrada para la grilla cartográfica boliviana. Optimizada en la v2.4 con:\n\n
-        • <b>Modo Replanteo</b>: Importación de puntos (.txt) y navegación asistida.\n
-        • <b>Procesamiento GNSS Avanzado</b>: Estabilización de coordenadas mediante promedio ponderado y detección de saltos (Outliers).\n
-        • <b>Caché de Mapas Independiente</b>: Gestión separada para mapas de calles y satélite (Modo Offline Total).\n
+        • <b>Suite de Ingeniería</b>: Motores de Vincenty, reducción de distancias y proyección Lambert oficial.\n
+        • <b>Modo Replanteo</b>: Importación de puntos (.txt) y navegación asistida con aviso de proximidad.\n
+        • <b>Procesamiento GNSS Pro</b>: Estabilización de coordenadas mediante filtro de precisión y detección de saltos.\n
+        • <b>Caché Unificada (1GB)</b>: Gestión optimizada para mapas de calles y satélite (Modo Offline Total).\n
         • <b>Factores IGM</b>: Cálculo de escala, altura y combinado con precisión de 9 decimales.\n\n
         <b>🎖️ Avalada técnicamente para apoyo en campo por profesionales del área.</b></string>
 
@@ -459,6 +460,9 @@
     <string name="guide_section_data_title">6. Gestión de Datos</string>
     <string name="guide_section_data_body">Exporta tus levantamientos en <b>TXT</b> para reportes humanos o <b>JSON</b> para integración directa con software GIS/CAD desde la pestaña REGISTROS.</string>
 
+    <string name="guide_section_eng_title">7. Herramientas de Ingeniería</string>
+    <string name="guide_section_eng_body">Accede desde el menú lateral a cálculos avanzados: <b>Geodésica (Vincenty)</b> para líneas base largas, <b>Reducción</b> al elipsoide, <b>Línea UTM</b> y conversión a <b>Lambert Bolivia</b>. Cada una permite copiar y compartir el reporte técnico.</string>
+
     <string name="label_height_gps_disp">Altura GPS Disp.</string>
     <string name="label_height_online_dem">Altura online DEM</string>
     <string name="msg_navigating_to">Navegando a posición...</string>
@@ -503,6 +507,51 @@
     <string name="msg_offline_warning">Función Online no disponible. Trabajando en modo Offline (Solo Sensores Locales).</string>
     <string name="msg_weather_offline">El análisis meteorológico requiere conexión a Internet.</string>
     <string name="title_stakeout_guide">Guía de Replanteo Profesional</string>
+    <string name="guide_geodesic_body"><b><font color="#F97316">CÁLCULOS GEODÉSICOS:</font></b>\n
+        Esta herramienta resuelve los problemas fundamentales de la geodesia sobre el elipsoide WGS84 utilizando los algoritmos de <b>Vincenty</b>.\n\n
+        • <b>DIRECTO:</b> Permite hallar las coordenadas de un punto destino a partir de un punto inicial, un azimut y una distancia.\n
+        • <b>INVERSO:</b> Calcula la distancia geodésica y los azimuts entre dos coordenadas conocidas.\n\n
+        Ideal para cálculos de líneas bases largas donde la curvatura terrestre es significativa.</string>
+
+    <string name="guide_distance_reduction_body"><b><font color="#F97316">REDUCCIÓN DE DISTANCIAS:</font></b>\n
+        Permite transformar una distancia medida en el terreno (Inclinada) a su valor equivalente sobre el elipsoide de referencia.\n\n
+        <b>PROCESO:</b>\n
+        1. <b>Reducción al Horizonte:</b> Elimina el efecto del desnivel entre los puntos A y B.\n
+        2. <b>Reducción al Elipsoide:</b> Proyecta la distancia horizontal a la superficie del elipsoide considerando la altura media.\n\n
+        Esencial para vincular mediciones de Estación Total con redes geodésicas GNSS.</string>
+
+    <string name="guide_line_calculator_body"><b><font color="#F97316">LÍNEA ENTRE PUNTOS UTM:</font></b>\n
+        Calcula los parámetros geométricos entre dos coordenadas proyectadas en el sistema UTM.\n\n
+        • <b>Distancia Plana:</b> Distancia directa sobre la cuadrícula cartográfica.\n
+        • <b>Acimut de Cuadrícula:</b> Ángulo respecto al Norte de cuadrícula.\n
+        • <b>Convergencia de Meridianos:</b> Diferencia angular entre el Norte Geográfico y el Norte de Cuadrícula en cada punto.\n\n
+        Útil para proyectos de ingeniería civil y catastro urbano.</string>
+
+    <string name="guide_lambert_body"><b><font color="#F97316">PROYECCIÓN LAMBERT BOLIVIA:</font></b>\n
+        Conversor especializado para la proyección <b>LCC (Lambert Conformal Conic)</b>, utilizada oficialmente en Bolivia para cartografía de escala regional.\n\n
+        Permite la transformación bidireccional entre coordenadas geográficas (Lat/Lon) y coordenadas planas Lambert (X, Y) manteniendo la conformidad de los ángulos.\n\n
+        Configurada con los parámetros estándar para el territorio boliviano.</string>
+
+    <string name="guide_manual_body"><b><font color="#F97316">INGRESO MANUAL DE DATOS:</font></b>\n
+        Módulo diseñado para el procesamiento de coordenadas puntuales ingresadas por teclado.\n\n
+        • <b>Proyección UTM:</b> Ingrese coordenadas métricas (E, N), zona y hemisferio para obtener factores de corrección.\n
+        • <b>Geodésicas:</b> Ingrese Latitud y Longitud en formato decimal.\n\n
+        El sistema aplicará automáticamente el modelo geoidal seleccionado en ajustes para el cálculo de alturas y presión.</string>
+
+    <string name="guide_field_notebook_body"><b><font color="#F97316">LIBRETA DE CAMPO DIGITAL:</font></b>\n
+        Optimiza el registro de radiaciones topográficas directamente desde el móvil.\n\n
+        <b>DATOS REQUERIDOS:</b>\n
+        • <b>Estación:</b> Identificación y altura del instrumento.\n
+        • <b>Referencia:</b> Punto visado para orientación.\n
+        • <b>Radiación:</b> ID del punto auxiliar y sus coordenadas métricas.\n\n
+        Los datos se guardan de forma segura en la base de datos local y pueden ser exportados desde la pestaña REGISTROS.</string>
+
+    <string name="guide_compass_body"><b><font color="#F97316">BRÚJULA PROFESIONAL Y NIVEL:</font></b>\n
+        Herramienta de apoyo para orientación y nivelación de sensores.\n\n
+        • <b>Acimut:</b> Lectura en tiempo real del ángulo respecto al Norte Geográfico.\n
+        • <b>Nivel de Burbuja:</b> Indicador visual para asegurar la horizontalidad del dispositivo (Crucial para precisión GNSS).\n
+        • <b>Panel Técnico:</b> Muestra la ubicación actual y coordenadas UTM sincronizadas con el GPS.</string>
+
     <string name="stakeout_guide_body"><b><font color="#F97316">1. FORMATO DE ARCHIVO (.txt):</font></b>\n
         Para una carga correcta, el archivo debe ser de texto plano separado por <b>COMAS</b>. Cada línea debe seguir este orden estricto:\n\n
         <i>Nombre, EsteE, NorteN, UTM, Zona, Hemisferio</i>\n\n

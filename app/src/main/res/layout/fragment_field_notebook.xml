@@ -19,27 +19,38 @@
             android:orientation="vertical"
             android:padding="12dp">
 
-            <!-- HEADER -->
-            <LinearLayout
+            <!-- HEADER UNIFICADO -->
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/layout_header_notebook"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:gravity="center_vertical"
-                android:layout_marginBottom="12dp">
-                <ImageView
-                    android:layout_width="32dp"
-                    android:layout_height="32dp"
-                    android:src="@drawable/ic_notebook"
-                    app:tint="@color/accent_light" />
+                android:layout_marginBottom="16dp">
+
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="LIBRETA DE CAMPO"
-                    android:textColor="@color/accent_light"
-                    android:textSize="20sp"
+                    android:textColor="@color/accent_orange"
+                    android:textSize="14sp"
                     android:textStyle="bold"
-                    android:layout_marginStart="12dp" />
-            </LinearLayout>
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+                <ImageView
+                    android:id="@+id/btn_notebook_info"
+                    android:layout_width="28dp"
+                    android:layout_height="28dp"
+                    android:background="?attr/selectableItemBackgroundBorderless"
+                    android:clickable="true"
+                    android:contentDescription="Información"
+                    android:focusable="true"
+                    android:src="@drawable/ic_info_round_blue"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+            </androidx.constraintlayout.widget.ConstraintLayout>
 
             <!-- 1. ESTACIÓN BASE -->
             <TextView

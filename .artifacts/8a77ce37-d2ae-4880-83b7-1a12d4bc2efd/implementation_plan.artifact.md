@@ -1,42 +1,53 @@
-# Plan de Implementación: Activación de Herramientas de Ingeniería Topográfica
+# Plan de Implementación: Optimización y Limpieza Integral de la App
 
-Este plan detalla la activación de una serie de motores de cálculo "dormidos" (clases IGM) para crear nuevas herramientas profesionales en el menú lateral de la aplicación.
+Este plan describe las acciones para eliminar código muerto, recursos redundantes y optimizar la lógica interna para mejorar la eficiencia y el rendimiento de **FactorEscalaTop**.
 
 ## User Review Required
 
-> [!IMPORTANT]
-> Se habilitarán 4 nuevas secciones en el menú lateral bajo la categoría "HERRAMIENTAS DE INGENIERÍA". Estas herramientas utilizan algoritmos avanzados del IGM (Instituto Geográfico Militar) para cálculos de alta precisión.
+> [!WARNING]
+> Se eliminarán permanentemente las clases técnicas del IGM que no han sido vinculadas a ninguna herramienta del menú lateral (`PlateVelocity`, `RasterProcessor`, `EnuConverter`, `TmConverter`, `DatumTransformer`, `EcefConverter`). Esto simplificará enormemente el mantenimiento del proyecto.
 
 ## Proposed Changes
 
-### 1. Activación de Motores de Cálculo (Desbloqueo de Clases)
-Se eliminarán los comentarios de bloque en las siguientes clases técnicas para que el compilador pueda utilizarlas:
-- `IGMGeodesicCalculator.java`: Algoritmos de Bowring y Vincenty para distancias geodésicas.
-- `IGMDistanceReducer.java`: Reducción de distancias inclinadas al horizonte y elipsoide.
-- `IGMLineCalculator.java`: Cálculos entre dos puntos UTM (Distancia, Azimut, Convergencia).
-- `IGMLambertConverter.java`: Conversión entre coordenadas geográficas y la proyección Lambert (específica para Bolivia).
-- `IGMSurveyCalculator.java`: Cálculos de topografía plana y rumbos.
+### 1. Eliminación de Clases Inactivas (Java)
 
-### 2. Nuevas Vistas (Fragments)
-Se crearán 4 nuevos fragmentos con interfaces de usuario profesionales:
-- `GeodesicFragment.java`: Interfaz para problemas geodésicos directos e inversos.
-- `DistanceReductionFragment.java`: Calculadora de reducción de distancias.
-- `LineCalculatorFragment.java`: Herramienta para cálculo entre dos coordenadas UTM.
-- `LambertFragment.java`: Conversor específico para la proyección oficial de Bolivia.
+Se eliminarán los siguientes archivos por no tener referencias activas ni funcionalidad vinculada a la UI:
+- [DELETE] `IGMPlateVelocityCalculator.java`
+- [DELETE] `IGMRasterProcessor.java`
+- [DELETE] `IGMEnuConverter.java`
+- [DELETE] `IGMTmConverter.java`
+- [DELETE] `IGMDatumTransformer.java`
+- [DELETE] `IGMEcefConverter.java`
 
-### 3. Actualización de Navegación
+### 2. Eliminación de Recursos Obsoletos (XML)
 
-#### [MODIFY] [drawer_menu.xml](file:///D:/Desarrollo-Software/Proyectos Android/factorEscala/app/src/main/res/menu/drawer_menu.xml)
-- Añadir una nueva categoría `<item android:title="Herramientas de Ingeniería">`.
-- Incluir los 4 nuevos accesos directos con iconos técnicos.
+Se eliminarán archivos de diseño y gráficos que han sido superados por nuevas versiones:
+- [DELETE] `item_weather_detail.xml` (reemplazado por `item_weather_detail_pro.xml`)
+- [DELETE] `layout_weather_weekly_card.xml` (reemplazado por `item_daily_weather.xml`)
+- [DELETE] `ic_info_white.xml` (sin uso actual)
+
+### 3. Refactorización y Limpieza de Código Muerto
 
 #### [MODIFY] [MainActivity.java](file:///D:/Desarrollo-Software/Proyectos Android/factorEscala/app/src/main/java/bo/com/factorcombinadotopo/MainActivity.java)
-- Implementar los métodos `showGeodesic()`, `showDistanceReduction()`, `showLineCalculator()` y `showLambert()` para gestionar el intercambio de fragmentos.
+- Eliminar el método `getGeoidUndulationForCurrentSetting` y sus variables relacionadas que ya no se usan tras la centralización en el ViewModel.
+
+#### [MODIFY] [SurveyViewModel.java](file:///D:/Desarrollo-Software/Proyectos Android/factorEscala/app/src/main/java/bo/com/factorcombinadotopo/SurveyViewModel.java)
+- Eliminar el método `shouldRefreshWeatherAuto` y todas las constantes de tiempo/distancia de clima que quedaron obsoletas con la carga bajo demanda.
+
+#### [MODIFY] [CompassFragment.java](file:///D:/Desarrollo-Software/Proyectos Android/factorEscala/app/src/main/java/bo/com/factorcombinadotopo/CompassFragment.java)
+- Eliminar la variable `geocoderThread` y optimizar la limpieza de tareas en `onPause` utilizando el pool de hilos.
+
+### 4. Mejora de Eficiencia en layouts
+
+#### [MODIFY] [layout_dialog_guide.xml](file:///D:/Desarrollo-Software/Proyectos Android/factorEscala/app/src/main/res/layout/layout_dialog_guide.xml)
+- Optimizar la jerarquía de vistas (eliminar anidamientos innecesarios) para mejorar la velocidad de renderizado.
 
 ## Verification Plan
 
+### Automated Tests
+- Ejecutar `gradlew assembleDebug` para asegurar que no se rompieron dependencias.
+
 ### Manual Verification
-1.  Desplegar la app y abrir el menú lateral.
-2.  Verificar que aparezca la nueva sección con las 4 herramientas.
-3.  Entrar a cada herramienta y realizar un cálculo de prueba comparando con los resultados esperados (ej. Vincenty para distancias largas).
-4.  Asegurar que la navegación de regreso al inicio (ViewPager) funcione correctamente.
+1.  **Navegación**: Verificar que todas las herramientas sigan funcionando sin las clases eliminadas.
+2.  **Clima**: Confirmar que la carga bajo demanda sigue siendo la única forma de obtener datos.
+3.  **Memoria**: Verificar que la app ocupe ligeramente menos espacio tras la limpieza.

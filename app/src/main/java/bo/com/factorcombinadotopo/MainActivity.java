@@ -71,6 +71,11 @@ import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.graphics.Color;
 
+import bo.com.factorcombinadotopo.GeodesicFragment;
+import bo.com.factorcombinadotopo.DistanceReductionFragment;
+import bo.com.factorcombinadotopo.LineCalculatorFragment;
+import bo.com.factorcombinadotopo.LambertFragment;
+
 public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
     private SectionsPagerAdapter mSectionsPagerAdapter;
     private ViewPager2 mViewPager;
@@ -355,6 +360,14 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             showStakeout();
         } else if (id == R.id.nav_weather) {
             showWeather();
+        } else if (id == R.id.nav_geodesic) {
+            showGeodesic();
+        } else if (id == R.id.nav_distance_reduction) {
+            showDistanceReduction();
+        } else if (id == R.id.nav_line_calculator) {
+            showLineCalculator();
+        } else if (id == R.id.nav_lambert) {
+            showLambert();
         }
 
         drawer.closeDrawer(GravityCompat.START);
@@ -375,7 +388,11 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             if (fragment instanceof CompassFragment || 
                 fragment instanceof FieldNotebookFragment || 
                 fragment instanceof StakeoutFragment ||
-                fragment instanceof WeatherFragment) {
+                fragment instanceof WeatherFragment ||
+                fragment instanceof GeodesicFragment ||
+                fragment instanceof DistanceReductionFragment ||
+                fragment instanceof LineCalculatorFragment ||
+                fragment instanceof LambertFragment) {
                 getSupportFragmentManager().beginTransaction().remove(fragment).commit();
             }
         }
@@ -402,6 +419,22 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     private void showWeather() {
         hideMainAndShowFragment(new WeatherFragment());
+    }
+
+    private void showGeodesic() {
+        hideMainAndShowFragment(new GeodesicFragment());
+    }
+
+    private void showDistanceReduction() {
+        hideMainAndShowFragment(new DistanceReductionFragment());
+    }
+
+    private void showLineCalculator() {
+        hideMainAndShowFragment(new LineCalculatorFragment());
+    }
+
+    private void showLambert() {
+        hideMainAndShowFragment(new LambertFragment());
     }
 
     private void hideMainAndShowFragment(Fragment fragment) {
@@ -789,23 +822,10 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         txtWeekNum.setText(String.format(Locale.getDefault(), "%d%d", weeks, dayOfWeekGps));
     }
     /**
-     * Obtiene la ondulación geoidal (N) respetando la preferencia del usuario (EGM96 o MGB)
-     * seleccionada en el menú de Ajustes.
+     * Proporciona acceso al ViewModel compartido desde los fragmentos.
      */
-    public double getGeoidUndulationForCurrentSetting(double lat, double lon) {
-        SharedPreferences prefs = getSharedPreferences(PREFS_NAME, MODE_PRIVATE);
-        int geoidModel = prefs.getInt(KEY_GEOID_MODEL, 1); // 1: MGB por defecto
-
-        if (geoidModel == 1 && MGBEngine.getInstance().estaLista()) {
-            double nMgb = MGBEngine.getInstance().getGeoidUndulation(lat, lon);
-            // Si las coordenadas están dentro del área de cobertura MGB (no retorna 0.0)
-            if (nMgb != 0.0) {
-                return nMgb;
-            }
-        }
-
-        // Modelo por defecto o Respaldo (Fallback) a EGM96
-        return EGM96Engine.getEGM96Undulation(lat, lon);
+    public SurveyViewModel getViewModel() {
+        return viewModel;
     }
     public class SectionsPagerAdapter extends FragmentStateAdapter {
         public SectionsPagerAdapter(AppCompatActivity activity) {

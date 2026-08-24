@@ -10,6 +10,7 @@ import android.widget.ImageView;
 import android.widget.PopupWindow;
 import android.widget.TextView;
 import android.widget.Toast;
+import androidx.appcompat.app.AlertDialog;
 
 public class UIUtils {
 
@@ -123,6 +124,32 @@ public class UIUtils {
         view.findViewById(R.id.btn_dialog_no).setOnClickListener(v -> dialog.dismiss());
 
         dialog.show();
+    }
+
+    /**
+     * Muestra un diálogo de forma segura, verificando que la Activity siga activa.
+     */
+    public static void safeShowDialog(AlertDialog dialog) {
+        try {
+            if (dialog != null && !dialog.isShowing()) {
+                dialog.show();
+            }
+        } catch (Exception e) {
+            android.util.Log.e("UIUtils", "Error showing dialog", e);
+        }
+    }
+
+    /**
+     * Cierra un diálogo de forma segura.
+     */
+    public static void safeDismissDialog(AlertDialog dialog) {
+        try {
+            if (dialog != null && dialog.isShowing()) {
+                dialog.dismiss();
+            }
+        } catch (Exception e) {
+            android.util.Log.e("UIUtils", "Error dismissing dialog", e);
+        }
     }
 
     private static Toast currentToast;
