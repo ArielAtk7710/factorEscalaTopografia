@@ -321,6 +321,7 @@
     <string name="btn_no">CANCEL</string>
     <string name="menu_weather_drone">Drone Flight Weather</string>
     <string name="msg_weather_accuracy_tip">Weather forecast information is calculated based on your location, it may sometimes vary slightly.</string>
+    <string name="msg_weather_offline">Weather service is not available offline.</string>
     <string name="desc_map_info">Automatic mode information</string>
     <string name="title_geoid_adjustment">Geoid Model</string>
     <string name="opt_mgb">MGBol08</string>
@@ -462,7 +463,14 @@
     <string name="label_total_visible">TOTAL VISIBLE</string>
     <string name="label_visible_status">Visible</string>
     <string name="msg_offline_warning">Online feature unavailable. Working in Offline Mode (Local Sensors only).</string>
-    <string name="msg_weather_offline">Weather analysis requires an Internet connection.</string>
+    <string name="title_map_help">MAP TOOLS GUIDE</string>
+    <string name="guide_map_help_body"><b><font color="#F97316">AVAILABLE FUNCTIONS:</font></b>\n\n
+        • <b>SEARCH (Top Panel):</b> Tap to search and navigate to specific coordinates (Lat/Lon).\n
+        • <b>BROOM (Orange):</b> Clears visual measurements and temporary polygons from the map.\n
+        • <b>POLYGON/RULER (Blue):</b> Activates area and distance measurement tools. Use the <b>MARK</b> button to fix vertices on the orange crosshair.\n
+        • <b>PIN (Light Blue):</b> Opens the dialog to save the central point to your records database.\n
+        • <b>LIST (Green):</b> Allows selecting and viewing multiple saved points on the map.\n
+        • <b>MAP (White):</b> Instantly toggles between Street (OSM) and Satellite (Esri) layers.</string>
     <string name="title_stakeout_guide">Professional Stakeout Guide</string>
     <string name="guide_geodesic_body"><b><font color="#F97316">GEODESIC CALCULATIONS:</font></b>\n
         This tool solves the fundamental problems of geodesy on the WGS84 ellipsoid using <b>Vincenty\'s</b> algorithms.\n\n

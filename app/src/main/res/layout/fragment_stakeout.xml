@@ -259,6 +259,20 @@
         android:contentDescription="Modo Estático" />
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/fab_create_stakeout_file"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="16dp"
+        android:layout_marginBottom="12dp"
+        android:src="@drawable/ic_copy"
+        app:backgroundTint="@color/accent_primary"
+        app:fabSize="mini"
+        app:layout_constraintBottom_toTopOf="@+id/fab_import_points"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:tint="@android:color/white"
+        android:contentDescription="Crear Archivo TXT" />
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/fab_import_points"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -267,7 +281,8 @@
         app:backgroundTint="@color/accent_blue_dark"
         app:layout_constraintBottom_toTopOf="@+id/fab_delete_stakeout"
         app:layout_constraintEnd_toEndOf="parent"
-        app:tint="@android:color/white" />
+        app:tint="@android:color/white"
+        android:contentDescription="Importar Puntos" />
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/fab_delete_stakeout"

@@ -1,6 +1,4 @@
-- [x] Eliminar clases inactivas del IGM
-- [x] Eliminar recursos XML obsoletos
-- [x] Limpiar código muerto en `MainActivity.java`
-- [x] Optimizar `SurveyViewModel.java` (Eliminar carga automática de clima)
-- [x] Refactorizar hilos en `CompassFragment.java`
-- [x] Verificar integridad del proyecto (Compilación)
+- [x] Agregar textos de guía del mapa en `strings.xml`
+- [x] Añadir botón `btn_map_help` en `fragment_map.xml` (Superior Derecha)
+- [x] Implementar listener para el botón de ayuda en `MapFragment.java`
+- [x] Verificar consistencia del diálogo de información del mapa

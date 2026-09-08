@@ -364,6 +364,7 @@
     <string name="btn_no">CANCELAR</string>
     <string name="menu_weather_drone">Clima Vuelo Dron</string>
     <string name="msg_weather_accuracy_tip">La información del pronóstico del clima se calcula con base en su ubicación, a veces puede variar un poco.</string>
+    <string name="msg_weather_offline">El servicio de clima no está disponible sin conexión.</string>
     <string name="desc_map_info">Información de modo automático</string>
     <string name="title_geoid_adjustment">Modelo Geoidal</string>
     <string name="opt_mgb">MGBol08</string>
@@ -505,7 +506,14 @@
     <string name="label_total_visible">TOTAL VISIBLES</string>
     <string name="label_visible_status">Visible</string>
     <string name="msg_offline_warning">Función Online no disponible. Trabajando en modo Offline (Solo Sensores Locales).</string>
-    <string name="msg_weather_offline">El análisis meteorológico requiere conexión a Internet.</string>
+    <string name="title_map_help">GUÍA DE HERRAMIENTAS DE MAPA</string>
+    <string name="guide_map_help_body"><b><font color="#F97316">FUNCIONES DISPONIBLES:</font></b>\n\n
+        • <b>LUPA (Panel Superior):</b> Pulse para buscar y navegar a coordenadas específicas (Lat/Lon).\n
+        • <b>ESCOBA (Naranja):</b> Limpia el mapa de mediciones visuales y polígonos temporales.\n
+        • <b>POLÍGONO/REGLA (Azul):</b> Activa herramientas de medición de área y distancia. Use el botón <b>MARCAR</b> para fijar vértices en la mira naranja.\n
+        • <b>PIN (Celeste):</b> Abre el diálogo para guardar el punto central en su base de datos de registros.\n
+        • <b>LISTA (Verde):</b> Permite seleccionar y visualizar múltiples puntos guardados en el mapa.\n
+        • <b>MAPA (Blanco):</b> Alterna instantáneamente entre capas de Calle (OSM) y Satélite (Esri).</string>
     <string name="title_stakeout_guide">Guía de Replanteo Profesional</string>
     <string name="guide_geodesic_body"><b><font color="#F97316">CÁLCULOS GEODÉSICOS:</font></b>\n
         Esta herramienta resuelve los problemas fundamentales de la geodesia sobre el elipsoide WGS84 utilizando los algoritmos de <b>Vincenty</b>.\n\n

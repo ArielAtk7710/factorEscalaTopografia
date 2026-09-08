@@ -1,0 +1,3 @@
+- `[x]` Add `msg_weather_offline` to Spanish `strings.xml`
+- `[x]` Add `msg_weather_offline` to English `strings.xml`
+- `[x]` Verify build with `./gradlew :app:compileDebugJavaWithJavac`

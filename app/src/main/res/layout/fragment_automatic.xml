@@ -343,114 +343,124 @@
             </GridLayout>
 
             <!-- PANEL DE RESULTADOS (AZUL) -->
-            <LinearLayout
+            <com.google.android.material.card.MaterialCardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:background="@color/accent_primary"
-                android:orientation="vertical"
-                android:padding="12dp">
+                android:layout_marginTop="8dp"
+                android:layout_marginBottom="8dp"
+                app:cardBackgroundColor="@color/accent_primary"
+                app:cardCornerRadius="24dp"
+                app:cardElevation="8dp">
 
-                <!-- Fila 1: Factor Combinado -->
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    android:gravity="center_vertical">
+                    android:orientation="vertical"
+                    android:padding="24dp">
 
-                    <TextView
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:text="@string/label_combined_factor"
-                        android:textColor="@color/text_primary"
-                        android:textStyle="bold"
-                        android:textSize="13sp" />
-
+                    <!-- Fila 1: Factor Combinado -->
                     <LinearLayout
-                        android:layout_width="wrap_content"
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:orientation="vertical"
-                        android:gravity="end">
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical">
+
                         <TextView
-                            android:id="@+id/txt_fc"
-                            android:layout_width="wrap_content"
+                            android:layout_width="0dp"
                             android:layout_height="wrap_content"
-                            android:text="0.000000000"
-                            android:textColor="@color/accent_orange"
-                            android:textSize="18sp"
-                            android:textStyle="bold" />
-                        <TextView
-                            android:id="@+id/txt_fc_ppm"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="-- PPM"
-                            android:textColor="@color/text_primary"
-                            android:textSize="11sp"
+                            android:layout_weight="1"
+                            android:text="@string/label_combined_factor"
+                            android:textColor="@android:color/white"
                             android:textStyle="bold"
-                            android:alpha="0.8" />
-                    </LinearLayout>
-                </LinearLayout>
+                            android:textSize="13sp" />
 
-                <View
-                    android:layout_width="match_parent"
-                    android:layout_height="1dp"
-                    android:background="@color/divider"
-                    android:layout_marginVertical="8dp" />
-
-                <!-- Fila 2: Presión -->
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    android:gravity="center_vertical">
-
-                    <TextView
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:text="@string/label_pressure"
-                        android:textColor="@color/text_primary"
-                        android:textStyle="bold"
-                        android:textSize="13sp" />
-
-                    <LinearLayout
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:orientation="vertical"
-                        android:gravity="end">
                         <LinearLayout
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:orientation="horizontal"
-                            android:gravity="center_vertical">
+                            android:orientation="vertical"
+                            android:gravity="end">
                             <TextView
-                                android:id="@+id/txt_presion"
+                                android:id="@+id/txt_fc"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:text="---"
+                                android:text="0.000000000"
                                 android:textColor="@color/accent_orange"
                                 android:textSize="18sp"
                                 android:textStyle="bold" />
                             <TextView
+                                android:id="@+id/txt_fc_ppm"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:text=" mmHg"
-                                android:textColor="@color/accent_orange"
+                                android:text="-- PPM"
+                                android:textColor="@android:color/white"
+                                android:textSize="11sp"
                                 android:textStyle="bold"
-                                android:textSize="13sp" />
+                                android:alpha="0.8" />
                         </LinearLayout>
+                    </LinearLayout>
+
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="1dp"
+                        android:background="@color/divider"
+                        android:layout_marginVertical="12dp"
+                        android:alpha="0.3" />
+
+                    <!-- Fila 2: Presión -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical">
+
                         <TextView
-                            android:id="@+id/txt_presion_hpa"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:text="@string/label_pressure"
+                            android:textColor="@android:color/white"
+                            android:textStyle="bold"
+                            android:textSize="13sp" />
+
+                        <LinearLayout
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="-- HPa"
-                            android:textColor="@color/text_primary"
-                            android:textSize="11sp"
-                            android:textStyle="bold"
-                            android:alpha="0.8" />
+                            android:orientation="vertical"
+                            android:gravity="end">
+                            <LinearLayout
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:orientation="horizontal"
+                                android:gravity="center_vertical">
+                                <TextView
+                                    android:id="@+id/txt_presion"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="---"
+                                    android:textColor="@color/accent_orange"
+                                    android:textSize="18sp"
+                                    android:textStyle="bold" />
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text=" mmHg"
+                                    android:textColor="@color/accent_orange"
+                                    android:textStyle="bold"
+                                    android:textSize="13sp" />
+                            </LinearLayout>
+                            <TextView
+                                android:id="@+id/txt_presion_hpa"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="-- HPa"
+                                android:textColor="@android:color/white"
+                                android:textSize="11sp"
+                                android:textStyle="bold"
+                                android:alpha="0.8" />
+                        </LinearLayout>
                     </LinearLayout>
                 </LinearLayout>
-            </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
 
             <!-- BOTÓN GUARDAR -->
             <Button

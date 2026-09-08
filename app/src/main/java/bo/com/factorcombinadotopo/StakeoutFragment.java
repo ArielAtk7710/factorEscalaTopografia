@@ -33,6 +33,8 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 import bo.com.factorcombinadotopo.gnss.GnssMeasurement;
+import android.widget.EditText;
+import android.widget.LinearLayout;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
@@ -47,7 +49,7 @@ public class StakeoutFragment extends Fragment implements SensorEventListener {
     private TextView txtPrecision, txtSat;
     private ImageView imgArrow;
     private View viewProximityRing;
-    private FloatingActionButton fabStatic;
+    private FloatingActionButton fabStatic, fabCreateFile;
 
     private SensorManager sensorManager;
     private Sensor accelerometer, magnetometer;
@@ -103,8 +105,11 @@ public class StakeoutFragment extends Fragment implements SensorEventListener {
         imgArrow = view.findViewById(R.id.img_stakeout_arrow);
         viewProximityRing = view.findViewById(R.id.view_stakeout_proximity_ring);
         fabStatic = view.findViewById(R.id.fab_stakeout_static);
+        fabCreateFile = view.findViewById(R.id.fab_create_stakeout_file);
 
         view.findViewById(R.id.btn_stakeout_info).setOnClickListener(v -> showFormatInfoDialog());
+
+        fabCreateFile.setOnClickListener(v -> showCreateStakeoutFileDialog());
 
         view.findViewById(R.id.fab_import_points).setOnClickListener(v -> {
             Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT);
@@ -189,6 +194,90 @@ public class StakeoutFragment extends Fragment implements SensorEventListener {
                 getString(R.string.title_stakeout_guide), 
                 android.text.Html.fromHtml(getString(R.string.stakeout_guide_body), android.text.Html.FROM_HTML_MODE_LEGACY), 
                 R.drawable.ic_info_round_blue);
+    }
+
+    private void showCreateStakeoutFileDialog() {
+        if (!isAdded()) return;
+        final Context safeContext = getContext();
+        if (safeContext == null) return;
+
+        View dv = LayoutInflater.from(safeContext).inflate(R.layout.dialog_create_stakeout_file, null);
+        AlertDialog d = new AlertDialog.Builder(safeContext).setView(dv).create();
+        if (d.getWindow() != null) d.getWindow().setBackgroundDrawableResource(android.R.color.transparent);
+
+        EditText etFileName = dv.findViewById(R.id.et_new_file_name);
+        EditText etPointId = dv.findViewById(R.id.et_new_point_id);
+        EditText etEast = dv.findViewById(R.id.et_new_point_east);
+        EditText etNorth = dv.findViewById(R.id.et_new_point_north);
+        Spinner spZone = dv.findViewById(R.id.sp_new_point_zone);
+        Spinner spHem = dv.findViewById(R.id.sp_new_point_hemisphere);
+        TextView txtPreview = dv.findViewById(R.id.txt_points_preview);
+
+        List<String> pointsBuffer = new ArrayList<>();
+
+        // Setup Spinners
+        List<Integer> zones = new ArrayList<>();
+        for (int i = 1; i <= 60; i++) zones.add(i);
+        ArrayAdapter<Integer> zoneAdapter = new ArrayAdapter<>(safeContext, android.R.layout.simple_spinner_item, zones);
+        zoneAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        spZone.setAdapter(zoneAdapter);
+        spZone.setSelection(18); // Zona 19
+
+        String[] hems = {"S", "N"};
+        ArrayAdapter<String> hemAdapter = new ArrayAdapter<>(safeContext, android.R.layout.simple_spinner_item, hems);
+        hemAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        spHem.setAdapter(hemAdapter);
+
+        dv.findViewById(R.id.btn_add_point_to_list).setOnClickListener(v -> {
+            String id = etPointId.getText().toString().trim();
+            String east = etEast.getText().toString().trim();
+            String north = etNorth.getText().toString().trim();
+            String zone = spZone.getSelectedItem().toString();
+            String hem = spHem.getSelectedItem().toString();
+
+            if (id.isEmpty() || east.isEmpty() || north.isEmpty()) {
+                UIUtils.showWarningToast(safeContext, "Complete los datos del punto.");
+                return;
+            }
+
+            // Formato oficial: P01, 816663.123E, 8088744.094N, UTM, 19, S
+            String line = String.format(Locale.US, "%s, %sE, %sN, UTM, %s, %s", id, east, north, zone, hem);
+            pointsBuffer.add(line);
+
+            // Actualizar preview
+            StringBuilder sb = new StringBuilder();
+            for (String p : pointsBuffer) sb.append(p).append("\n");
+            txtPreview.setText(sb.toString());
+
+            // Limpiar campos para el siguiente punto
+            etPointId.setText("");
+            etEast.setText("");
+            etNorth.setText("");
+            etPointId.requestFocus();
+        });
+
+        dv.findViewById(R.id.btn_generate_stakeout_txt).setOnClickListener(v -> {
+            String fileName = etFileName.getText().toString().trim();
+            if (fileName.isEmpty()) {
+                UIUtils.showWarningToast(safeContext, "Ingrese un nombre para el archivo.");
+                return;
+            }
+            if (pointsBuffer.isEmpty()) {
+                UIUtils.showWarningToast(safeContext, "Añada al menos un punto.");
+                return;
+            }
+
+            if (!fileName.toLowerCase().endsWith(".txt")) fileName += ".txt";
+
+            StringBuilder content = new StringBuilder();
+            for (String line : pointsBuffer) content.append(line).append("\n");
+
+            FileUtils.savePublicTxtFile(safeContext, fileName, content.toString(), "Archivo de replanteo creado:");
+            d.dismiss();
+        });
+
+        dv.findViewById(R.id.btn_close_creator).setOnClickListener(v -> d.dismiss());
+        d.show();
     }
 
     private void resetStakeoutData() {

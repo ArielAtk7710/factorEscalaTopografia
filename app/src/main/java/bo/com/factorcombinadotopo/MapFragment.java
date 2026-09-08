@@ -149,7 +149,15 @@ public class MapFragment extends Fragment {
             view.findViewById(R.id.fab_draw_polygon).setOnClickListener(v -> startDrawingMode());
             view.findViewById(R.id.fab_measure_distance).setOnClickListener(v -> startDistanceMode());
             view.findViewById(R.id.btn_cancel_polygon).setOnClickListener(v -> cancelDrawing());
+            view.findViewById(R.id.btn_mark_center).setOnClickListener(v -> markPointAtCenter());
             view.findViewById(R.id.btn_finish_polygon).setOnClickListener(v -> finishMeasurement());
+
+            view.findViewById(R.id.btn_map_help).setOnClickListener(v -> {
+                UIUtils.showProInfoDialog(requireContext(), 
+                        getString(R.string.title_map_help), 
+                        android.text.Html.fromHtml(getString(R.string.guide_map_help_body), android.text.Html.FROM_HTML_MODE_LEGACY), 
+                        R.drawable.ic_info_round_blue);
+            });
 
             // Hacer que el panel superior de coordenadas también actúe como botón de búsqueda
             if (layoutCoords != null) {
@@ -681,7 +689,7 @@ public class MapFragment extends Fragment {
         polygonPoints.clear();
         if (cardPolygonControls != null) cardPolygonControls.setVisibility(View.VISIBLE);
         if (txtMeasurementTitle != null) txtMeasurementTitle.setText("MEDICIÓN DE ÁREA (POLÍGONO)");
-        UIUtils.showInfoToast(requireContext(), "Toque el mapa para añadir vértices de área");
+        UIUtils.showInfoToast(requireContext(), "Toque el mapa o use la mira para añadir vértices");
         
         if (drawingPreview == null) {
             drawingPreview = new Polyline(mapView);
@@ -700,7 +708,7 @@ public class MapFragment extends Fragment {
         segmentDistances.clear();
         if (cardPolygonControls != null) cardPolygonControls.setVisibility(View.VISIBLE);
         if (txtMeasurementTitle != null) txtMeasurementTitle.setText("MEDICIÓN DE DISTANCIA (REGLA)");
-        UIUtils.showInfoToast(requireContext(), "Toque el mapa para medir distancias");
+        UIUtils.showInfoToast(requireContext(), "Toque el mapa o use la mira para añadir puntos");
 
         if (drawingPreview == null) {
             drawingPreview = new Polyline(mapView);
@@ -711,6 +719,16 @@ public class MapFragment extends Fragment {
             drawingPreview.getOutlinePaint().setColor(ContextCompat.getColor(requireContext(), R.color.accent_red_soft));
         }
         mapView.getOverlays().add(drawingPreview);
+    }
+
+    private void markPointAtCenter() {
+        if (mapView == null) return;
+        GeoPoint center = (GeoPoint) mapView.getMapCenter();
+        if (isDrawingArea) {
+            addPointToPolygon(center);
+        } else if (isMeasuringDistance) {
+            addPointToDistancePath(center);
+        }
     }
 
     private void addPointToPolygon(GeoPoint p) {

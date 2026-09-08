@@ -14,14 +14,15 @@
         android:text="FactorEscalaTop"
         android:textAppearance="@style/TextAppearance.AppCompat.Body1"
         android:textStyle="bold"
-        android:textColor="@color/text_primary"
+        android:textColor="@android:color/white"
         android:textSize="18sp" />
 
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/desc_high_precision"
-        android:textColor="@color/text_primary"
+        android:textColor="@android:color/white"
+        android:alpha="0.8"
         android:textSize="14sp" />
 
 </LinearLayout>

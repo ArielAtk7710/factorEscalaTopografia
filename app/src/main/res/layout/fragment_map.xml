@@ -74,6 +74,19 @@
                 android:textStyle="bold" />
         </LinearLayout>
 
+        <!-- Botón de Información del Mapa (Superior Derecha) -->
+        <ImageButton
+            android:id="@+id/btn_map_help"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:layout_gravity="top|end"
+            android:layout_marginTop="16dp"
+            android:layout_marginEnd="16dp"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:src="@drawable/ic_info_round_blue"
+            android:scaleType="centerInside"
+            android:contentDescription="Ayuda de Mapa" />
+
     </FrameLayout>
 
     <!-- Herramientas de Medición y Limpieza (Izquierda) -->
@@ -93,7 +106,7 @@
             android:layout_marginBottom="12dp"
             android:contentDescription="Limpiar Mapa"
             android:src="@drawable/ic_broom_pro"
-            app:backgroundTint="@color/color_magenta"
+            app:backgroundTint="@color/accent_red_soft"
             app:fabSize="mini"
             app:tint="@android:color/white" />
 
@@ -104,7 +117,7 @@
             android:layout_marginBottom="12dp"
             android:contentDescription="Medir Área"
             android:src="@drawable/ic_area_polygon_pro"
-            app:backgroundTint="@color/color_blue_intense"
+            app:backgroundTint="@color/accent_primary"
             app:fabSize="mini"
             app:tint="@android:color/white" />
 
@@ -114,7 +127,7 @@
             android:layout_height="wrap_content"
             android:contentDescription="Medir Distancia"
             android:src="@drawable/ic_ruler_diagonal_pro"
-            app:backgroundTint="@color/accent_red_soft"
+            app:backgroundTint="@color/accent_light"
             app:fabSize="mini"
             app:tint="@android:color/white" />
 
@@ -210,12 +223,26 @@
 
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/btn_cancel_polygon"
-                    style="@style/Widget.MaterialComponents.Button.TextButton"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Cancelar"
-                    android:textColor="@color/state_error"
-                    android:textSize="11sp" />
+                    android:textColor="@android:color/white"
+                    android:textSize="11sp"
+                    android:textStyle="bold"
+                    app:backgroundTint="@color/state_error"
+                    app:cornerRadius="8dp" />
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btn_mark_center"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="8dp"
+                    android:text="Marcar"
+                    android:textSize="11sp"
+                    android:textColor="@android:color/white"
+                    android:textStyle="bold"
+                    app:backgroundTint="@color/accent_primary"
+                    app:cornerRadius="8dp" />
 
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/btn_finish_polygon"
@@ -223,8 +250,11 @@
                     android:layout_height="wrap_content"
                     android:layout_marginStart="8dp"
                     android:text="Finalizar"
+                    android:textColor="@color/text_primary"
                     android:textSize="11sp"
-                    app:backgroundTint="@color/accent_orange" />
+                    android:textStyle="bold"
+                    app:backgroundTint="@color/accent_orange"
+                    app:cornerRadius="8dp" />
             </LinearLayout>
         </LinearLayout>
     </com.google.android.material.card.MaterialCardView>

@@ -155,134 +155,145 @@
         </com.google.android.material.card.MaterialCardView>
 
         <!-- PANEL DE RESULTADOS (AZUL) -->
-        <LinearLayout
+        <com.google.android.material.card.MaterialCardView
             android:id="@+id/layoutResults"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="@color/accent_primary"
-            android:orientation="vertical"
-            android:padding="16dp"
+            app:cardBackgroundColor="@color/accent_primary"
+            app:cardCornerRadius="24dp"
+            app:cardElevation="8dp"
             android:visibility="gone">
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="RESULTADOS DE LÍNEA"
-                android:textColor="@color/text_primary"
-                android:textSize="12sp"
-                android:textStyle="bold"
-                android:layout_marginBottom="8dp" />
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Distancia Plana"
-                android:textColor="@color/text_secondary"
-                android:textSize="10sp" />
-            <TextView
-                android:id="@+id/txtResDist"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="0.000 m"
-                android:textColor="@color/text_primary"
-                android:textSize="20sp"
-                android:textStyle="bold" />
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Acimut de Cuadrícula"
-                android:textColor="@color/text_secondary"
-                android:textSize="10sp"
-                android:layout_marginTop="8dp" />
-            <TextView
-                android:id="@+id/txtResAzimuth"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="0.0000°"
-                android:textColor="@color/text_primary"
-                android:textSize="16sp"
-                android:textStyle="bold" />
-
-            <GridLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:columnCount="2"
-                android:layout_marginTop="8dp">
-                <LinearLayout
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_columnWeight="1"
-                    android:orientation="vertical">
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Convergencia P1"
-                        android:textColor="@color/text_secondary"
-                        android:textSize="10sp" />
-                    <TextView
-                        android:id="@+id/txtResConv1"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="0.0000°"
-                        android:textColor="@color/text_primary"
-                        android:textSize="14sp"
-                        android:textStyle="bold" />
-                </LinearLayout>
-                <LinearLayout
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_columnWeight="1"
-                    android:orientation="vertical">
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Convergencia P2"
-                        android:textColor="@color/text_secondary"
-                        android:textSize="10sp" />
-                    <TextView
-                        android:id="@+id/txtResConv2"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="0.0000°"
-                        android:textColor="@color/text_primary"
-                        android:textSize="14sp"
-                        android:textStyle="bold" />
-                </LinearLayout>
-            </GridLayout>
-
-            <!-- Botones de Acción (Exportación) -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:gravity="center"
-                android:layout_marginTop="16dp">
+                android:orientation="vertical"
+                android:padding="24dp">
 
-                <com.google.android.material.button.MaterialButton
-                    android:id="@+id/btnCopyResults"
-                    style="@style/Widget.MaterialComponents.Button.TextButton"
-                    android:layout_width="0dp"
+                <TextView
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:text="COPIAR"
-                    android:textColor="@color/text_primary"
-                    app:icon="@drawable/ic_copy"
-                    app:iconTint="@color/text_primary" />
+                    android:text="RESULTADOS DE LÍNEA"
+                    android:textColor="@android:color/white"
+                    android:textSize="12sp"
+                    android:textStyle="bold"
+                    android:layout_marginBottom="16dp" />
 
-                <com.google.android.material.button.MaterialButton
-                    android:id="@+id/btnShareResults"
-                    style="@style/Widget.MaterialComponents.Button.TextButton"
-                    android:layout_width="0dp"
+                <TextView
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:text="COMPARTIR"
-                    android:textColor="@color/text_primary"
-                    app:icon="@drawable/ic_share"
-                    app:iconTint="@color/text_primary" />
+                    android:text="Distancia Plana"
+                    android:textColor="@android:color/white"
+                    android:alpha="0.7"
+                    android:textSize="10sp" />
+                <TextView
+                    android:id="@+id/txtResDist"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="0.000 m"
+                    android:textColor="@color/accent_orange"
+                    android:textSize="24sp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Acimut de Cuadrícula"
+                    android:textColor="@android:color/white"
+                    android:alpha="0.7"
+                    android:textSize="10sp"
+                    android:layout_marginTop="12dp" />
+                <TextView
+                    android:id="@+id/txtResAzimuth"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="0.0000°"
+                    android:textColor="@color/accent_orange"
+                    android:textSize="18sp"
+                    android:textStyle="bold" />
+
+                <GridLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:columnCount="2"
+                    android:layout_marginTop="12dp">
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_columnWeight="1"
+                        android:orientation="vertical">
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Convergencia P1"
+                            android:textColor="@android:color/white"
+                            android:alpha="0.7"
+                            android:textSize="10sp" />
+                        <TextView
+                            android:id="@+id/txtResConv1"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="0.0000°"
+                            android:textColor="@color/accent_orange"
+                            android:textSize="14sp"
+                            android:textStyle="bold" />
+                    </LinearLayout>
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_columnWeight="1"
+                        android:orientation="vertical">
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Convergencia P2"
+                            android:textColor="@android:color/white"
+                            android:alpha="0.7"
+                            android:textSize="10sp" />
+                        <TextView
+                            android:id="@+id/txtResConv2"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="0.0000°"
+                            android:textColor="@color/accent_orange"
+                            android:textSize="14sp"
+                            android:textStyle="bold" />
+                    </LinearLayout>
+                </GridLayout>
+
+                <!-- Botones de Acción (Exportación) -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center"
+                    android:layout_marginTop="24dp">
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btnCopyResults"
+                        style="@style/Widget.MaterialComponents.Button.TextButton"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="COPIAR"
+                        android:textColor="@android:color/white"
+                        app:icon="@drawable/ic_copy"
+                        app:iconTint="@android:color/white" />
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btnShareResults"
+                        style="@style/Widget.MaterialComponents.Button.TextButton"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="COMPARTIR"
+                        android:textColor="@android:color/white"
+                        app:icon="@drawable/ic_share"
+                        app:iconTint="@android:color/white" />
+                </LinearLayout>
+
             </LinearLayout>
-
-        </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
 
     </LinearLayout>
 </ScrollView>

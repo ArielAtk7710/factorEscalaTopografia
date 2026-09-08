@@ -1,53 +1,49 @@
-# Plan de Implementación: Optimización y Limpieza Integral de la App
+# Plan de Implementación: Botón de Información en la Vista de Mapa
 
-Este plan describe las acciones para eliminar código muerto, recursos redundantes y optimizar la lógica interna para mejorar la eficiencia y el rendimiento de **FactorEscalaTop**.
+Este plan describe la adición de un botón de información profesional en la esquina superior derecha del Mapa, permitiendo a los usuarios acceder a una guía rápida sobre las funciones y herramientas disponibles en esta vista.
 
 ## User Review Required
 
-> [!WARNING]
-> Se eliminarán permanentemente las clases técnicas del IGM que no han sido vinculadas a ninguna herramienta del menú lateral (`PlateVelocity`, `RasterProcessor`, `EnuConverter`, `TmConverter`, `DatumTransformer`, `EcefConverter`). Esto simplificará enormemente el mantenimiento del proyecto.
+> [!IMPORTANT]
+> Se añadirá un botón redondo azul con un icono blanco "i" en la parte superior derecha, siguiendo el estándar visual de las otras herramientas de ingeniería para mantener la coherencia.
+
+---
 
 ## Proposed Changes
 
-### 1. Eliminación de Clases Inactivas (Java)
+### 1. Recursos de Texto (Strings)
 
-Se eliminarán los siguientes archivos por no tener referencias activas ni funcionalidad vinculada a la UI:
-- [DELETE] `IGMPlateVelocityCalculator.java`
-- [DELETE] `IGMRasterProcessor.java`
-- [DELETE] `IGMEnuConverter.java`
-- [DELETE] `IGMTmConverter.java`
-- [DELETE] `IGMDatumTransformer.java`
-- [DELETE] `IGMEcefConverter.java`
+#### [MODIFY] [strings.xml](file:///D:/Desarrollo-Software/Proyectos Android/factorEscala/app/src/main/res/values/strings.xml)
+Añadir la guía detallada del mapa:
+- `guide_map_functions_title`: "GUÍA DE HERRAMIENTAS DE MAPA"
+- `guide_map_functions_body`: Explicación de los botones:
+    - **Búsqueda (Lupa)**: Navegar a coordenadas específicas.
+    - **Medición (Polígono/Regla)**: Cálculo de áreas y distancias con marcado de mira.
+    - **Limpiar (Escoba)**: Reseteo de mediciones visuales.
+    - **Marcado (Pin)**: Guardar el punto central en los registros.
+    - **Capas (Mapa)**: Alternar entre vista Satelital y Calles.
 
-### 2. Eliminación de Recursos Obsoletos (XML)
+### 2. Interfaz de Usuario (Layouts)
 
-Se eliminarán archivos de diseño y gráficos que han sido superados por nuevas versiones:
-- [DELETE] `item_weather_detail.xml` (reemplazado por `item_weather_detail_pro.xml`)
-- [DELETE] `layout_weather_weekly_card.xml` (reemplazado por `item_daily_weather.xml`)
-- [DELETE] `ic_info_white.xml` (sin uso actual)
+#### [MODIFY] [fragment_map.xml](file:///D:/Desarrollo-Software/Proyectos Android/factorEscala/app/src/main/res/layout/fragment_map.xml)
+- Añadir un `ImageView` con el ID `btn_map_help`.
+- **Estilo**: Redondo, fondo azul (`accent_primary`), icono blanco.
+- **Posición**: Arriba a la derecha con un margen de 16dp.
 
-### 3. Refactorización y Limpieza de Código Muerto
+### 3. Lógica de Fragmento (Java)
 
-#### [MODIFY] [MainActivity.java](file:///D:/Desarrollo-Software/Proyectos Android/factorEscala/app/src/main/java/bo/com/factorcombinadotopo/MainActivity.java)
-- Eliminar el método `getGeoidUndulationForCurrentSetting` y sus variables relacionadas que ya no se usan tras la centralización en el ViewModel.
+#### [MODIFY] [MapFragment.java](file:///D:/Desarrollo-Software/Proyectos Android/factorEscala/app/src/main/java/bo/com/factorcombinadotopo/MapFragment.java)
+- Vincular el botón en `onViewCreated`.
+- Implementar la llamada a `UIUtils.showProInfoDialog` para mostrar la guía con formato HTML.
 
-#### [MODIFY] [SurveyViewModel.java](file:///D:/Desarrollo-Software/Proyectos Android/factorEscala/app/src/main/java/bo/com/factorcombinadotopo/SurveyViewModel.java)
-- Eliminar el método `shouldRefreshWeatherAuto` y todas las constantes de tiempo/distancia de clima que quedaron obsoletas con la carga bajo demanda.
-
-#### [MODIFY] [CompassFragment.java](file:///D:/Desarrollo-Software/Proyectos Android/factorEscala/app/src/main/java/bo/com/factorcombinadotopo/CompassFragment.java)
-- Eliminar la variable `geocoderThread` y optimizar la limpieza de tareas en `onPause` utilizando el pool de hilos.
-
-### 4. Mejora de Eficiencia en layouts
-
-#### [MODIFY] [layout_dialog_guide.xml](file:///D:/Desarrollo-Software/Proyectos Android/factorEscala/app/src/main/res/layout/layout_dialog_guide.xml)
-- Optimizar la jerarquía de vistas (eliminar anidamientos innecesarios) para mejorar la velocidad de renderizado.
+---
 
 ## Verification Plan
 
-### Automated Tests
-- Ejecutar `gradlew assembleDebug` para asegurar que no se rompieron dependencias.
-
 ### Manual Verification
-1.  **Navegación**: Verificar que todas las herramientas sigan funcionando sin las clases eliminadas.
-2.  **Clima**: Confirmar que la carga bajo demanda sigue siendo la única forma de obtener datos.
-3.  **Memoria**: Verificar que la app ocupe ligeramente menos espacio tras la limpieza.
+1.  Abrir la vista de **Mapa**.
+2.  Verificar que aparezca el botón `(i)` en la esquina superior derecha.
+3.  Pulsar el botón y confirmar que se abra el diálogo con el título naranja y la descripción técnica de los botones.
+4.  Asegurar que el botón sea legible tanto en tema claro como oscuro.
+
+**¿Deseas que proceda con la adición de esta guía de funciones en el mapa?**

@@ -183,144 +183,156 @@
         </com.google.android.material.card.MaterialCardView>
 
         <!-- PANEL DE RESULTADOS (AZUL) -->
-        <LinearLayout
+        <com.google.android.material.card.MaterialCardView
             android:id="@+id/layoutResults"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="@color/accent_primary"
-            android:orientation="vertical"
-            android:padding="16dp"
+            app:cardBackgroundColor="@color/accent_primary"
+            app:cardCornerRadius="24dp"
+            app:cardElevation="8dp"
             android:visibility="gone">
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="RESULTADOS"
-                android:textColor="@color/text_primary"
-                android:textSize="12sp"
-                android:textStyle="bold"
-                android:layout_marginBottom="8dp" />
-
             <LinearLayout
-                android:id="@+id/resLatLon"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="vertical">
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Latitud 2"
-                    android:textColor="@color/text_secondary"
-                    android:textSize="10sp" />
-                <TextView
-                    android:id="@+id/txtResLat"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="0.00000000"
-                    android:textColor="@color/text_primary"
-                    android:textSize="16sp"
-                    android:textStyle="bold" />
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Longitud 2"
-                    android:textColor="@color/text_secondary"
-                    android:textSize="10sp"
-                    android:layout_marginTop="4dp" />
-                <TextView
-                    android:id="@+id/txtResLon"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="0.00000000"
-                    android:textColor="@color/text_primary"
-                    android:textSize="16sp"
-                    android:textStyle="bold" />
-            </LinearLayout>
+                android:orientation="vertical"
+                android:padding="24dp">
 
-            <LinearLayout
-                android:id="@+id/resDistAz"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="vertical">
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Distancia"
-                    android:textColor="@color/text_secondary"
-                    android:textSize="10sp" />
+                    android:text="RESULTADOS"
+                    android:textColor="@android:color/white"
+                    android:textSize="12sp"
+                    android:textStyle="bold"
+                    android:layout_marginBottom="16dp" />
+
+                <LinearLayout
+                    android:id="@+id/resLatLon"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Latitud 2"
+                        android:textColor="@android:color/white"
+                        android:alpha="0.7"
+                        android:textSize="10sp" />
+                    <TextView
+                        android:id="@+id/txtResLat"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="0.00000000"
+                        android:textColor="@color/accent_orange"
+                        android:textSize="18sp"
+                        android:textStyle="bold" />
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Longitud 2"
+                        android:textColor="@android:color/white"
+                        android:alpha="0.7"
+                        android:textSize="10sp"
+                        android:layout_marginTop="8dp" />
+                    <TextView
+                        android:id="@+id/txtResLon"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="0.00000000"
+                        android:textColor="@color/accent_orange"
+                        android:textSize="18sp"
+                        android:textStyle="bold" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:id="@+id/resDistAz"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Distancia"
+                        android:textColor="@android:color/white"
+                        android:alpha="0.7"
+                        android:textSize="10sp" />
+                    <TextView
+                        android:id="@+id/txtResDist"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="0.000 m"
+                        android:textColor="@color/accent_orange"
+                        android:textSize="20sp"
+                        android:textStyle="bold" />
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Azimut Directo"
+                        android:textColor="@android:color/white"
+                        android:alpha="0.7"
+                        android:textSize="10sp"
+                        android:layout_marginTop="8dp" />
+                    <TextView
+                        android:id="@+id/txtResAzDirect"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="0.0000°"
+                        android:textColor="@color/accent_orange"
+                        android:textSize="18sp"
+                        android:textStyle="bold" />
+                </LinearLayout>
+
                 <TextView
-                    android:id="@+id/txtResDist"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="0.000 m"
-                    android:textColor="@color/text_primary"
-                    android:textSize="16sp"
-                    android:textStyle="bold" />
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Azimut Directo"
-                    android:textColor="@color/text_secondary"
+                    android:text="Azimut Inverso"
+                    android:textColor="@android:color/white"
+                    android:alpha="0.7"
                     android:textSize="10sp"
-                    android:layout_marginTop="4dp" />
+                    android:layout_marginTop="8dp" />
                 <TextView
-                    android:id="@+id/txtResAzDirect"
+                    android:id="@+id/txtResAzInv"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="0.0000°"
-                    android:textColor="@color/text_primary"
-                    android:textSize="16sp"
+                    android:textColor="@color/accent_orange"
+                    android:textSize="18sp"
                     android:textStyle="bold" />
-            </LinearLayout>
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Azimut Inverso"
-                android:textColor="@color/text_secondary"
-                android:textSize="10sp"
-                android:layout_marginTop="4dp" />
-            <TextView
-                android:id="@+id/txtResAzInv"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="0.0000°"
-                android:textColor="@color/text_primary"
-                android:textSize="16sp"
-                android:textStyle="bold" />
-
-            <!-- Botones de Acción (Exportación) -->
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:gravity="center"
-                android:layout_marginTop="16dp">
-
-                <com.google.android.material.button.MaterialButton
-                    android:id="@+id/btnCopyResults"
-                    style="@style/Widget.MaterialComponents.Button.TextButton"
-                    android:layout_width="0dp"
+                <!-- Botones de Acción (Exportación) -->
+                <LinearLayout
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:text="COPIAR"
-                    android:textColor="@color/text_primary"
-                    app:icon="@drawable/ic_copy"
-                    app:iconTint="@color/text_primary" />
+                    android:orientation="horizontal"
+                    android:gravity="center"
+                    android:layout_marginTop="24dp">
 
-                <com.google.android.material.button.MaterialButton
-                    android:id="@+id/btnShareResults"
-                    style="@style/Widget.MaterialComponents.Button.TextButton"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:text="COMPARTIR"
-                    android:textColor="@color/text_primary"
-                    app:icon="@drawable/ic_share"
-                    app:iconTint="@color/text_primary" />
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btnCopyResults"
+                        style="@style/Widget.MaterialComponents.Button.TextButton"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="COPIAR"
+                        android:textColor="@android:color/white"
+                        app:icon="@drawable/ic_copy"
+                        app:iconTint="@android:color/white" />
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btnShareResults"
+                        style="@style/Widget.MaterialComponents.Button.TextButton"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="COMPARTIR"
+                        android:textColor="@android:color/white"
+                        app:icon="@drawable/ic_share"
+                        app:iconTint="@android:color/white" />
+                </LinearLayout>
+
             </LinearLayout>
-
-        </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
 
     </LinearLayout>
 </ScrollView>

@@ -70,8 +70,8 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:text="@string/btn_no"
-                android:textColor="@color/text_primary"
-                app:strokeColor="@color/accent_primary"
+                android:textColor="@color/state_error"
+                app:strokeColor="@color/state_error"
                 app:strokeWidth="1.2dp"
                 app:cornerRadius="12dp"
                 android:layout_marginEnd="12dp" />

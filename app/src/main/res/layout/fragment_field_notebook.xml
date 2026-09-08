@@ -222,19 +222,19 @@
                 android:gravity="center_vertical"
                 android:layout_marginTop="16dp">
 
-                <TextView
+                <com.google.android.material.button.MaterialButton
                     android:id="@+id/btn_lib_cancelar"
+                    style="@style/Widget.MaterialComponents.Button.OutlinedButton"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:text="@string/btn_cancel"
-                    android:textColor="@color/text_secondary"
-                    android:textStyle="bold"
-                    android:gravity="center"
-                    android:padding="12dp"
-                    android:background="?attr/selectableItemBackground" />
+                    android:textColor="@color/state_error"
+                    app:strokeColor="@color/state_error"
+                    app:strokeWidth="1.2dp"
+                    android:textStyle="bold" />
 
-                <Button
+                <com.google.android.material.button.MaterialButton
                     android:id="@+id/btn_lib_guardar"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
@@ -243,7 +243,7 @@
                     android:textAllCaps="false"
                     android:textStyle="bold"
                     app:backgroundTint="@color/accent_orange"
-                    android:textColor="@android:color/white" />
+                    android:textColor="@color/text_primary" />
             </LinearLayout>
 
         </LinearLayout>

@@ -174,8 +174,9 @@
             android:layout_marginTop="8dp"
             android:text="@string/btn_cancel"
             android:textAllCaps="false"
-            android:textColor="@color/text_secondary"
-            app:strokeColor="@color/divider"
+            android:textColor="@color/state_error"
+            app:strokeColor="@color/state_error"
+            app:strokeWidth="1.2dp"
             app:cornerRadius="12dp" />
 
     </LinearLayout>

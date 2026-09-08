@@ -334,13 +334,29 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         if (drawer.isDrawerOpen(GravityCompat.START)) {
             drawer.closeDrawer(GravityCompat.START);
         } else {
-            UIUtils.showConfirmDialog(this, 
-                R.string.title_exit_app, 
-                R.string.msg_exit_app, 
-                () -> {
-                    MapManager.clearSession(); // Limpiar pines al salir
-                    finishAffinity();
-                });
+            // Verificar si hay fragmentos activos sobre el home
+            boolean hasSecondaryFragment = false;
+            for (Fragment f : getSupportFragmentManager().getFragments()) {
+                if (f instanceof CompassFragment || f instanceof FieldNotebookFragment || 
+                    f instanceof StakeoutFragment || f instanceof WeatherFragment ||
+                    f instanceof GeodesicFragment || f instanceof DistanceReductionFragment ||
+                    f instanceof LineCalculatorFragment || f instanceof LambertFragment) {
+                    hasSecondaryFragment = true;
+                    break;
+                }
+            }
+
+            if (hasSecondaryFragment) {
+                showHome();
+            } else {
+                UIUtils.showConfirmDialog(this, 
+                    R.string.title_exit_app, 
+                    R.string.msg_exit_app, 
+                    () -> {
+                        MapManager.clearSession(); // Limpiar pines al salir
+                        finishAffinity();
+                    });
+            }
         }
     }
 

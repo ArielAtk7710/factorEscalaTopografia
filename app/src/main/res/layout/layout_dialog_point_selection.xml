@@ -63,16 +63,15 @@
 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/btn_selection_close"
-                style="@style/Widget.MaterialComponents.Button.TextButton"
+                style="@style/Widget.MaterialComponents.Button.OutlinedButton"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:text="CERRAR"
-                app:strokeColor="@color/accent_orange"
+                app:strokeColor="@color/state_error"
                 app:strokeWidth="1.2dp"
                 app:cornerRadius="8dp"
-                android:textColor="#FFFFFF"
-
+                android:textColor="@color/state_error"
                 android:layout_marginStart="6dp" />
         </LinearLayout>
 

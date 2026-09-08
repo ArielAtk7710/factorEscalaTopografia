@@ -277,17 +277,17 @@
                         android:textSize="12sp" />
                 </LinearLayout>
 
-                <Button
+                <com.google.android.material.button.MaterialButton
                     android:id="@+id/btn_clear_cache_street"
-                    style="?attr/materialButtonOutlinedStyle"
+                    style="@style/Widget.MaterialComponents.Button.OutlinedButton"
                     android:layout_width="wrap_content"
                     android:layout_height="36dp"
                     android:layout_marginStart="6dp"
                     android:text="@string/btn_clean"
                     android:textSize="9sp"
                     android:paddingHorizontal="8dp"
-                    app:strokeColor="@color/accent_light"
-                    android:textColor="@color/accent_light" />
+                    app:strokeColor="@color/state_error"
+                    android:textColor="@color/state_error" />
             </LinearLayout>
 
 
