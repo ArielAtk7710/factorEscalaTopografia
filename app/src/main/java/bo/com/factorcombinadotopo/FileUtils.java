@@ -21,17 +21,21 @@ public class FileUtils {
      * Compatible con Android 11+ (Scoped Storage) y versiones anteriores.
      */
     public static void savePublicTxtFile(Context context, String fileName, String content) {
-        savePublicTxtFile(context, fileName, content, null);
+        savePublicFile(context, fileName, content, getMimeTypeForFile(fileName), null);
     }
 
     public static void savePublicTxtFile(Context context, String fileName, String content, String successMessage) {
+        savePublicFile(context, fileName, content, getMimeTypeForFile(fileName), successMessage);
+    }
+
+    public static void savePublicFile(Context context, String fileName, String content, String mimeType, String successMessage) {
         String relativePath = Environment.DIRECTORY_DOCUMENTS + "/FactorEscalaTop";
         
         try {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
                 ContentValues values = new ContentValues();
                 values.put(MediaStore.MediaColumns.DISPLAY_NAME, fileName);
-                values.put(MediaStore.MediaColumns.MIME_TYPE, "text/plain");
+                values.put(MediaStore.MediaColumns.MIME_TYPE, mimeType != null ? mimeType : "text/plain");
                 values.put(MediaStore.MediaColumns.RELATIVE_PATH, relativePath);
 
                 Uri externalUri = MediaStore.Files.getContentUri("external");
@@ -40,25 +44,37 @@ public class FileUtils {
                 if (fileUri != null) {
                     try (OutputStream outputStream = context.getContentResolver().openOutputStream(fileUri)) {
                         if (outputStream != null) {
-                            outputStream.write(content.getBytes());
+                            outputStream.write(content.getBytes("UTF-8"));
                             showPathToast(context, fileName, successMessage);
                         }
                     }
                 }
             } else {
-                // Para versiones muy antiguas (Legacy)
                 java.io.File directory = new java.io.File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOCUMENTS), "FactorEscalaTop");
                 if (!directory.exists()) directory.mkdirs();
                 
                 java.io.File file = new java.io.File(directory, fileName);
                 try (java.io.FileOutputStream fos = new java.io.FileOutputStream(file)) {
-                    fos.write(content.getBytes());
+                    fos.write(content.getBytes("UTF-8"));
                     showPathToast(context, fileName, successMessage);
                 }
             }
         } catch (Exception e) {
             UIUtils.showErrorToast(context, "Error al guardar archivo: " + e.getMessage());
         }
+    }
+
+    public static String getMimeTypeForFile(String fileName) {
+        if (fileName == null) return "text/plain";
+        String lower = fileName.toLowerCase();
+        if (lower.endsWith(".kml")) return "application/vnd.google-earth.kml+xml";
+        if (lower.endsWith(".kmz")) return "application/vnd.google-earth.kmz";
+        if (lower.endsWith(".csv")) return "text/csv";
+        if (lower.endsWith(".geojson")) return "application/geo+json";
+        if (lower.endsWith(".dxf")) return "image/vnd.dxf";
+        if (lower.endsWith(".gpx")) return "application/gpx+xml";
+        if (lower.endsWith(".json")) return "application/json";
+        return "text/plain";
     }
 
     private static void showPathToast(Context context, String fileName, String successMessage) {

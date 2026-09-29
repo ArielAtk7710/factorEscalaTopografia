@@ -1,81 +1,165 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:orientation="vertical"
-    android:padding="24dp"
-    android:background="@drawable/bg_dialog_confirm_border"
-    android:gravity="center_horizontal">
+    android:layout_height="wrap_content">
 
-    <ImageView
-        android:layout_width="48dp"
-        android:layout_height="48dp"
-        android:src="@drawable/ic_export"
-        app:tint="@color/accent_orange"
-        android:layout_marginBottom="16dp"
-        android:contentDescription="Exportar" />
-
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Exportar Datos"
-        android:textColor="@color/text_white_pure"
-        android:textSize="20sp"
-        android:textStyle="bold"
-        android:layout_marginBottom="12dp"
-        android:textAlignment="center" />
-
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Seleccione el formato de salida para sus registros"
-        android:textColor="@color/text_gray_light"
-        android:textSize="14sp"
-        android:layout_marginBottom="24dp"
-        android:textAlignment="center"
-        android:lineSpacingExtra="4dp" />
-
-    <!-- Opción TXT -->
-    <com.google.android.material.button.MaterialButton
-        android:id="@+id/btn_export_txt"
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="FORMATO TEXTO (TXT)"
-        android:textAllCaps="false"
-        app:icon="@drawable/ic_manual"
-        app:iconGravity="textStart"
-        app:backgroundTint="@color/accent_orange"
-        android:textColor="@android:color/white"
-        android:textStyle="bold"
-        app:cornerRadius="8dp" />
+        android:orientation="vertical"
+        android:padding="20dp"
+        android:background="@drawable/bg_dialog_confirm_border"
+        android:gravity="center_horizontal">
 
-    <!-- Opción JSON -->
-    <com.google.android.material.button.MaterialButton
-        android:id="@+id/btn_export_json"
-        style="@style/Widget.MaterialComponents.Button.OutlinedButton"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="12dp"
-        android:text="FORMATO DIGITAL (JSON)"
-        android:textAllCaps="false"
-        app:icon="@drawable/ic_auto"
-        app:iconGravity="textStart"
-        android:textColor="@color/text_white_pure"
-        app:strokeColor="@color/accent_orange"
-        app:strokeWidth="1.2dp"
-        app:cornerRadius="8dp" />
+        <ImageView
+            android:layout_width="44dp"
+            android:layout_height="44dp"
+            android:src="@drawable/ic_export"
+            app:tint="@color/accent_orange"
+            android:layout_marginBottom="12dp"
+            android:contentDescription="Exportar" />
 
-    <com.google.android.material.button.MaterialButton
-        android:id="@+id/btn_export_cancel"
-        style="@style/Widget.MaterialComponents.Button.OutlinedButton"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
-        android:text="@string/btn_cancel"
-        android:textColor="@color/text_white_pure"
-        app:strokeColor="@color/accent_orange"
-        app:strokeWidth="1.2dp"
-        app:cornerRadius="8dp" />
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Exportar Datos Topográficos"
+            android:textColor="@color/text_white_pure"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            android:layout_marginBottom="6dp"
+            android:textAlignment="center" />
 
-</LinearLayout>
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Seleccione el formato compatible con su software de trabajo"
+            android:textColor="@color/text_gray_light"
+            android:textSize="13sp"
+            android:layout_marginBottom="18dp"
+            android:textAlignment="center" />
+
+        <!-- 1. Google Maps / Google Earth (.KML) -->
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btn_export_kml"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Google Maps / Earth (.KML)"
+            android:textAllCaps="false"
+            app:icon="@drawable/ic_pushpin"
+            app:iconGravity="textStart"
+            app:backgroundTint="@color/accent_orange"
+            android:textColor="@android:color/white"
+            android:textStyle="bold"
+            app:cornerRadius="8dp" />
+
+        <!-- 2. QGIS / ArcGIS / Excel (.CSV) -->
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btn_export_csv"
+            style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:text="QGIS / ArcGIS / Excel (.CSV)"
+            android:textAllCaps="false"
+            app:icon="@drawable/ic_notebook"
+            app:iconGravity="textStart"
+            android:textColor="@color/text_white_pure"
+            app:strokeColor="@color/accent_orange"
+            app:strokeWidth="1.2dp"
+            app:cornerRadius="8dp" />
+
+        <!-- 3. AutoCAD / Civil 3D (.DXF 3D) -->
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btn_export_dxf"
+            style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:text="AutoCAD / Civil 3D (.DXF 3D)"
+            android:textAllCaps="false"
+            app:icon="@drawable/ic_precision"
+            app:iconGravity="textStart"
+            android:textColor="@color/text_white_pure"
+            app:strokeColor="@color/accent_orange"
+            app:strokeWidth="1.2dp"
+            app:cornerRadius="8dp" />
+
+        <!-- 4. GIS Vectorial (.GeoJSON) -->
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btn_export_geojson"
+            style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:text="GIS Vectorial (.GeoJSON)"
+            android:textAllCaps="false"
+            app:icon="@drawable/ic_map"
+            app:iconGravity="textStart"
+            android:textColor="@color/text_white_pure"
+            app:strokeColor="@color/accent_orange"
+            app:strokeWidth="1.2dp"
+            app:cornerRadius="8dp" />
+
+        <!-- 5. GPS Garmin / Navegadores (.GPX) -->
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btn_export_gpx"
+            style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:text="GPS Garmin / Navegador (.GPX)"
+            android:textAllCaps="false"
+            app:icon="@drawable/ic_map_pin"
+            app:iconGravity="textStart"
+            android:textColor="@color/text_white_pure"
+            app:strokeColor="@color/accent_orange"
+            app:strokeWidth="1.2dp"
+            app:cornerRadius="8dp" />
+
+        <!-- 6. Texto Plano (.TXT) -->
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btn_export_txt"
+            style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:text="Reporte en Texto (.TXT)"
+            android:textAllCaps="false"
+            app:icon="@drawable/ic_manual"
+            app:iconGravity="textStart"
+            android:textColor="@color/text_white_pure"
+            app:strokeColor="@color/accent_orange"
+            app:strokeWidth="1.2dp"
+            app:cornerRadius="8dp" />
+
+        <!-- 7. Digital (.JSON) -->
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btn_export_json"
+            style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:text="Respaldo Digital (.JSON)"
+            android:textAllCaps="false"
+            app:icon="@drawable/ic_auto"
+            app:iconGravity="textStart"
+            android:textColor="@color/text_white_pure"
+            app:strokeColor="@color/accent_orange"
+            app:strokeWidth="1.2dp"
+            app:cornerRadius="8dp" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btn_export_cancel"
+            style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="14dp"
+            android:text="@string/btn_cancel"
+            android:textColor="@color/text_white_pure"
+            app:strokeColor="@color/accent_orange"
+            app:strokeWidth="1.2dp"
+            app:cornerRadius="8dp" />
+
+    </LinearLayout>
+</ScrollView>

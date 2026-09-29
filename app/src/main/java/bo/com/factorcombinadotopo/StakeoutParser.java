@@ -22,19 +22,20 @@ public class StakeoutParser {
     public static List<StakeoutPoint> parseUri(Context context, Uri uri) throws Exception {
         List<StakeoutPoint> points = new ArrayList<>();
         Pattern pattern = Pattern.compile(REGEX, Pattern.CASE_INSENSITIVE);
+        StringBuilder fullContent = new StringBuilder();
 
         try (InputStream inputStream = context.getContentResolver().openInputStream(uri);
              BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream))) {
             
             String line;
             while ((line = reader.readLine()) != null) {
-                line = line.trim();
-                if (line.isEmpty()) continue;
+                fullContent.append(line).append("\n");
+                String trimmed = line.trim();
+                if (trimmed.isEmpty()) continue;
 
-                Matcher matcher = pattern.matcher(line);
+                Matcher matcher = pattern.matcher(trimmed);
                 if (matcher.find()) {
                     String id = matcher.group(1).trim();
-                    // Limpiar posibles comas decimales para que Double.parseDouble no falle
                     String eastStr = matcher.group(2).replace(",", ".");
                     String northStr = matcher.group(3).replace(",", ".");
                     
@@ -47,6 +48,14 @@ public class StakeoutParser {
                 }
             }
         }
+
+        // Si el formato legacy no dio resultados, intentar parsear como CSV / KML / GPX multiformato
+        if (points.isEmpty() && fullContent.length() > 0) {
+            String fileName = FileUtils.getFileName(context, uri);
+            if (fileName == null) fileName = "puntos.csv";
+            points = ExportUtils.parseImportFile(fullContent.toString(), fileName);
+        }
+
         return points;
     }
 }

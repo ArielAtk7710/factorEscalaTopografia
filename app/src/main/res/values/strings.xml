@@ -413,9 +413,12 @@
 
     <string name="title_collaborators">👥 Desarrolladores y Colaboradores</string>
     <string name="about_collaborators_body">Este proyecto ha sido impulsado gracias al esfuerzo conjunto de ingeniería de software y la experiencia técnica en campo:\n\n
-        <b>Desarrollo de Software &amp; Arquitectura:</b> Equipo Técnico de FactorCombinadoTopo.\n\n
-        <b>Asesoría Geodésica y Validación de Campo:</b> Especialistas y topógrafos asociados del Colegio de Topógrafos de La Paz.\n\n
-        <b>Colaboradores Topógrafos:</b> Profesionales del área que aportaron con pruebas de campo en Topografía y Geodesia, asimismo en la validación de la grilla MGB08 basada en la EGM2008 en el altiplano, valles y llanos de Bolivia.</string>
+        <b>Desarrollo de Software &amp; Arquitectura:</b>\n
+        • <b>Lic. en Informática - Ariel Ticona K.</b>\n\n
+        <b>Asesoría Geodésica y Colaboradores:</b>\n
+        • <b>M.Sc. Geodesia, Topografía y Geomática Ronald Ticona K.</b>\n\n
+        • Especialistas y topógrafos asociados del Colegio de Topógrafos de La Paz.\n
+        • Profesionales del área que aportaron con pruebas de campo en Topografía y Geodesia, asimismo en la validación de la grilla MGB08 basada en la EGM2008 en el altiplano, valles y llanos de Bolivia.</string>
 
     <string name="about_legal_note"><b>Nota importante:</b> Esta aplicación es una herramienta de apoyo técnico. Para trabajos que exijan rigor oficial, los resultados deben ser verificados con equipos topográficos certificados.</string>
 

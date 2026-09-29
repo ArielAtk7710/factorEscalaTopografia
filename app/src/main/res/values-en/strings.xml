@@ -370,9 +370,12 @@
 
     <string name="title_collaborators">👥 Developers and Collaborators</string>
     <string name="about_collaborators_body">This project has been driven by the joint effort of software engineering and technical field experience:\n\n
-        <b>Software Development &amp; Architecture:</b> FactorCombinadoTopo Technical Team.\n\n
-        <b>Geodetic Advisory and Field Validation:</b> Specialists and associated surveyors from the College of Surveyors of La Paz.\n\n
-        <b>Surveyor Collaborators:</b> Professionals in the area who contributed field tests in Topography and Geodesy, as well as in the validation of the MGB08 grid based on EGM2008 in the highlands, valleys, and lowlands of Bolivia.</string>
+        <b>Software Development &amp; Architecture:</b>\n
+        • <b>Lic. en Informática - Ariel Ticona K.</b>\n\n
+        <b>Geodetic Advisory &amp; Collaborators:</b>\n
+        • <b>M.Sc. Geodesia, Topografía y Geomática Ronald Ticona K.</b>\n\n
+        • Specialists and associated surveyors from the College of Surveyors of La Paz.\n
+        • Professionals in the area who contributed field tests in Topography and Geodesy, as well as in the validation of the MGB08 grid based on EGM2008 in the highlands, valleys, and lowlands of Bolivia.</string>
 
     <string name="about_legal_note"><b>Important Note:</b> This application is a technical support tool. For works demanding official rigor, results must be verified with certified topographic equipment.</string>
 

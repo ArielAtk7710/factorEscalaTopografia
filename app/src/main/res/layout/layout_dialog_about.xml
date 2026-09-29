@@ -65,6 +65,7 @@
                 android:layout_marginBottom="4dp" />
 
             <TextView
+                android:id="@+id/txt_about_collaborators_body"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="@string/about_collaborators_body"

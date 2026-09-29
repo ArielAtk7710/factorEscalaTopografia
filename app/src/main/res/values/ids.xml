@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <item name="btn_export_kml" type="id" />
+    <item name="btn_export_csv" type="id" />
+    <item name="btn_export_dxf" type="id" />
+    <item name="btn_export_geojson" type="id" />
+    <item name="btn_export_gpx" type="id" />
+</resources>

@@ -194,7 +194,7 @@ public class RegisterFragment extends Fragment {
         if (activeTab == 0) {
             List<Punto> seleccionados = new ArrayList<>();
             for (Punto p : puntosList) if (selectedIds.contains(p.id)) seleccionados.add(p);
-            exportarHistorialTxt(seleccionados, "Seleccion");
+            showExportOptionsDialogForPuntos(seleccionados, "Seleccion");
         } else {
             List<LibretaEntry> seleccionados = new ArrayList<>();
             for (LibretaEntry e : libretaList) if (selectedIds.contains(e.id)) seleccionados.add(e);
@@ -204,10 +204,51 @@ public class RegisterFragment extends Fragment {
     }
 
     private void showExportOptionsDialog() {
+        if (activeTab == 0) {
+            showExportOptionsDialogForPuntos(puntosList, "Completo");
+        } else {
+            showExportOptionsDialogForLibreta(libretaList, "Completo_Libreta");
+        }
+    }
+
+    private List<ExportUtils.ExportPoint> mapPuntosToExport(List<Punto> puntos) {
+        List<ExportUtils.ExportPoint> result = new ArrayList<>();
+        if (puntos == null) return result;
+        for (Punto p : puntos) {
+            ExportUtils.ExportPoint ep = new ExportUtils.ExportPoint();
+            ep.id = p.id;
+            ep.nombre = p.nombre;
+            ep.latitud = p.latitud;
+            ep.longitud = p.longitud;
+            ep.alturaElipsoidal = p.altura;
+            ep.alturaOrtometrica = p.altOrto;
+            ep.este = p.este;
+            ep.norte = p.norte;
+            ep.zona = p.zona;
+            ep.hemisferio = p.hemisferio;
+            ep.factorEscala = p.fe;
+            ep.factorAltura = p.fa;
+            ep.factorCombinado = p.fc;
+            ep.modeloGeoidal = p.geoidModel;
+            ep.precision = p.precision;
+            ep.satelites = p.satelites;
+            ep.temperatura = p.temperatura;
+            ep.fecha = p.fecha;
+            ep.notas = p.notas;
+            result.add(ep);
+        }
+        return result;
+    }
+
+    private void showExportOptionsDialogForPuntos(List<Punto> lista, String sufijo) {
         if (!isAdded()) return;
         final Context safeContext = getContext();
         if (safeContext == null) return;
-        
+        if (lista == null || lista.isEmpty()) {
+            UIUtils.showWarningToast(safeContext, getString(R.string.warn_no_export_data));
+            return;
+        }
+
         LayoutInflater inflater = LayoutInflater.from(safeContext);
         View dv = inflater.inflate(R.layout.dialog_export_options, null);
         AlertDialog.Builder b = new AlertDialog.Builder(safeContext);
@@ -215,9 +256,45 @@ public class RegisterFragment extends Fragment {
         if (d.getWindow() != null) d.getWindow().setBackgroundDrawableResource(android.R.color.transparent);
         d.setView(dv);
 
+        String timeTag = new SimpleDateFormat("yyyyMMdd_HHmm", Locale.getDefault()).format(new Date());
+
+        dv.findViewById(R.id.btn_export_kml).setOnClickListener(v -> {
+            String content = ExportUtils.generateKml(mapPuntosToExport(lista));
+            String name = "Puntos_" + sufijo + "_" + timeTag + ".kml";
+            FileUtils.savePublicFile(safeContext, name, content, "application/vnd.google-earth.kml+xml", "Puntos exportados para Google Maps/Earth");
+            UIUtils.safeDismissDialog(d);
+        });
+
+        dv.findViewById(R.id.btn_export_csv).setOnClickListener(v -> {
+            String content = ExportUtils.generateCsv(mapPuntosToExport(lista));
+            String name = "Puntos_" + sufijo + "_" + timeTag + ".csv";
+            FileUtils.savePublicFile(safeContext, name, content, "text/csv", "Puntos exportados para QGIS/ArcGIS/Excel");
+            UIUtils.safeDismissDialog(d);
+        });
+
+        dv.findViewById(R.id.btn_export_dxf).setOnClickListener(v -> {
+            String content = ExportUtils.generateDxf(mapPuntosToExport(lista));
+            String name = "Puntos_" + sufijo + "_" + timeTag + ".dxf";
+            FileUtils.savePublicFile(safeContext, name, content, "image/vnd.dxf", "Puntos 3D exportados para AutoCAD/Civil 3D");
+            UIUtils.safeDismissDialog(d);
+        });
+
+        dv.findViewById(R.id.btn_export_geojson).setOnClickListener(v -> {
+            String content = ExportUtils.generateGeoJson(mapPuntosToExport(lista));
+            String name = "Puntos_" + sufijo + "_" + timeTag + ".geojson";
+            FileUtils.savePublicFile(safeContext, name, content, "application/geo+json", "Puntos exportados en formato GeoJSON");
+            UIUtils.safeDismissDialog(d);
+        });
+
+        dv.findViewById(R.id.btn_export_gpx).setOnClickListener(v -> {
+            String content = ExportUtils.generateGpx(mapPuntosToExport(lista));
+            String name = "Puntos_" + sufijo + "_" + timeTag + ".gpx";
+            FileUtils.savePublicFile(safeContext, name, content, "application/gpx+xml", "Waypoints exportados para GPS Garmin");
+            UIUtils.safeDismissDialog(d);
+        });
+
         dv.findViewById(R.id.btn_export_txt).setOnClickListener(v -> {
-            if (activeTab == 0) exportarHistorialTxt(puntosList, "Completo");
-            else exportarLibretaTxt(libretaList, "Completo_Libreta");
+            exportarHistorialTxt(lista, sufijo);
             UIUtils.safeDismissDialog(d);
         });
 
@@ -228,6 +305,18 @@ public class RegisterFragment extends Fragment {
 
         dv.findViewById(R.id.btn_export_cancel).setOnClickListener(v -> UIUtils.safeDismissDialog(d));
         UIUtils.safeShowDialog(d);
+    }
+
+    private void showExportOptionsDialogForLibreta(List<LibretaEntry> lista, String sufijo) {
+        if (!isAdded()) return;
+        final Context safeContext = getContext();
+        if (safeContext == null) return;
+        if (lista == null || lista.isEmpty()) {
+            UIUtils.showWarningToast(safeContext, getString(R.string.warn_no_export_data));
+            return;
+        }
+
+        exportarLibretaTxt(lista, sufijo);
     }
 
     private void exportarDatosJson() {

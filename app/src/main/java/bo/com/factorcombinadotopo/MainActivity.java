@@ -486,6 +486,11 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         BottomSheetDialog dialog = new BottomSheetDialog(this);
         View view = getLayoutInflater().inflate(R.layout.layout_dialog_about, null);
         dialog.setContentView(view);
+
+        TextView txtCollabBody = view.findViewById(R.id.txt_about_collaborators_body);
+        if (txtCollabBody != null) {
+            txtCollabBody.setText(getText(R.string.about_collaborators_body));
+        }
         
         final int[] _x_val = {0};
         View _v_trig = view.findViewById(R.id.txt_about_collaborators_title);
