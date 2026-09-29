@@ -376,14 +376,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             showStakeout();
         } else if (id == R.id.nav_weather) {
             showWeather();
-        } else if (id == R.id.nav_geodesic) {
-            showGeodesic();
-        } else if (id == R.id.nav_distance_reduction) {
-            showDistanceReduction();
-        } else if (id == R.id.nav_line_calculator) {
-            showLineCalculator();
-        } else if (id == R.id.nav_lambert) {
-            showLambert();
         }
 
         drawer.closeDrawer(GravityCompat.START);
@@ -404,11 +396,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             if (fragment instanceof CompassFragment || 
                 fragment instanceof FieldNotebookFragment || 
                 fragment instanceof StakeoutFragment ||
-                fragment instanceof WeatherFragment ||
-                fragment instanceof GeodesicFragment ||
-                fragment instanceof DistanceReductionFragment ||
-                fragment instanceof LineCalculatorFragment ||
-                fragment instanceof LambertFragment) {
+                fragment instanceof WeatherFragment) {
                 getSupportFragmentManager().beginTransaction().remove(fragment).commit();
             }
         }
@@ -435,22 +423,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     private void showWeather() {
         hideMainAndShowFragment(new WeatherFragment());
-    }
-
-    private void showGeodesic() {
-        hideMainAndShowFragment(new GeodesicFragment());
-    }
-
-    private void showDistanceReduction() {
-        hideMainAndShowFragment(new DistanceReductionFragment());
-    }
-
-    private void showLineCalculator() {
-        hideMainAndShowFragment(new LineCalculatorFragment());
-    }
-
-    private void showLambert() {
-        hideMainAndShowFragment(new LambertFragment());
     }
 
     private void hideMainAndShowFragment(Fragment fragment) {

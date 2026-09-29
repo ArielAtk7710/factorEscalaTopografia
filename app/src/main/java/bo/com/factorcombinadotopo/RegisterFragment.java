@@ -260,35 +260,39 @@ public class RegisterFragment extends Fragment {
         
         TopographyRepository.getInstance(safeContext).runOnBackground(() -> {
             final List<Punto> tempPuntos = new ArrayList<>();
-            Cursor cursor = dbHelper.obtenerPuntos();
-            if (cursor != null && cursor.moveToFirst()) {
-                do {
-                    Punto p = new Punto();
-                    p.id = cursor.getInt(cursor.getColumnIndexOrThrow(DatabaseHelper.COLUMN_ID));
-                    p.nombre = cursor.getString(cursor.getColumnIndexOrThrow(DatabaseHelper.COLUMN_NOMBRE));
-                    p.latitud = cursor.getString(cursor.getColumnIndexOrThrow(DatabaseHelper.COLUMN_LATITUD));
-                    p.longitud = cursor.getString(cursor.getColumnIndexOrThrow(DatabaseHelper.COLUMN_LONGITUD));
-                    p.altura = cursor.getString(cursor.getColumnIndexOrThrow(DatabaseHelper.COLUMN_ALTURA));
-                    p.altOrto = cursor.getString(cursor.getColumnIndexOrThrow(DatabaseHelper.COLUMN_ALTURA_ORTO));
-                    p.presion = cursor.getString(cursor.getColumnIndexOrThrow(DatabaseHelper.COLUMN_PRESION));
-                    p.este = cursor.getString(cursor.getColumnIndexOrThrow(DatabaseHelper.COLUMN_ESTE));
-                    p.norte = cursor.getString(cursor.getColumnIndexOrThrow(DatabaseHelper.COLUMN_NORTE));
-                    p.zona = cursor.getString(cursor.getColumnIndexOrThrow(DatabaseHelper.COLUMN_ZONA));
-                    p.hemisferio = cursor.getString(cursor.getColumnIndexOrThrow(DatabaseHelper.COLUMN_HEMISFERIO));
-                    p.fe = cursor.getString(cursor.getColumnIndexOrThrow(DatabaseHelper.COLUMN_FACTOR_ESCALA));
-                    p.fa = cursor.getString(cursor.getColumnIndexOrThrow(DatabaseHelper.COLUMN_FACTOR_ALTURA));
-                    p.fc = cursor.getString(cursor.getColumnIndexOrThrow(DatabaseHelper.COLUMN_FACTOR_COMBINADO));
-                    p.geoidModel = cursor.getString(cursor.getColumnIndexOrThrow(DatabaseHelper.COLUMN_MODELO_GEOIDAL));
-                    p.tipoRegistro = cursor.getString(cursor.getColumnIndexOrThrow(DatabaseHelper.COLUMN_TIPO_REGISTRO));
-                    p.precision = cursor.getString(cursor.getColumnIndexOrThrow(DatabaseHelper.COLUMN_PRECISION));
-                    p.satelites = cursor.getString(cursor.getColumnIndexOrThrow(DatabaseHelper.COLUMN_SATELITES));
-                    p.temperatura = cursor.getString(cursor.getColumnIndexOrThrow(DatabaseHelper.COLUMN_TEMPERATURA));
-                    p.modeloDem = cursor.getString(cursor.getColumnIndexOrThrow(DatabaseHelper.COLUMN_MODELO_DEM));
-                    p.fecha = cursor.getString(cursor.getColumnIndexOrThrow(DatabaseHelper.COLUMN_FECHA));
-                    p.notas = cursor.getString(cursor.getColumnIndexOrThrow(DatabaseHelper.COLUMN_NOTAS));
-                    tempPuntos.add(p);
-                } while (cursor.moveToNext());
-                cursor.close();
+            Cursor cursor = null;
+            try {
+                cursor = dbHelper.obtenerPuntos();
+                if (cursor != null && cursor.moveToFirst()) {
+                    do {
+                        Punto p = new Punto();
+                        p.id = cursor.getInt(cursor.getColumnIndexOrThrow(DatabaseHelper.COLUMN_ID));
+                        p.nombre = cursor.getString(cursor.getColumnIndexOrThrow(DatabaseHelper.COLUMN_NOMBRE));
+                        p.latitud = cursor.getString(cursor.getColumnIndexOrThrow(DatabaseHelper.COLUMN_LATITUD));
+                        p.longitud = cursor.getString(cursor.getColumnIndexOrThrow(DatabaseHelper.COLUMN_LONGITUD));
+                        p.altura = cursor.getString(cursor.getColumnIndexOrThrow(DatabaseHelper.COLUMN_ALTURA));
+                        p.altOrto = cursor.getString(cursor.getColumnIndexOrThrow(DatabaseHelper.COLUMN_ALTURA_ORTO));
+                        p.presion = cursor.getString(cursor.getColumnIndexOrThrow(DatabaseHelper.COLUMN_PRESION));
+                        p.este = cursor.getString(cursor.getColumnIndexOrThrow(DatabaseHelper.COLUMN_ESTE));
+                        p.norte = cursor.getString(cursor.getColumnIndexOrThrow(DatabaseHelper.COLUMN_NORTE));
+                        p.zona = cursor.getString(cursor.getColumnIndexOrThrow(DatabaseHelper.COLUMN_ZONA));
+                        p.hemisferio = cursor.getString(cursor.getColumnIndexOrThrow(DatabaseHelper.COLUMN_HEMISFERIO));
+                        p.fe = cursor.getString(cursor.getColumnIndexOrThrow(DatabaseHelper.COLUMN_FACTOR_ESCALA));
+                        p.fa = cursor.getString(cursor.getColumnIndexOrThrow(DatabaseHelper.COLUMN_FACTOR_ALTURA));
+                        p.fc = cursor.getString(cursor.getColumnIndexOrThrow(DatabaseHelper.COLUMN_FACTOR_COMBINADO));
+                        p.geoidModel = cursor.getString(cursor.getColumnIndexOrThrow(DatabaseHelper.COLUMN_MODELO_GEOIDAL));
+                        p.tipoRegistro = cursor.getString(cursor.getColumnIndexOrThrow(DatabaseHelper.COLUMN_TIPO_REGISTRO));
+                        p.precision = cursor.getString(cursor.getColumnIndexOrThrow(DatabaseHelper.COLUMN_PRECISION));
+                        p.satelites = cursor.getString(cursor.getColumnIndexOrThrow(DatabaseHelper.COLUMN_SATELITES));
+                        p.temperatura = cursor.getString(cursor.getColumnIndexOrThrow(DatabaseHelper.COLUMN_TEMPERATURA));
+                        p.modeloDem = cursor.getString(cursor.getColumnIndexOrThrow(DatabaseHelper.COLUMN_MODELO_DEM));
+                        p.fecha = cursor.getString(cursor.getColumnIndexOrThrow(DatabaseHelper.COLUMN_FECHA));
+                        p.notas = cursor.getString(cursor.getColumnIndexOrThrow(DatabaseHelper.COLUMN_NOTAS));
+                        tempPuntos.add(p);
+                    } while (cursor.moveToNext());
+                }
+            } finally {
+                if (cursor != null) cursor.close();
             }
 
             if (getActivity() != null) {
@@ -310,25 +314,29 @@ public class RegisterFragment extends Fragment {
         
         TopographyRepository.getInstance(safeContext).runOnBackground(() -> {
             final List<LibretaEntry> tempLibreta = new ArrayList<>();
-            Cursor cursor = dbHelper.obtenerLibreta();
-            if (cursor != null && cursor.moveToFirst()) {
-                do {
-                    LibretaEntry e = new LibretaEntry();
-                    e.id = cursor.getInt(cursor.getColumnIndexOrThrow(DatabaseHelper.COL_LIB_ID));
-                    e.estacion = cursor.getString(cursor.getColumnIndexOrThrow(DatabaseHelper.COL_LIB_ESTACION));
-                    e.altIns = cursor.getString(cursor.getColumnIndexOrThrow(DatabaseHelper.COL_LIB_ALT_INS));
-                    e.puntoRef = cursor.getString(cursor.getColumnIndexOrThrow(DatabaseHelper.COL_LIB_PUNTO_REF));
-                    e.altPri = cursor.getString(cursor.getColumnIndexOrThrow(DatabaseHelper.COL_LIB_ALT_PRI));
-                    e.puntoAux = cursor.getString(cursor.getColumnIndexOrThrow(DatabaseHelper.COL_LIB_PUNTO_AUX));
-                    e.tipoReg = cursor.getString(cursor.getColumnIndexOrThrow(DatabaseHelper.COL_LIB_TIPO_REG));
-                    e.este = cursor.getString(cursor.getColumnIndexOrThrow(DatabaseHelper.COL_LIB_ESTE));
-                    e.norte = cursor.getString(cursor.getColumnIndexOrThrow(DatabaseHelper.COL_LIB_NORTE));
-                    e.cota = cursor.getString(cursor.getColumnIndexOrThrow(DatabaseHelper.COL_LIB_COTA));
-                    e.obs = cursor.getString(cursor.getColumnIndexOrThrow(DatabaseHelper.COL_LIB_OBS));
-                    e.fecha = cursor.getString(cursor.getColumnIndexOrThrow(DatabaseHelper.COL_LIB_FECHA));
-                    tempLibreta.add(e);
-                } while (cursor.moveToNext());
-                cursor.close();
+            Cursor cursor = null;
+            try {
+                cursor = dbHelper.obtenerLibreta();
+                if (cursor != null && cursor.moveToFirst()) {
+                    do {
+                        LibretaEntry e = new LibretaEntry();
+                        e.id = cursor.getInt(cursor.getColumnIndexOrThrow(DatabaseHelper.COL_LIB_ID));
+                        e.estacion = cursor.getString(cursor.getColumnIndexOrThrow(DatabaseHelper.COL_LIB_ESTACION));
+                        e.altIns = cursor.getString(cursor.getColumnIndexOrThrow(DatabaseHelper.COL_LIB_ALT_INS));
+                        e.puntoRef = cursor.getString(cursor.getColumnIndexOrThrow(DatabaseHelper.COL_LIB_PUNTO_REF));
+                        e.altPri = cursor.getString(cursor.getColumnIndexOrThrow(DatabaseHelper.COL_LIB_ALT_PRI));
+                        e.puntoAux = cursor.getString(cursor.getColumnIndexOrThrow(DatabaseHelper.COL_LIB_PUNTO_AUX));
+                        e.tipoReg = cursor.getString(cursor.getColumnIndexOrThrow(DatabaseHelper.COL_LIB_TIPO_REG));
+                        e.este = cursor.getString(cursor.getColumnIndexOrThrow(DatabaseHelper.COL_LIB_ESTE));
+                        e.norte = cursor.getString(cursor.getColumnIndexOrThrow(DatabaseHelper.COL_LIB_NORTE));
+                        e.cota = cursor.getString(cursor.getColumnIndexOrThrow(DatabaseHelper.COL_LIB_COTA));
+                        e.obs = cursor.getString(cursor.getColumnIndexOrThrow(DatabaseHelper.COL_LIB_OBS));
+                        e.fecha = cursor.getString(cursor.getColumnIndexOrThrow(DatabaseHelper.COL_LIB_FECHA));
+                        tempLibreta.add(e);
+                    } while (cursor.moveToNext());
+                }
+            } finally {
+                if (cursor != null) cursor.close();
             }
 
             if (getActivity() != null) {
