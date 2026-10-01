@@ -57,6 +57,13 @@ public class DistanceReductionFragment extends Fragment {
         spEllipsoid.setAdapter(adapter);
 
         view.findViewById(R.id.btnCalculate).setOnClickListener(v -> calculate());
+        view.findViewById(R.id.btnClear).setOnClickListener(v -> {
+            etDistInclinada.setText("");
+            etAltA.setText("");
+            etAltB.setText("");
+            etLatMedia.setText("");
+            layoutResults.setVisibility(View.GONE);
+        });
 
         view.findViewById(R.id.btn_distance_reduction_info).setOnClickListener(v -> {
             UIUtils.showProInfoDialog(requireContext(), 

@@ -264,13 +264,13 @@
         android:layout_height="wrap_content"
         android:layout_marginEnd="16dp"
         android:layout_marginBottom="12dp"
-        android:src="@drawable/ic_copy"
+        android:src="@drawable/ic_manual"
         app:backgroundTint="@color/accent_primary"
         app:fabSize="mini"
         app:layout_constraintBottom_toTopOf="@+id/fab_import_points"
         app:layout_constraintEnd_toEndOf="parent"
         app:tint="@android:color/white"
-        android:contentDescription="Crear Archivo TXT" />
+        android:contentDescription="Editar Archivo TXT" />
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/fab_import_points"

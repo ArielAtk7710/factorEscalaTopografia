@@ -383,12 +383,12 @@
     <!-- Terms and Conditions -->
     <string name="title_terms_conditions">📜 Términos y Condiciones de Uso</string>
     <string name="terms_body">Al utilizar FactorEscalaTop v2.4, aceptas formalmente los siguientes términos y condiciones:\n\n
-        <b>Alcance Geográfico:</b> La aplicación está diseñada y calibrada exclusivamente para los sistemas de referencia y la grilla cartográfica de Bolivia.\n\n
-        <b>Herramienta de Apoyo Técnico:</b> Los datos suministrados son de carácter orientativo y no sustituyen los procedimientos ni equipos profesionales certificados. La nueva <b>Suite de Ingeniería</b> incluye motores para Vincenty, Reducción de Distancias y Proyección Lambert.\n\n
-        <b>Sistemas de Referencia:</b> La app utiliza los modelos oficiales <b>MGBol08</b> y el estándar global <b>EGM2008</b> para la precisión geodésica.\n\n
-        <b>Conectividad y APIs:</b> Las funciones de "Altura Online" y "Clima" dependen de servicios de terceros. La app garantiza operatividad 100% offline para cálculos topográficos básicos y herramientas de ingeniería.\n\n
-        <b>Responsabilidad del Usuario:</b> Es obligación exclusiva del profesional verificar, validar y certificar todos los cálculos antes de su aplicación en proyectos formales.\n\n
-        <b>Cumplimiento Normativo:</b> El usuario se compromete a utilizar la herramienta en conformidad con la Ley 164 y normativa vigente en el Estado Plurinacional de Bolivia.</string>
+        <b>Alcance Cartográfico y Geodésico:</b> La aplicación está calibrada para los sistemas de referencia geodésicos del Estado Plurinacional de Bolivia (UTM Zonas 19S y 20S, WGS84, y Proyección Conforme Cónica de Lambert).\n\n
+        <b>Suite de Ingeniería y Herramientas Topográficas:</b> Incluye módulos de Cálculo de Factores IGM (k, ha, K), Algoritmos Geodésicos de Vincenty (Directo e Inverso), Reducción de Distancias Inclinadas al Elipsoide, Geometría de Líneas UTM, Conversión Lambert Bolivia, Mapeo Offline y Replanteo con importación/exportación GIS/CAD (KML, CSV, DXF 3D, GPX, GeoJSON).\n\n
+        <b>Modelos Geoidales y Elevación:</b> La app integra el modelo geoidal oficial <b>MGBol08</b> (basado en EGM2008) y el estándar global <b>EGM96</b>, así como la consulta de cotas ortométricas MSL mediante el modelo Copernicus DEM GLO-90.\n\n
+        <b>Asistente de Clima y Sensores Locales:</b> Las herramientas de análisis meteorológico para drones y altimetría dependen de sensores locales (barómetro, brújula, GPS) y APIs externas. Las funciones de cálculo básico y herramientas de ingeniería operan 100% offline.\n\n
+        <b>Carácter de Apoyo Técnico:</b> Los resultados calculados son herramientas de asistencia técnica para ingenieros y topógrafos. Es responsabilidad exclusiva del profesional verificar, validar y certificar los datos antes de su aplicación formal en proyectos.\n\n
+        <b>Cumplimiento Normativo:</b> El usuario se compromete a utilizar la herramienta en conformidad con la normativa técnica y legal vigente en el Estado Plurinacional de Bolivia.</string>
 
     <string name="title_privacy_policy">🔒 Política de Privacidad</string>
     <string name="privacy_body">En cumplimiento con las directrices de Google Play para la protección de datos, esta política detalla cómo se gestiona la información:\n\n
@@ -403,24 +403,33 @@
     <!-- About Section -->
     <string name="title_about_detailed">ℹ️ Acerca de FactorEscalaTop</string>
     <string name="about_version_region"><b>Versión:</b> 2.4 (Estabilidad Pro)\n<b>Región:</b> Estado Plurinacional de Bolivia</string>
-    <string name="about_app_description">Aplicación profesional para el apoyo topográfico y geodésico, calibrada para la grilla cartográfica boliviana. Optimizada en la v2.4 con:\n\n
-        • <b>Suite de Ingeniería</b>: Motores de Vincenty, reducción de distancias y proyección Lambert oficial.\n
-        • <b>Modo Replanteo</b>: Importación de puntos (.txt) y navegación asistida con aviso de proximidad.\n
-        • <b>Procesamiento GNSS Pro</b>: Estabilización de coordenadas mediante filtro de precisión y detección de saltos.\n
-        • <b>Caché Unificada (1GB)</b>: Gestión optimizada para mapas de calles y satélite (Modo Offline Total).\n
-        • <b>Factores IGM</b>: Cálculo de escala, altura y combinado con precisión de 9 decimales.\n\n
-        <b>🎖️ Avalada técnicamente para apoyo en campo por profesionales del área.</b></string>
+    <string name="title_app_description">📱 Descripción de la App</string>
+    <string name="about_app_description"><b>FactorEscalaTop v2.4</b> es una estación de trabajo topográfica profesional dirigida a <b>topógrafos, ingenieros civiles y profesionales geomáticos</b> en Bolivia.\n\n<b>¿Qué se puede hacer?</b>\n
+• <b>Factores IGM:</b> Calcular factores de escala, altura y combinado con 9 decimales.\n
+• <b>GNSS Pro:</b> Estabilizar y filtrar datos GNSS en tiempo real.\n
+• <b>Replanteo y GIS:</b> Navegar hacia puntos e importar/exportar en KML, CSV, DXF, GeoJSON y GPX.\n
+• <b>Herramientas de Campo:</b> Analizar clima para drones, usar mapas offline (1GB), brújula pro y libreta digital.</string>
 
     <string name="title_collaborators">👥 Desarrolladores y Colaboradores</string>
     <string name="about_collaborators_body">Este proyecto ha sido impulsado gracias al esfuerzo conjunto de ingeniería de software y la experiencia técnica en campo:\n\n
-        <b>Desarrollo de Software &amp; Arquitectura:</b>\n
-        • <b>Lic. en Informática - Ariel Ticona K.</b>\n\n
-        <b>Asesoría Geodésica y Colaboradores:</b>\n
-        • <b>M.Sc. Geodesia, Topografía y Geomática Ronald Ticona K.</b>\n\n
-        • Especialistas y topógrafos asociados del Colegio de Topógrafos de La Paz.\n
-        • Profesionales del área que aportaron con pruebas de campo en Topografía y Geodesia, asimismo en la validación de la grilla MGB08 basada en la EGM2008 en el altiplano, valles y llanos de Bolivia.</string>
+        <b>💻 Desarrollo de Software &amp; Arquitectura:</b>\n
+        • <b>Lic. en Informática mención Ingeniería de Sistemas - Ariel Ticona K.</b>\n
+        Email: ariel6764@gmail.com - Cel: +591 69856525\n\n
+        <b>🛰️ Asesoría Geodésica y Colaboración Técnica:</b>\n
+        • <b>M.Sc. en Geomática, Lic. Topografía y Geodesia - Ronald Ticona K.</b>\n
+        Profesional Senior Especialista, asociado al Colegio de Topógrafos de Bolivia, Departamental La Paz.\n\n
+        • <b>Profesionales del área que contribuyeron mediante pruebas de campo en Topografía y Geodesia, así como en la validación de la grilla MGB08 basada en la EGM2008 en el altiplano, valles y llanos de Bolivia.</b></string>
 
     <string name="about_legal_note"><b>Nota importante:</b> Esta aplicación es una herramienta de apoyo técnico. Para trabajos que exijan rigor oficial, los resultados deben ser verificados con equipos topográficos certificados.</string>
+
+    <!-- Sponsors Section -->
+    <string name="title_sponsors">AUSPICIADORES</string>
+    <string name="about_sponsors_subtitle">Con el auspicio de los Colegios de Profesionales:</string>
+    <string name="sponsor_image_1">Imagen 1</string>
+    <string name="sponsor_image_2">Imagen 2</string>
+    <string name="sponsor_image_3">Imagen 3</string>
+    <string name="sponsor_image_4">Imagen 4</string>
+    <string name="sponsor_image_5">Imagen 5</string>
 
     <!-- Cache Management -->
     <string name="title_confirm_cache_clear">Confirmar Limpieza de Caché</string>
@@ -446,26 +455,26 @@
     <!-- Quick Guide Content -->
     <string name="title_quick_guide">📖 Guía Rápida de Uso</string>
 
-    <string name="guide_section_gen_title">1. Conceptos Generales</string>
-    <string name="guide_section_gen_body">FactorEscalaTop v2.4 es una estación de trabajo topográfica para el cálculo de factores de corrección (k, ha, K), gestión avanzada de datos GNSS y replanteo de precisión, diseñada para el entorno boliviano.</string>
+    <string name="guide_section_gen_title">1. Conceptos y Factores IGM</string>
+    <string name="guide_section_gen_body">FactorEscalaTop v2.4 calcula con precisión de 9 decimales los factores de corrección (k, ha, K) calibrados para la grilla cartográfica de Bolivia.</string>
 
-    <string name="guide_section_calc_title">2. Estabilización y Cálculos</string>
-    <string name="guide_section_calc_body"><b>Modo Estático:</b> Pulsa "INICIAR ESTÁTICO" sobre un punto fijo para promediar la señal GNSS y fijar los decimales UTM.\n<b>Filtro GNSS:</b> La app descarta automáticamente saltos de posición erráticos (Outliers) para una mayor confiabilidad.</string>
+    <string name="guide_section_calc_title">2. Estabilización GNSS Pro</string>
+    <string name="guide_section_calc_body"><b>Modo Estático:</b> Promedia la señal sobre puntos fijos.\n<b>Filtro GNSS:</b> Elimina automáticamente saltos de posición erráticos (Outliers) para lecturas confiables.</string>
 
-    <string name="guide_section_map_title">3. Navegación y Replanteo</string>
-    <string name="guide_section_map_body"><b>Modo Replanteo:</b> Importa archivos .txt (Nombre, E, N, UTM, Zona, Hem) y sigue la flecha dinámica hacia el objetivo.\n<b>Mapas Offline:</b> Descarga zonas en caché (Calles o Satélite) y gestiónalas de forma independiente en Ajustes.</string>
+    <string name="guide_section_map_title">3. Mapas Offline y Replanteo</string>
+    <string name="guide_section_map_body"><b>Modo Replanteo:</b> Importa archivos (.kml, .csv, .gpx, .txt) y guía con flecha dinámica y aviso de proximidad.\n<b>Mapas 1GB:</b> Visualización offline en Calles y Satélite.</string>
 
-    <string name="guide_section_alt_title">4. Altura y Modelos DEM</string>
-    <string name="guide_section_alt_body"><b>GPS Dispositivo:</b> Altura elipsoidal del móvil.\n<b>Altura Online:</b> Obtiene la cota (MSL) vía API de Open-Meteo (Copernicus DEM) con corrección EGM2008.</string>
+    <string name="guide_section_alt_title">4. Alturas y Modelos Geoidales</string>
+    <string name="guide_section_alt_body"><b>Modelos:</b> Soporte para MGBol08 (Bolivia) y EGM96 (Global).\n<b>Altura DEM:</b> Obtención de cota ortométrica MSL online mediante Open-Meteo y Copernicus DEM.</string>
 
-    <string name="guide_section_drone_title">5. Asistente de Vuelo</string>
-    <string name="guide_section_drone_body">Analiza la seguridad para drones mediante un semáforo (Verde a Rojo). Toca la sección de <b>SATÉLITES</b> para un diagnóstico detallado de la constelación y potencia de señal.</string>
+    <string name="guide_section_drone_title">5. Asistente de Clima para Drones</string>
+    <string name="guide_section_drone_body">Analiza la seguridad de vuelo en tiempo real mediante un semáforo (Verde a Rojo) evaluando viento, ráfagas, Kp y visibilidad. Toca <b>SATÉLITES</b> para diagnóstico detallado.</string>
 
-    <string name="guide_section_data_title">6. Gestión de Datos</string>
-    <string name="guide_section_data_body">Exporta tus levantamientos en <b>TXT</b> para reportes humanos o <b>JSON</b> para integración directa con software GIS/CAD desde la pestaña REGISTROS.</string>
+    <string name="guide_section_data_title">6. Brújula Pro y Libreta de Campo</string>
+    <string name="guide_section_data_body"><b>Brújula y Nivel:</b> Herramientas de orientación con calibración magnética y burbuja de nivelación.\n<b>Libreta Digital:</b> Registro y control de observaciones taquimétricas y poligonales.</string>
 
-    <string name="guide_section_eng_title">7. Herramientas de Ingeniería</string>
-    <string name="guide_section_eng_body">Accede desde el menú lateral a cálculos avanzados: <b>Geodésica (Vincenty)</b> para líneas base largas, <b>Reducción</b> al elipsoide, <b>Línea UTM</b> y conversión a <b>Lambert Bolivia</b>. Cada una permite copiar y compartir el reporte técnico.</string>
+    <string name="guide_section_eng_title">7. Interoperabilidad GIS y CAD</string>
+    <string name="guide_section_eng_body">Exporta levantamientos e importa puntos en formato <b>KML</b> (Google Earth), <b>CSV/GeoJSON</b> (QGIS/ArcGIS), <b>DXF 3D</b> (AutoCAD Civil 3D) y <b>GPX</b> (GPS Garmin).</string>
 
     <string name="label_height_gps_disp">Altura GPS Disp.</string>
     <string name="label_height_online_dem">Altura online DEM</string>
@@ -582,4 +591,23 @@
         • 🟢 <b>MODO VERDE (Estático):</b> Actívelo al estar a menos de 1 metro. El sistema promediará la señal por 15-30 segundos para eliminar el ruido y fijar la marca con precisión centimétrica.\n\n
         <b>🗑️ BOTÓN ROJO (BASURERO):</b>\n
         Limpia toda la sesión de replanteo, elimina los puntos cargados y resetea la flecha indicadora.</string>
+
+    <!-- License Section -->
+    <string name="title_license">Licencia del Sistema</string>
+    <string name="label_license_type">Tipo de Licencia</string>
+    <string name="label_license_status">Estado de la Licencia</string>
+    <string name="label_expiration_date">Fecha de Expiración</string>
+    <string name="label_remaining_days">Días Restantes</string>
+    <string name="label_activation_code">Código de Activación (8 caracteres)</string>
+    <string name="hint_activation_code">Código (ej. Demo2026)</string>
+    <string name="btn_activate_license">ACTIVAR LICENCIA</string>
+    <string name="msg_license_activated_success">Licencia %1$s activada exitosamente hasta el %2$s.</string>
+    <string name="msg_invalid_activation_code">Código de activación inválido. Verifica los 8 caracteres.</string>
+    <string name="msg_license_expired_title">Licencia Expirada</string>
+    <string name="msg_license_expired_desc">Tu periodo de prueba DEMO o licencia de uso ha expirado. Por favor ingresa un código de activación de 8 dígitos para continuar utilizando la aplicación.</string>
+    <string name="status_license_active">Activa</string>
+    <string name="status_license_expired">Expirada</string>
+    <string name="type_license_demo">DEMO (Versión de Prueba)</string>
+    <string name="type_license_estandar">ESTÁNDAR</string>
+    <string name="type_license_profesional">PROFESIONAL</string>
 </resources>

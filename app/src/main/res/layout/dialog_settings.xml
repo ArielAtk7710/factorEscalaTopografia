@@ -355,6 +355,173 @@
                     app:trackTint="@color/switch_track_selector" />
             </LinearLayout>
 
+            <!-- Divider / License Section -->
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="6dp"
+                android:text="@string/title_license"
+                android:textColor="@color/accent_orange"
+                android:textSize="13sp"
+                android:textStyle="bold" />
+
+            <!-- License Card Container -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@color/bg_surface"
+                android:orientation="vertical"
+                android:padding="12dp"
+                android:layout_marginBottom="10dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:layout_marginBottom="6dp">
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="@string/label_license_type"
+                        android:textColor="@color/text_secondary"
+                        android:textSize="12sp" />
+
+                    <TextView
+                        android:id="@+id/txt_license_type"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="DEMO"
+                        android:textColor="@color/accent_orange"
+                        android:textStyle="bold"
+                        android:textSize="12sp"
+                        android:paddingHorizontal="8dp"
+                        android:paddingVertical="2dp"
+                        android:background="@drawable/bg_spinner_with_arrow" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:layout_marginBottom="4dp">
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="@string/label_license_status"
+                        android:textColor="@color/text_secondary"
+                        android:textSize="11sp" />
+
+                    <TextView
+                        android:id="@+id/txt_license_status"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/status_license_active"
+                        android:textColor="@color/state_success"
+                        android:textStyle="bold"
+                        android:textSize="12sp" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:layout_marginBottom="4dp">
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="@string/label_expiration_date"
+                        android:textColor="@color/text_secondary"
+                        android:textSize="11sp" />
+
+                    <TextView
+                        android:id="@+id/txt_license_expiration"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="30/10/2026"
+                        android:textColor="@color/text_primary"
+                        android:textSize="11sp" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical">
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="@string/label_remaining_days"
+                        android:textColor="@color/text_secondary"
+                        android:textSize="11sp" />
+
+                    <TextView
+                        android:id="@+id/txt_license_days_remaining"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="30 días"
+                        android:textColor="@color/accent_orange"
+                        android:textStyle="bold"
+                        android:textSize="12sp" />
+                </LinearLayout>
+            </LinearLayout>
+
+            <!-- Text code input and activate button -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="4dp"
+                android:text="@string/label_activation_code"
+                android:textColor="@color/text_secondary"
+                android:textSize="11sp"
+                android:textStyle="bold" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:layout_marginBottom="12dp">
+
+                <EditText
+                    android:id="@+id/et_activation_code"
+                    android:layout_width="0dp"
+                    android:layout_height="44dp"
+                    android:layout_weight="1"
+                    android:background="@drawable/bg_spinner_with_arrow"
+                    android:backgroundTint="@color/bg_surface_secondary"
+                    android:hint="@string/hint_activation_code"
+                    android:inputType="textCapCharacters|textVisiblePassword"
+                    android:maxLength="8"
+                    android:paddingHorizontal="12dp"
+                    android:textColor="@color/accent_orange"
+                    android:textSize="13sp"
+                    android:textStyle="bold" />
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btn_activate_license"
+                    style="@style/Widget.MaterialComponents.Button"
+                    android:layout_width="wrap_content"
+                    android:layout_height="44dp"
+                    android:layout_marginStart="8dp"
+                    android:text="@string/btn_activate_license"
+                    android:textSize="10sp"
+                    android:textStyle="bold"
+                    app:backgroundTint="@color/accent_orange"
+                    android:textColor="@android:color/white" />
+            </LinearLayout>
+
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"

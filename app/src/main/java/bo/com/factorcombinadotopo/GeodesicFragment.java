@@ -79,6 +79,15 @@ public class GeodesicFragment extends Fragment {
         });
 
         view.findViewById(R.id.btnCalculate).setOnClickListener(v -> calculate());
+        view.findViewById(R.id.btnClear).setOnClickListener(v -> {
+            etLat1.setText("");
+            etLon1.setText("");
+            etLat2.setText("");
+            etLon2.setText("");
+            etAzimuth.setText("");
+            etDistance.setText("");
+            layoutResults.setVisibility(View.GONE);
+        });
 
         view.findViewById(R.id.btn_geodesic_info).setOnClickListener(v -> {
             UIUtils.showProInfoDialog(requireContext(), 

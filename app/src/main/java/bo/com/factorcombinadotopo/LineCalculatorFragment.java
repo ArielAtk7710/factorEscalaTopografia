@@ -71,6 +71,13 @@ public class LineCalculatorFragment extends Fragment {
         spHemisphere.setSelection(1); // Sur por defecto
 
         view.findViewById(R.id.btnCalculate).setOnClickListener(v -> calculate());
+        view.findViewById(R.id.btnClear).setOnClickListener(v -> {
+            etEast1.setText("");
+            etNorth1.setText("");
+            etEast2.setText("");
+            etNorth2.setText("");
+            layoutResults.setVisibility(View.GONE);
+        });
 
         view.findViewById(R.id.btn_line_calculator_info).setOnClickListener(v -> {
             UIUtils.showProInfoDialog(requireContext(), 

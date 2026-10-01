@@ -340,12 +340,12 @@
     <!-- Terms and Conditions -->
     <string name="title_terms_conditions">📜 Terms and Conditions of Use</string>
     <string name="terms_body">By using FactorEscalaTop v2.4, you formally accept the following terms and conditions:\n\n
-        <b>Geographic Scope:</b> The application is designed and calibrated exclusively for the reference systems and cartographic grid of Bolivia.\n\n
-        <b>Technical Support Tool:</b> The data provided is for guidance only and does not replace certified procedures or professional equipment. The new <b>Engineering Suite</b> includes engines for Vincenty, Distance Reduction, and Lambert Projection.\n\n
-        <b>Reference Systems:</b> The app utilizes official <b>MGBol08</b> models and the global <b>EGM2008</b> standard for geodetic precision.\n\n
-        <b>Connectivity and APIs:</b> "Online Height" and "Weather" functions depend on third-party services. The app guarantees 100% offline operability for basic topographic calculations and engineering tools.\n\n
-        <b>User Responsibility:</b> It is the professional\'s exclusive obligation to verify, validate, and certify all calculations before their application in formal projects.\n\n
-        <b>Regulatory Compliance:</b> The user agrees to use the tool in accordance with Law 164 and current regulations in the Plurinational State of Bolivia.</string>
+        <b>Cartographic &amp; Geodetic Scope:</b> The application is calibrated for reference systems in the Plurinational State of Bolivia (UTM Zones 19S &amp; 20S, WGS84, and Lambert Conformal Conic Projection).\n\n
+        <b>Engineering Suite &amp; Surveying Tools:</b> Includes IGM Factor Calculation (k, ha, K), Vincenty Geodesic Algorithms (Direct &amp; Inverse), Slope Distance Reduction, UTM Line Geometry, Lambert Conversion, Offline Mapping, and Stakeout with GIS/CAD import &amp; export (KML, CSV, DXF 3D, GPX, GeoJSON).\n\n
+        <b>Geoid Models &amp; Elevation:</b> Integrates official <b>MGBol08</b> (EGM2008) and global <b>EGM96</b> geoid models, as well as online MSL orthometric elevation retrieval via Copernicus DEM GLO-90.\n\n
+        <b>Weather Assistant &amp; Sensors:</b> Drone weather analysis and altimetry rely on local sensors (barometer, compass, GPS) and external APIs. Core calculation tools operate 100% offline.\n\n
+        <b>Technical Support Character:</b> Results provided are technical support tools for engineers and surveyors. It is the professional\'s sole responsibility to verify, validate, and certify calculations before formal project application.\n\n
+        <b>Regulatory Compliance:</b> The user agrees to use the tool in compliance with applicable technical standards and regulations in Bolivia.</string>
 
     <string name="title_privacy_policy">🔒 Privacy Policy</string>
     <string name="privacy_body">In compliance with Google Play guidelines for data protection, this policy details how information is managed:\n\n
@@ -360,24 +360,31 @@
     <!-- About Section -->
     <string name="title_about_detailed">ℹ️ About FactorEscalaTop</string>
     <string name="about_version_region"><b>Version:</b> 2.4 (Pro Stability)\n<b>Region:</b> Plurinational State of Bolivia</string>
-    <string name="about_app_description">Professional application for topographic and geodetic support, calibrated for the Bolivian cartographic grid. Optimized in v2.4 with:\n\n
-        • <b>Engineering Suite</b>: Engines for Vincenty, distance reduction, and official Lambert projection.\n
-        • <b>Stakeout Mode</b>: Point import (.txt) and assisted navigation with proximity alerts.\n
-        • <b>GNSS Pro Processing</b>: Coordinate stabilization via precision filter and jump detection.\n
-        • <b>Unified Cache (1GB)</b>: Optimized management for street and satellite maps (Total Offline Mode).\n
-        • <b>IGM Factors</b>: Calculation of scale, elevation, and combined factors with 9-decimal precision.\n\n
-        <b>🎖️ Technically endorsed for field support by professionals in the field.</b></string>
+    <string name="title_app_description">📱 App Description</string>
+    <string name="about_app_description"><b>FactorEscalaTop v2.4</b> is a professional topographic workstation aimed at <b>surveyors, civil engineers, and geomatics professionals</b> in Bolivia.\n\n<b>What can you do?</b>\n
+• <b>IGM Factors:</b> Calculate scale, elevation, and combined factors with 9 decimals.\n
+• <b>GNSS Pro:</b> Stabilize and filter GNSS data in real time.\n
+• <b>Stakeout &amp; GIS:</b> Navigate to points and import/export in KML, CSV, DXF, GeoJSON, and GPX.\n
+• <b>Field Tools:</b> Analyze drone weather, use offline maps (1GB), pro compass, and digital notebook.</string>
 
-    <string name="title_collaborators">👥 Developers and Collaborators</string>
-    <string name="about_collaborators_body">This project has been driven by the joint effort of software engineering and technical field experience:\n\n
-        <b>Software Development &amp; Architecture:</b>\n
-        • <b>Lic. en Informática - Ariel Ticona K.</b>\n\n
-        <b>Geodetic Advisory &amp; Collaborators:</b>\n
-        • <b>M.Sc. Geodesia, Topografía y Geomática Ronald Ticona K.</b>\n\n
-        • Specialists and associated surveyors from the College of Surveyors of La Paz.\n
-        • Professionals in the area who contributed field tests in Topography and Geodesy, as well as in the validation of the MGB08 grid based on EGM2008 in the highlands, valleys, and lowlands of Bolivia.</string>
+    <string name="title_collaborators">👥 Developers &amp; Collaborators</string>
+    <string name="about_collaborators_body">This project has been driven thanks to the joint effort of software engineering and field technical expertise:\n\n
+        <b>💻 Software Development &amp; Architecture:</b>\n
+        • <b>BSc. in Computer Science, Systems Engineering major - Ariel Ticona K.</b>\n
+        Email: ariel6764@gmail.com - Cell: +591 69856525\n\n
+        <b>🛰️ Geodetic Advisory &amp; Technical Collaboration:</b>\n
+        • <b>M.Sc. in Geomatics, Topography and Geodesy - Ronald Ticona K.</b>\n
+        Senior Specialist Professional, associated with the College of Surveyors of Bolivia, La Paz Departmental.\n\n
+        • <b>Professionals in the field who contributed through field tests in Topography and Geodesy, as well as in the validation of the MGB08 grid based on EGM2008 in the altiplano, valleys, and lowlands of Bolivia.</b></string>
 
-    <string name="about_legal_note"><b>Important Note:</b> This application is a technical support tool. For works demanding official rigor, results must be verified with certified topographic equipment.</string>
+    <!-- Sponsors Section -->
+    <string name="title_sponsors">SPONSORS</string>
+    <string name="about_sponsors_subtitle">Sponsored by Professional Colleges &amp; Associations:</string>
+    <string name="sponsor_image_1">Image 1</string>
+    <string name="sponsor_image_2">Image 2</string>
+    <string name="sponsor_image_3">Image 3</string>
+    <string name="sponsor_image_4">Image 4</string>
+    <string name="sponsor_image_5">Image 5</string>
 
     <!-- Cache Management -->
     <string name="title_confirm_cache_clear">Confirm Cache Clear</string>
@@ -399,26 +406,26 @@
     <!-- Quick Guide Content -->
     <string name="title_quick_guide">📖 Quick User Guide</string>
 
-    <string name="guide_section_gen_title">1. General Concepts</string>
-    <string name="guide_section_gen_body">FactorEscalaTop v2.4 is a topographic workstation for calculating correction factors (k, ha, K), advanced GNSS data management, and precision stakeout, designed for the Bolivian environment.</string>
+    <string name="guide_section_gen_title">1. Concepts &amp; IGM Factors</string>
+    <string name="guide_section_gen_body">FactorEscalaTop v2.4 calculates correction factors (k, ha, K) calibrated for the Bolivian cartographic grid with 9-decimal precision.</string>
 
-    <string name="guide_section_calc_title">2. Stabilization and Calculations</string>
-    <string name="guide_section_calc_body"><b>Static Mode:</b> Tap "START STATIC" over a fixed point to average the GNSS signal and fix UTM decimals.\n<b>GNSS Filter:</b> The app automatically discards erratic position jumps (Outliers) for greater reliability.</string>
+    <string name="guide_section_calc_title">2. GNSS Pro Stabilization</string>
+    <string name="guide_section_calc_body"><b>Static Mode:</b> Averages signal over fixed points.\n<b>GNSS Filter:</b> Automatically eliminates erratic position jumps (Outliers) for reliable readings.</string>
 
-    <string name="guide_section_map_title">3. Navigation and Stakeout</string>
-    <string name="guide_section_map_body"><b>Stakeout Mode:</b> Import .txt files (Name, E, N, UTM, Zone, Hem) and follow the dynamic arrow towards the target.\n<b>Offline Maps:</b> Download cached zones (Street or Satellite) and manage them independently in Settings.</string>
+    <string name="guide_section_map_title">3. Offline Maps &amp; Stakeout</string>
+    <string name="guide_section_map_body"><b>Stakeout Mode:</b> Import files (.kml, .csv, .gpx, .txt) and navigate with dynamic arrow and proximity alert.\n<b>1GB Maps:</b> Offline visualization in Street and Satellite.</string>
 
-    <string name="guide_section_alt_title">4. Altitude and DEM Models</string>
-    <string name="guide_section_alt_body"><b>Device GPS:</b> Ellipsoidal height from the mobile.\n<b>Online Height:</b> Obtains the elevation (MSL) via Open-Meteo API (Copernicus DEM) with EGM2008 correction.</string>
+    <string name="guide_section_alt_title">4. Heights &amp; Geoid Models</string>
+    <string name="guide_section_alt_body"><b>Models:</b> Support for MGBol08 (Bolivia) and EGM96 (Global).\n<b>DEM Height:</b> Obtaining orthometric MSL height online via Open-Meteo &amp; Copernicus DEM.</string>
 
-    <string name="guide_section_drone_title">5. Flight Assistant</string>
-    <string name="guide_section_drone_body">Analyzes drone safety via traffic light (Green to Red). Tap the <b>SATELLITES</b> section for a detailed constellation diagnosis and signal strength.</string>
+    <string name="guide_section_drone_title">5. Drone Weather Assistant</string>
+    <string name="guide_section_drone_body">Analyzes real-time flight safety via traffic light (Green to Red) evaluating wind, gusts, Kp, and visibility. Tap <b>SATELLITES</b> for detailed diagnostics.</string>
 
-    <string name="guide_section_data_title">6. Data Management</string>
-    <string name="guide_section_data_body">Export your surveys in <b>TXT</b> for human reports or <b>JSON</b> for direct integration with GIS/CAD software from the RECORDS tab.</string>
+    <string name="guide_section_data_title">6. Pro Compass &amp; Field Notebook</string>
+    <string name="guide_section_data_body"><b>Compass &amp; Level:</b> Orientation tools with magnetic calibration and bubble level.\n<b>Digital Notebook:</b> Recording and control of tachymetric and polygonal observations.</string>
 
-    <string name="guide_section_eng_title">7. Engineering Tools</string>
-    <string name="guide_section_eng_body">Access advanced calculations from the side menu: <b>Geodesic (Vincenty)</b> for long baselines, <b>Reduction</b> to the ellipsoid, <b>UTM Line</b> and conversion to <b>Lambert Bolivia</b>. Each allows copying and sharing the technical report.</string>
+    <string name="guide_section_eng_title">7. GIS &amp; CAD Interoperability</string>
+    <string name="guide_section_eng_body">Export surveys and import points in <b>KML</b> (Google Earth), <b>CSV/GeoJSON</b> (QGIS/ArcGIS), <b>DXF 3D</b> (AutoCAD Civil 3D), and <b>GPX</b> (Garmin GPS).</string>
 
     <string name="title_confirm_cache_street">Confirm Street Cache Clear</string>
     <string name="msg_confirm_cache_street">Do you want to delete the street map cache?</string>
@@ -533,4 +540,23 @@
         2. When less than 1 meter away, stop and switch to <b>GREEN</b> mode.\n
         3. Keep the equipment motionless for <b>15 to 20 seconds</b>.\n
         4. The distance will stabilize. Mark the ground with full confidence.</string>
+
+    <!-- License Section -->
+    <string name="title_license">System License</string>
+    <string name="label_license_type">License Type</string>
+    <string name="label_license_status">License Status</string>
+    <string name="label_expiration_date">Expiration Date</string>
+    <string name="label_remaining_days">Remaining Days</string>
+    <string name="label_activation_code">Activation Code (8 characters)</string>
+    <string name="hint_activation_code">Code (e.g., Demo2026)</string>
+    <string name="btn_activate_license">ACTIVATE LICENSE</string>
+    <string name="msg_license_activated_success">%1$s License successfully activated until %2$s.</string>
+    <string name="msg_invalid_activation_code">Invalid activation code. Please check the 8 characters.</string>
+    <string name="msg_license_expired_title">License Expired</string>
+    <string name="msg_license_expired_desc">Your DEMO trial period or usage license has expired. Please enter an 8-digit activation code to continue using the app.</string>
+    <string name="status_license_active">Active</string>
+    <string name="status_license_expired">Expired</string>
+    <string name="type_license_demo">DEMO (Trial Version)</string>
+    <string name="type_license_estandar">STANDARD</string>
+    <string name="type_license_profesional">PROFESSIONAL</string>
 </resources>

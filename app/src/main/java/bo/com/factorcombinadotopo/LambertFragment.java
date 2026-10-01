@@ -67,6 +67,13 @@ public class LambertFragment extends Fragment {
         });
 
         view.findViewById(R.id.btnCalculate).setOnClickListener(v -> calculate());
+        view.findViewById(R.id.btnClear).setOnClickListener(v -> {
+            etLat.setText("");
+            etLon.setText("");
+            etX.setText("");
+            etY.setText("");
+            layoutResults.setVisibility(View.GONE);
+        });
 
         view.findViewById(R.id.btn_lambert_info).setOnClickListener(v -> {
             UIUtils.showProInfoDialog(requireContext(), 

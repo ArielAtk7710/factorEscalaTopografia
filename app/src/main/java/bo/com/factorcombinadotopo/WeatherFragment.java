@@ -492,8 +492,11 @@ public class WeatherFragment extends Fragment {
             try {
                 SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd", Locale.US);
                 Date date = sdf.parse(dateStr);
-                return new SimpleDateFormat("EEE", Locale.getDefault()).format(date);
-            } catch (Exception e) { return dateStr; }
+                if (date != null) {
+                    return new SimpleDateFormat("EEE", Locale.getDefault()).format(date);
+                }
+            } catch (Exception e) { }
+            return dateStr;
         }
         class ViewHolder extends RecyclerView.ViewHolder {
             TextView txtDay, txtTempRange, txtRain; ImageView imgIcon;

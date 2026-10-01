@@ -13,7 +13,7 @@ import java.util.Locale;
 public class DatabaseHelper extends SQLiteOpenHelper {
 
     private static final String DATABASE_NAME = "puntos.db";
-    private static final int DATABASE_VERSION = 8;
+    private static final int DATABASE_VERSION = 9;
 
     public static final String TABLE_PUNTOS = "puntos";
     public static final String TABLE_LIBRETA = "libreta_campo";
@@ -55,6 +55,24 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public static final String COL_LIB_COTA = "cota";
     public static final String COL_LIB_OBS = "observaciones";
     public static final String COL_LIB_FECHA = "fecha";
+
+    // Tabla Licencias de Catálogo
+    public static final String TABLE_LICENCIAS = "licencias";
+    public static final String COL_LIC_ID = "id";
+    public static final String COL_LIC_CODIGO = "codigo";
+    public static final String COL_LIC_TIPO = "tipo";
+    public static final String COL_LIC_DIAS = "dias_duracion";
+    public static final String COL_LIC_FECHA_EXP_FIJA = "fecha_expiracion_fija";
+    public static final String COL_LIC_DESC = "descripcion";
+
+    // Tabla Licencia Activa del Sistema
+    public static final String TABLE_LICENCIA_ACTIVA = "licencia_activa";
+    public static final String COL_ACT_ID = "id";
+    public static final String COL_ACT_TIPO = "tipo";
+    public static final String COL_ACT_CODIGO = "codigo";
+    public static final String COL_ACT_FECHA_ACTIVACION = "fecha_activacion";
+    public static final String COL_ACT_FECHA_EXPIRACION = "fecha_expiracion";
+    public static final String COL_ACT_ESTADO = "estado";
 
     // 💡 Modificación: Se eliminó DEFAULT CURRENT_TIMESTAMP para forzar que siempre use la hora local enviada desde la App
     private static final String TABLE_CREATE =
@@ -99,6 +117,26 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                     COL_LIB_FECHA + " TEXT" +
                     ");";
 
+    private static final String TABLE_LICENCIAS_CREATE =
+            "CREATE TABLE " + TABLE_LICENCIAS + " (" +
+                    COL_LIC_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
+                    COL_LIC_CODIGO + " TEXT UNIQUE, " +
+                    COL_LIC_TIPO + " TEXT, " +
+                    COL_LIC_DIAS + " INTEGER, " +
+                    COL_LIC_FECHA_EXP_FIJA + " TEXT, " +
+                    COL_LIC_DESC + " TEXT" +
+                    ");";
+
+    private static final String TABLE_LICENCIA_ACTIVA_CREATE =
+            "CREATE TABLE " + TABLE_LICENCIA_ACTIVA + " (" +
+                    COL_ACT_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
+                    COL_ACT_TIPO + " TEXT, " +
+                    COL_ACT_CODIGO + " TEXT, " +
+                    COL_ACT_FECHA_ACTIVACION + " TEXT, " +
+                    COL_ACT_FECHA_EXPIRACION + " TEXT, " +
+                    COL_ACT_ESTADO + " TEXT" +
+                    ");";
+
     private static DatabaseHelper instance;
 
     public static synchronized DatabaseHelper getInstance(Context context) {
@@ -116,6 +154,9 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public void onCreate(SQLiteDatabase db) {
         db.execSQL(TABLE_CREATE);
         db.execSQL(TABLE_LIBRETA_CREATE);
+        db.execSQL(TABLE_LICENCIAS_CREATE);
+        db.execSQL(TABLE_LICENCIA_ACTIVA_CREATE);
+        seedLicenseTables(db);
     }
 
     @Override
@@ -139,6 +180,58 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         }
         if (oldVersion < 8) {
             db.execSQL("ALTER TABLE " + TABLE_PUNTOS + " ADD COLUMN " + COLUMN_MODELO_DEM + " TEXT DEFAULT 'GPS Dispositivo'");
+        }
+        if (oldVersion < 9) {
+            db.execSQL(TABLE_LICENCIAS_CREATE);
+            db.execSQL(TABLE_LICENCIA_ACTIVA_CREATE);
+            seedLicenseTables(db);
+        }
+    }
+
+    public synchronized void seedLicenseTables(SQLiteDatabase db) {
+        try {
+            // Eliminar otras licencias no DEMO si existieran
+            db.delete(TABLE_LICENCIAS, COL_LIC_TIPO + " != ?", new String[]{"DEMO"});
+
+            // Verificar e insertar licencia DEMO predeterminada
+            Cursor c = db.rawQuery("SELECT COUNT(*) FROM " + TABLE_LICENCIAS, null);
+            boolean emptyLicencias = true;
+            if (c != null) {
+                if (c.moveToFirst() && c.getInt(0) > 0) emptyLicencias = false;
+                c.close();
+            }
+
+            if (emptyLicencias) {
+                // DEMO: "Demo2026", tipo DEMO, 30 días, expira el 30/10/2026
+                ContentValues lDemo = new ContentValues();
+                lDemo.put(COL_LIC_CODIGO, "Demo2026");
+                lDemo.put(COL_LIC_TIPO, "DEMO");
+                lDemo.put(COL_LIC_DIAS, 30);
+                lDemo.put(COL_LIC_FECHA_EXP_FIJA, "2026-10-30 23:59:59");
+                lDemo.put(COL_LIC_DESC, "Licencia Demo de Prueba 1 Mes (30/10/2026)");
+                db.insertWithOnConflict(TABLE_LICENCIAS, null, lDemo, SQLiteDatabase.CONFLICT_IGNORE);
+            }
+
+            // Insertar Licencia Activa Inicial si no existe
+            Cursor cAct = db.rawQuery("SELECT COUNT(*) FROM " + TABLE_LICENCIA_ACTIVA, null);
+            boolean emptyActiva = true;
+            if (cAct != null) {
+                if (cAct.moveToFirst() && cAct.getInt(0) > 0) emptyActiva = false;
+                cAct.close();
+            }
+
+            if (emptyActiva) {
+                String timeStampLocal = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault()).format(new Date());
+                ContentValues active = new ContentValues();
+                active.put(COL_ACT_TIPO, "DEMO");
+                active.put(COL_ACT_CODIGO, "Demo2026");
+                active.put(COL_ACT_FECHA_ACTIVACION, timeStampLocal);
+                active.put(COL_ACT_FECHA_EXPIRACION, "2026-10-30 23:59:59");
+                active.put(COL_ACT_ESTADO, "ACTIVA");
+                db.insert(TABLE_LICENCIA_ACTIVA, null, active);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 

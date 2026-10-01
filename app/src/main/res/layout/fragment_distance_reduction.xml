@@ -146,15 +146,33 @@
                     android:hint="Ej: -16.5"
                     android:inputType="numberDecimal|numberSigned" />
 
-                <com.google.android.material.button.MaterialButton
-                    android:id="@+id/btnCalculate"
+                <LinearLayout
+                    android:orientation="horizontal"
+                    android:layout_marginTop="12dp"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="16dp"
-                    android:text="REDUCIR DISTANCIA"
-                    android:textColor="@color/text_primary"
-                    android:textStyle="bold"
-                    app:backgroundTint="@color/accent_orange" />
+                    android:layout_height="wrap_content">
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btnCalculate"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:text="@string/btn_calculate"
+                        app:backgroundTint="@color/accent_orange"
+                        android:textColor="@color/text_primary"
+                        android:textStyle="bold"
+                        android:layout_weight="1"
+                        android:layout_marginEnd="4dp"/>
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btnClear"
+                        style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:text="@string/btn_clean"
+                        app:strokeColor="@color/state_error"
+                        android:textColor="@color/state_error"
+                        android:textStyle="bold"
+                        android:layout_weight="1"
+                        android:layout_marginStart="4dp"/>
+                </LinearLayout>
             </LinearLayout>
         </com.google.android.material.card.MaterialCardView>
 

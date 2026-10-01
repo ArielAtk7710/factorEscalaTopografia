@@ -654,6 +654,56 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             txtStatus.setText(isChecked ? R.string.label_dark_mode : R.string.label_light_mode);
         });
 
+        // 5. Configurar Sección LICENCIA
+        TextView txtLicType = view.findViewById(R.id.txt_license_type);
+        TextView txtLicStatus = view.findViewById(R.id.txt_license_status);
+        TextView txtLicExp = view.findViewById(R.id.txt_license_expiration);
+        TextView txtLicDays = view.findViewById(R.id.txt_license_days_remaining);
+        EditText etCode = view.findViewById(R.id.et_activation_code);
+        View btnActivate = view.findViewById(R.id.btn_activate_license);
+
+        Runnable updateLicenseUI = () -> {
+            LicenseManager.LicenseInfo info = LicenseManager.getActiveLicense(this);
+            if (txtLicType != null) txtLicType.setText(info.tipo);
+            if (txtLicStatus != null) {
+                if (info.isExpired) {
+                    txtLicStatus.setText(R.string.status_license_expired);
+                    txtLicStatus.setTextColor(androidx.core.content.ContextCompat.getColor(this, R.color.state_error));
+                } else {
+                    txtLicStatus.setText(R.string.status_license_active);
+                    txtLicStatus.setTextColor(androidx.core.content.ContextCompat.getColor(this, R.color.state_success));
+                }
+            }
+            if (txtLicExp != null) {
+                String cleanExp = info.fechaExpiracion;
+                if (cleanExp != null && cleanExp.length() >= 10) {
+                    String[] parts = cleanExp.substring(0, 10).split("-");
+                    if (parts.length == 3) cleanExp = parts[2] + "/" + parts[1] + "/" + parts[0];
+                }
+                txtLicExp.setText(cleanExp);
+            }
+            if (txtLicDays != null) {
+                txtLicDays.setText(String.format(java.util.Locale.getDefault(), "%d días", info.diasRestantes));
+            }
+        };
+
+        updateLicenseUI.run();
+
+        if (btnActivate != null) {
+            btnActivate.setOnClickListener(v -> {
+                String inputCode = etCode.getText().toString().trim();
+                if (inputCode.length() == 8 && LicenseManager.activateCode(this, inputCode)) {
+                    LicenseManager.LicenseInfo newInfo = LicenseManager.getActiveLicense(this);
+                    String msg = String.format(getString(R.string.msg_license_activated_success), newInfo.tipo, newInfo.fechaExpiracion);
+                    UIUtils.showInfoToast(this, msg);
+                    etCode.setText("");
+                    updateLicenseUI.run();
+                } else {
+                    UIUtils.showErrorToast(this, getString(R.string.msg_invalid_activation_code));
+                }
+            });
+        }
+
         view.findViewById(R.id.btn_close_settings).setOnClickListener(v -> {
             String offsetStr = etOffset.getText().toString();
             try {
@@ -772,6 +822,14 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 selected.set(year, month, dayOfMonth, 12, 0, 0);
                 updateGnssFields(selected, txtJulian, txtDoy, txtGpsWeek, txtGpsWeekNum, txtDateDisplay);
             }, current.get(Calendar.YEAR), current.get(Calendar.MONTH), current.get(Calendar.DAY_OF_MONTH));
+            datePicker.setOnShowListener(dialogInterface -> {
+                try {
+                    android.widget.Button posButton = datePicker.getButton(DatePickerDialog.BUTTON_POSITIVE);
+                    android.widget.Button negButton = datePicker.getButton(DatePickerDialog.BUTTON_NEGATIVE);
+                    if (posButton != null) posButton.setTextColor(getResources().getColor(R.color.accent_orange, null));
+                    if (negButton != null) negButton.setTextColor(getResources().getColor(R.color.text_primary, null));
+                } catch (Exception ignored) {}
+            });
             datePicker.show();
         });
 
@@ -877,6 +935,50 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         registerReceiver(gpsStateReceiver, new IntentFilter(LocationManager.PROVIDERS_CHANGED_ACTION));
         checkGlobalGpsState(true);
         startLocationUpdates();
+        checkLicenseExpiration();
+    }
+
+    private void checkLicenseExpiration() {
+        if (LicenseManager.isLicenseExpired(this)) {
+            showLicenseExpiredDialog();
+        }
+    }
+
+    private void showLicenseExpiredDialog() {
+        android.app.Dialog dialog = new android.app.Dialog(this);
+        dialog.setContentView(R.layout.dialog_license_expired);
+        dialog.setCancelable(false);
+        if (dialog.getWindow() != null) {
+            dialog.getWindow().setLayout(android.view.ViewGroup.LayoutParams.MATCH_PARENT, android.view.ViewGroup.LayoutParams.WRAP_CONTENT);
+        }
+
+        EditText etCode = dialog.findViewById(R.id.et_expired_activation_code);
+        View btnActivate = dialog.findViewById(R.id.btn_activate_expired_license);
+        View btnExit = dialog.findViewById(R.id.btn_close_app);
+
+        if (btnActivate != null) {
+            btnActivate.setOnClickListener(v -> {
+                String inputCode = (etCode != null) ? etCode.getText().toString().trim() : "";
+                if (inputCode.length() == 8 && LicenseManager.activateCode(this, inputCode)) {
+                    LicenseManager.LicenseInfo info = LicenseManager.getActiveLicense(this);
+                    String msg = String.format(getString(R.string.msg_license_activated_success), info.tipo, info.fechaExpiracion);
+                    UIUtils.showInfoToast(this, msg);
+                    dialog.dismiss();
+                    recreate();
+                } else {
+                    UIUtils.showErrorToast(this, getString(R.string.msg_invalid_activation_code));
+                }
+            });
+        }
+
+        if (btnExit != null) {
+            btnExit.setOnClickListener(v -> {
+                dialog.dismiss();
+                finishAffinity();
+            });
+        }
+
+        dialog.show();
     }
 
     @Override

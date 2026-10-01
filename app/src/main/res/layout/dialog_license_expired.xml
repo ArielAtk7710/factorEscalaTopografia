@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@color/bg_main"
+    android:orientation="vertical"
+    android:padding="20dp"
+    android:gravity="center_horizontal">
+
+    <ImageView
+        android:layout_width="56dp"
+        android:layout_height="56dp"
+        android:src="@drawable/ic_info_round_blue"
+        app:tint="@color/state_error"
+        android:layout_marginBottom="12dp"
+        android:contentDescription="@string/msg_license_expired_title" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/msg_license_expired_title"
+        android:textColor="@color/state_error"
+        android:textSize="20sp"
+        android:textStyle="bold"
+        android:gravity="center"
+        android:layout_marginBottom="8dp" />
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/msg_license_expired_desc"
+        android:textColor="@color/text_primary"
+        android:textSize="14sp"
+        android:gravity="center"
+        android:layout_marginBottom="16dp" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/label_activation_code"
+        android:textColor="@color/text_secondary"
+        android:textSize="12sp"
+        android:textStyle="bold"
+        android:layout_gravity="start"
+        android:layout_marginBottom="4dp" />
+
+    <EditText
+        android:id="@+id/et_expired_activation_code"
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        android:background="@drawable/bg_spinner_with_arrow"
+        android:backgroundTint="@color/bg_surface_secondary"
+        android:hint="@string/hint_activation_code"
+        android:inputType="textCapCharacters|textVisiblePassword"
+        android:maxLength="8"
+        android:paddingHorizontal="14dp"
+        android:textColor="@color/accent_orange"
+        android:textSize="14sp"
+        android:textStyle="bold"
+        android:layout_marginBottom="16dp" />
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/btn_activate_expired_license"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/btn_activate_license"
+        android:textStyle="bold"
+        app:backgroundTint="@color/accent_orange"
+        android:textColor="@android:color/white"
+        android:layout_marginBottom="8dp" />
+
+    <Button
+        android:id="@+id/btn_close_app"
+        style="?attr/materialButtonOutlinedStyle"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/btn_exit"
+        android:textColor="@color/text_secondary"
+        app:strokeColor="@color/text_secondary" />
+
+</LinearLayout>

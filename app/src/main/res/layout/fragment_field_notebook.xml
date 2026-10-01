@@ -123,7 +123,7 @@
                 </LinearLayout>
                 <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:orientation="vertical">
                     <TextView android:text="@string/label_reg_type" android:textSize="10sp" android:textColor="@color/text_secondary" android:textStyle="bold" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginBottom="4dp"/>
-                    <Spinner android:id="@+id/sp_lib_tipo_reg" android:layout_width="match_parent" android:layout_height="wrap_content" android:background="@drawable/bg_spinner_with_arrow" android:backgroundTint="@color/bg_surface_secondary" android:padding="12dp"/>
+                    <Spinner android:id="@+id/sp_lib_tipo_reg" android:layout_width="match_parent" android:layout_height="wrap_content" android:background="@drawable/bg_spinner_with_arrow" android:paddingStart="12dp" android:paddingTop="12dp" android:paddingBottom="12dp" android:paddingEnd="36dp"/>
                 </LinearLayout>
             </LinearLayout>
 
@@ -228,6 +228,7 @@
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
+                    android:layout_marginEnd="6dp"
                     android:text="@string/btn_cancel"
                     android:textColor="@color/state_error"
                     app:strokeColor="@color/state_error"
@@ -239,6 +240,7 @@
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1.5"
+                    android:layout_marginStart="6dp"
                     android:text="@string/btn_save_notebook"
                     android:textAllCaps="false"
                     android:textStyle="bold"
