@@ -3,4 +3,7 @@
 /app/build/
 /app/build/intermediates/javac/debug/compileDebugJavaWithJavac/classes/
 /build/
-/licencias.txt
+/app/src/main/assets/licenceP.bin
+/app/src/main/assets/GMB/
+/app/src/main/assets/gmb/
+/app/src/main/assets/mgb/

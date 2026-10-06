@@ -221,12 +221,16 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             }
 
             if (emptyActiva) {
-                String timeStampLocal = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault()).format(new Date());
+                SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault());
+                String timeStampLocal = sdf.format(new Date());
+                long thirtyDaysMillis = System.currentTimeMillis() + (30L * 24 * 60 * 60 * 1000);
+                String expirationDemo = sdf.format(new Date(thirtyDaysMillis));
+
                 ContentValues active = new ContentValues();
                 active.put(COL_ACT_TIPO, "DEMO");
                 active.put(COL_ACT_CODIGO, "Demo2026");
                 active.put(COL_ACT_FECHA_ACTIVACION, timeStampLocal);
-                active.put(COL_ACT_FECHA_EXPIRACION, "2026-10-30 23:59:59");
+                active.put(COL_ACT_FECHA_EXPIRACION, expirationDemo);
                 active.put(COL_ACT_ESTADO, "ACTIVA");
                 db.insert(TABLE_LICENCIA_ACTIVA, null, active);
             }

@@ -2,16 +2,37 @@ package bo.com.factorcombinadotopo;
 
 import android.content.ContentValues;
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import java.io.BufferedReader;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
 
 public class LicenseManager {
 
+    private static final String PREFS_NAME = "prefs_license";
+    private static final String KEY_LIC_TIPO = "lic_tipo";
+    private static final String KEY_LIC_CODIGO = "lic_codigo";
+    private static final String KEY_LIC_FECHA_ACT = "lic_fecha_act";
+    private static final String KEY_LIC_FECHA_EXP = "lic_fecha_exp";
+
+    private static final String[] LICENSE_BIN_PATHS = {
+            "GMB/LicenceP.bin",
+            "GMB/licenceP.bin",
+            "gmb/LicenceP.bin",
+            "gmb/licenceP.bin",
+            "mgb/LicenceP.bin",
+            "mgb/licenceP.bin",
+            "LicenceP.bin",
+            "licenceP.bin"
+    };
+
     public static class LicenseInfo {
-        public String tipo; // DEMO, ESTANDAR, PROFESIONAL
+        public String tipo; // DEMO, PROFESIONAL
         public String codigo;
         public String fechaActivacion;
         public String fechaExpiracion;
@@ -25,6 +46,36 @@ public class LicenseManager {
             this.fechaExpiracion = fechaExpiracion;
             this.isExpired = isExpired;
             this.diasRestantes = diasRestantes;
+        }
+
+        public boolean isProfessional() {
+            return "PROFESIONAL".equalsIgnoreCase(tipo);
+        }
+    }
+
+    private static void saveToPreferences(Context context, String tipo, String codigo, String fechaAct, String fechaExp) {
+        if (context == null) return;
+        context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+                .edit()
+                .putString(KEY_LIC_TIPO, tipo)
+                .putString(KEY_LIC_CODIGO, codigo)
+                .putString(KEY_LIC_FECHA_ACT, fechaAct)
+                .putString(KEY_LIC_FECHA_EXP, fechaExp)
+                .apply();
+    }
+
+    private static void restoreLicenseToDbIfMissing(SQLiteDatabase db, String tipoPref, String codigoPref, String actPref, String expPref) {
+        try {
+            db.delete(DatabaseHelper.TABLE_LICENCIA_ACTIVA, null, null);
+            ContentValues cv = new ContentValues();
+            cv.put(DatabaseHelper.COL_ACT_TIPO, tipoPref);
+            cv.put(DatabaseHelper.COL_ACT_CODIGO, codigoPref);
+            cv.put(DatabaseHelper.COL_ACT_FECHA_ACTIVACION, actPref);
+            cv.put(DatabaseHelper.COL_ACT_FECHA_EXPIRACION, expPref);
+            cv.put(DatabaseHelper.COL_ACT_ESTADO, "ACTIVA");
+            db.insert(DatabaseHelper.TABLE_LICENCIA_ACTIVA, null, cv);
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 
@@ -57,7 +108,25 @@ public class LicenseManager {
             cursor.close();
         }
 
-        // Calcular expiración y días restantes
+        // Respaldo / Auto-Restauración vía SharedPreferences si SQLite volvió a DEMO pero hay PROFESIONAL guardado
+        if (!"PROFESIONAL".equalsIgnoreCase(tipo) && context != null) {
+            SharedPreferences prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
+            String prefTipo = prefs.getString(KEY_LIC_TIPO, null);
+            if ("PROFESIONAL".equalsIgnoreCase(prefTipo)) {
+                tipo = "PROFESIONAL";
+                codigo = prefs.getString(KEY_LIC_CODIGO, codigo);
+                fechaAct = prefs.getString(KEY_LIC_FECHA_ACT, fechaAct);
+                fechaExp = prefs.getString(KEY_LIC_FECHA_EXP, "2099-12-31 23:59:59");
+                restoreLicenseToDbIfMissing(db, tipo, codigo, fechaAct, fechaExp);
+            }
+        }
+
+        boolean isProfessional = "PROFESIONAL".equalsIgnoreCase(tipo);
+        if (isProfessional) {
+            return new LicenseInfo("PROFESIONAL", codigo, fechaAct, "2099-12-31 23:59:59", false, -1);
+        }
+
+        // Calcular expiración y días restantes para DEMO
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault());
         boolean isExpired = false;
         int diasRestantes = 0;
@@ -83,6 +152,27 @@ public class LicenseManager {
         return getActiveLicense(context).isExpired;
     }
 
+    public static boolean isValidProfessionalCode(Context context, String code) {
+        if (code == null || code.trim().isEmpty()) return false;
+        String target = code.trim();
+
+        for (String assetPath : LICENSE_BIN_PATHS) {
+            try (InputStream is = context.getAssets().open(assetPath);
+                 BufferedReader reader = new BufferedReader(new InputStreamReader(is))) {
+                String line;
+                while ((line = reader.readLine()) != null) {
+                    line = line.trim();
+                    if (!line.isEmpty() && line.equalsIgnoreCase(target)) {
+                        return true;
+                    }
+                }
+            } catch (Exception ignored) {
+                // Probar siguiente ruta
+            }
+        }
+        return false;
+    }
+
     public static boolean activateCode(Context context, String code) {
         if (code == null || code.trim().isEmpty()) return false;
         String cleanCode = code.trim();
@@ -90,7 +180,29 @@ public class LicenseManager {
         DatabaseHelper dbHelper = DatabaseHelper.getInstance(context);
         SQLiteDatabase db = dbHelper.getWritableDatabase();
 
-        // Buscar código en la tabla licencias (case-insensitive)
+        // 1. Verificar si el código pertenece al binario de Licencias Profesionales (LicenceP.bin)
+        if (isValidProfessionalCode(context, cleanCode)) {
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault());
+            String nowStr = sdf.format(new Date());
+
+            db.delete(DatabaseHelper.TABLE_LICENCIA_ACTIVA, null, null);
+
+            ContentValues cv = new ContentValues();
+            cv.put(DatabaseHelper.COL_ACT_TIPO, "PROFESIONAL");
+            cv.put(DatabaseHelper.COL_ACT_CODIGO, cleanCode);
+            cv.put(DatabaseHelper.COL_ACT_FECHA_ACTIVACION, nowStr);
+            cv.put(DatabaseHelper.COL_ACT_FECHA_EXPIRACION, "2099-12-31 23:59:59"); // Uso eterno
+            cv.put(DatabaseHelper.COL_ACT_ESTADO, "ACTIVA");
+
+            long rowId = db.insert(DatabaseHelper.TABLE_LICENCIA_ACTIVA, null, cv);
+            if (rowId != -1) {
+                saveToPreferences(context, "PROFESIONAL", cleanCode, nowStr, "2099-12-31 23:59:59");
+                return true;
+            }
+            return false;
+        }
+
+        // 2. Buscar código en la tabla licencias (DEMO)
         Cursor cursor = db.query(DatabaseHelper.TABLE_LICENCIAS, null,
                 "LOWER(" + DatabaseHelper.COL_LIC_CODIGO + ") = ?",
                 new String[]{cleanCode.toLowerCase(Locale.ROOT)}, null, null, null);
@@ -108,7 +220,6 @@ public class LicenseManager {
                 String fechaExpFija = (idxExpFija != -1) ? cursor.getString(idxExpFija) : null;
                 cursor.close();
 
-                // Calcular nueva fecha de expiración
                 SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault());
                 String nowStr = sdf.format(new Date());
                 String expStr;
@@ -120,7 +231,6 @@ public class LicenseManager {
                     expStr = sdf.format(new Date(futureMillis));
                 }
 
-                // Actualizar tabla de licencia activa
                 db.delete(DatabaseHelper.TABLE_LICENCIA_ACTIVA, null, null);
 
                 ContentValues cv = new ContentValues();
@@ -131,7 +241,11 @@ public class LicenseManager {
                 cv.put(DatabaseHelper.COL_ACT_ESTADO, "ACTIVA");
 
                 long rowId = db.insert(DatabaseHelper.TABLE_LICENCIA_ACTIVA, null, cv);
-                return rowId != -1;
+                if (rowId != -1) {
+                    saveToPreferences(context, tipo, codigoOriginal, nowStr, expStr);
+                    return true;
+                }
+                return false;
             }
             cursor.close();
         }

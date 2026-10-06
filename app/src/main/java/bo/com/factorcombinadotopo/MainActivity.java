@@ -664,7 +664,13 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
         Runnable updateLicenseUI = () -> {
             LicenseManager.LicenseInfo info = LicenseManager.getActiveLicense(this);
-            if (txtLicType != null) txtLicType.setText(info.tipo);
+            if (txtLicType != null) {
+                if (info.isProfessional()) {
+                    txtLicType.setText(R.string.type_license_profesional_eternal);
+                } else {
+                    txtLicType.setText(info.tipo);
+                }
+            }
             if (txtLicStatus != null) {
                 if (info.isExpired) {
                     txtLicStatus.setText(R.string.status_license_expired);
@@ -675,15 +681,23 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 }
             }
             if (txtLicExp != null) {
-                String cleanExp = info.fechaExpiracion;
-                if (cleanExp != null && cleanExp.length() >= 10) {
-                    String[] parts = cleanExp.substring(0, 10).split("-");
-                    if (parts.length == 3) cleanExp = parts[2] + "/" + parts[1] + "/" + parts[0];
+                if (info.isProfessional()) {
+                    txtLicExp.setText(R.string.label_expiration_eternal);
+                } else {
+                    String cleanExp = info.fechaExpiracion;
+                    if (cleanExp != null && cleanExp.length() >= 10) {
+                        String[] parts = cleanExp.substring(0, 10).split("-");
+                        if (parts.length == 3) cleanExp = parts[2] + "/" + parts[1] + "/" + parts[0];
+                    }
+                    txtLicExp.setText(cleanExp);
                 }
-                txtLicExp.setText(cleanExp);
             }
             if (txtLicDays != null) {
-                txtLicDays.setText(String.format(java.util.Locale.getDefault(), "%d días", info.diasRestantes));
+                if (info.isProfessional()) {
+                    txtLicDays.setText(R.string.label_expiration_eternal);
+                } else {
+                    txtLicDays.setText(String.format(java.util.Locale.getDefault(), "%d días", info.diasRestantes));
+                }
             }
         };
 
@@ -692,9 +706,14 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         if (btnActivate != null) {
             btnActivate.setOnClickListener(v -> {
                 String inputCode = etCode.getText().toString().trim();
-                if (inputCode.length() == 8 && LicenseManager.activateCode(this, inputCode)) {
+                if (!inputCode.isEmpty() && LicenseManager.activateCode(this, inputCode)) {
                     LicenseManager.LicenseInfo newInfo = LicenseManager.getActiveLicense(this);
-                    String msg = String.format(getString(R.string.msg_license_activated_success), newInfo.tipo, newInfo.fechaExpiracion);
+                    String msg;
+                    if (newInfo.isProfessional()) {
+                        msg = String.format(getString(R.string.msg_license_activated_eternal), newInfo.tipo);
+                    } else {
+                        msg = String.format(getString(R.string.msg_license_activated_success), newInfo.tipo, newInfo.fechaExpiracion);
+                    }
                     UIUtils.showInfoToast(this, msg);
                     etCode.setText("");
                     updateLicenseUI.run();
@@ -938,9 +957,16 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         checkLicenseExpiration();
     }
 
+    private boolean hasShownDemoToastThisSession = false;
+
     private void checkLicenseExpiration() {
-        if (LicenseManager.isLicenseExpired(this)) {
+        LicenseManager.LicenseInfo info = LicenseManager.getActiveLicense(this);
+        if (info.isExpired) {
             showLicenseExpiredDialog();
+        } else if (!info.isProfessional() && !hasShownDemoToastThisSession) {
+            hasShownDemoToastThisSession = true;
+            String msg = String.format(getString(R.string.msg_demo_days_remaining_toast), info.diasRestantes);
+            UIUtils.showInfoToast(this, msg);
         }
     }
 
@@ -959,9 +985,14 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         if (btnActivate != null) {
             btnActivate.setOnClickListener(v -> {
                 String inputCode = (etCode != null) ? etCode.getText().toString().trim() : "";
-                if (inputCode.length() == 8 && LicenseManager.activateCode(this, inputCode)) {
+                if (!inputCode.isEmpty() && LicenseManager.activateCode(this, inputCode)) {
                     LicenseManager.LicenseInfo info = LicenseManager.getActiveLicense(this);
-                    String msg = String.format(getString(R.string.msg_license_activated_success), info.tipo, info.fechaExpiracion);
+                    String msg;
+                    if (info.isProfessional()) {
+                        msg = String.format(getString(R.string.msg_license_activated_eternal), info.tipo);
+                    } else {
+                        msg = String.format(getString(R.string.msg_license_activated_success), info.tipo, info.fechaExpiracion);
+                    }
                     UIUtils.showInfoToast(this, msg);
                     dialog.dismiss();
                     recreate();

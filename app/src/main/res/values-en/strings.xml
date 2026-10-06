@@ -339,13 +339,23 @@
 
     <!-- Terms and Conditions -->
     <string name="title_terms_conditions">📜 Terms and Conditions of Use</string>
-    <string name="terms_body">By using FactorEscalaTop v2.4, you formally accept the following terms and conditions:\n\n
-        <b>Cartographic &amp; Geodetic Scope:</b> The application is calibrated for reference systems in the Plurinational State of Bolivia (UTM Zones 19S &amp; 20S, WGS84, and Lambert Conformal Conic Projection).\n\n
-        <b>Engineering Suite &amp; Surveying Tools:</b> Includes IGM Factor Calculation (k, ha, K), Vincenty Geodesic Algorithms (Direct &amp; Inverse), Slope Distance Reduction, UTM Line Geometry, Lambert Conversion, Offline Mapping, and Stakeout with GIS/CAD import &amp; export (KML, CSV, DXF 3D, GPX, GeoJSON).\n\n
-        <b>Geoid Models &amp; Elevation:</b> Integrates official <b>MGBol08</b> (EGM2008) and global <b>EGM96</b> geoid models, as well as online MSL orthometric elevation retrieval via Copernicus DEM GLO-90.\n\n
-        <b>Weather Assistant &amp; Sensors:</b> Drone weather analysis and altimetry rely on local sensors (barometer, compass, GPS) and external APIs. Core calculation tools operate 100% offline.\n\n
-        <b>Technical Support Character:</b> Results provided are technical support tools for engineers and surveyors. It is the professional\'s sole responsibility to verify, validate, and certify calculations before formal project application.\n\n
-        <b>Regulatory Compliance:</b> The user agrees to use the tool in compliance with applicable technical standards and regulations in Bolivia.</string>
+    <string name="terms_body"><b>TERMS AND CONDITIONS OF USE - FACTORESCALATOP v2.4</b>\n\n
+        By downloading, installing, or using <b>FactorEscalaTop v2.4</b>, you formally and unconditionally accept the following terms, conditions, and applicable regulations in the Plurinational State of Bolivia:\n\n
+        <b>1. Purpose and Technical Scope:</b>\n
+        FactorEscalaTop is a professional topographic and geodetic workstation designed exclusively for use in Bolivia. It incorporates advanced calculation engines for:\n
+        • IGM correction factors (k, ha, K) with 9-decimal precision.\n
+        • Vincenty geodesic algorithms (Direct and Inverse) on the WGS84 ellipsoid.\n
+        • Slope distance reduction, UTM line geometry, and bidirectional Lambert Conformal Conic (LCC Bolivia) coordinate conversion.\n
+        • Official <b>MGBol08</b> (EGM2008-based) and global <b>EGM96</b> geoid models.\n
+        • Advanced offline mapping (1GB), digital field notebook, professional compass, and drone weather assistant.\n\n
+        <b>2. Legal and Regulatory Framework:</b>\n
+        The development and use of the application align with constitutional principles and laws in the Plurinational State of Bolivia, including compliance with official cartographic reference standards and telecommunication regulations (Law No. 164).\n\n
+        <b>3. Technical Support Character and Professional Liability:</b>\n
+        Calculations, projections, factors, and meteorological data provided are strictly for <b>technical support and guidance</b>. They do not replace certified surveying equipment or official measurement procedures. It is the sole responsibility of the civil engineer, surveyor, or geomatics professional to verify, validate, adjust, and formally certify all results before their application in engineering works, cadastre, or legal projects.\n\n
+        <b>4. Connectivity, APIs, and Offline Operability:</b>\n
+        The application guarantees 100% offline operability for all core topographic and engineering calculation engines. Secondary features, such as online DEM height retrieval (Copernicus GLO-90) and advanced weather forecasting, rely on third-party services (Open-Meteo API).\n\n
+        <b>5. Intellectual Property and Privacy:</b>\n
+        All software rights, architecture design, and interfaces belong to the developers of FactorEscalaTop. Survey data, points, and projects are stored exclusively in the user\'s local device memory, ensuring total privacy.</string>
 
     <string name="title_privacy_policy">🔒 Privacy Policy</string>
     <string name="privacy_body">In compliance with Google Play guidelines for data protection, this policy details how information is managed:\n\n
@@ -551,12 +561,16 @@
     <string name="hint_activation_code">Code (e.g., Demo2026)</string>
     <string name="btn_activate_license">ACTIVATE LICENSE</string>
     <string name="msg_license_activated_success">%1$s License successfully activated until %2$s.</string>
+    <string name="msg_license_activated_eternal">%1$s License successfully activated with lifetime / eternal usage.</string>
     <string name="msg_invalid_activation_code">Invalid activation code. Please check the 8 characters.</string>
     <string name="msg_license_expired_title">License Expired</string>
     <string name="msg_license_expired_desc">Your DEMO trial period or usage license has expired. Please enter an 8-digit activation code to continue using the app.</string>
+    <string name="msg_demo_days_remaining_toast">DEMO Version: You have %1$d days of usage remaining.</string>
     <string name="status_license_active">Active</string>
     <string name="status_license_expired">Expired</string>
     <string name="type_license_demo">DEMO (Trial Version)</string>
     <string name="type_license_estandar">STANDARD</string>
     <string name="type_license_profesional">PROFESSIONAL</string>
+    <string name="type_license_profesional_eternal">PROFESSIONAL (Lifetime Usage)</string>
+    <string name="label_expiration_eternal">Lifetime / Unlimited</string>
 </resources>

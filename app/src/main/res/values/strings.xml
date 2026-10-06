@@ -382,13 +382,25 @@
 
     <!-- Terms and Conditions -->
     <string name="title_terms_conditions">📜 Términos y Condiciones de Uso</string>
-    <string name="terms_body">Al utilizar FactorEscalaTop v2.4, aceptas formalmente los siguientes términos y condiciones:\n\n
-        <b>Alcance Cartográfico y Geodésico:</b> La aplicación está calibrada para los sistemas de referencia geodésicos del Estado Plurinacional de Bolivia (UTM Zonas 19S y 20S, WGS84, y Proyección Conforme Cónica de Lambert).\n\n
-        <b>Suite de Ingeniería y Herramientas Topográficas:</b> Incluye módulos de Cálculo de Factores IGM (k, ha, K), Algoritmos Geodésicos de Vincenty (Directo e Inverso), Reducción de Distancias Inclinadas al Elipsoide, Geometría de Líneas UTM, Conversión Lambert Bolivia, Mapeo Offline y Replanteo con importación/exportación GIS/CAD (KML, CSV, DXF 3D, GPX, GeoJSON).\n\n
-        <b>Modelos Geoidales y Elevación:</b> La app integra el modelo geoidal oficial <b>MGBol08</b> (basado en EGM2008) y el estándar global <b>EGM96</b>, así como la consulta de cotas ortométricas MSL mediante el modelo Copernicus DEM GLO-90.\n\n
-        <b>Asistente de Clima y Sensores Locales:</b> Las herramientas de análisis meteorológico para drones y altimetría dependen de sensores locales (barómetro, brújula, GPS) y APIs externas. Las funciones de cálculo básico y herramientas de ingeniería operan 100% offline.\n\n
-        <b>Carácter de Apoyo Técnico:</b> Los resultados calculados son herramientas de asistencia técnica para ingenieros y topógrafos. Es responsabilidad exclusiva del profesional verificar, validar y certificar los datos antes de su aplicación formal en proyectos.\n\n
-        <b>Cumplimiento Normativo:</b> El usuario se compromete a utilizar la herramienta en conformidad con la normativa técnica y legal vigente en el Estado Plurinacional de Bolivia.</string>
+    <string name="terms_body"><b>TÉRMINOS Y CONDICIONES DE USO - FACTORESCALATOP v2.4</b>\n\n
+        Al descargar, instalar o utilizar <b>FactorEscalaTop v2.4</b>, el usuario acepta formalmente y sin reservas los siguientes términos, condiciones y normativas aplicables en el Estado Plurinacional de Bolivia:\n\n
+        <b>1. Objeto y Alcance Técnico:</b>\n
+        FactorEscalaTop es una estación de trabajo topográfica y geodésica profesional diseñada exclusivamente para su uso en el territorio boliviano. Incorpora motores de cálculo avanzados para:\n
+        • Factores de Corrección IGM (k, ha, K) con precisión de 9 decimales.\n
+        • Algoritmos geodésicos de Vincenty (Directo e Inverso) sobre elipsoide WGS84.\n
+        • Reducción de distancias al horizonte y elipsoide, cálculo de líneas UTM, y conversión bidireccional en Proyección Cónica Conforme de Lambert (LCC Bolivia).\n
+        • Modelos geoidales oficiales <b>MGBol08</b> (basado en EGM2008) y <b>EGM96</b>.\n
+        • Mapeo offline avanzado (1GB), libreta digital, brújula profesional y asistente meteorológico para operaciones con drones.\n\n
+        <b>2. Marco Legal y Normativo en Bolivia:</b>\n
+        El desarrollo y uso de la aplicación se enmarca en los preceptos constitucionales y leyes vigentes en el Estado Plurinacional de Bolivia, incluyendo:\n
+        • <b>Ley N° 164 (Ley General de Telecomunicaciones, Tecnologías de Información y Comunicación):</b> En lo referente al uso seguro y ético de herramientas tecnológicas y geoinformación.\n
+        • <b>Normativa del Instituto Geográfico Militar (IGM) y Colegio de Topógrafos de Bolivia:</b> Respeto a los sistemas de referencia cartográfica oficial nacional.\n\n
+        <b>3. Carácter de Apoyo Técnico y Responsabilidad Profesional:</b>\n
+        Los cálculos, proyecciones, factores y datos meteorológicos proporcionados por la aplicación tienen un carácter estrictamente de <b>apoyo técnico y orientativo</b>. No sustituyen los equipos topográficos certificados ni los procedimientos oficiales de mensura. Es obligación exclusiva del ingeniero civil, topógrafo o profesional geomático verificar, validar, compensar y certificar formalmente todos los resultados antes de su aplicación en obras de ingeniería, catastro o proyectos legales.\n\n
+        <b>4. Conectividad, APIs y Operatividad Offline:</b>\n
+        La aplicación garantiza operatividad 100% offline para todos sus motores de cálculo topográfico e ingeniería. Las funciones secundarias, tales como la consulta de alturas DEM online (Copernicus GLO-90) y el pronóstico meteorológico avanzado, dependen de servicios de terceros (Open-Meteo API), quedando exenta la aplicación de fallas por conectividad externa.\n\n
+        <b>5. Propiedad Intelectual y Privacidad:</b>\n
+        Todos los derechos de software, diseño de arquitectura e interfaces pertenecen a los desarrolladores de FactorEscalaTop. Los datos de levantamiento, puntos y proyectos se almacenan exclusivamente en la memoria local del dispositivo del usuario garantizando total privacidad conforme a directrices internacionales de protección de datos.</string>
 
     <string name="title_privacy_policy">🔒 Política de Privacidad</string>
     <string name="privacy_body">En cumplimiento con las directrices de Google Play para la protección de datos, esta política detalla cómo se gestiona la información:\n\n
@@ -602,12 +614,16 @@
     <string name="hint_activation_code">Código (ej. Demo2026)</string>
     <string name="btn_activate_license">ACTIVAR LICENCIA</string>
     <string name="msg_license_activated_success">Licencia %1$s activada exitosamente hasta el %2$s.</string>
+    <string name="msg_license_activated_eternal">Licencia %1$s activada exitosamente con uso eterno (sin límite de tiempo).</string>
     <string name="msg_invalid_activation_code">Código de activación inválido. Verifica los 8 caracteres.</string>
     <string name="msg_license_expired_title">Licencia Expirada</string>
     <string name="msg_license_expired_desc">Tu periodo de prueba DEMO o licencia de uso ha expirado. Por favor ingresa un código de activación de 8 dígitos para continuar utilizando la aplicación.</string>
+    <string name="msg_demo_days_remaining_toast">Versión DEMO: Le quedan %1$d días de uso.</string>
     <string name="status_license_active">Activa</string>
     <string name="status_license_expired">Expirada</string>
     <string name="type_license_demo">DEMO (Versión de Prueba)</string>
     <string name="type_license_estandar">ESTÁNDAR</string>
     <string name="type_license_profesional">PROFESIONAL</string>
+    <string name="type_license_profesional_eternal">PROFESIONAL (Uso Eterno)</string>
+    <string name="label_expiration_eternal">Sin Límite / Uso Eterno</string>
 </resources>
