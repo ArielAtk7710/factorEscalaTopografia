@@ -575,4 +575,33 @@
     <string name="label_expiration_eternal">Lifetime / Unlimited</string>
     <string name="btn_get_license_whatsapp">GET LICENSE (WHATSAPP)</string>
     <string name="msg_whatsapp_license_request">Information for FesTop app activation</string>
+
+    <!-- Firebase License Request Form -->
+    <string name="title_license_request_form">License Request Form</string>
+    <string name="desc_license_request_firebase">Fill in your details to register your request in Firebase. The license will be tied to your device ID.</string>
+    <string name="label_full_name">Full Name</string>
+    <string name="hint_full_name">Enter your Full Name</string>
+    <string name="label_phone_whatsapp">Phone / WhatsApp Number</string>
+    <string name="hint_phone_whatsapp">e.g. +591 69856525</string>
+    <string name="label_profession">Profession / Occupation</string>
+    <string name="label_registration_number">Professional Registration Number</string>
+    <string name="hint_registration_number">e.g. RNI-12345 / SIB-6789</string>
+    <string name="hint_registration_not_required">Not required for students</string>
+    <string name="label_university">University / Educational Institution</string>
+    <string name="hint_university">e.g. UMSA, UAGRM, UMSS, UPEA, Univalle</string>
+    <string name="label_device_id_auto">Unique Device ID (Auto-detected)</string>
+    <string name="btn_submit_license_request">SUBMIT REQUEST TO FIREBASE</string>
+    <string name="btn_open_request_form">REQUEST LICENSE (FORM)</string>
+    <string name="msg_request_submitted_success">Request submitted to Firebase successfully! We will contact you via WhatsApp.</string>
+    <string name="msg_please_fill_required_fields">Please fill in all required fields.</string>
+
+    <string-array name="professions_array">
+        <item>Civil Engineer</item>
+        <item>Surveying / Geodetic Engineer</item>
+        <item>Topography Technician</item>
+        <item>Architect / Designer</item>
+        <item>Geomatics Graduate</item>
+        <item>Student</item>
+        <item>Other</item>
+    </string-array>
 </resources>

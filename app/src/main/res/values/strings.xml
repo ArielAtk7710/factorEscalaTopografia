@@ -628,4 +628,33 @@
     <string name="label_expiration_eternal">Sin Límite / Uso Eterno</string>
     <string name="btn_get_license_whatsapp">OBTENER LICENCIA (WHATSAPP)</string>
     <string name="msg_whatsapp_license_request">Información de activación de la app FesTop</string>
+
+    <!-- Firebase License Request Form -->
+    <string name="title_license_request_form">Formulario de Solicitud de Licencia</string>
+    <string name="desc_license_request_firebase">Completa tus datos para registrar tu solicitud en Firebase. La licencia quedará vinculada a tu dispositivo.</string>
+    <string name="label_full_name">Nombre Completo</string>
+    <string name="hint_full_name">Ingresa tu Nombre y Apellidos</string>
+    <string name="label_phone_whatsapp">Número de Celular / WhatsApp</string>
+    <string name="hint_phone_whatsapp">ej. +591 69856525</string>
+    <string name="label_profession">Profesión u Ocupación</string>
+    <string name="label_registration_number">Número de Matrícula Profesional</string>
+    <string name="hint_registration_number">ej. RNI-12345 / SIB-6789</string>
+    <string name="hint_registration_not_required">No requerida para estudiantes</string>
+    <string name="label_university">Universidad / Institución Educativa</string>
+    <string name="hint_university">ej. UMSA, UAGRM, UMSS, UPEA, Univalle</string>
+    <string name="label_device_id_auto">ID Único de Dispositivo (Autodetectado)</string>
+    <string name="btn_submit_license_request">ENVIAR SOLICITUD A FIREBASE</string>
+    <string name="btn_open_request_form">SOLICITAR LICENCIA (FORMULARIO)</string>
+    <string name="msg_request_submitted_success">¡Solicitud enviada a Firebase con éxito! Estaremos en contacto vía WhatsApp.</string>
+    <string name="msg_please_fill_required_fields">Por favor completa los campos obligatorios.</string>
+
+    <string-array name="professions_array">
+        <item>Ingeniero Civil</item>
+        <item>Ingeniero Topógrafo / Geodesta</item>
+        <item>Técnico Superior en Topografía</item>
+        <item>Arquitecto / Proyectista</item>
+        <item>Licenciado en Geomensura</item>
+        <item>Estudiante</item>
+        <item>Otro</item>
+    </string-array>
 </resources>

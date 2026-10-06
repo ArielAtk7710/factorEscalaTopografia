@@ -522,6 +522,22 @@
             </LinearLayout>
 
             <com.google.android.material.button.MaterialButton
+                android:id="@+id/btn_open_firebase_form"
+                style="@style/Widget.MaterialComponents.Button"
+                android:layout_width="match_parent"
+                android:layout_height="44dp"
+                android:layout_marginBottom="8dp"
+                android:text="@string/btn_open_request_form"
+                android:textSize="11sp"
+                android:textStyle="bold"
+                app:icon="@drawable/ic_info_round_blue"
+                app:iconGravity="textStart"
+                app:iconPadding="8dp"
+                app:iconTint="@android:color/white"
+                app:backgroundTint="@color/accent_orange"
+                android:textColor="@android:color/white" />
+
+            <com.google.android.material.button.MaterialButton
                 android:id="@+id/btn_request_license_whatsapp"
                 style="@style/Widget.MaterialComponents.Button"
                 android:layout_width="match_parent"

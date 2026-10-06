@@ -71,6 +71,20 @@
         android:layout_marginBottom="8dp" />
 
     <com.google.android.material.button.MaterialButton
+        android:id="@+id/btn_expired_open_firebase_form"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/btn_open_request_form"
+        android:textStyle="bold"
+        app:icon="@drawable/ic_info_round_blue"
+        app:iconGravity="textStart"
+        app:iconPadding="8dp"
+        app:iconTint="@android:color/white"
+        app:backgroundTint="@color/accent_orange"
+        android:textColor="@android:color/white"
+        android:layout_marginBottom="8dp" />
+
+    <com.google.android.material.button.MaterialButton
         android:id="@+id/btn_expired_request_whatsapp"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
