@@ -626,4 +626,6 @@
     <string name="type_license_profesional">PROFESIONAL</string>
     <string name="type_license_profesional_eternal">PROFESIONAL (Uso Eterno)</string>
     <string name="label_expiration_eternal">Sin Límite / Uso Eterno</string>
+    <string name="btn_get_license_whatsapp">OBTENER LICENCIA (WHATSAPP)</string>
+    <string name="msg_whatsapp_license_request">Información de activación de la app FesTop</string>
 </resources>

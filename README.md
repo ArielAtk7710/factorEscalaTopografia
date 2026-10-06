@@ -17,6 +17,8 @@ Aplicación profesional avanzada para topografía, geodesia y cálculos de ingen
   - Análisis de índice Kp y seguridad solar/geomagnética para operaciones de campo.
 - **Sistema de Licenciamiento Seguro**:
   - Soporte para licencias DEMO y profesionales con doble persistencia (SQLite + SharedPreferences) para garantizar que la activación permanezca intacta tras reinicios.
+  - **Obtener Licencia Profesional**: Podrás solicitar tu código de activación directamente desde la App o GitHub vía WhatsApp a través del enlace:
+    👉 **[📲 Solicitar Licencia por WhatsApp (+591 69856525)](https://wa.me/59169856525?text=Informaci%C3%B3n%20de%20activaci%C3%B3n%20de%20la%20app%20FesTop)**
 
 ---
 

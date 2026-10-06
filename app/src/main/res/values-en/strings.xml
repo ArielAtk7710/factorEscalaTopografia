@@ -573,4 +573,6 @@
     <string name="type_license_profesional">PROFESSIONAL</string>
     <string name="type_license_profesional_eternal">PROFESSIONAL (Lifetime Usage)</string>
     <string name="label_expiration_eternal">Lifetime / Unlimited</string>
+    <string name="btn_get_license_whatsapp">GET LICENSE (WHATSAPP)</string>
+    <string name="msg_whatsapp_license_request">Information for FesTop app activation</string>
 </resources>

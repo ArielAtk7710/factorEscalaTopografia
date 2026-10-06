@@ -70,6 +70,20 @@
         android:textColor="@android:color/white"
         android:layout_marginBottom="8dp" />
 
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/btn_expired_request_whatsapp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/btn_get_license_whatsapp"
+        android:textStyle="bold"
+        app:icon="@drawable/ic_whatsapp"
+        app:iconGravity="textStart"
+        app:iconPadding="8dp"
+        app:iconTint="@android:color/white"
+        app:backgroundTint="#25D366"
+        android:textColor="@android:color/white"
+        android:layout_marginBottom="8dp" />
+
     <Button
         android:id="@+id/btn_close_app"
         style="?attr/materialButtonOutlinedStyle"

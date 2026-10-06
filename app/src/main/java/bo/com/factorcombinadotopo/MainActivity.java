@@ -723,6 +723,11 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             });
         }
 
+        View btnWhatsappSettings = view.findViewById(R.id.btn_request_license_whatsapp);
+        if (btnWhatsappSettings != null) {
+            btnWhatsappSettings.setOnClickListener(v -> openWhatsAppLicenseRequest());
+        }
+
         view.findViewById(R.id.btn_close_settings).setOnClickListener(v -> {
             String offsetStr = etOffset.getText().toString();
             try {
@@ -1002,6 +1007,11 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             });
         }
 
+        View btnExpiredWhatsapp = dialog.findViewById(R.id.btn_expired_request_whatsapp);
+        if (btnExpiredWhatsapp != null) {
+            btnExpiredWhatsapp.setOnClickListener(v -> openWhatsAppLicenseRequest());
+        }
+
         if (btnExit != null) {
             btnExit.setOnClickListener(v -> {
                 dialog.dismiss();
@@ -1010,6 +1020,18 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         }
 
         dialog.show();
+    }
+
+    private void openWhatsAppLicenseRequest() {
+        try {
+            String number = "59169856525";
+            String message = getString(R.string.msg_whatsapp_license_request);
+            String url = "https://wa.me/" + number + "?text=" + java.net.URLEncoder.encode(message, "UTF-8");
+            android.content.Intent intent = new android.content.Intent(android.content.Intent.ACTION_VIEW, android.net.Uri.parse(url));
+            startActivity(intent);
+        } catch (Exception e) {
+            UIUtils.showErrorToast(this, "No se pudo abrir WhatsApp");
+        }
     }
 
     @Override

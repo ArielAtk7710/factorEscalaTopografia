@@ -399,8 +399,7 @@
                         android:textStyle="bold"
                         android:textSize="12sp"
                         android:paddingHorizontal="8dp"
-                        android:paddingVertical="2dp"
-                        android:background="@drawable/bg_spinner_with_arrow" />
+                        android:paddingVertical="2dp" />
                 </LinearLayout>
 
                 <LinearLayout
@@ -521,6 +520,22 @@
                     app:backgroundTint="@color/accent_orange"
                     android:textColor="@android:color/white" />
             </LinearLayout>
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btn_request_license_whatsapp"
+                style="@style/Widget.MaterialComponents.Button"
+                android:layout_width="match_parent"
+                android:layout_height="44dp"
+                android:layout_marginBottom="8dp"
+                android:text="@string/btn_get_license_whatsapp"
+                android:textSize="11sp"
+                android:textStyle="bold"
+                app:icon="@drawable/ic_whatsapp"
+                app:iconGravity="textStart"
+                app:iconPadding="8dp"
+                app:iconTint="@android:color/white"
+                app:backgroundTint="#25D366"
+                android:textColor="@android:color/white" />
 
             <TextView
                 android:layout_width="match_parent"
