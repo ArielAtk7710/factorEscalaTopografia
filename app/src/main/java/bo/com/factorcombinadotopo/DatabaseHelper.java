@@ -202,13 +202,12 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             }
 
             if (emptyLicencias) {
-                // DEMO: "Demo2026", tipo DEMO, 30 días, expira el 30/10/2026
+                // DEMO: "Demo2026", tipo DEMO, 30 días a partir de la instalación
                 ContentValues lDemo = new ContentValues();
                 lDemo.put(COL_LIC_CODIGO, "Demo2026");
                 lDemo.put(COL_LIC_TIPO, "DEMO");
                 lDemo.put(COL_LIC_DIAS, 30);
-                lDemo.put(COL_LIC_FECHA_EXP_FIJA, "2026-10-30 23:59:59");
-                lDemo.put(COL_LIC_DESC, "Licencia Demo de Prueba 1 Mes (30/10/2026)");
+                lDemo.put(COL_LIC_DESC, "Licencia Demo de Prueba 1 Mes (30 días)");
                 db.insertWithOnConflict(TABLE_LICENCIAS, null, lDemo, SQLiteDatabase.CONFLICT_IGNORE);
             }
 

@@ -88,10 +88,15 @@ public class LicenseManager {
 
         Cursor cursor = db.query(DatabaseHelper.TABLE_LICENCIA_ACTIVA, null, null, null, null, null, DatabaseHelper.COL_ACT_ID + " DESC", "1");
 
+        SimpleDateFormat sdfNow = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault());
+        Date currentDate = new Date();
+        String defaultNow = sdfNow.format(currentDate);
+        String defaultExp = sdfNow.format(new Date(currentDate.getTime() + (30L * 24 * 60 * 60 * 1000)));
+
         String tipo = "DEMO";
         String codigo = "Demo2026";
-        String fechaAct = "2026-09-30 00:00:00";
-        String fechaExp = "2026-10-30 23:59:59";
+        String fechaAct = defaultNow;
+        String fechaExp = defaultExp;
 
         if (cursor != null) {
             if (cursor.moveToFirst()) {
