@@ -626,7 +626,7 @@
     <string name="type_license_profesional">PROFESIONAL</string>
     <string name="type_license_profesional_eternal">PROFESIONAL (Uso Indefinido / Eterno)</string>
     <string name="label_expiration_eternal">Sin Límite / Uso Indefinido</string>
-    <string name="btn_get_license_whatsapp">OBTENER LICENCIA (WHATSAPP)</string>
+    <string name="btn_get_license_whatsapp">LICENCIA (WHATSAPP)</string>
     <string name="msg_whatsapp_license_request">Información de activación de la app FesTop</string>
     <string name="btn_official_website">SITIO WEB OFICIAL</string>
     <string name="url_official_website">https://chakanatechnologies.netlify.app/</string>
@@ -636,6 +636,6 @@
     <string name="title_chakana_tech">Chakana Technologies</string>
     <string name="subtitle_chakana_tech">Soluciones de Software a Medida</string>
     <string name="about_more_products_text">Visita nuestro sitio web oficial para explorar más aplicaciones, herramientas topográficas, geodésicas y soluciones de software a medida desarrolladas por Chakana Technologies.</string>
-    <string name="btn_about_website">EXPLORAR MÁS PRODUCTOS (WEB)</string>
-    <string name="btn_about_whatsapp">CONTACTO DIRECTO WHATSAPP</string>
+    <string name="btn_about_website">SITIO WEB OFICIAL</string>
+    <string name="btn_about_whatsapp">WHATSAPP DIRECTO</string>
 </resources>
