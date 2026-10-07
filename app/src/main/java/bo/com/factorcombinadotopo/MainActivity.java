@@ -482,6 +482,16 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         return super.onOptionsItemSelected(item);
     }
 
+    private void openOfficialWebsite() {
+        try {
+            String url = getString(R.string.url_official_website);
+            Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
+            startActivity(intent);
+        } catch (Exception e) {
+            UIUtils.showErrorToast(this, "No se pudo abrir el sitio web oficial");
+        }
+    }
+
     private void showAboutDialog() {
         BottomSheetDialog dialog = new BottomSheetDialog(this);
         View view = getLayoutInflater().inflate(R.layout.layout_dialog_about, null);
@@ -490,6 +500,21 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         TextView txtCollabBody = view.findViewById(R.id.txt_about_collaborators_body);
         if (txtCollabBody != null) {
             txtCollabBody.setText(getText(R.string.about_collaborators_body));
+        }
+
+        View btnAboutWeb = view.findViewById(R.id.btn_about_website);
+        if (btnAboutWeb != null) {
+            btnAboutWeb.setOnClickListener(v -> openOfficialWebsite());
+        }
+
+        View btnAboutWsp = view.findViewById(R.id.btn_about_whatsapp);
+        if (btnAboutWsp != null) {
+            btnAboutWsp.setOnClickListener(v -> openWhatsAppLicenseRequest());
+        }
+
+        View btnSponsorChakana = view.findViewById(R.id.btn_sponsor_chakana);
+        if (btnSponsorChakana != null) {
+            btnSponsorChakana.setOnClickListener(v -> openOfficialWebsite());
         }
         
         final int[] _x_val = {0};
@@ -723,14 +748,19 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             });
         }
 
-        View btnFirebaseForm = view.findViewById(R.id.btn_open_firebase_form);
-        if (btnFirebaseForm != null) {
-            btnFirebaseForm.setOnClickListener(v -> showFirebaseLicenseRequestDialog());
+        View btnLicenseInfoToast = view.findViewById(R.id.btn_license_info_toast);
+        if (btnLicenseInfoToast != null) {
+            btnLicenseInfoToast.setOnClickListener(v -> UIUtils.showInfoToast(this, getString(R.string.msg_license_benefits_info)));
         }
 
         View btnWhatsappSettings = view.findViewById(R.id.btn_request_license_whatsapp);
         if (btnWhatsappSettings != null) {
             btnWhatsappSettings.setOnClickListener(v -> openWhatsAppLicenseRequest());
+        }
+
+        View btnOfficialWeb = view.findViewById(R.id.btn_official_website);
+        if (btnOfficialWeb != null) {
+            btnOfficialWeb.setOnClickListener(v -> openOfficialWebsite());
         }
 
         view.findViewById(R.id.btn_close_settings).setOnClickListener(v -> {
@@ -1012,11 +1042,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             });
         }
 
-        View btnExpiredFirebase = dialog.findViewById(R.id.btn_expired_open_firebase_form);
-        if (btnExpiredFirebase != null) {
-            btnExpiredFirebase.setOnClickListener(v -> showFirebaseLicenseRequestDialog());
-        }
-
         View btnExpiredWhatsapp = dialog.findViewById(R.id.btn_expired_request_whatsapp);
         if (btnExpiredWhatsapp != null) {
             btnExpiredWhatsapp.setOnClickListener(v -> openWhatsAppLicenseRequest());
@@ -1026,98 +1051,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             btnExit.setOnClickListener(v -> {
                 dialog.dismiss();
                 finishAffinity();
-            });
-        }
-
-        dialog.show();
-    }
-
-    private void showFirebaseLicenseRequestDialog() {
-        android.app.Dialog dialog = new android.app.Dialog(this);
-        dialog.setContentView(R.layout.dialog_request_license_firebase);
-        if (dialog.getWindow() != null) {
-            dialog.getWindow().setLayout(android.view.ViewGroup.LayoutParams.MATCH_PARENT, android.view.ViewGroup.LayoutParams.WRAP_CONTENT);
-        }
-
-        EditText etFullName = dialog.findViewById(R.id.et_full_name);
-        EditText etPhoneNumber = dialog.findViewById(R.id.et_phone_number);
-        android.widget.Spinner spinnerProf = dialog.findViewById(R.id.spinner_profession);
-        EditText etRegistration = dialog.findViewById(R.id.et_registration_number);
-        EditText etUniversity = dialog.findViewById(R.id.et_university);
-        TextView txtDeviceId = dialog.findViewById(R.id.txt_device_id_auto);
-        View btnSubmit = dialog.findViewById(R.id.btn_submit_license_request);
-        View btnClose = dialog.findViewById(R.id.btn_close_request_dialog);
-
-        String autoDeviceId = FirebaseLicenseManager.getDeviceId(this);
-        if (txtDeviceId != null) txtDeviceId.setText(autoDeviceId);
-
-        android.widget.ArrayAdapter<CharSequence> adapter = android.widget.ArrayAdapter.createFromResource(
-                this, R.array.professions_array, android.R.layout.simple_spinner_item);
-        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        if (spinnerProf != null) {
-            spinnerProf.setAdapter(adapter);
-            spinnerProf.setOnItemSelectedListener(new android.widget.AdapterView.OnItemSelectedListener() {
-                @Override
-                public void onItemSelected(android.widget.AdapterView<?> parent, View view, int position, long id) {
-                    String selected = parent.getItemAtPosition(position).toString();
-                    boolean isStudent = selected.toLowerCase(Locale.ROOT).contains("estudiante") || selected.toLowerCase(Locale.ROOT).contains("student");
-                    if (etRegistration != null) {
-                        etRegistration.setEnabled(!isStudent);
-                        if (isStudent) {
-                            etRegistration.setText("");
-                            etRegistration.setHint(R.string.hint_registration_not_required);
-                        } else {
-                            etRegistration.setHint(R.string.hint_registration_number);
-                        }
-                    }
-                }
-
-                @Override
-                public void onNothingSelected(android.widget.AdapterView<?> parent) {}
-            });
-        }
-
-        if (btnClose != null) {
-            btnClose.setOnClickListener(v -> dialog.dismiss());
-        }
-
-        if (btnSubmit != null) {
-            btnSubmit.setOnClickListener(v -> {
-                String fullName = (etFullName != null) ? etFullName.getText().toString().trim() : "";
-                String phone = (etPhoneNumber != null) ? etPhoneNumber.getText().toString().trim() : "";
-                String profession = (spinnerProf != null && spinnerProf.getSelectedItem() != null) ? spinnerProf.getSelectedItem().toString() : "Otro";
-                String regNum = (etRegistration != null) ? etRegistration.getText().toString().trim() : "";
-                String university = (etUniversity != null) ? etUniversity.getText().toString().trim() : "";
-
-                boolean isStudent = profession.toLowerCase(Locale.ROOT).contains("estudiante") || profession.toLowerCase(Locale.ROOT).contains("student");
-
-                if (fullName.isEmpty() || phone.isEmpty()) {
-                    UIUtils.showErrorToast(this, getString(R.string.msg_please_fill_required_fields));
-                    return;
-                }
-
-                if (!isStudent && regNum.isEmpty()) {
-                    UIUtils.showErrorToast(this, "Ingresa tu número de matrícula profesional.");
-                    return;
-                }
-
-                if (isStudent && university.isEmpty()) {
-                    UIUtils.showErrorToast(this, "Ingresa tu Universidad e Institución educativa.");
-                    return;
-                }
-
-                FirebaseLicenseManager.submitLicenseRequest(this, fullName, phone, profession, regNum, university, new FirebaseLicenseManager.LicenseCallback() {
-                    @Override
-                    public void onSuccess(String message) {
-                        UIUtils.showInfoToast(MainActivity.this, getString(R.string.msg_request_submitted_success));
-                        dialog.dismiss();
-                    }
-
-                    @Override
-                    public void onError(String error) {
-                        UIUtils.showErrorToast(MainActivity.this, error);
-                    }
-                });
             });
         }
 

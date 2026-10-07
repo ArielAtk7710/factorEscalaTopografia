@@ -568,40 +568,21 @@
     <string name="msg_demo_days_remaining_toast">DEMO Version: You have %1$d days of usage remaining.</string>
     <string name="status_license_active">Active</string>
     <string name="status_license_expired">Expired</string>
-    <string name="type_license_demo">DEMO (Trial Version)</string>
+    <string name="type_license_demo">FREE (1 Year Free Usage)</string>
     <string name="type_license_estandar">STANDARD</string>
     <string name="type_license_profesional">PROFESSIONAL</string>
-    <string name="type_license_profesional_eternal">PROFESSIONAL (Lifetime Usage)</string>
-    <string name="label_expiration_eternal">Lifetime / Unlimited</string>
+    <string name="type_license_profesional_eternal">PROFESSIONAL (Lifetime / Indefinite Usage)</string>
+    <string name="label_expiration_eternal">Lifetime / Indefinite Usage</string>
     <string name="btn_get_license_whatsapp">GET LICENSE (WHATSAPP)</string>
     <string name="msg_whatsapp_license_request">Information for FesTop app activation</string>
+    <string name="btn_official_website">OFFICIAL WEBSITE</string>
+    <string name="url_official_website">https://chakanatechnologies.netlify.app/</string>
+    <string name="msg_license_benefits_info">The application includes 365 days of free usage. The professional license grants lifetime (indefinite) usage and access to the desktop version with the same activation code.</string>
 
-    <!-- Firebase License Request Form -->
-    <string name="title_license_request_form">License Request Form</string>
-    <string name="desc_license_request_firebase">Fill in your details to register your request in Firebase. The license will be tied to your device ID.</string>
-    <string name="label_full_name">Full Name</string>
-    <string name="hint_full_name">Enter your Full Name</string>
-    <string name="label_phone_whatsapp">Phone / WhatsApp Number</string>
-    <string name="hint_phone_whatsapp">e.g. +591 69856525</string>
-    <string name="label_profession">Profession / Occupation</string>
-    <string name="label_registration_number">Professional Registration Number</string>
-    <string name="hint_registration_number">e.g. RNI-12345 / SIB-6789</string>
-    <string name="hint_registration_not_required">Not required for students</string>
-    <string name="label_university">University / Educational Institution</string>
-    <string name="hint_university">e.g. UMSA, UAGRM, UMSS, UPEA, Univalle</string>
-    <string name="label_device_id_auto">Unique Device ID (Auto-detected)</string>
-    <string name="btn_submit_license_request">SUBMIT REQUEST TO FIREBASE</string>
-    <string name="btn_open_request_form">REQUEST LICENSE (FORM)</string>
-    <string name="msg_request_submitted_success">Request submitted to Firebase successfully! We will contact you via WhatsApp.</string>
-    <string name="msg_please_fill_required_fields">Please fill in all required fields.</string>
-
-    <string-array name="professions_array">
-        <item>Civil Engineer</item>
-        <item>Surveying / Geodetic Engineer</item>
-        <item>Topography Technician</item>
-        <item>Architect / Designer</item>
-        <item>Geomatics Graduate</item>
-        <item>Student</item>
-        <item>Other</item>
-    </string-array>
+    <!-- Chakana Technologies & Official Website -->
+    <string name="title_chakana_tech">Chakana Technologies</string>
+    <string name="subtitle_chakana_tech">Custom Software Solutions</string>
+    <string name="about_more_products_text">Visit our official website to explore more surveying tools, mobile apps, and custom software solutions developed by Chakana Technologies.</string>
+    <string name="btn_about_website">EXPLORE MORE PRODUCTS (WEB)</string>
+    <string name="btn_about_whatsapp">DIRECT WHATSAPP CONTACT</string>
 </resources>

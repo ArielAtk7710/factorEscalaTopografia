@@ -91,7 +91,7 @@ public class LicenseManager {
         SimpleDateFormat sdfNow = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault());
         Date currentDate = new Date();
         String defaultNow = sdfNow.format(currentDate);
-        String defaultExp = sdfNow.format(new Date(currentDate.getTime() + (30L * 24 * 60 * 60 * 1000)));
+        String defaultExp = sdfNow.format(new Date(currentDate.getTime() + (365L * 24 * 60 * 60 * 1000)));
 
         String tipo = "DEMO";
         String codigo = "Demo2026";

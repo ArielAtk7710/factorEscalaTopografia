@@ -202,16 +202,16 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             }
 
             if (emptyLicencias) {
-                // DEMO: "Demo2026", tipo DEMO, 30 días a partir de la instalación
+                // DEMO / LIBRE: Tipo DEMO, 365 días (1 Año) a partir de la instalación
                 ContentValues lDemo = new ContentValues();
                 lDemo.put(COL_LIC_CODIGO, "Demo2026");
                 lDemo.put(COL_LIC_TIPO, "DEMO");
-                lDemo.put(COL_LIC_DIAS, 30);
-                lDemo.put(COL_LIC_DESC, "Licencia Demo de Prueba 1 Mes (30 días)");
+                lDemo.put(COL_LIC_DIAS, 365);
+                lDemo.put(COL_LIC_DESC, "Licencia Uso Libre 1 Año (365 días)");
                 db.insertWithOnConflict(TABLE_LICENCIAS, null, lDemo, SQLiteDatabase.CONFLICT_IGNORE);
             }
 
-            // Insertar Licencia Activa Inicial si no existe
+            // Insertar Licencia Activa Inicial si no existe (1 Año de Uso Libre desde instalación)
             Cursor cAct = db.rawQuery("SELECT COUNT(*) FROM " + TABLE_LICENCIA_ACTIVA, null);
             boolean emptyActiva = true;
             if (cAct != null) {
@@ -222,8 +222,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             if (emptyActiva) {
                 SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault());
                 String timeStampLocal = sdf.format(new Date());
-                long thirtyDaysMillis = System.currentTimeMillis() + (30L * 24 * 60 * 60 * 1000);
-                String expirationDemo = sdf.format(new Date(thirtyDaysMillis));
+                long oneYearMillis = System.currentTimeMillis() + (365L * 24 * 60 * 60 * 1000);
+                String expirationDemo = sdf.format(new Date(oneYearMillis));
 
                 ContentValues active = new ContentValues();
                 active.put(COL_ACT_TIPO, "DEMO");

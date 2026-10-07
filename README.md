@@ -15,10 +15,12 @@ Aplicación profesional avanzada para topografía, geodesia y cálculos de ingen
 - **Módulo Meteorológico y de Seguridad**:
   - Monitoreo de condiciones atmosféricas y presión barométrica.
   - Análisis de índice Kp y seguridad solar/geomagnética para operaciones de campo.
-- **Sistema de Licenciamiento Seguro**:
-  - Soporte para licencias DEMO y profesionales con doble persistencia (SQLite + SharedPreferences) para garantizar que la activación permanezca intacta tras reinicios.
-  - **Obtener Licencia Profesional**: Podrás solicitar tu código de activación directamente desde la App o GitHub vía WhatsApp a través del enlace:
-    👉 **[📲 Solicitar Licencia por WhatsApp (+591 69856525)](https://wa.me/59169856525?text=Informaci%C3%B3n%20de%20activaci%C3%B3n%20de%20la%20app%20FesTop)**
+- **Modelo de Licenciamiento Flexible**:
+  - **1 Año de Uso Libre y Gratuito**: Incluido automáticamente desde la primera instalación en cada dispositivo.
+  - **Uso Indefinido / Eterno con Código**: Opción de cambiar a uso ilimitado mediante código de activación profesional.
+  - **Doble Persistencia Local**: Garantiza la conservación de la activación offline en el campo.
+  - **Obtener Código Indefinido**: Puedes consultar o solicitar tu código de activación vía WhatsApp:
+    👉 **[📲 Consultar Activación por WhatsApp (+591 69856525)](https://wa.me/59169856525?text=Informaci%C3%B3n%20de%20activaci%C3%B3n%20de%20la%20app%20FesTop)**
 
 ---
 
