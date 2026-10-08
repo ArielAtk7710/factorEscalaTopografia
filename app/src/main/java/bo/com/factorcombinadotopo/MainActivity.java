@@ -529,6 +529,11 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             });
         }
         
+        View btnAboutBack = view.findViewById(R.id.btn_about_back);
+        if (btnAboutBack != null) {
+            btnAboutBack.setOnClickListener(v -> dialog.dismiss());
+        }
+
         view.findViewById(R.id.btn_about_close).setOnClickListener(v -> dialog.dismiss());
         dialog.show();
     }
@@ -761,6 +766,11 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         View btnOfficialWeb = view.findViewById(R.id.btn_official_website);
         if (btnOfficialWeb != null) {
             btnOfficialWeb.setOnClickListener(v -> openOfficialWebsite());
+        }
+
+        View btnSettingsBack = view.findViewById(R.id.btn_settings_back);
+        if (btnSettingsBack != null) {
+            btnSettingsBack.setOnClickListener(v -> dialog.dismiss());
         }
 
         view.findViewById(R.id.btn_close_settings).setOnClickListener(v -> {
